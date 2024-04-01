@@ -37,8 +37,7 @@ const login = async (credentials: Credentials) => {
   return user;
 };
 
-export const authOptions = {
-  adapter: PrismaAdapter(prisma),
+export const authOptions: AuthOptions = {
   secret: process.env.JWT_SECRET,
   pages: {
     signIn: "/login",
@@ -71,7 +70,6 @@ export const authOptions = {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
   },
-  
 };
 
 const handler = NextAuth(authOptions as any);
