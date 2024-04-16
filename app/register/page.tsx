@@ -2,7 +2,22 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+const schema = Yup.object().shape({
+  username: Yup.string().required("Username is required"),
+  email: Yup.string()
+    .email("Invalid email address")
+    .required("Email is required"),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password")], "Passwords must match")
+    .required("Confirm Password is required"),
+});
+type FormData = Yup.InferType<typeof schema>;
 export default function Register() {
   const [data, SetData] = useState({
     username: "",
@@ -11,8 +26,14 @@ export default function Register() {
   });
   const [err, setErr] = useState();
   const route = useRouter();
-  const registerUser = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+  const registerUser = async (data: FormData) => {
     const response = await fetch("/api/register", {
       method: "POST",
       headers: {
@@ -54,7 +75,7 @@ export default function Register() {
               <span>{err}</span>
             </div>
           )}
-          <form onSubmit={registerUser} className="space-y-6">
+          <form onSubmit={handleSubmit(registerUser)} className="space-y-4">
             <div>
               <label
                 htmlFor="username"
@@ -62,20 +83,18 @@ export default function Register() {
               >
                 username
               </label>
-              <div className="mt-2">
+              <div className="mt-1">
                 <input
                   id="username"
-                  name="username"
+                  {...register("username")}
                   type="text"
                   autoComplete="username"
-                  value={data.username}
-                  onChange={(e) =>
-                    SetData({ ...data, username: e.target.value })
-                  }
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
+              <p className="text-red-500 text-sm">{errors.username?.message}</p>
             </div>
+
             <div>
               <label
                 htmlFor="email"
@@ -83,17 +102,16 @@ export default function Register() {
               >
                 Email address
               </label>
-              <div className="mt-2">
+              <div className="mt-1">
                 <input
                   id="email"
-                  name="email"
                   type="email"
                   autoComplete="email"
-                  value={data.email}
-                  onChange={(e) => SetData({ ...data, email: e.target.value })}
+                  {...register("email")}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
+              <p className="text-red-500 text-sm">{errors.email?.message}</p>
             </div>
 
             <div>
@@ -103,19 +121,16 @@ export default function Register() {
                   className="block text-sm font-medium leading-6 text-gray-900"
                 ></label>
               </div>
-              <div className="mt-2">
+              <div className="mt-1">
                 <input
                   id="password"
-                  name="password"
                   type="password"
                   autoComplete="current-password"
-                  value={data.password}
-                  onChange={(e) =>
-                    SetData({ ...data, password: e.target.value })
-                  }
+                  {...register("password")}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                 />
               </div>
+              <p className="text-red-500 text-sm">{errors.password?.message}</p>
             </div>
             <div>
               <div className="flex items-center justify-between">
@@ -126,16 +141,16 @@ export default function Register() {
                   Confirm Password
                 </label>
               </div>
-              <div className="mt-2">
+              <div className="mt-1">
                 <input
                   id="Repassword"
-                  name="Repassword"
                   type="password"
+                  {...register("confirmPassword")}
                   autoComplete="current-password"
-                  required
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                 />
               </div>
+              <p className="text-red-500 text-sm">{errors.confirmPassword?.message}</p>
             </div>
 
             <div>
@@ -145,11 +160,11 @@ export default function Register() {
             </div>
           </form>
 
-          <p className="mt-10 text-center text-sm text-gray-500">
+          <p className="mt-6 text-center text-sm text-gray-500">
             Already Have Account
             <Link
               href="login"
-              className="font-semibold leading-6 text-primary-blue hover:text-blue-500"
+              className="font-semibold mx-4 leading-6 text-primary-blue hover:text-blue-500"
             >
               Login
             </Link>

@@ -1,6 +1,47 @@
-import React from "react";
-
+"use client";
+import { signIn } from "next-auth/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+const schema = Yup.object().shape({
+  email: Yup.string()
+    .email("Invalid email address")
+    .required("Email is required"),
+  password: Yup.string().required("Password is required"),
+});
+type FormData = Yup.InferType<typeof schema>;
 export default function Login() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+  const [error, setError] = useState<String | null>(null);
+
+  const loginUser = async (data: FormData) => {
+    setLoading(true);
+    const response = await signIn("credentials", {
+      email: data.email,
+      password: data.password,
+      redirect: false,
+      callbackUrl: "/dashboard",
+    });
+    setLoading(false);
+    if (response?.error) {
+      console.error("Error", response.error);
+      setError(response?.error);
+    } else {
+      console.log("Success", response);
+      router.push("/dashboard");
+    }
+  };
   return (
     <div className="h-screen flex">
       <div className="hidden  w-1/2 bg-gradient-to-tr from-primary-blue to-blue-500 i justify-around items-center md:flex">
@@ -23,7 +64,15 @@ export default function Login() {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" action="#" method="POST">
+          {error && (
+            <div
+              className="bg-red-100 rounded-md border border-red-400 text-red-700 px-4 py-2 mb-4"
+              role="alert"
+            >
+              <span>{error}</span>
+            </div>
+          )}
+          <form className="space-y-6" onSubmit={handleSubmit(loginUser)}>
             <div>
               <label
                 htmlFor="email"
@@ -34,13 +83,13 @@ export default function Login() {
               <div className="mt-2">
                 <input
                   id="email"
-                  name="email"
                   type="email"
                   autoComplete="email"
-                  required
+                  {...register("email")}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
+              <p className="text-red-500 text-sm">{errors.email?.message}</p>
             </div>
 
             <div>
@@ -63,33 +112,34 @@ export default function Login() {
               <div className="mt-2">
                 <input
                   id="password"
-                  name="password"
                   type="password"
                   autoComplete="current-password"
-                  required
+                  {...register("password")}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                 />
               </div>
+              <p className="text-red-500 text-sm">{errors.password?.message}</p>
             </div>
 
             <div>
               <button
+                disabled={loading}
                 type="submit"
                 className="flex w-full justify-center rounded-md bg-primary-blue px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
               >
-                Sign in
+                {loading ? "Loading..." : "Sign in"}
               </button>
             </div>
           </form>
 
           <p className="mt-10 text-center text-sm text-gray-500">
             Not a member?{" "}
-            <a
-              href="#"
+            <Link
+              href="/register"
               className="font-semibold leading-6 text-primary-blue hover:text-blue-500"
             >
               Sign up
-            </a>
+            </Link>
           </p>
         </div>
       </div>

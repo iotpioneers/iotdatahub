@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import {SessionProvider} from "./utils/SessionProvider";
 
 export const metadata: Metadata = {
   title: "IoT service",
@@ -14,7 +15,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="relative">{children}</body>
+      <body className="relative">
+        <SessionProvider>{children}</SessionProvider>
+      </body>
     </html>
   );
 }
