@@ -2,11 +2,17 @@ import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { CreateProjectProps } from "@/types";
+import CustomButton from "../CustomButton";
+import { useRouter } from "next/navigation";
 
 const CreateProject = ({
   createProject,
   setCreateProject,
 }: CreateProjectProps) => {
+  const router = useRouter();
+
+  const handleNewDevice = () => router.push("/dashboard/channels/new");
+
   return (
     <Transition.Root show={createProject} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={setCreateProject}>
@@ -63,7 +69,12 @@ const CreateProject = ({
                       </Dialog.Title>
                     </div>
                     <div className="relative mt-6 flex-1 px-4 sm:px-6">
-                      {/* Your content */}
+                      <CustomButton
+                        title="New Device"
+                        btnType="button"
+                        containerStyles="bg-primary-blue text-white "
+                        handleClick={handleNewDevice}
+                      />
                     </div>
                   </div>
                 </Dialog.Panel>
