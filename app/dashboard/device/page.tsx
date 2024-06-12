@@ -1,10 +1,14 @@
 import Navigation from "@/components/device/Navigation";
 import PageHeading from "@/components/device/PageHeading";
 
-export default function Device() {
+interface Props {
+  searchParams: { id: string };
+}
+
+export default function Device({ searchParams: { id } }: Props) {
   return (
     <main className="overflow-hidden">
-      <PageHeading />
+      <PageHeading channelId={id} />
       <div className="mt-10 border-t border-gray-200"></div>
       <Navigation />
     </main>

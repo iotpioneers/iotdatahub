@@ -1,3 +1,4 @@
+import useMediaQuery from "@/hooks/useMediaQuery";
 import React, { PureComponent } from "react";
 import {
   LineChart,
@@ -56,9 +57,11 @@ const data = [
 ];
 
 const LineChartComponent = () => {
+  const isSmallScreens = useMediaQuery("(max-width: 480px)");
+
   return (
     <LineChart
-      width={500}
+      width={isSmallScreens ? 300 : 500}
       height={300}
       data={data}
       margin={{

@@ -9,7 +9,7 @@ export default async function Dashboard() {
   }
   return (
     <main className="overflow-hidden">
-      <h1 className="font-bold ml-8 my-5">My Channels</h1>
+      <h1 className="font-bold ml-8 my-5">Channels</h1>
       <Projects />
     </main>
   );

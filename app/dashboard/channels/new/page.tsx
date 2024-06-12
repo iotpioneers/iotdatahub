@@ -3,10 +3,12 @@
 import { CustomButton } from "@/components";
 import { useState, ChangeEvent, FormEvent } from "react";
 import { ArchiveBoxXMarkIcon } from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation";
 
 const isValidObjectId = (id: string) => /^[a-f\d]{24}$/i.test(id);
 
 export default function NewChannel() {
+  const router = useRouter();
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [fields, setFields] = useState<string[]>([""]);
@@ -58,8 +60,7 @@ export default function NewChannel() {
       }
 
       const result = await response.json();
-      console.log("Channel created successfully:", result);
-      // Clear the form or redirect the user as needed
+      if (result) router.push("/dashboard/device");
     } catch (error) {
       console.error("Error creating channel:", error);
     }
