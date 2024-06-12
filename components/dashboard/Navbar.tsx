@@ -9,6 +9,7 @@ import {
   CursorArrowRaysIcon,
   FingerPrintIcon,
   SquaresPlusIcon,
+  WifiIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 
@@ -17,6 +18,7 @@ import {
   PhoneIcon,
   PlayCircleIcon,
 } from "@heroicons/react/20/solid";
+import { useRouter } from "next/navigation";
 
 const products = [
   {
@@ -44,6 +46,8 @@ function classNames(...classes: any) {
 }
 
 const Navbar = () => {
+  const router = useRouter();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -60,6 +64,14 @@ const Navbar = () => {
               src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
               alt=""
             /> */}
+            <button
+              type="button"
+              className="-m-2.5 inline-flex items-left justify-center rounded-md p-2.5 text-gray-700"
+              onClick={() => router.push("/")}
+            >
+              <WifiIcon className="h-6 w-6 mx-3 " aria-hidden="true" />
+              <span className=" hover:text-zinc-950">Ten2Ten</span>
+            </button>
           </a>
         </div>
         <div className="flex lg:hidden">
