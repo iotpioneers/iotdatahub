@@ -1,7 +1,7 @@
 import { error } from "console";
 import { NextRequest, NextResponse } from "next/server";
-import channelSchema from "../schema";
 import prisma from "@/prisma/client";
+import channelSchema from "@/validations/schema.validation";
 
 export async function GET(
   request: NextRequest,

@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
-
 import { CustomButton } from "..";
 import CreateProject from "./CreateProject";
 import ProjectList from "./ProjectList";
 import Pagination from "./Pagination";
+import { Box, Button, Flex, TextField } from "@radix-ui/themes";
+import {
+  MagnifyingGlassIcon,
+  PlusCircleIcon,
+} from "@heroicons/react/24/outline";
 
 const Projects = () => {
   const [createProject, setCreateProject] = useState(false);
@@ -16,28 +20,28 @@ const Projects = () => {
         createProject={createProject}
         setCreateProject={setCreateProject}
       />
-      <div className="flex justify-end mb-8">
-        <CustomButton
-          title="Explore Tools"
-          containerStyles="bg-primary-blue text-white rounded-md mt-10"
-          handleClick={() => setCreateProject(true)}
-          icon={
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-          }
-        />
+      <div className="flex justify-between items-center mb-8">
+        <div className="flex ustify-between items-center w-full">
+          <div className="fle mr-4">
+            <Flex>
+              <Box maxWidth="300px">
+                <TextField.Root placeholder="Search the channel…" size="3">
+                  <TextField.Slot>
+                    <MagnifyingGlassIcon height="16" width="16" />
+                  </TextField.Slot>
+                </TextField.Root>
+              </Box>
+            </Flex>
+          </div>
+          <Button
+            title="Explore Tools"
+            size="3"
+            className="bg-primary-blue h-16 w-16 text-white rounded-md justify-center"
+            onClick={() => setCreateProject(true)}
+          >
+            Explore Tools <PlusCircleIcon className="w-5 h-5" />
+          </Button>
+        </div>
       </div>
       <div>
         <ProjectList />
