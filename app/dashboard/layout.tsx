@@ -11,7 +11,7 @@ export default async function DashboardLayout({
   return (
     <section>
       <Navbar />
-      <main className="flex">
+      <main className="flex w-full mt-5">
         <aside className="bg-slate-200 p-5 mr-5">
           <DashboardSidebar />
         </aside>

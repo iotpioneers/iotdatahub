@@ -6,18 +6,12 @@ import {
   ArrowPathIcon,
   Bars3Icon,
   ChartPieIcon,
-  CursorArrowRaysIcon,
-  FingerPrintIcon,
+  ChevronDownIcon,
   SquaresPlusIcon,
   WifiIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 
-import {
-  ChevronDownIcon,
-  PhoneIcon,
-  PlayCircleIcon,
-} from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
 
 const products = [
@@ -51,7 +45,7 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white border-b">
+    <header className="bg-white border-b fixed inset-x-0 top-0 z-50 m-y-5">
       <nav
         className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8"
         aria-label="Global"
@@ -59,17 +53,12 @@ const Navbar = () => {
         <div className="flex lg:flex-1">
           <a href="#" className="-m-1.5 p-1.5">
             <span className="sr-only">IoT Hub</span>
-            {/* <img
-              className="h-8 w-auto"
-              src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-              alt=""
-            /> */}
             <button
               type="button"
               className="-m-2.5 inline-flex items-left justify-center rounded-md p-2.5 text-gray-700"
               onClick={() => router.push("/")}
             >
-              <WifiIcon className="h-6 w-6 mx-3 " aria-hidden="true" />
+              <WifiIcon className="h-6 w-6 mx-3" aria-hidden="true" />
               <span className=" hover:text-zinc-950">Ten2Ten</span>
             </button>
           </a>
