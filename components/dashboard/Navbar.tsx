@@ -13,6 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { useRouter } from "next/navigation";
+import { Select } from "@radix-ui/themes";
 
 const products = [
   {
@@ -45,7 +46,7 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white border-b fixed inset-x-0 top-0 z-50 m-y-5">
+    <header className="bg-white border-b  inset-x-0 top-0">
       <nav
         className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8"
         aria-label="Global"
@@ -133,12 +134,29 @@ const Navbar = () => {
           </a>
         </Popover.Group>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-          <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
-            Sign out{" "}
-            <span aria-hidden="true" className="px-2">
-              &rarr;
-            </span>
-          </a>
+          <Select.Root defaultValue="user">
+            <Select.Trigger />
+            <Select.Content>
+              <Select.Group>
+                <Select.Label>Account</Select.Label>
+                <Select.Item value="user">User</Select.Item>
+              </Select.Group>
+              <Select.Separator />
+              <Select.Group>
+                <Select.Label>
+                  <a
+                    href="#"
+                    className="text-sm font-semibold leading-6 text-gray-900"
+                  >
+                    Sign out{" "}
+                    <span aria-hidden="true" className="px-2">
+                      &rarr;
+                    </span>
+                  </a>
+                </Select.Label>
+              </Select.Group>
+            </Select.Content>
+          </Select.Root>
         </div>
       </nav>
       <Dialog

@@ -2,7 +2,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 
 const Pagination = () => {
   return (
-    <div className="flex items-center justify-between bg-white py-5">
+    <div className="flex items-center justify-between mr-5 bg-white py-5">
       <div className="flex flex-1 justify-between sm:hidden">
         <a
           href="#"

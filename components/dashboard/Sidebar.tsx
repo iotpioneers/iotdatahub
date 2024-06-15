@@ -11,39 +11,56 @@ import {
   CpuChipIcon,
   ViewfinderCircleIcon,
 } from "@heroicons/react/24/outline";
+import useMediaQuery from "@/hooks/useMediaQuery";
 
 const DashboardSidebar = () => {
+  const isSmallScreens = useMediaQuery("(max-width: 760px)");
+
   return (
-    <div className="h-full">
-      <h2 className="text-lg font-semibold mb-4">Dashboard</h2>
-      <ul className="space-y-2">
-        <li className="flex py-2 px-4 items-center">
-          <CpuChipIcon className="h-4 w-4 mr-2" />
-          <Link href="/#">Devices</Link>
+    <div className="flex">
+      <ul className="space-y-2 ">
+        <li className="py-2 px-4">
+          <Link href="/#" className="flex  items-center">
+            <CpuChipIcon className="h-4 w-4 mr-2 " />
+            {!isSmallScreens && "Devices"}
+          </Link>
         </li>
-        <li className="flex py-2 px-4 items-center">
-          <SignalIcon className="h-4 w-4 mr-2" />
-          <Link href="/#">Channels</Link>
+        <li className="py-2 px-4">
+          <Link href="/#" className="flex  items-center">
+            <SignalIcon className="h-4 w-4 mr-2" />
+            {!isSmallScreens && "Channels"}
+          </Link>
         </li>
-        <li className="flex py-2 px-4 items-center">
-          <CloudArrowDownIcon className="h-4 w-4 mr-2" />
-          <Link href="/#">Data</Link>
+        <li className="py-2 px-4">
+          <Link href="/#" className="flex  items-center">
+            <CloudArrowDownIcon className="h-4 w-4 mr-2 " />
+
+            {!isSmallScreens && "Data"}
+          </Link>
         </li>
-        <li className="flex py-2 px-4 items-center">
-          <ChartBarIcon className="h-4 w-4 mr-2" />
-          <Link href="/#">Analytics</Link>
+        <li className="py-2 px-4">
+          <Link href="/#" className="flex  items-center">
+            <ChartBarIcon className="h-4 w-4 mr-2" />
+            {!isSmallScreens && "Analytics"}
+          </Link>
         </li>
-        <li className="flex py-2 px-4 items-center">
-          <CogIcon className="h-4 w-4 mr-2" />
-          <Link href="/#">Settings</Link>
+        <li className="py-2 px-4">
+          <Link href="/#" className="flex  items-center">
+            <CogIcon className="h-4 w-4 mr-2" />
+            {!isSmallScreens && "Settings"}
+          </Link>
         </li>
-        <li className="flex py-2 px-4 items-center">
-          <ViewfinderCircleIcon className="h-4 w-4 mr-2" />
-          <Link href="/#">Help</Link>
+        <li className="py-2 px-4">
+          <Link href="/#" className="flex  items-center">
+            <ViewfinderCircleIcon className="h-4 w-4 mr-2" />
+            {!isSmallScreens && "Help"}
+          </Link>
         </li>
-        <li className="flex py-2 px-4 items-center">
-          <InformationCircleIcon className="h-4 w-4 mr-2" />
-          <Link href="/#">About</Link>
+        <li className="py-2 px-4">
+          <Link href="/#" className="flex  items-center">
+            <InformationCircleIcon className="h-4 w-4 mr-2" />
+            {!isSmallScreens && "About"}
+          </Link>
         </li>
       </ul>
     </div>
