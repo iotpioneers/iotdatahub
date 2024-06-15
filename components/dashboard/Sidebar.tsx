@@ -20,7 +20,7 @@ const DashboardSidebar = () => {
     <div className="flex">
       <ul className="space-y-2 ">
         <li className="py-2 px-4">
-          <Link href="/#" className="flex  items-center">
+          <Link href="/dashboard/devices" className="flex  items-center">
             <CpuChipIcon className="h-4 w-4 mr-2 " />
             {!isSmallScreens && "Devices"}
           </Link>

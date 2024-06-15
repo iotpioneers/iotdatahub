@@ -1,10 +1,13 @@
 "use client";
 
 import { ChangeEvent, useState } from "react";
-import { ArchiveBoxXMarkIcon } from "@heroicons/react/24/outline";
+import {
+  ArchiveBoxXMarkIcon,
+  ArrowLeftIcon,
+} from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
-import { Button, Callout } from "@radix-ui/themes";
+import { Button, Callout, Flex } from "@radix-ui/themes";
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +15,7 @@ import { z } from "zod";
 import { deviceSchema } from "@/validations/schema.validation";
 import ErrorMessage from "@/components/ErrorMessage";
 import Spinner from "@/components/Spinner";
+import BackButton from "@/components/device/BackButton";
 
 type DeviceForm = z.infer<typeof deviceSchema>;
 
@@ -45,7 +49,10 @@ export default function Newdevice() {
 
   return (
     <main className="overflow-hidden p-4">
-      <h1>Add a new device</h1>
+      <Flex gap={"3"}>
+        <BackButton />
+        <h1>Add a new device</h1>
+      </Flex>
       <div className="mt-10 border-t border-gray-200"></div>
       {error && (
         <Callout.Root color="red" className="mb-5">

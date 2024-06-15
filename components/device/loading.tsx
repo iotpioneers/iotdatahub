@@ -8,7 +8,7 @@ const LoadingDevicesPage = () => {
     <div className="mt-5 mr-5">
       <div className="mb-5">
         <Button>
-          <Link href="/#">New device</Link>
+          <Link href="/dashboard/devices/new">New device</Link>
         </Button>
       </div>
       <Table.Root variant="surface" className="mr-5">
