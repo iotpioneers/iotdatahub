@@ -14,7 +14,7 @@ import {
 import useMediaQuery from "@/hooks/useMediaQuery";
 
 const DashboardSidebar = () => {
-  const isSmallScreens = useMediaQuery("(max-width: 760px)");
+  const isSmallScreens = useMediaQuery("(max-width: 1060px)");
 
   return (
     <div className="flex">

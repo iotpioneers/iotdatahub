@@ -1,10 +1,7 @@
 import Pagination from "@/components/dashboard/Pagination";
-import Link from "@/components/device/Link";
+import DeviceAction from "@/components/device/DeviceAction";
 import StatusBadge from "@/components/StatusBadge";
-import { Button, Table } from "@radix-ui/themes";
-import { Description } from "@radix-ui/themes/dist/esm/components/alert-dialog.js";
-import { channel } from "diagnostics_channel";
-import { title } from "process";
+import { Table } from "@radix-ui/themes";
 import React from "react";
 
 const page = () => {
@@ -40,11 +37,7 @@ const page = () => {
 
   return (
     <div className="mt-5">
-      <div className="mb-5">
-        <Button>
-          <Link href="/#">New device</Link>
-        </Button>
-      </div>
+      <DeviceAction />
       <Table.Root variant="surface" className="mr-5">
         <Table.Header>
           <Table.Row>
@@ -66,7 +59,7 @@ const page = () => {
         <Table.Body>
           {devices.map((device) => (
             <Table.Row>
-              <Table.Cell key={device.id}>
+              <Table.Cell key={device.id} className="min-w-32">
                 {device.title}
                 <div className="block md:hidden">
                   <StatusBadge status={device.status} />
@@ -80,9 +73,9 @@ const page = () => {
                 {device.channels}
               </Table.Cell>
               <Table.Cell className="hidden md:table-cell">
-                {device.status}
+                <StatusBadge status={device.status} />
               </Table.Cell>
-              <Table.Cell className="hidden md:table-cell">
+              <Table.Cell className="hidden md:table-cell min-w-32">
                 {device.createdAt}
               </Table.Cell>
             </Table.Row>
