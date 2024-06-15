@@ -9,7 +9,7 @@ import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import channelSchema from "@/validations/schema.validation";
+import { channelSchema } from "@/validations/schema.validation";
 import ErrorMessage from "@/components/ErrorMessage";
 import Spinner from "@/components/Spinner";
 

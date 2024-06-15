@@ -1,5 +1,6 @@
 import Pagination from "@/components/dashboard/Pagination";
 import DeviceAction from "@/components/device/DeviceAction";
+import Link from "@/components/device/Link";
 import StatusBadge from "@/components/StatusBadge";
 import { Table } from "@radix-ui/themes";
 import React from "react";
@@ -60,9 +61,13 @@ const page = () => {
           {devices.map((device) => (
             <Table.Row>
               <Table.Cell key={device.id} className="min-w-32">
-                {device.title}
-                <div className="block md:hidden">
-                  <StatusBadge status={device.status} />
+                <div className="flex justify-between">
+                  <Link href={`/dashboard/devices/${device.id}`}>
+                    {device.title}
+                  </Link>
+                  <div className="block md:hidden mb-2">
+                    <StatusBadge status={device.status} />
+                  </div>
                 </div>
                 <div className="block md:hidden">{device.description}</div>
               </Table.Cell>

@@ -6,7 +6,7 @@ const DeviceAction = () => {
   return (
     <div className="mb-5">
       <Button>
-        <Link href="/#">New device</Link>
+        <Link href="/dashboard/devices/new">New device</Link>
       </Button>
     </div>
   );

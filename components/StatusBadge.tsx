@@ -9,7 +9,7 @@ const StatusBadge = ({ status }: Status) => {
   if (status === "active") return <Badge color="green">Active</Badge>;
   if (status === "disabled") return <Badge color="red">Disabled</Badge>;
   if (status === "disconnected")
-    return <Badge color="indigo">Disconnected</Badge>;
+    return <Badge color="brown">Disconnected</Badge>;
   return <Badge color="brown">{status}</Badge>;
 };
 
