@@ -28,7 +28,7 @@ const Hero = () => {
             src="/demo_dash_one.svg"
             alt="hero"
             fill
-            className="object-contain"
+            className="object-cover"
           />
         </div>
         {/* <div className="hero__image-overlay" /> */}

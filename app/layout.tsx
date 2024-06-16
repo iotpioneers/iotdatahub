@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SessionProvider } from "./utils/SessionProvider";
+import Navbar from "@/components/Home/Navbar";
+import Footer from "@/components/Home/Footer";
+import { Theme } from "@radix-ui/themes";
 
 export const metadata: Metadata = {
   title: "IoT service",
@@ -15,9 +18,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="relative">
-        <SessionProvider>{children}</SessionProvider>
+      <body>
+        <Theme>
+          <Navbar />
+          <main className="relative overflow-hidden">{children}</main>
+          <Footer />
+        </Theme>
       </body>
     </html>
+    // <html lang="en">
+    //   <body className="relative">
+    //     <SessionProvider>{children}</SessionProvider>
+    //   </body>
+    // </html>
   );
 }

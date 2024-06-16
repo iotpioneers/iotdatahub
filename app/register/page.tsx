@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import { Heading } from "@radix-ui/themes";
 const schema = Yup.object().shape({
   username: Yup.string().required("Username is required"),
   email: Yup.string()
@@ -53,19 +54,12 @@ export default function Register() {
   };
 
   return (
-    <div className="h-screen flex">
-      <div className="hidden  w-1/2 bg-gradient-to-tr from-primary-blue to-blue-500 i justify-around items-center md:flex">
-        <div>
-          <h1 className="text-white font-bold text-4xl font-sans">IoT Hub</h1>
-          <p className="text-white mt-1">An Innovative way for plug and play</p>
-        </div>
-      </div>
-
+    <div className="h-screen flex bg-gray-20 justify-center my-10 mx-10 sm:mx-20 rounded-md">
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+          <Heading className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             Create Account
-          </h2>
+          </Heading>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">

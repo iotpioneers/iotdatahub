@@ -43,14 +43,7 @@ export default function Login() {
     }
   };
   return (
-    <div className="h-screen flex">
-      <div className="hidden  w-1/2 bg-gradient-to-tr from-primary-blue to-blue-500 i justify-around items-center md:flex">
-        <div>
-          <h1 className="text-white font-bold text-4xl font-sans">IoT Hub</h1>
-          <p className="text-white mt-1">An Innovative way for plug and play</p>
-        </div>
-      </div>
-
+    <div className="h-screen flex m-10 bg-gray-20 justify-center">
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           {/* <img
