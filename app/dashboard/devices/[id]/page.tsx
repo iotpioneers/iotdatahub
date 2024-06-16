@@ -1,5 +1,5 @@
 import StatusBadge from "@/components/StatusBadge";
-import { Flex, Heading, Text } from "@radix-ui/themes";
+import { Card, Flex, Heading, Text } from "@radix-ui/themes";
 import { notFound } from "next/navigation";
 import React from "react";
 
@@ -21,12 +21,13 @@ const DeviceDetailsPage = ({ params }: Props) => {
   if (!params.id) notFound();
 
   return (
-    <div className="mt-5">
+    <div className="mt-5 mr-5">
       <Heading>{device.title}</Heading>
       <Flex gap="3" my="2">
         <StatusBadge status={device.status} />
         <Text>{device.createdAt}</Text>
       </Flex>
+      <Card>{device.description}</Card>
     </div>
   );
 };

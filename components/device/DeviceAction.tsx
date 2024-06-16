@@ -5,13 +5,11 @@ import BackButton from "./BackButton";
 
 const DeviceAction = () => {
   return (
-    <div className="mb-5">
-      <Flex gap={"3"}>
-        <BackButton />
-        <Button>
-          <Link href="/dashboard/devices/new">New device</Link>
-        </Button>
-      </Flex>
+    <div className=" flex mb-5 justify-between mr-5">
+      <BackButton />
+      <Button>
+        <Link href="/dashboard/devices/new">New device</Link>
+      </Button>
     </div>
   );
 };

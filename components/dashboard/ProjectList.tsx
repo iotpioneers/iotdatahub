@@ -37,7 +37,7 @@ const ProjectList = async () => {
           <div className="flex min-w-0 gap-x-4">
             <div className="min-w-0 flex-auto">
               <p className="text-lg font-semibold leading-6 text-primary-blue">
-                <Link href={`dashboard/device?id=${project.id}`}>
+                <Link href={`dashboard/channels?id=${project.id}`}>
                   {project.name}
                 </Link>
               </p>

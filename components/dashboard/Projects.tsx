@@ -22,17 +22,6 @@ const Projects = () => {
       />
       <div className="flex justify-between items-center mb-8">
         <div className="flex ustify-between items-center w-full">
-          <div className="fle mr-4">
-            <Flex>
-              <Box maxWidth="300px">
-                <TextField.Root placeholder="Search the channel…" size="3">
-                  <TextField.Slot>
-                    <MagnifyingGlassIcon height="16" width="16" />
-                  </TextField.Slot>
-                </TextField.Root>
-              </Box>
-            </Flex>
-          </div>
           <Button
             title="Explore Tools"
             size="3"

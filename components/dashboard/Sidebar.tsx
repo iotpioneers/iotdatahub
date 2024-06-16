@@ -17,8 +17,8 @@ const DashboardSidebar = () => {
   const isSmallScreens = useMediaQuery("(max-width: 1060px)");
 
   return (
-    <div className="flex">
-      <ul className="space-y-2 ">
+    <div className="flex -ml-5">
+      <ul className="space-y-2">
         <li className="py-2 px-4">
           <Link href="/dashboard/devices" className="flex  items-center">
             <CpuChipIcon className="h-4 w-4 mr-2 " />
@@ -26,38 +26,38 @@ const DashboardSidebar = () => {
           </Link>
         </li>
         <li className="py-2 px-4">
-          <Link href="/#" className="flex  items-center">
+          <Link href="/dashboard/channels" className="flex  items-center">
             <SignalIcon className="h-4 w-4 mr-2" />
             {!isSmallScreens && "Channels"}
           </Link>
         </li>
         <li className="py-2 px-4">
-          <Link href="/#" className="flex  items-center">
+          <Link href="/dashboard" className="flex  items-center">
             <CloudArrowDownIcon className="h-4 w-4 mr-2 " />
 
             {!isSmallScreens && "Data"}
           </Link>
         </li>
         <li className="py-2 px-4">
-          <Link href="/#" className="flex  items-center">
+          <Link href="/dashboard" className="flex  items-center">
             <ChartBarIcon className="h-4 w-4 mr-2" />
             {!isSmallScreens && "Analytics"}
           </Link>
         </li>
         <li className="py-2 px-4">
-          <Link href="/#" className="flex  items-center">
+          <Link href="/dashboard" className="flex  items-center">
             <CogIcon className="h-4 w-4 mr-2" />
             {!isSmallScreens && "Settings"}
           </Link>
         </li>
         <li className="py-2 px-4">
-          <Link href="/#" className="flex  items-center">
+          <Link href="/dashboard" className="flex  items-center">
             <ViewfinderCircleIcon className="h-4 w-4 mr-2" />
             {!isSmallScreens && "Help"}
           </Link>
         </li>
         <li className="py-2 px-4">
-          <Link href="/#" className="flex  items-center">
+          <Link href="/dashboard" className="flex  items-center">
             <InformationCircleIcon className="h-4 w-4 mr-2" />
             {!isSmallScreens && "About"}
           </Link>
