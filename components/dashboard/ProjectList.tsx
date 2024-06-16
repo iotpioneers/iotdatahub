@@ -1,6 +1,8 @@
 import useMediaQuery from "@/hooks/useMediaQuery";
+import { Card, Text } from "@radix-ui/themes";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 interface Channel {
   id: number;
@@ -36,30 +38,32 @@ const ProjectList = async () => {
         >
           <div className="flex min-w-0 gap-x-4">
             <div className="min-w-0 flex-auto">
-              <p className="text-lg font-semibold leading-6 text-primary-blue">
-                <Link href={`dashboard/channels?id=${project.id}`}>
+              <Text className="text-lg font-semibold leading-6 text-primary-blue">
+                <Link href={`/dashboard/channels/${project.id}`}>
                   {project.name}
                 </Link>
-              </p>
-              <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                {project.description}
-              </p>
+              </Text>
+              <Card className="prose mt-2 mb-2 truncate text-xs leading-5 text-gray-500">
+                <ReactMarkdown className=" md:min-w-96">
+                  {project.description}
+                </ReactMarkdown>
+              </Card>
             </div>
           </div>
           <div className="shrink-0 sm:flex sm:flex-col sm:items-end flex flex-auto">
-            <p className="text-sm leading-6 text-gray-900">
+            <Text className="text-sm leading-6 text-gray-900">
               <span>Device ID: </span>{" "}
               <span className="font-semibold"># {project.deviceId}</span>
-            </p>
+            </Text>
             {project.lastSeen ? (
-              <p className="mt-1 text-xs leading-5 text-gray-500">
+              <Text className="mt-1 text-xs leading-5 text-gray-500">
                 Last seen{" "}
                 <time dateTime={project.lastSeenDateTime?.toISOString() || ""}>
                   {project.lastSeen.toLocaleString()}
                 </time>
-              </p>
+              </Text>
             ) : (
-              <div className="mt-1 flex items-center gap-x-1.5">
+              <div className="mt-1 flex items-center gap-x-1.5 ml-2">
                 <div className="flex-none rounded-full bg-emerald-500/20 p-1">
                   <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 </div>

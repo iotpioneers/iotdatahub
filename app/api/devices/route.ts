@@ -2,7 +2,7 @@ import prisma from "@/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { getToken } from "next-auth/jwt";
-import { channelSchema } from "@/validations/schema.validation";
+import { deviceSchema } from "@/validations/schema.validation";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -27,50 +27,39 @@ export async function POST(request: NextRequest) {
   }
 
   // Validate the request body against the schema
-  const validation = channelSchema.safeParse(body);
+  const validation = deviceSchema.safeParse(body);
 
   if (!validation.success) {
     return NextResponse.json(validation.error.errors, { status: 400 });
   }
 
-  const { name, description, deviceId, fields } = validation.data;
+  const { name, description } = validation.data;
 
-  const writeApiKey = nanoid(16);
-  const readApiKey = nanoid(16);
+  const apiKey = nanoid(16);
 
   try {
-    // Format the fields data as Prisma expects
-    const formattedFields = fields?.map((fieldName: string) => ({
-      name: fieldName,
-    }));
-
-    // Create a new channel with formatted fields data and associate it with the user
-    const newChannel = await prisma.channel.create({
+    // Create a new device and associate it with the user
+    const newDevice = await prisma.device.create({
       data: {
         name,
         description,
-        writeApiKey,
-        readApiKey,
-        deviceId,
+        apiKey,
         userId: user.id,
-        fields: {
-          create: formattedFields || [],
-        },
       },
       include: { user: true },
     });
 
-    // Update the user's channels array
+    // Update the user's devices array
     await prisma.user.update({
       where: { id: user.id },
-      data: { channels: { connect: { id: newChannel.id } } },
+      data: { devices: { connect: { id: newDevice.id } } },
     });
 
-    return NextResponse.json(newChannel, { status: 201 });
+    return NextResponse.json(newDevice, { status: 201 });
   } catch (error) {
-    console.error("Error creating channel:", error);
+    console.error("Error creating device:", error);
     return NextResponse.json(
-      { error: "Error creating channel" },
+      { error: "Error creating device" },
       { status: 500 }
     );
   }
@@ -97,16 +86,16 @@ export async function GET(request: NextRequest) {
     throw new Error("User not found");
   }
 
-  const channels = await prisma.channel.findMany({
+  const devices = await prisma.device.findMany({
     where: { userId: user.id },
   });
 
-  if (!channels || channels.length === 0) {
+  if (!devices || devices.length === 0) {
     return NextResponse.json(
-      { error: "No channels found for this user" },
+      { error: "No devices found for this user" },
       { status: 404 }
     );
   }
 
-  return NextResponse.json(channels);
+  return NextResponse.json(devices);
 }

@@ -1,7 +1,7 @@
 import { Button, Flex } from "@radix-ui/themes";
 import React from "react";
 import Link from "./Link";
-import BackButton from "./BackButton";
+import BackButton from "../BackButton";
 
 const DeviceAction = () => {
   return (

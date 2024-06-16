@@ -25,6 +25,8 @@
     "react-dom": "^18",
     "react-hook-form": "^7.51.2",
     "react-hot-toast": "^2.4.1",
+    "react-loading-skeleton": "^3.4.0",
+    "react-markdown": "^8.0.7",
     "react-simplemde-editor": "^5.2.0",
     "recharts": "^2.10.3",
     "sonner": "^1.5.0",
@@ -34,6 +36,7 @@
   "devDependencies": {
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.13",
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^20",
     "@types/react": "^18",

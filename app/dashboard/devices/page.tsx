@@ -1,6 +1,5 @@
 import Pagination from "@/components/dashboard/Pagination";
-import DeviceAction from "@/components/device/DeviceAction";
-import Link from "@/components/device/Link";
+import { Link, DeviceAction } from "@/components/device";
 import StatusBadge from "@/components/StatusBadge";
 import { Table } from "@radix-ui/themes";
 import React from "react";

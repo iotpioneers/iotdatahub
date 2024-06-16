@@ -70,7 +70,7 @@ const CreateProject = ({
                     </div>
                     <div className="relative mt-6 flex-1 px-4 sm:px-6">
                       <CustomButton
-                        title="New Device"
+                        title="New Channel"
                         btnType="button"
                         containerStyles="bg-primary-blue text-white "
                         handleClick={handleNewDevice}

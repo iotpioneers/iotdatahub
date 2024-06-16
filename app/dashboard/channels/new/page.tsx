@@ -75,7 +75,7 @@ export default function NewChannel() {
       }
 
       const result = await response.json();
-      if (result) router.push(`/dashboard/device?id=${result.id}`);
+      if (result) router.push(`/dashboard/channels/${result.id}`);
       setIsSubmitting(false);
     } catch (error) {
       setIsSubmitting(false);

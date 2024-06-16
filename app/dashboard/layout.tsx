@@ -13,7 +13,7 @@ export default async function DashboardLayout({
       <Theme>
         <Navbar />
         <main className="flex w-full gap-2">
-          <aside className="bg-white w-1/12 border-solid p-5 mr-5">
+          <aside className="w-1/11 bg-slate-200 rounded-sm h-screen border-solid p-5 mr-5">
             <DashboardSidebar />
           </aside>
           <div className="relative">{children}</div>

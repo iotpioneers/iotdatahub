@@ -15,7 +15,7 @@ import { z } from "zod";
 import { deviceSchema } from "@/validations/schema.validation";
 import ErrorMessage from "@/components/ErrorMessage";
 import Spinner from "@/components/Spinner";
-import BackButton from "@/components/device/BackButton";
+import BackButton from "@/components/BackButton";
 
 type DeviceForm = z.infer<typeof deviceSchema>;
 
