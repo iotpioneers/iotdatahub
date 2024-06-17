@@ -54,7 +54,7 @@ const authOptions: AuthOptions = {
           }
           const user = await login(credentials);
           if (!user) {
-            return null; // or throw an error
+            return null;
           }
           return user;
         } catch (error) {

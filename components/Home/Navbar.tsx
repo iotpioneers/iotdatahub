@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Text } from "@radix-ui/themes";
 import { WifiIcon } from "@heroicons/react/24/outline";
 import SigninButton from "./SigninButton";
+import MenuBar from "../MenuBar";
 
 const Navbar = () => {
   return (
@@ -29,13 +30,7 @@ const Navbar = () => {
         <SigninButton />
       </div>
 
-      <Image
-        src="menu.svg"
-        alt="menu"
-        width={32}
-        height={32}
-        className="inline-block cursor-pointer lg:hidden"
-      />
+      <MenuBar />
     </nav>
   );
 };

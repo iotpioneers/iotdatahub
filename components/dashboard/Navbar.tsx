@@ -53,7 +53,6 @@ const Navbar = () => {
       >
         <div className="flex lg:flex-1">
           <a href="#" className="-m-1.5 p-1.5">
-            <span className="sr-only">IoT Hub</span>
             <button
               type="button"
               className="-m-2.5 inline-flex items-left justify-center rounded-md p-2.5 text-gray-700"

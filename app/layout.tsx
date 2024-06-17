@@ -3,7 +3,8 @@ import "./globals.css";
 import { SessionProvider } from "./utils/SessionProvider";
 import Navbar from "@/components/Home/Navbar";
 import Footer from "@/components/Home/Footer";
-import { Theme } from "@radix-ui/themes";
+import { Container, Theme, ThemePanel } from "@radix-ui/themes";
+import AuthProvider from "./auth/Provider";
 
 export const metadata: Metadata = {
   title: "IoT service",
@@ -19,17 +20,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Theme>
-          <Navbar />
-          <main className="relative overflow-hidden">{children}</main>
-          <Footer />
-        </Theme>
+        <AuthProvider>
+          <Theme accentColor="violet">
+            <div className="mb-3">
+              <Navbar />
+            </div>
+            <main className="relative overflow-hidden">
+              <Container>{children}</Container>
+            </main>
+          </Theme>
+        </AuthProvider>
       </body>
     </html>
-    // <html lang="en">
-    //   <body className="relative">
-    //     <SessionProvider>{children}</SessionProvider>
-    //   </body>
-    // </html>
   );
 }

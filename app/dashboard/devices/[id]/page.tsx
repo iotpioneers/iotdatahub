@@ -1,34 +1,35 @@
-import StatusBadge from "@/components/StatusBadge";
-import { Card, Flex, Heading, Text } from "@radix-ui/themes";
+import { Box, Flex, Grid } from "@radix-ui/themes";
 import { notFound } from "next/navigation";
 import React from "react";
+import DeviceDetails from "../_components/DeviceDetails";
+import { getServerSession } from "next-auth";
+import authOptions from "@/app/api/auth/authOptions";
+import DeleteButton from "@/components/DeleteButton";
+import EditButton from "@/components/EditButton";
 
 interface Props {
   params: { id: string };
 }
 
-const DeviceDetailsPage = ({ params }: Props) => {
-  const device = {
-    id: 1,
-    title: "Rasperry Pi",
-    description:
-      "This device is used for the channel demonstration of sensor and devices' functionalities, data generation, and health purpose",
-    channels: 3,
-    status: "active",
-    createdAt: "2023 - 02 - 10",
-  };
+const DeviceDetailsPage = async ({ params }: Props) => {
+  const session = await getServerSession(authOptions);
 
   if (!params.id) notFound();
 
   return (
-    <div className="mt-5 mr-5">
-      <Heading>{device.title}</Heading>
-      <Flex gap="3" my="2">
-        <StatusBadge status={device.status} />
-        <Text>{device.createdAt}</Text>
-      </Flex>
-      <Card>{device.description}</Card>
-    </div>
+    <Grid columns={{ initial: "1", sm: "5" }} gap="5">
+      <Box className="md:col-span-4">
+        <DeviceDetails />
+      </Box>
+      {session && (
+        <Box>
+          <Flex direction="column" gap="4" mr="4">
+            <EditButton />
+            <DeleteButton />
+          </Flex>
+        </Box>
+      )}
+    </Grid>
   );
 };
 
