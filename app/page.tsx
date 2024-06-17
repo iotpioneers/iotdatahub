@@ -4,10 +4,12 @@ import Footer from "@/components/Home/Footer";
 import GetApp from "@/components/Home/GetApp";
 import Guide from "@/components/Home/Guide";
 import Hero from "@/components/Home/Hero";
+import Navbar from "@/components/Home/Navbar";
 
 export default function Home() {
   return (
     <>
+      <Navbar />
       <Hero />
       <Camp />
       <Footer />

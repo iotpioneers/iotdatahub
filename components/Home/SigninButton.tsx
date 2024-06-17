@@ -5,7 +5,6 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { Link } from "../device";
 
 const SigninButton = () => {
   const router = useRouter();
@@ -19,7 +18,7 @@ const SigninButton = () => {
   return (
     <Box>
       <Button
-        className="flexCenter gap-3 rounded-3xl border btn_dark_green"
+        className="flexCenter gap-3 rounded-3xl border btn_dark_green max-h-10"
         onClick={handleSignIn}
       >
         <Image src="/user.svg" alt={AuthLabel} width={24} height={24} />

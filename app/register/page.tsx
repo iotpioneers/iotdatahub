@@ -3,22 +3,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
-import { Heading } from "@radix-ui/themes";
-const schema = Yup.object().shape({
-  username: Yup.string().required("Username is required"),
-  email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required"),
-  password: Yup.string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password")], "Passwords must match")
-    .required("Confirm Password is required"),
-});
-type FormData = Yup.InferType<typeof schema>;
+import { Callout, Heading } from "@radix-ui/themes";
+import { userSchema } from "@/validations/schema.validation";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { error } from "console";
+import { ErrorMessage } from "@/components";
+
+type FormData = z.infer<typeof userSchema>;
+
 export default function Register() {
   const [data, SetData] = useState({
     username: "",
@@ -31,10 +24,11 @@ export default function Register() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
-    resolver: yupResolver(schema),
+  } = useForm<FormData>({
+    resolver: zodResolver(userSchema),
   });
-  const registerUser = async (data: FormData) => {
+
+  const onSubmit = handleSubmit(async (data: FormData) => {
     const response = await fetch("/api/register", {
       method: "POST",
       headers: {
@@ -51,10 +45,10 @@ export default function Register() {
       console.log(result.message);
       setErr(result.message);
     }
-  };
+  });
 
   return (
-    <div className="h-screen flex bg-gray-20 justify-center my-10 mx-10 sm:mx-20 rounded-md">
+    <div className="h-screen flex justify-center my-10 mx-10 sm:mx-20 rounded-md  mb-10 ">
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <Heading className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
@@ -64,12 +58,13 @@ export default function Register() {
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           {/* if error display error message */}
+
           {err && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-              <span>{err}</span>
-            </div>
+            <Callout.Root color="red" className="mb-5">
+              <Callout.Text>{err}</Callout.Text>
+            </Callout.Root>
           )}
-          <form onSubmit={handleSubmit(registerUser)} className="space-y-4">
+          <form onSubmit={onSubmit} className="space-y-4">
             <div>
               <label
                 htmlFor="username"
@@ -86,7 +81,7 @@ export default function Register() {
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
-              <p className="text-red-500 text-sm">{errors.username?.message}</p>
+              <ErrorMessage>{errors.username?.message}</ErrorMessage>
             </div>
 
             <div>
@@ -105,7 +100,7 @@ export default function Register() {
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
-              <p className="text-red-500 text-sm">{errors.email?.message}</p>
+              <ErrorMessage>{errors.email?.message}</ErrorMessage>
             </div>
 
             <div>
@@ -126,7 +121,7 @@ export default function Register() {
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                 />
               </div>
-              <p className="text-red-500 text-sm">{errors.password?.message}</p>
+              <ErrorMessage>{errors.password?.message}</ErrorMessage>
             </div>
             <div>
               <div className="flex items-center justify-between">
@@ -146,9 +141,7 @@ export default function Register() {
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                 />
               </div>
-              <p className="text-red-500 text-sm">
-                {errors.confirmPassword?.message}
-              </p>
+              <ErrorMessage>{errors.confirmPassword?.message}</ErrorMessage>
             </div>
 
             <div>

@@ -26,6 +26,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -36,50 +37,58 @@ model Session {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt()
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model User {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  username      String?
-  email         String?   @unique
+  username      String
+  email         String    @unique
   emailVerified DateTime?
   image         String?
   password      String
+  role          Role      @default(USER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt()
   accounts      Account[]
   sessions      Session[]
   devices       Device[]
   channels      Channel[]
+  apiKeys       ApiKey[]
 }
 
 model Device {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String?
-  apiKey      String    @unique
-  userId      String    @db.ObjectId
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt()
+  userId      String       @db.ObjectId
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status      DeviceStatus @default(OFFLINE)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt()
   channels    Channel[]
+
+  @@index([userId])
 }
 
 model Channel {
   id          String      @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String?
-  deviceId    String      @db.ObjectId
-  device      Device      @relation(fields: [deviceId], references: [id], onDelete: Cascade)
-  writeApiKey String
-  readApiKey  String
-  access      String      @default("Private")
+  deviceId    String?     @db.ObjectId
+  device      Device?     @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  access      Access      @default(PRIVATE)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt()
   fields      Field[]
   dataPoints  DataPoint[]
   userId      String      @db.ObjectId
   user        User        @relation(fields: [userId], references: [id])
+  apiKeys     ApiKey[]
+
+  @@index([deviceId])
+  @@index([userId])
 }
 
 model Field {
@@ -91,6 +100,8 @@ model Field {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt()
   dataPoints  DataPoint[]
+
+  @@index([channelId])
 }
 
 model DataPoint {
@@ -103,4 +114,37 @@ model DataPoint {
   channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
+
+  @@index([fieldId])
+  @@index([channelId])
+}
+
+model ApiKey {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  apiKey    String    @unique
+  userId    String    @db.ObjectId
+  user      User      @relation(fields: [userId], references: [id])
+  channelId String    @db.ObjectId
+  channel   Channel   @relation(fields: [channelId], references: [id])
+  fields    String[]
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+
+  @@index([userId])
+  @@index([channelId])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Access {
+  PUBLIC
+  PRIVATE
+}
+
+enum DeviceStatus {
+  ONLINE
+  OFFLINE
 }

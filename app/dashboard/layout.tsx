@@ -9,7 +9,8 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <section className="block">
+    <section className="block -mt-20">
+      <Navbar />
       <Theme>
         <main className="flex w-full gap-2">
           <aside className="w-1/11 bg-slate-200 rounded-sm h-screen border-solid p-5 mr-5">

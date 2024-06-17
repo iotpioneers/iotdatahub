@@ -1,16 +1,15 @@
 import { NAV_LINKS } from "@/constants";
-import Image from "next/image";
 import Link from "next/link";
-import { Text } from "@radix-ui/themes";
+import { Button, DropdownMenu, Text } from "@radix-ui/themes";
 import { WifiIcon } from "@heroicons/react/24/outline";
 import SigninButton from "./SigninButton";
 import MenuBar from "../MenuBar";
 
 const Navbar = () => {
   return (
-    <nav className="flexBetween max-container padding-container relative z-30 py-5">
-      <Link href="/" className="flex font-bold text-red-800">
-        <WifiIcon className="h-6 w-6 mx-3" aria-hidden="true" />
+    <nav className="flexBetween max-container padding-container relative z-30 py-5 x-3 border-b navbar bg-green-50 rounded-sm max-h-16">
+      <Link href="/" className="flex font-extrabold text-2xl text-white">
+        <WifiIcon className="h-8 w-8 mx-3" aria-hidden="true" />
         <Text>Ten2Ten</Text>
       </Link>
 
@@ -19,7 +18,7 @@ const Navbar = () => {
           <Link
             href={link.href}
             key={link.key}
-            className="regular-16 text-gray-50 flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
+            className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
           >
             {link.label}
           </Link>

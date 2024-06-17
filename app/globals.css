@@ -11,6 +11,14 @@
   font-family: "Manrope", sans-serif;
 }
 
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; /* Adjust z-index as needed */
+}
+
 /* START: General styles */
 .max-width {
   @apply max-w-[1440px] mx-auto;

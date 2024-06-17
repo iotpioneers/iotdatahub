@@ -13,8 +13,6 @@ import { channelSchema } from "@/validations/schema.validation";
 import ErrorMessage from "@/components/ErrorMessage";
 import Spinner from "@/components/Spinner";
 
-const isValidObjectId = (id: string) => /^[a-f\d]{24}$/i.test(id);
-
 type ChannelForm = z.infer<typeof channelSchema>;
 
 export default function NewChannel() {
@@ -52,11 +50,6 @@ export default function NewChannel() {
   };
 
   const onSubmit = handleSubmit(async (data) => {
-    if (!isValidObjectId(data.deviceId)) {
-      setError("Invalid device ID");
-      return;
-    }
-
     try {
       setIsSubmitting(true);
       const response = await fetch("/api/channels", {
@@ -157,23 +150,6 @@ export default function NewChannel() {
           New Field
         </Button>
 
-        <div className="mb-4 mt-3">
-          <label
-            className="block text-sm font-medium text-gray-700"
-            htmlFor="deviceId"
-          >
-            Device ID
-          </label>
-          <input
-            type="text"
-            id="deviceId"
-            placeholder="Enter device ID"
-            {...register("deviceId")}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            required
-          />
-          <ErrorMessage>{errors.deviceId?.message}</ErrorMessage>
-        </div>
         <div className="mb-4">
           <label
             className="block text-sm font-medium text-gray-700"

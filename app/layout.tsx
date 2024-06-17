@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { SessionProvider } from "./utils/SessionProvider";
-import Navbar from "@/components/Home/Navbar";
-import Footer from "@/components/Home/Footer";
-import { Container, Theme, ThemePanel } from "@radix-ui/themes";
+import { Container, Theme } from "@radix-ui/themes";
 import AuthProvider from "./auth/Provider";
 
 export const metadata: Metadata = {
@@ -22,10 +19,7 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <Theme accentColor="violet">
-            <div className="mb-3">
-              <Navbar />
-            </div>
-            <main className="relative overflow-hidden">
+            <main className="relative overflow-hidden pt-20">
               <Container>{children}</Container>
             </main>
           </Theme>
