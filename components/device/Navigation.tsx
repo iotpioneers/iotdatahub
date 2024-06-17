@@ -1,19 +1,16 @@
 "use client";
 
-import { Fragment, useState } from "react";
-import { Dialog, Popover, Tab, Transition } from "@headlessui/react";
-import {
-  Bars3Icon,
-  MagnifyingGlassIcon,
-  ShoppingBagIcon,
-  WifiIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { Fragment } from "react";
+import { Tab } from "@headlessui/react";
 import { AdjustmentsVerticalIcon } from "@heroicons/react/16/solid";
-import BarChartComponent from "./charts/BarChartComponent";
-import LineChartComponent from "./charts/LineChartComponent";
 import Stream from "./navigation/Stream";
 import CodeSnippet from "./navigation/CodeSnippet";
+import { Text } from "@radix-ui/themes";
+
+
+interface Props {
+  channelId:string;
+}
 
 const navigation = {
   categories: [
@@ -44,14 +41,14 @@ function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
 }
 
-const Navigation = () => {
+const Navigation = ({ channelId }: Props) => {
   //   const [open, setOpen] = useState(false);
   return (
     <div className="bg-white">
       <header className="relative bg-white">
-        <p className="flex h-10 items-center justify-center bg-primary-blue px-4 text-sm font-medium text-white sm:px-6 lg:px-8">
+        <Text className="flex h-10 items-center justify-center bg-primary-blue px-4 text-sm font-medium text-white sm:px-6 lg:px-8 mr-5">
           Onboard your devices as quick as possible
-        </p>
+        </Text>
 
         {/* Links */}
         <Tab.Group
@@ -66,16 +63,6 @@ const Navigation = () => {
               />
             </div>
             <Tab.List className="h-full space-x-8 flex-1 text-center">
-              {/* Promise for mobile experience */}
-              {/* <button
-                type="button"
-                className="relative rounded-md bg-white p-2 text-gray-400 lg:hidden"
-                onClick={() => setOpen(true)}
-              >
-                <span className="absolute -inset-0.5" />
-                <span className="sr-only">Open menu</span>
-                <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-              </button> */}
               {navigation.categories.map((category) => (
                 <Tab
                   key={category.name}
@@ -95,7 +82,7 @@ const Navigation = () => {
           </div>
           <Tab.Panels as={Fragment}>
             <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
-              <Stream />
+              <Stream channelId={channelId} />
             </Tab.Panel>
             <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
               <CodeSnippet />

@@ -8,21 +8,13 @@ import {
   PencilIcon,
 } from "@heroicons/react/20/solid";
 import { ChartPieIcon } from "@heroicons/react/24/solid";
-import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import BackButton from "../BackButton";
 import { Button, Card, Heading } from "@radix-ui/themes";
+import { ChannelProps } from "@/types";
 
-interface Channel {
-  id: number;
-  name: string;
-  description: string;
-  deviceId: string;
-  createdAt: string;
-  lastSeenDateTime: Date;
-}
-interface PageHeadingProps {
-  channelId: string;
+interface ChannelHeadingProps {
+  channel: ChannelProps;
 }
 
 const formatDate = (date: string) =>
@@ -33,24 +25,7 @@ const formatDate = (date: string) =>
     weekday: "long",
   }).format(new Date(date));
 
-const PageHeading = ({ channelId }: PageHeadingProps) => {
-  console.log("channelId:---", channelId);
-
-  const [channel, setChannel] = useState<Channel | null>(null);
-
-  useEffect(() => {
-    const fetchChannel = async () => {
-      const res = await fetch(
-        `http://localhost:3000/api/channels/${channelId}`
-      );
-      const channelData: Channel = await res.json();
-
-      setChannel(channelData);
-    };
-
-    fetchChannel();
-  }, [channelId]);
-
+const PageHeading = ({ channel }: ChannelHeadingProps) => {
   if (!channel) {
     return <Loading />;
   }

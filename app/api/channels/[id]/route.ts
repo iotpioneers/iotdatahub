@@ -13,12 +13,17 @@ export async function GET(
   if (!channel)
     return NextResponse.json({ error: "Channel not found" }, { status: 404 });
 
+  // Find a fields with the channel
+  const fields = await prisma.field.findMany({
+    where: { channelId: channel.id },
+  });
+
   // Find a data point with the channel
   const dataPoint = await prisma.dataPoint.findMany({
     where: { channelId: channel.id },
   });
 
-  return NextResponse.json({ channel, dataPoint });
+  return NextResponse.json({ channel, dataPoint, fields });
 }
 
 export async function PUT(

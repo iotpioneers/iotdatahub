@@ -1,5 +1,5 @@
+import React from "react";
 import useMediaQuery from "@/hooks/useMediaQuery";
-import React, { PureComponent } from "react";
 import {
   LineChart,
   Line,
@@ -10,54 +10,34 @@ import {
   Legend,
   Brush,
 } from "recharts";
+import { DataPointProps } from "@/types";
 
-const data = [
-  {
-    timeStamp: "time 1",
-    uv: 4000,
-    pv: 2400,
-    amt: 2400,
-  },
-  {
-    timeStamp: "time 2",
-    uv: 3000,
-    pv: 1398,
-    amt: 2210,
-  },
-  {
-    timeStamp: "time 3",
-    uv: 2000,
-    pv: 9800,
-    amt: 2290,
-  },
-  {
-    timeStamp: "time 4",
-    uv: 2780,
-    pv: 3908,
-    amt: 2000,
-  },
-  {
-    timeStamp: "time 5",
-    uv: 1890,
-    pv: 4800,
-    amt: 2181,
-  },
-  {
-    timeStamp: "time 6",
-    uv: 2390,
-    pv: 3800,
-    amt: 2500,
-  },
-  {
-    timeStamp: "time 7",
-    uv: 3490,
-    pv: 4300,
-    amt: 2100,
-  },
-];
+interface LineChartProps {
+  chartData: DataPointProps[];
+}
 
-const LineChartComponent = () => {
+const LineChartComponent = ({ chartData }: LineChartProps) => {
   const isSmallScreens = useMediaQuery("(max-width: 480px)");
+
+  const data = chartData.map((dataPoint) => {
+    const formatDate = (date: string) =>
+      new Intl.DateTimeFormat("en", {
+        hour: "numeric",
+        minute: "numeric",
+      }).format(new Date(date));
+
+    const formatHours = (date: string) => {
+      const parsedDate = new Date(date);
+      const hours = parsedDate.getHours().toString().padStart(2, "0"); // Add leading zero if needed
+      return hours;
+    };
+
+    return {
+      key: dataPoint.id,
+      timestamp: formatDate(dataPoint.timestamp),
+      value: dataPoint.value,
+    };
+  });
 
   return (
     <LineChart
@@ -72,11 +52,11 @@ const LineChartComponent = () => {
       }}
     >
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="timeStamp" />
+      <XAxis dataKey="timestamp" />
       <YAxis />
       <Tooltip />
       <Legend />
-      <Line type="monotone" dataKey="uv" stroke="#0000ff" strokeWidth={2} />
+      <Line type="monotone" dataKey="value" stroke="#0000ff" strokeWidth={2} />
       <Brush />
     </LineChart>
   );
