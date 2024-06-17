@@ -26,12 +26,6 @@ const LineChartComponent = ({ chartData }: LineChartProps) => {
         minute: "numeric",
       }).format(new Date(date));
 
-    const formatHours = (date: string) => {
-      const parsedDate = new Date(date);
-      const hours = parsedDate.getHours().toString().padStart(2, "0"); // Add leading zero if needed
-      return hours;
-    };
-
     return {
       key: dataPoint.id,
       timestamp: formatDate(dataPoint.timestamp),

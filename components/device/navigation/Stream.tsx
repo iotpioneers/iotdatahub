@@ -40,7 +40,7 @@ const Stream = ({ channelId }: Props) => {
     };
 
     fetchChannel();
-  }, [channelId]);
+  }, [channelDetails]);
 
   if (!channelDetails) {
     return <Loading />;

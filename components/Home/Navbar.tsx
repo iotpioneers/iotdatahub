@@ -1,6 +1,6 @@
 import { NAV_LINKS } from "@/constants";
 import Link from "next/link";
-import { Button, DropdownMenu, Text } from "@radix-ui/themes";
+import { Text } from "@radix-ui/themes";
 import { WifiIcon } from "@heroicons/react/24/outline";
 import SigninButton from "./SigninButton";
 import MenuBar from "../MenuBar";
