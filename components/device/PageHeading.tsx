@@ -44,6 +44,7 @@ const PageHeading = ({ channelId }: PageHeadingProps) => {
         `http://localhost:3000/api/channels/${channelId}`
       );
       const channelData: Channel = await res.json();
+
       setChannel(channelData);
     };
 

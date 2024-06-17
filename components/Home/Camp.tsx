@@ -22,11 +22,17 @@ const CampSite = ({
       <div className="flex h-full flex-col items-start justify-between p-6 lg:px-20 lg:py-10">
         <div className="flexCenter gap-4">
           <div className="rounded-full bg-green-50 p-4">
-            <Image src="/folded-map.svg" alt="map" width={28} height={28} />
+            <Image
+              src="/folded-map.svg"
+              alt="map"
+              width={28}
+              height={28}
+              className="object-cover"
+            />
           </div>
           <div className="flex flex-col gap-1">
-            <h4 className="bold-18 text-white">{title}</h4>
-            <p className="regular-14 text-white">{subtitle}</p>
+            <h4 className="bold-18 text-black">{title}</h4>
+            <p className="regular-14 text-black">{subtitle}</p>
           </div>
         </div>
 
@@ -43,7 +49,7 @@ const CampSite = ({
               />
             ))}
           </span>
-          <p className="bold-16 md:bold-20 text-white">{peopleJoined}</p>
+          <p className="bold-16 md:bold-20 text-black">{peopleJoined}</p>
         </div>
       </div>
     </div>

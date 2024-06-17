@@ -4,6 +4,10 @@ import { nanoid } from "nanoid";
 import { getToken } from "next-auth/jwt";
 import { channelSchema } from "@/validations/schema.validation";
 
+interface Field {
+  name: string;
+}
+
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const token = await getToken({ req: request });
@@ -33,28 +37,34 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(validation.error.errors, { status: 400 });
   }
 
-  const { name, description, deviceId, fields } = validation.data;
+  const { name, description, fields } = validation.data;
 
-  const writeApiKey = nanoid(16);
-  const readApiKey = nanoid(16);
+  const apiKey = nanoid(16);
 
   try {
     // Format the fields data as Prisma expects
-    const formattedFields = fields?.map((fieldName: string) => ({
-      name: fieldName,
-    }));
+    const formattedFields: Field[] | undefined = fields?.map(
+      (fieldName: string) => ({
+        name: fieldName,
+      })
+    );
 
     // Create a new channel with formatted fields data and associate it with the user
     const newChannel = await prisma.channel.create({
       data: {
         name,
         description,
-        writeApiKey,
-        readApiKey,
-        deviceId,
         userId: user.id,
         fields: {
           create: formattedFields || [],
+        },
+        apiKeys: {
+          // Associate the API key directly while creating the channel
+          create: {
+            apiKey,
+            userId: user.id,
+            fields: formattedFields?.map((field) => field.name) || [], // Corrected: Removed 'create'
+          },
         },
       },
       include: { user: true },

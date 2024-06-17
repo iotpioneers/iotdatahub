@@ -77,3 +77,14 @@ export const deviceSchema = z.object({
     .max(500, { message: "Description must be 500 characters or less" }),
   channels: z.string().min(1, "At least one channel is required"),
 });
+
+// The schema for the device data
+export const apiKeySchema = z.object({
+  apiKey: z.string(),
+
+  userId: z.string(),
+
+  channelId: z.string(),
+
+  fields: z.array(z.string()).min(1),
+});

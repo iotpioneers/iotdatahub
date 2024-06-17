@@ -143,6 +143,7 @@ export default function NewChannel() {
         ))}
 
         <Button
+          type="button"
           className="inline-flex justify-center rounded-md"
           onClick={addNewField}
           disabled={fields.length >= 6}
