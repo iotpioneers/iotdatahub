@@ -10,8 +10,9 @@ import {
 import { ChartPieIcon } from "@heroicons/react/24/solid";
 import ReactMarkdown from "react-markdown";
 import BackButton from "../BackButton";
-import { Button, Card, Heading } from "@radix-ui/themes";
+import { Box, Button, Card, Flex, Heading, Text } from "@radix-ui/themes";
 import { ChannelProps } from "@/types";
+import EditChannel from "../Channels/EditChannel";
 
 interface ChannelHeadingProps {
   channel: ChannelProps;
@@ -67,35 +68,29 @@ const PageHeading = ({ channel }: ChannelHeadingProps) => {
         </div>
       </div>
       <div className="mt-5 flex lg:ml-4 lg:mt-0">
-        <span className="hidden sm:block">
-          <Button
-            type="button"
-            className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-          >
-            <PencilIcon
-              className="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400"
-              aria-hidden="true"
-            />
-            Edit
-          </Button>
-        </span>
-
-        <span className="ml-3 hidden sm:block">
-          <Button
-            type="button"
-            className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-          >
-            <LinkIcon
-              className="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400"
-              aria-hidden="true"
-            />
-            Link
-          </Button>
-        </span>
-
-        <div className="sm:ml-3">
-          <BackButton />
-        </div>
+        <Box maxWidth="230px">
+          <Flex gap="3" mb="5">
+            <BackButton />
+            <EditChannel />
+            <Button
+              type="button"
+              className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            >
+              <LinkIcon
+                className="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400"
+                aria-hidden="true"
+              />
+              Link
+            </Button>
+          </Flex>
+          <Card size="1">
+            <a href="#">
+              <Text as="div" color="gray" size="2">
+                To send data to your channel, you have to use the API key
+              </Text>
+            </a>
+          </Card>
+        </Box>
       </div>
     </div>
   );

@@ -1,6 +1,20 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import authOptions from "../api/auth/authOptions";
+import {
+  Avatar,
+  Box,
+  Button,
+  Card,
+  Checkbox,
+  Flex,
+  Heading,
+  Link,
+  Popover,
+  Text,
+  TextArea,
+} from "@radix-ui/themes";
+import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 
 export default async function Dashboard() {
   const session = await getServerSession(authOptions);
@@ -10,30 +24,49 @@ export default async function Dashboard() {
 
   return (
     <main className="overflow-hidden p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-semibold mb-6">Dashboard</h1>
+      <Heading className="text-3xl font-semibold mb-6">Dashboard</Heading>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         {/* Overview Cards */}
-        <OverviewCard
-          title="Total Revenue"
-          value="$53,009.89"
-          change="2% increase from last month"
-        />
-        <OverviewCard
-          title="Projects"
-          value="95 / 100"
-          change="10% decrease from last month"
-        />
-        <OverviewCard
-          title="Time Spent"
-          value="1022 / 1300 Hrs"
-          change="8% increase from last month"
-        />
-        <OverviewCard
-          title="Resources"
-          value="101 / 120"
-          change="2% increase from last month"
-        />
+        <OverviewCard title="Channels" value="5" url="/dashboard/channels" />
+        <OverviewCard title="Devices" value="2" url="/dashboard/devices" />
+        <Box>
+          <Card asChild>
+            <a href="#">
+              <Text as="div" size="3" weight="bold" mb="4">
+                Quick start
+              </Text>
+              <Text as="div" color="gray" size="2">
+                Start building your next project in minutes
+              </Text>
+            </a>
+          </Card>
+        </Box>
+
+        <Popover.Root>
+          <Popover.Trigger>
+            <Button variant="soft">
+              <ChatBubbleLeftIcon width="16" height="16" />
+              Need help or support?
+            </Button>
+          </Popover.Trigger>
+          <Popover.Content width="360px">
+            <Flex gap="3">
+              <Avatar size="2" src="/person-4.png" fallback="A" radius="full" />
+              <Box flexGrow="1">
+                <TextArea
+                  placeholder="Write a message…"
+                  style={{ height: 80 }}
+                />
+                <Flex gap="3" mt="3" justify="between">
+                  <Popover.Close>
+                    <Button size="1">Send</Button>
+                  </Popover.Close>
+                </Flex>
+              </Box>
+            </Flex>
+          </Popover.Content>
+        </Popover.Root>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -58,15 +91,19 @@ export default async function Dashboard() {
 interface OverviewCardProps {
   title: string;
   value: string;
-  change: string;
+  url: string;
 }
 
-function OverviewCard({ title, value, change }: OverviewCardProps) {
+function OverviewCard({ title, value, url }: OverviewCardProps) {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="text-2xl font-bold">{value}</p>
-      <p className="text-sm text-gray-500">{change}</p>
+      <div className="flex justify-between items-center">
+        <Text className="text-lg font-semibold">{title}</Text>
+        <Text className="text-2xl font-bold">{value}</Text>
+      </div>
+      <Link href={url} className="text-sm text-gray-500">
+        Learn More
+      </Link>
     </div>
   );
 }

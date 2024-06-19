@@ -14,10 +14,10 @@ export default async function DashboardLayout({
   const isSmallScreens = useMediaQuery("(max-width: 1200px)");
 
   return (
-    <section className="flex">
-      <div>
+    <section className="flex w-full">
+      <div className="-ml-16 mr-16 mt-8">
         {!isSmallScreens && (
-          <aside className="w-36 bg-slate-200 rounded-sm h-screen border-solid fixed lg:-ml-16">
+          <aside className="w-1/5 rounded-sm h-screen border-solid fixed">
             <DashboardSidebar />
           </aside>
         )}

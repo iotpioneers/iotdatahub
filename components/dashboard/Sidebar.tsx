@@ -4,7 +4,7 @@ import Link from "next/link";
 import React from "react";
 import {
   ChartBarIcon,
-  CogIcon,
+  Cog8ToothIcon,
   InformationCircleIcon,
   SignalIcon,
   CloudArrowDownIcon,
@@ -18,7 +18,7 @@ const DashboardSidebar = () => {
     <div className="flex">
       <ul className="space-y-2">
         <li className="py-2 px-4">
-          <Link href="/dashboard/devices" className="flex  items-center">
+          <Link href="/dashboard" className="flex  items-center">
             <AcademicCapIcon className="h-4 w-4 mr-2 " />
             Dashboard
           </Link>
@@ -50,7 +50,7 @@ const DashboardSidebar = () => {
         </li>
         <li className="py-2 px-4">
           <Link href="/dashboard" className="flex  items-center">
-            <CogIcon className="h-4 w-4 mr-2" />
+            <Cog8ToothIcon className="h-4 w-4 mr-2" />
             Settings
           </Link>
         </li>

@@ -38,7 +38,7 @@ const page = () => {
   return (
     <div className="mt-5">
       <DeviceAction />
-      <Table.Root variant="surface" className="mr-5">
+      <Table.Root variant="surface">
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeaderCell>Device</Table.ColumnHeaderCell>
