@@ -19,7 +19,7 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <Theme accentColor="violet">
-            <main className="relative overflow-hidden pt-20">
+            <main className="relative overflow-hidden">
               <Container>{children}</Container>
             </main>
           </Theme>

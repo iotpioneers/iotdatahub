@@ -25,7 +25,7 @@ const Navbar = () => {
         ))}
       </ul>
 
-      <div className="lg:flexCenter hidden">
+      <div className="lg:flexCenter hidden z-50">
         <SigninButton />
       </div>
 

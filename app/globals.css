@@ -11,12 +11,16 @@
   font-family: "Manrope", sans-serif;
 }
 
+body {
+  margin: 0;
+  padding: 0;
+}
+
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 1000; /* Adjust z-index as needed */
 }
 
 /* START: General styles */
