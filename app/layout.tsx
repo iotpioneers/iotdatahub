@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Container, Theme } from "@radix-ui/themes";
 import AuthProvider from "./auth/Provider";
+import QueryClientProvider from "./QueryClientProvider";
 
 export const metadata: Metadata = {
   title: "IoT service",
@@ -17,13 +18,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
-          <Theme accentColor="violet">
-            <main className="relative overflow-hidden">
-              <Container>{children}</Container>
-            </main>
-          </Theme>
-        </AuthProvider>
+        <QueryClientProvider>
+          <AuthProvider>
+            <Theme accentColor="violet">
+              <main className="relative overflow-hidden">
+                <Container>{children}</Container>
+              </main>
+            </Theme>
+          </AuthProvider>
+        </QueryClientProvider>
       </body>
     </html>
   );
