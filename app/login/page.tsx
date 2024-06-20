@@ -1,4 +1,6 @@
 "use client";
+
+import { Button, Separator, Text } from "@radix-ui/themes";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -7,6 +9,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { Heading } from "@radix-ui/themes";
+import Image from "next/image";
+
 const schema = Yup.object().shape({
   email: Yup.string()
     .email("Invalid email address")
@@ -14,7 +18,8 @@ const schema = Yup.object().shape({
   password: Yup.string().required("Password is required"),
 });
 type FormData = Yup.InferType<typeof schema>;
-export default function Login() {
+
+const Login = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const {
@@ -44,94 +49,116 @@ export default function Login() {
     }
   };
   return (
-    <div className="h-screen flex m-10 justify-center mb-10 ">
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 max-w-lg">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <Heading className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Sign in to your account
-          </Heading>
+    <div className="flex min-h-screen items-center justify-center">
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: "url('/anime.gif')" }}
+      ></div>
+      <div className="relative bg-white p-6 rounded-md shadow-md max-w-md w-full mx-4 mt-8 mb-0">
+        <div className="flex gap-3 text-lime-600">
+          <Heading className=" mb-5 text-center">Welcome Back </Heading>
+          <span className="relative flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-50"></span>
+          </span>
         </div>
 
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          {error && (
-            <div
-              className="bg-red-100 rounded-md border border-red-400 text-red-700 px-4 py-2 mb-4"
-              role="alert"
+        <Text className="text-xl font-bold">Sign in to your account</Text>
+
+        {error && (
+          <div
+            className="bg-red-100 rounded-md border border-red-400 text-red-700 px-4 py-2 mb-4"
+            role="alert"
+          >
+            <span>{error}</span>
+          </div>
+        )}
+        <form className="w-full" onSubmit={handleSubmit(loginUser)}>
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium leading-6 mt-4 text-gray-900"
             >
-              <span>{error}</span>
+              Email address
+            </label>
+            <div className="mt-0">
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                {...register("email")}
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mb-5"
+              />
             </div>
-          )}
-          <form className="space-y-6" onSubmit={handleSubmit(loginUser)}>
-            <div>
+            <p className="text-red-500 text-sm">{errors.email?.message}</p>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between">
               <label
-                htmlFor="email"
+                htmlFor="password"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-                Email address
+                Password
               </label>
-              <div className="mt-2">
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  {...register("email")}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-              <p className="text-red-500 text-sm">{errors.email?.message}</p>
             </div>
+            <div className="mt-0">
+              <input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                {...register("password")}
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6  mb-5"
+              />
+            </div>
+            <p className="text-red-500 text-sm">{errors.password?.message}</p>
+          </div>
 
-            <div>
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Password
-                </label>
-                <div className="text-sm">
-                  <a
-                    href="#"
-                    className="font-semibold text-primary-blue hover:text-blue-500"
-                  >
-                    Forgot password?
-                  </a>
-                </div>
-              </div>
-              <div className="mt-2">
-                <input
-                  id="password"
-                  type="password"
-                  autoComplete="current-password"
-                  {...register("password")}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-              <p className="text-red-500 text-sm">{errors.password?.message}</p>
-            </div>
+          <div className="flex justify-between items-center mb-4">
+            <label className="flex items-center text-sm">
+              <input type="checkbox" name="remember" className="mr-2" />
+              Remember me
+            </label>
+            <a
+              href="#forgot-password"
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Forgot Password?
+            </a>
+          </div>
 
-            <div>
-              <button
-                disabled={loading}
-                type="submit"
-                className="flex w-full justify-center rounded-md bg-primary-blue px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-              >
-                {loading ? "Loading..." : "Sign in"}
-              </button>
-            </div>
-          </form>
+          <div>
+            <Button
+              disabled={loading}
+              type="submit"
+              className="flex w-full justify-center rounded-lg bg-gray-950 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 mb-5"
+            >
+              {loading ? "Loading..." : "Sign in"}
+            </Button>
+          </div>
+
+          <div className="flex w-full flex-col space-y-2 border-2 rounded-lg items-center">
+            <Link href="/#">
+              <Text className="flex items-center font-bold ">
+                Continue with
+                <Image src="/google.gif" alt="google" width={75} height={75} />
+              </Text>
+            </Link>
+          </div>
 
           <p className="mt-10 text-center text-sm text-gray-500">
-            Not a member?{" "}
+            No account yet?
             <Link
               href="/register"
-              className="font-semibold leading-6 text-primary-blue hover:text-blue-500"
+              className="font-semibold leading-6 ml-2 text-primary-blue hover:text-blue-500"
             >
               Sign up
             </Link>
           </p>
-        </div>
+        </form>
       </div>
     </div>
   );
-}
+};
+
+export default Login;
