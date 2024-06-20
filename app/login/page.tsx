@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Separator, Text } from "@radix-ui/themes";
+import { Button, Text } from "@radix-ui/themes";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,6 +10,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { Heading } from "@radix-ui/themes";
 import Image from "next/image";
+import {
+  ArrowDownIcon,
+  ArrowRightEndOnRectangleIcon,
+} from "@heroicons/react/24/outline";
 
 const schema = Yup.object().shape({
   email: Yup.string()
@@ -22,6 +26,8 @@ type FormData = Yup.InferType<typeof schema>;
 const Login = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<String | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -29,7 +35,6 @@ const Login = () => {
   } = useForm({
     resolver: yupResolver(schema),
   });
-  const [error, setError] = useState<String | null>(null);
 
   const loginUser = async (data: FormData) => {
     setLoading(true);
@@ -56,14 +61,14 @@ const Login = () => {
       ></div>
       <div className="relative bg-white p-6 rounded-md shadow-md max-w-md w-full mx-4 mt-8 mb-0">
         <div className="flex gap-3 text-lime-600">
-          <Heading className=" mb-5 text-center">Welcome Back </Heading>
+          <Heading className=" mb-5 text-center">
+            Sign in to your account
+          </Heading>
           <span className="relative flex h-3 w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-green-50"></span>
           </span>
         </div>
-
-        <Text className="text-xl font-bold">Sign in to your account</Text>
 
         {error && (
           <div
@@ -131,15 +136,29 @@ const Login = () => {
             <Button
               disabled={loading}
               type="submit"
-              className="flex w-full justify-center rounded-lg bg-gray-950 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 mb-5"
+              className="flex w-full justify-center items-center rounded-lg bg-gray-950 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 mb-5"
             >
+              {!loading && (
+                <svg
+                  className="animate-bounce h-5 w-5 items-center rounded-full bg-white mr-2"
+                  viewBox="0 0 20 20"
+                >
+                  <g transform="translate(2.5, 2.5)">
+                    <ArrowRightEndOnRectangleIcon
+                      width={14}
+                      height={14}
+                      color="black"
+                    />
+                  </g>
+                </svg>
+              )}
               {loading ? "Loading..." : "Sign in"}
             </Button>
           </div>
 
           <div className="flex w-full flex-col space-y-2 border-2 rounded-lg items-center">
             <Link href="/#">
-              <Text className="flex items-center font-bold ">
+              <Text className="flex items-center font-bold hover:text-green-50 ">
                 Continue with
                 <Image src="/google.gif" alt="google" width={75} height={75} />
               </Text>

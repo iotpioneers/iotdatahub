@@ -1,23 +1,18 @@
 "use client";
+
+import { userSchema } from "@/validations/schema.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, Heading, Text } from "@radix-ui/themes";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Callout, Heading } from "@radix-ui/themes";
-import { userSchema } from "@/validations/schema.validation";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { error } from "console";
-import { ErrorMessage } from "@/components";
 
 type FormData = z.infer<typeof userSchema>;
 
-export default function Register() {
-  const [data, SetData] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
+const Register = () => {
   const [err, setErr] = useState();
   const route = useRouter();
   const {
@@ -39,7 +34,7 @@ export default function Register() {
     const result = await response.json();
 
     if (response.ok) {
-      route.push("login");
+      route.push("/login");
       console.log(result.message);
     } else {
       console.log(result.message);
@@ -48,120 +43,135 @@ export default function Register() {
   });
 
   return (
-    <div className="h-screen flex justify-center my-10 mx-10 sm:mx-20 rounded-md  mb-10 ">
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <Heading className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Create Account
-          </Heading>
+    <div className="flex min-h-screen items-center justify-center">
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: "url('/anime.gif')" }}
+      ></div>
+      <div className="relative bg-white p-6 rounded-md shadow-md max-w-md w-full mx-4 mt-8 mb-0">
+        <div className="flex gap-3 text-lime-600">
+          <Heading className=" mb-5 text-center">Create Account</Heading>
+          <span className="relative flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-50"></span>
+          </span>
         </div>
 
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          {/* if error display error message */}
+        {err && (
+          <div
+            className="bg-red-100 rounded-md border border-red-400 text-red-700 px-4 py-2 mb-4"
+            role="alert"
+          >
+            <span>{err}</span>
+          </div>
+        )}
+        <form className="space-y-4" onSubmit={onSubmit}>
+          <div>
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium leading-6 text-gray-900"
+            >
+              username
+            </label>
+            <div className="mt-1">
+              <input
+                id="username"
+                {...register("username")}
+                type="text"
+                autoComplete="username"
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
 
-          {err && (
-            <Callout.Root color="red" className="mb-5">
-              <Callout.Text>{err}</Callout.Text>
-            </Callout.Root>
-          )}
-          <form onSubmit={onSubmit} className="space-y-4">
-            <div>
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium leading-6 text-gray-900"
+            >
+              Email address
+            </label>
+            <div className="mt-1">
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                {...register("email")}
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            {/* <ErrorMessage>{errors.email?.message}</ErrorMessage> */}
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between">
               <label
-                htmlFor="username"
+                htmlFor="password"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-                username
+                Password
               </label>
-              <div className="mt-1">
-                <input
-                  id="username"
-                  {...register("username")}
-                  type="text"
-                  autoComplete="username"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-              <ErrorMessage>{errors.username?.message}</ErrorMessage>
             </div>
-
-            <div>
+            <div className="mt-1">
+              <input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                {...register("password")}
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            {/* <ErrorMessage>{errors.password?.message}</ErrorMessage> */}
+          </div>
+          <div>
+            <div className="flex items-center justify-between">
               <label
-                htmlFor="email"
+                htmlFor="Repassword"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-                Email address
+                Confirm Password
               </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  {...register("email")}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-              <ErrorMessage>{errors.email?.message}</ErrorMessage>
             </div>
+            <div className="mt-1">
+              <input
+                id="Repassword"
+                type="password"
+                {...register("confirmPassword")}
+                autoComplete="current-password"
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            {/* <ErrorMessage>{errors.confirmPassword?.message}</ErrorMessage> */}
+          </div>
 
-            <div>
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Password
-                </label>
-              </div>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  type="password"
-                  autoComplete="current-password"
-                  {...register("password")}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-              <ErrorMessage>{errors.password?.message}</ErrorMessage>
-            </div>
-            <div>
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="Repassword"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Confirm Password
-                </label>
-              </div>
-              <div className="mt-1">
-                <input
-                  id="Repassword"
-                  type="password"
-                  {...register("confirmPassword")}
-                  autoComplete="current-password"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-              <ErrorMessage>{errors.confirmPassword?.message}</ErrorMessage>
-            </div>
+          <div>
+            <Button className="flex w-full justify-center rounded-md bg-primary-blue px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+              Register
+            </Button>
+          </div>
 
-            <div>
-              <button className="flex w-full justify-center rounded-md bg-primary-blue px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                Sign in
-              </button>
-            </div>
-          </form>
+          <div className="flex w-full flex-col space-y-2 border-2 rounded-lg items-center">
+            <Link href="/#">
+              <Text className="flex items-center font-bold hover:text-green-50">
+                Continue with
+                <Image src="/google.gif" alt="google" width={75} height={75} />
+              </Text>
+            </Link>
+          </div>
 
           <p className="mt-6 text-center text-sm text-gray-500">
-            Already Have Account
+            Already Have Account?
             <Link
-              href="login"
+              href="/login"
               className="font-semibold mx-4 leading-6 text-primary-blue hover:text-blue-500"
             >
               Login
             </Link>
           </p>
-        </div>
+        </form>
       </div>
     </div>
   );
-}
+};
+
+export default Register;

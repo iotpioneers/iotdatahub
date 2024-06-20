@@ -2,14 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import {
-  Avatar,
-  Box,
-  Button,
-  DropdownMenu,
-  Select,
-  Text,
-} from "@radix-ui/themes";
+import { Box, Button, Select } from "@radix-ui/themes";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
