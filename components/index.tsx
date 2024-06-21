@@ -1,23 +1,10 @@
-import Hero from "./Hero";
-import CustomButton from "./CustomButton";
-import SearchBar from "./SearchBar";
-import CustomFilter from "./CustomFilter";
-import SearchManufacturer from "./SearchManufacturer";
-import BackButton from "./BackButton";
-import StatusBadge from "./StatusBadge";
-import Spinner from "./Spinner";
-import Skeleton from "./Skeleton";
-import ErrorMessage from "./ErrorMessage";
-
-export {
-  Hero,
-  CustomButton,
-  SearchBar,
-  CustomFilter,
-  SearchManufacturer,
-  BackButton,
-  StatusBadge,
-  Spinner,
-  Skeleton,
-  ErrorMessage,
-};
+export { default as Hero } from "./Hero";
+export { default as CustomButton } from "./CustomButton";
+export { default as SearchBar } from "./SearchBar";
+export { default as CustomFilter } from "./CustomFilter";
+export { default as SearchManufacturer } from "./SearchManufacturer";
+export { default as BackButton } from "./BackButton";
+export { default as StatusBadge } from "./StatusBadge";
+export { default as ErrorMessage } from "./ErrorMessage";
+export { default as Spinner } from "./Spinner";
+export { default as Skeleton } from "./Skeleton";

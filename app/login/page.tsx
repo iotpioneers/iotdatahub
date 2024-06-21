@@ -10,10 +10,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { Heading } from "@radix-ui/themes";
 import Image from "next/image";
-import {
-  ArrowDownIcon,
-  ArrowRightEndOnRectangleIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowRightEndOnRectangleIcon } from "@heroicons/react/24/outline";
 
 const schema = Yup.object().shape({
   email: Yup.string()
@@ -21,6 +18,7 @@ const schema = Yup.object().shape({
     .required("Email is required"),
   password: Yup.string().required("Password is required"),
 });
+
 type FormData = Yup.InferType<typeof schema>;
 
 const Login = () => {
@@ -140,7 +138,7 @@ const Login = () => {
             >
               {!loading && (
                 <svg
-                  className="animate-bounce h-5 w-5 items-center rounded-full bg-white mr-2"
+                  className="animate-none h-5 w-5 items-center rounded-full bg-white mr-2"
                   viewBox="0 0 20 20"
                 >
                   <g transform="translate(2.5, 2.5)">
@@ -155,26 +153,32 @@ const Login = () => {
               {loading ? "Loading..." : "Sign in"}
             </Button>
           </div>
-
-          <div className="flex w-full flex-col space-y-2 border-2 rounded-lg items-center">
-            <Link href="/#">
-              <Text className="flex items-center font-bold hover:text-green-50 ">
-                Continue with
-                <Image src="/google.gif" alt="google" width={75} height={75} />
-              </Text>
-            </Link>
-          </div>
-
-          <p className="mt-10 text-center text-sm text-gray-500">
-            No account yet?
-            <Link
-              href="/register"
-              className="font-semibold leading-6 ml-2 text-primary-blue hover:text-blue-500"
-            >
-              Sign up
-            </Link>
-          </p>
         </form>
+        <div className="flex w-full flex-col space-y-2 border-2 rounded-lg items-center">
+          <Button
+            onClick={() => signIn("google")}
+            className="flex items-center font-bold hover:text-green-50"
+          >
+            Continue with
+            <Image
+              src="/google.gif"
+              alt="google"
+              width={75}
+              height={75}
+              className="object-contain"
+            />
+          </Button>
+        </div>
+
+        <p className="mt-10 text-center text-sm text-gray-500">
+          No account yet?
+          <Link
+            href="/register"
+            className="font-semibold leading-6 ml-2 text-primary-blue hover:text-blue-500"
+          >
+            Sign up
+          </Link>
+        </p>
       </div>
     </div>
   );

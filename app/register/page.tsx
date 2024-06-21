@@ -1,8 +1,13 @@
 "use client";
 
 import { userSchema } from "@/validations/schema.validation";
+import {
+  ArrowDownOnSquareIcon,
+  ArrowDownTrayIcon,
+} from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Heading, Text } from "@radix-ui/themes";
+import { signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -145,30 +150,44 @@ const Register = () => {
           </div>
 
           <div>
-            <Button className="flex w-full justify-center rounded-md bg-primary-blue px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+            <Button className="flex w-full justify-center rounded-md bg-primary-blue px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-black items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+              <svg
+                className="animate-none h-5 w-5 items-center rounded-full bg-white mr-2"
+                viewBox="0 0 20 20"
+              >
+                <g transform="translate(2.5, 2.5)">
+                  <ArrowDownTrayIcon width={14} height={14} color="black" />
+                </g>
+              </svg>
               Register
             </Button>
           </div>
-
-          <div className="flex w-full flex-col space-y-2 border-2 rounded-lg items-center">
-            <Link href="/#">
-              <Text className="flex items-center font-bold hover:text-green-50">
-                Continue with
-                <Image src="/google.gif" alt="google" width={75} height={75} />
-              </Text>
-            </Link>
-          </div>
-
-          <p className="mt-6 text-center text-sm text-gray-500">
-            Already Have Account?
-            <Link
-              href="/login"
-              className="font-semibold mx-4 leading-6 text-primary-blue hover:text-blue-500"
-            >
-              Login
-            </Link>
-          </p>
         </form>
+        <div className="flex w-full flex-col space-y-2 border-2 rounded-lg items-center mt-2">
+          <Button
+            onClick={() => signIn("google")}
+            className="flex items-center font-bold hover:text-green-50"
+          >
+            Continue with
+            <Image
+              src="/google.gif"
+              alt="google"
+              width={75}
+              height={75}
+              className="object-contain"
+            />
+          </Button>
+        </div>
+
+        <p className="mt-6 text-center text-sm text-gray-500">
+          Already Have Account?
+          <Link
+            href="/login"
+            className="font-semibold mx-4 leading-6 text-primary-blue hover:text-blue-500"
+          >
+            Login
+          </Link>
+        </p>
       </div>
     </div>
   );

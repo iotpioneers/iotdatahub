@@ -33,6 +33,7 @@ const Hero = () => {
                   alt="star"
                   width={24}
                   height={24}
+                  className="object-contain"
                 />
               ))}
           </div>

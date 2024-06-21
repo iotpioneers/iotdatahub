@@ -2,7 +2,7 @@ import { NAV_LINKS } from "@/constants";
 import Link from "next/link";
 import { Text } from "@radix-ui/themes";
 import { WifiIcon } from "@heroicons/react/24/outline";
-import SigninButton from "./SigninButton";
+import AvatarIcon from "./AvatarIcon";
 import MenuBar from "../MenuBar";
 
 const Navbar = () => {
@@ -26,7 +26,7 @@ const Navbar = () => {
       </ul>
 
       <div className="lg:flexCenter hidden z-50">
-        <SigninButton />
+        <AvatarIcon />
       </div>
 
       <MenuBar />

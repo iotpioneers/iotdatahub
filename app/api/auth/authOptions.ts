@@ -3,6 +3,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { AuthOptions } from "next-auth";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 interface Credentials {
   email: string;
@@ -37,12 +38,14 @@ const login = async (credentials: Credentials) => {
 };
 
 const authOptions: AuthOptions = {
+  adapter: PrismaAdapter(prisma),
   secret: process.env.JWT_SECRET,
   pages: {
     signIn: "/login",
   },
   providers: [
     CredentialsProvider({
+      id: "credentials",
       name: "credentials",
       credentials: {
         email: { label: "email", type: "email" },
@@ -65,6 +68,8 @@ const authOptions: AuthOptions = {
       },
     }),
     GoogleProvider({
+      id: "google",
+      name: "google",
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),

@@ -6,7 +6,6 @@ import {
   Box,
   Button,
   Card,
-  Checkbox,
   Flex,
   Heading,
   Link,
