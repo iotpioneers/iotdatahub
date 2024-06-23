@@ -76,7 +76,7 @@ export const NAV_LINKS = [
   { href: "/", key: "about", label: "About" },
   { href: "/", key: "services", label: "Services" },
   { href: "/", key: "pricing ", label: "Pricing " },
-  { href: "/", key: "contact_us", label: "Contact Us" },
+  { href: "/contactus", key: "contact_us", label: "Contact Us" },
 ];
 
 // CAMP SECTION
