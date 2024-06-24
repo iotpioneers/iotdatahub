@@ -17,13 +17,13 @@ export default async function DashboardLayout({
     <section className="flex w-full">
       {/* Sidebar (conditionally rendered based on screen size) */}
       {!isSmallScreens && (
-        <aside className="ml-44">
+        <aside className="ml-36">
           <SideNavbar />
         </aside>
       )}
 
       {/* Main content area */}
-      <div className="flex flex-col w-full h-screen bg-gray-100 -mr-20">
+      <div className="flex flex-col w-full -mr-16">
         <Navbar />
 
         {/* Theme wrapper for main content */}

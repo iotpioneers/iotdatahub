@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { channelSchema } from "@/validations/schema.validation";
 import ErrorMessage from "@/components/ErrorMessage";
-import Spinner from "@/components/Spinner";
+import LoadingSkeleton from "../LoadingSkeleton";
 
 type ChannelForm = z.infer<typeof channelSchema>;
 
@@ -76,6 +76,8 @@ export default function ChannelForm() {
       console.error("Error creating channel:", error);
     }
   });
+
+  if (isSubmitting) return <LoadingSkeleton />;
 
   return (
     <main className="overflow-hidden p-4">
@@ -178,7 +180,7 @@ export default function ChannelForm() {
           className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           disabled={isSubmitting}
         >
-          Add Channel {isSubmitting && <Spinner />}
+          Add Channel
         </Button>
       </form>
     </main>

@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import ProjectList from "./ProjectList";
 import ChannelAction from "../device/ChannelAction";
-import useMediaQuery from "@/hooks/useMediaQuery";
 import { Heading, Text } from "@radix-ui/themes";
+import LoadingSkeleton from "../LoadingSkeleton";
 
 interface Channel {
   id: number;
@@ -15,11 +15,13 @@ interface Channel {
 }
 
 const Projects = () => {
+  const [isLoading, setIsLoading] = useState<Boolean>(false);
   const [channels, setChannels] = useState<Channel[] | null>(null);
 
   useEffect(() => {
     const fetchChannels = async () => {
       try {
+        setIsLoading(true);
         const res = await fetch("http://localhost:3000/api/channels");
         if (!res.ok) {
           throw new Error("Failed to fetch channels");
@@ -31,17 +33,19 @@ const Projects = () => {
       } catch (error) {
         console.error("Error fetching channels:", error);
         // Handle error state or retry logic if needed
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchChannels();
   }, []);
 
-  console.log("channels", channels);
+  if (isLoading) return <LoadingSkeleton />;
 
   return (
     <div className="padding-x padding-y max-width">
-      {(channels === null || channels.length === 0) && (
+      {channels && channels.length === 0 && (
         <div className="mb-8 flex flex-col items-center text-center max-w-2xl mx-auto">
           <Heading as="h3" className="mb-5">
             Start by creating your first channel
@@ -58,9 +62,7 @@ const Projects = () => {
       <div className="flex justify-between items-center mb-8">
         <ChannelAction />
       </div>
-      <div>
-        <ProjectList />
-      </div>
+      <div>{channels && channels.length > 0 && <ProjectList />}</div>
     </div>
   );
 };

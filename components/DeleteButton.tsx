@@ -2,19 +2,21 @@
 
 import { AlertDialog, Button, Flex } from "@radix-ui/themes";
 import React, { useState } from "react";
-import Spinner from "./Spinner";
 import { TrashIcon } from "@heroicons/react/24/outline";
+import LoadingSkeleton from "./LoadingSkeleton";
 
 const DeleteButton = () => {
   const [error, setError] = useState(false);
   const [isDeleting, setDeleting] = useState(false);
+
+  if (isDeleting) return <LoadingSkeleton />;
+
   return (
     <>
       <AlertDialog.Root>
         <AlertDialog.Trigger>
           <Button color="red" disabled={isDeleting}>
             <TrashIcon width={15} height={15} /> Delete
-            {isDeleting && <Spinner />}
           </Button>
         </AlertDialog.Trigger>
         <AlertDialog.Content>

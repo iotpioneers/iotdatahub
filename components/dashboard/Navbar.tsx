@@ -27,7 +27,7 @@ const Navbar = () => {
   const isSmallScreens = useMediaQuery("(max-width: 1200px)");
 
   return (
-    <nav className="flex flex-col sm:flex-row items-center justify-between my-4 mx-4 border-b">
+    <nav className="flex flex-col sm:flex-row items-center justify-between my-4 mx-4">
       <div className="flex items-center justify-between w-full sm:w-auto">
         <div className="flex items-center gap-5">
           {isSmallScreens && (

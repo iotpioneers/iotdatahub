@@ -1,3 +1,3 @@
-import ChannelFormSkeleton from "@/components/Channels/ChannelFormSkeleton";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
 
-export default ChannelFormSkeleton;
+export default LoadingSkeleton;

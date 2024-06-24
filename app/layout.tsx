@@ -21,7 +21,7 @@ export default function RootLayout({
         <QueryClientProvider>
           <AuthProvider>
             <Theme accentColor="violet">
-              <main className="relative overflow-hidden">
+              <main>
                 <Container>{children}</Container>
               </main>
             </Theme>

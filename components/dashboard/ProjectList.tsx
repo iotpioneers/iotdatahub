@@ -74,7 +74,6 @@ const ProjectList = async () => {
         <Table.Body>
           {channels.map((channel) => (
             <Table.Row key={channel.id}>
-              {/* Add key prop */}
               <Table.Cell className="min-w-32">
                 <div className="flex justify-between">
                   <Link href={`/dashboard/channels/${channel.id}`}>

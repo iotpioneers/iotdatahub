@@ -17,10 +17,10 @@ const Footer = () => {
 
           <div className="flex flex-wrap gap-10 sm:justify-between md:flex-1">
             {FOOTER_LINKS.map((columns) => (
-              <FooterColumn title={columns.title}>
+              <FooterColumn title={columns.title} key={columns.title}>
                 <ul className="regular-14 flex flex-col gap-4 text-gray-30">
-                  {columns.links.map((link) => (
-                    <Link href="/" key={link}>
+                  {columns.links.map((link, index) => (
+                    <Link href="/" key={`${link}-${index}`}>
                       {link}
                     </Link>
                   ))}
@@ -29,11 +29,14 @@ const Footer = () => {
             ))}
 
             <div className="flex flex-col gap-5">
-              <FooterColumn title={FOOTER_CONTACT_INFO.title}>
-                {FOOTER_CONTACT_INFO.links.map((link) => (
+              <FooterColumn
+                title={FOOTER_CONTACT_INFO.title}
+                key={FOOTER_CONTACT_INFO.title}
+              >
+                {FOOTER_CONTACT_INFO.links.map((link, index) => (
                   <Link
                     href="/"
-                    key={link}
+                    key={`${link}-${index}`}
                     className="flex gap-4 md:flex-col lg:flex-row"
                   >
                     <p className="medium-14 whitespace-nowrap text-blue-600">
@@ -45,10 +48,10 @@ const Footer = () => {
             </div>
 
             <div className="flex flex-col gap-5">
-              <FooterColumn title={SOCIALS.title}>
+              <FooterColumn title={SOCIALS.title} key={SOCIALS.title}>
                 <ul className="regular-14 flex gap-4 text-gray-30">
-                  {SOCIALS.links.map((link) => (
-                    <Link href="/" key={link}>
+                  {SOCIALS.links.map((link, index) => (
+                    <Link href="/" key={`${link}-${index}`}>
                       <Image
                         src={link}
                         alt="logo"
@@ -80,7 +83,7 @@ type FooterColumnProps = {
 
 const FooterColumn = ({ title, children }: FooterColumnProps) => {
   return (
-    <div className="flex flex-col gap-5" key={title}>
+    <div className="flex flex-col gap-5">
       <h4 className="bold-18 whitespace-nowrap">{title}</h4>
       {children}
     </div>

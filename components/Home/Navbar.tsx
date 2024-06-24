@@ -7,9 +7,9 @@ import MenuBar from "../MenuBar";
 
 const Navbar = () => {
   return (
-    <nav className="flexBetween max-container padding-container relative z-30 py-5 x-3 border-b navbar bg-green-50 rounded-sm max-h-16">
+    <nav className="flexBetween max-container padding-container relative z-30 py-5 border-b navbar bg-green-50 rounded-sm max-h-16">
       <Link href="/" className="flex font-extrabold text-2xl text-white">
-        <WifiIcon className="h-8 w-8 mx-3" aria-hidden="true" />
+        <WifiIcon className="h-8 w-8" aria-hidden="true" />
         <Text>Ten2Ten</Text>
       </Link>
 
