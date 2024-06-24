@@ -1,9 +1,7 @@
 import useMediaQuery from "@/hooks/useMediaQuery";
-import { Card, Heading, Spinner, Text } from "@radix-ui/themes";
+import { Card, Text } from "@radix-ui/themes";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import { LoadingPage } from "../device";
 
 interface Channel {
   id: number;
@@ -37,14 +35,9 @@ const ProjectList = async () => {
     fetchChannels();
   }, []);
 
-  if (channels === null) {
+  if (channels === null || channels.length === 0) {
     // Loading state or placeholder content while fetching channels
-    return <LoadingPage />;
-  }
-
-  if (channels.length === 0) {
-    // No channels found for the user
-    return <Heading>No channels found.</Heading>;
+    return null;
   }
 
   return (

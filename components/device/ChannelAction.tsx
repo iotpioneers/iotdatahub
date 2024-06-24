@@ -1,15 +1,19 @@
-import { Button, Flex } from "@radix-ui/themes";
-import React from "react";
-import Link from "./Link";
-import BackButton from "../BackButton";
+// device/ChannelAction.tsx
+
+import { Button } from "@radix-ui/themes";
+import Link from "next/link";
+import React, { useState } from "react";
 
 const ChannelAction = () => {
+  const [loading, setLoading] = useState(false);
+
   return (
-    <div className=" flex mb-5 justify-between mr-5 gap-3">
-      <BackButton />
-      <Button>
-        <Link href="/dashboard/channels/new">New channel</Link>
-      </Button>
+    <div className="flex mb-5 justify-between mr-5 gap-3">
+      <Link href="/dashboard/channels/new">
+        <Button disabled={loading}>
+          {loading ? "Loading..." : "New channel"}
+        </Button>
+      </Link>
     </div>
   );
 };

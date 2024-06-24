@@ -22,7 +22,7 @@ export default async function Dashboard() {
   }
 
   return (
-    <main className="overflow-hidden p-6 bg-gray-100 min-h-screen">
+    <main className="overflow-hidden p-6 min-h-screen">
       <Heading className="text-3xl font-semibold mb-6">Dashboard</Heading>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">

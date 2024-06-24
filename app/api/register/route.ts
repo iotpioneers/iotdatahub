@@ -5,19 +5,20 @@ import bcrypt from "bcrypt";
 const prisma = new PrismaClient();
 
 type TUser = {
-  username: string;
+  name: string;
   email: string;
-  password: string;
+  password?: string;
+  image?: string;
 };
 
 export async function POST(req: Request, res: NextResponse) {
   try {
     const body: TUser = await req.json();
-    const { username, email, password } = body;
+    const { name, email, password, image } = body;
 
-    if (!username || !email || !password) {
+    if (!name || !email || !password) {
       return NextResponse.json(
-        { message: "Missing Required fields" },
+        { message: "Missing required fields" },
         { status: 400 }
       );
     }
@@ -34,16 +35,18 @@ export async function POST(req: Request, res: NextResponse) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await prisma.user.create({
       data: {
-        username,
+        name,
         email,
         password: hashedPassword,
+        image,
       },
     });
 
     return NextResponse.json(
-      { message: "User created successfuly", user },
+      { message: "User created successfully", user },
       { status: 201 }
     );
   } catch (error) {

@@ -76,14 +76,14 @@ const Register = () => {
               htmlFor="username"
               className="block text-sm font-medium leading-6 text-gray-900"
             >
-              username
+              Name
             </label>
             <div className="mt-1">
               <input
-                id="username"
-                {...register("username")}
+                id="name"
+                {...register("name")}
                 type="text"
-                autoComplete="username"
+                autoComplete="name"
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
             </div>
@@ -165,7 +165,11 @@ const Register = () => {
         </form>
         <div className="flex w-full flex-col space-y-2 border-2 rounded-lg items-center mt-2">
           <Button
-            onClick={() => signIn("google")}
+            onClick={() =>
+              signIn("google", {
+                callbackUrl: "http://localhost:3000/dashboard",
+              })
+            }
             className="flex items-center font-bold hover:text-green-50"
           >
             Continue with

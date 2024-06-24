@@ -12,7 +12,6 @@ export default function Home() {
     <div className="mt-5">
       <Navbar />
       <Hero />
-      <Camp />
       <ContactUs />
       <Footer />
 

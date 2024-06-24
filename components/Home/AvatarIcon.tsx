@@ -16,24 +16,22 @@ import Link from "next/link";
 const AvatarIcon = () => {
   const { status, data: session } = useSession();
 
-  console.log(session);
-
   return (
-    <IconButton color="crimson" variant="ghost" className="z-50">
+    <IconButton color="crimson" variant="ghost" className="mr-5 z-50">
       {status === "authenticated" ? (
         <Popover.Root>
           <Popover.Trigger>
             <img
-              src="/person-4.png"
+              src={session!.user!.image! || "/user.svg"}
               alt="Profile"
               className="w-10 h-10 rounded-full "
             />
           </Popover.Trigger>
           <Popover.Content>
             <Flex gap="4">
-              <Box className="m-0 bg-slate-100 p-2">
+              <Box className="m-0 p-2">
                 <Heading size="2" as="h3" className="mt-2 mb-3">
-                  emashyirambere1@gmail.com
+                  {session!.user!.email}
                 </Heading>
                 <div className="grid">
                   <Link

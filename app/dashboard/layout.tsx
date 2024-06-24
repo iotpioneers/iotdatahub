@@ -2,9 +2,9 @@
 
 import "@radix-ui/themes/styles.css";
 import Navbar from "@/components/dashboard/Navbar";
-import DashboardSidebar from "@/components/dashboard/Sidebar";
 import { Theme } from "@radix-ui/themes";
 import useMediaQuery from "@/hooks/useMediaQuery";
+import SideNavbar from "@/components/sidebar/SideNavbar";
 
 export default async function DashboardLayout({
   children,
@@ -15,19 +15,24 @@ export default async function DashboardLayout({
 
   return (
     <section className="flex w-full">
-      <div className="-ml-16 mr-16 mt-8">
-        {!isSmallScreens && (
-          <aside className="w-1/5 rounded-sm h-screen border-solid fixed">
-            <DashboardSidebar />
-          </aside>
-        )}
-      </div>
+      {/* Sidebar (conditionally rendered based on screen size) */}
+      {!isSmallScreens && (
+        <aside className="ml-44">
+          <SideNavbar />
+        </aside>
+      )}
 
-      <div className={`block ${isSmallScreens ? "mx-5" : "ml-24 -mr-12"} `}>
+      {/* Main content area */}
+      <div className="flex flex-col w-full  bg-gray-100 -mr-16">
         <Navbar />
+
+        {/* Theme wrapper for main content */}
         <Theme>
           <main className="flex w-full gap-1">
-            <div className="relative">{children}</div>
+            {/* Adjust styles for the main content */}
+            <div className={`relative ${isSmallScreens ? "w-full" : "ml-5"}`}>
+              {children}
+            </div>
           </main>
         </Theme>
       </div>

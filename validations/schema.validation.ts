@@ -28,7 +28,7 @@ const passwordValidation = z
 // The schema for the user data
 export const userSchema = z
   .object({
-    username: z
+    name: z
       .string()
       .min(1, "Username is required and cannot be empty")
       .max(255, { message: "Username must be 255 characters or less" }),

@@ -1,182 +1,104 @@
-"use client";
-
-import { Button, Text } from "@radix-ui/themes";
-import { signIn } from "next-auth/react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
-import { Heading } from "@radix-ui/themes";
-import Image from "next/image";
-import {
-  ArrowDownTrayIcon,
-  ArrowRightEndOnRectangleIcon,
-} from "@heroicons/react/24/outline";
-
-const schema = Yup.object().shape({
-  email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required"),
-  password: Yup.string().required("Password is required"),
-});
-
-type FormData = Yup.InferType<typeof schema>;
+// import React from 'react';
 
 const ContactUs = () => {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<String | null>(null);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
-
-  const loginUser = async (data: FormData) => {
-    setLoading(true);
-    const response = await signIn("credentials", {
-      email: data.email,
-      password: data.password,
-      redirect: false,
-      callbackUrl: "/dashboard",
-    });
-    setLoading(false);
-    if (response?.error) {
-      console.error("Error", response.error);
-      setError(response?.error);
-    } else {
-      console.log("Success", response);
-      router.push("/dashboard");
-    }
-  };
   return (
-    <div className="flex items-center justify-center m-10">
-      <div className="relative bg-white p-6 rounded-md shadow-md max-w-md w-full mx-4 mt-8 mb-0">
-        <div className="flex gap-3 text-lime-600">
-          <Heading className=" mb-5 text-center">Contact Us</Heading>
-          <span className="relative flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-50"></span>
-          </span>
+    <div className="p-6 bg-gray-100">
+      <h2 className="text-3xl font-bold text-center text-yellow-600">
+        Contact Us
+      </h2>
+      <p className="text-center text-gray-600">
+        Any question or remarks? Just write us a message!
+      </p>
+      <div className="flex flex-wrap justify-around mt-10">
+        <div className="bg-blue-900 text-white p-8 rounded-lg w-full md:w-1/3 mb-6 md:mb-0">
+          <h3 className="text-xl font-bold mb-4">Contact Information</h3>
+          <p className="mb-6">Say something to start a live chat!</p>
+          <p className="mb-2">
+            <i className="fas fa-phone"></i> +1012 3456 789
+          </p>
+          <p className="mb-2">
+            <i className="fas fa-envelope"></i> demo@gmail.com
+          </p>
+          <p className="mb-6">
+            <i className="fas fa-map-marker-alt"></i> 132 Dartmouth Street
+            Boston, Massachusetts 02156 United States
+          </p>
+          <div className="flex space-x-4">
+            <i className="fab fa-twitter"></i>
+            <i className="fab fa-facebook-f"></i>
+            <i className="fab fa-instagram"></i>
+          </div>
         </div>
-
-        {error && (
-          <div
-            className="bg-red-100 rounded-md border border-red-400 text-red-700 px-4 py-2 mb-4"
-            role="alert"
-          >
-            <span>{error}</span>
-          </div>
-        )}
-        <form className="w-full" onSubmit={handleSubmit(loginUser)}>
-          <div>
-            <label
-              htmlFor="firstname"
-              className="block text-sm font-medium leading-6 mt-4 text-gray-900"
-            >
-              First Name
-            </label>
-            <div className="mt-0">
+        <div className="w-full md:w-1/2">
+          <form className="bg-white p-8 rounded-lg shadow-lg">
+            <div className="mb-4">
+              <label className="block text-gray-700">First Name</label>
               <input
-                id="firstname"
                 type="text"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mb-5"
+                name="firstName"
+                className="w-full p-2 border border-gray-300 rounded mt-2"
+                required
               />
             </div>
-          </div>
-
-          <div>
-            <label
-              htmlFor="lastname"
-              className="block text-sm font-medium leading-6 mt-4 text-gray-900"
-            >
-              Last Name
-            </label>
-            <div className="mt-0">
+            <div className="mb-4">
+              <label className="block text-gray-700">Last Name</label>
               <input
-                id="lastname"
                 type="text"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mb-5"
+                name="lastName"
+                className="w-full p-2 border border-gray-300 rounded mt-2"
+                required
               />
             </div>
-          </div>
-
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium leading-6 mt-4 text-gray-900"
-            >
-              Email address
-            </label>
-            <div className="mt-0">
+            <div className="mb-4">
+              <label className="block text-gray-700">Email</label>
               <input
-                id="email"
                 type="email"
-                autoComplete="email"
-                {...register("email")}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mb-5"
+                name="email"
+                className="w-full p-2 border border-gray-300 rounded mt-2"
+                required
               />
             </div>
-            <p className="text-red-500 text-sm">{errors.email?.message}</p>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between">
-              <label
-                htmlFor="address"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Address
-              </label>
+            <div className="mb-4">
+              <label className="block text-gray-700">Phone Number</label>
+              <input
+                type="text"
+                name="phone"
+                className="w-full p-2 border border-gray-300 rounded mt-2"
+                required
+              />
             </div>
-            <input
-              id="address"
-              type="text"
-              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6  mb-5"
-            />
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between">
-              <label
-                htmlFor="message"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Message
-              </label>
+            <div className="mb-4">
+              <label className="block text-gray-700">Select Subject:</label>
+              <div className="mt-2">
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="subject"
+                    value="General Inquiry"
+                    className="form-radio text-yellow-500"
+                    defaultChecked
+                  />
+                  <span className="ml-2">General Inquiry</span>
+                </label>
+                {/* Add more radio buttons as needed */}
+              </div>
             </div>
-            <input
-              id="message"
-              type="text"
-              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6  mb-5"
-            />
-          </div>
-
-          <div>
-            <Button
-              disabled={loading}
+            <div className="mb-4">
+              <label className="block text-gray-700">Message</label>
+              <textarea
+                name="message"
+                className="w-full p-2 border border-gray-300 rounded mt-2"
+                required
+              ></textarea>
+            </div>
+            <button
               type="submit"
-              className="flex w-full justify-center items-center rounded-lg bg-gray-950 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 mb-5"
+              className="bg-blue-900 text-white py-2 px-4 rounded hover:bg-blue-700"
             >
-              {!loading && (
-                <svg
-                  className="animate-none h-5 w-5 items-center rounded-full bg-white mr-2"
-                  viewBox="0 0 20 20"
-                >
-                  <g transform="translate(2.5, 2.5)">
-                    <ArrowDownTrayIcon width={14} height={14} color="black" />
-                  </g>
-                </svg>
-              )}
-              {loading ? "Loading..." : "Submit"}
-            </Button>
-          </div>
-        </form>
+              Send Message
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

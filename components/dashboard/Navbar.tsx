@@ -21,12 +21,13 @@ import {
 import Link from "next/link";
 import React from "react";
 import NotificationIcon from "./NotificationIcon";
+import AvatarIcon from "../Home/AvatarIcon";
 
 const Navbar = () => {
   const isSmallScreens = useMediaQuery("(max-width: 1200px)");
 
   return (
-    <nav className="flex flex-col sm:flex-row items-center justify-between my-4 bg-white border-gray-200">
+    <nav className="flex flex-col sm:flex-row items-center justify-between my-4 mx-4 border-b">
       <div className="flex items-center justify-between w-full sm:w-auto">
         <div className="flex items-center gap-5">
           {isSmallScreens && (
@@ -34,19 +35,20 @@ const Navbar = () => {
               <Bars3Icon className="h-6 w-6" />
             </div>
           )}
-          <Link href="/" className="flex">
-            <WifiIcon className="h-6 w-6 mx-2" aria-hidden="true" />
-            <span className="hover:text-zinc-950">Ten2Ten</span>
-          </Link>
+
+          {isSmallScreens && (
+            <Link href="/" className="flex ">
+              <WifiIcon className="h-6 w-6 mx-2" aria-hidden="true" />
+              <span className="hover:text-zinc-950">Ten2Ten</span>
+            </Link>
+          )}
         </div>
 
         <div className="flex gap-2 items-center sm:hidden">
           <NotificationIcon />
-          <img
-            src="/person-4.png"
-            alt="Profile"
-            className="w-10 h-10 rounded-full "
-          />
+          <div className="flexCenter hidden z-50">
+            <AvatarIcon />
+          </div>
         </div>
       </div>
       <div className="sm:hidden flex sm:flex-row items-center w-full sm:w-auto mt-4 sm:mt-0">
@@ -64,11 +66,9 @@ const Navbar = () => {
 
         <NotificationIcon />
 
-        <img
-          src="/person-4.png"
-          alt="Profile"
-          className="w-10 h-10 rounded-full"
-        />
+        <div>
+          <AvatarIcon />
+        </div>
       </div>
     </nav>
   );

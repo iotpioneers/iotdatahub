@@ -44,8 +44,11 @@ const authOptions: AuthOptions = {
     signIn: "/login",
   },
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
     CredentialsProvider({
-      id: "credentials",
       name: "credentials",
       credentials: {
         email: { label: "email", type: "email" },
@@ -66,12 +69,6 @@ const authOptions: AuthOptions = {
           throw error;
         }
       },
-    }),
-    GoogleProvider({
-      id: "google",
-      name: "google",
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
   session: {

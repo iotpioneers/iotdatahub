@@ -156,7 +156,11 @@ const Login = () => {
         </form>
         <div className="flex w-full flex-col space-y-2 border-2 rounded-lg items-center">
           <Button
-            onClick={() => signIn("google")}
+            onClick={() =>
+              signIn("google", {
+                callbackUrl: "http://localhost:3000/dashboard",
+              })
+            }
             className="flex items-center font-bold hover:text-green-50"
           >
             Continue with
