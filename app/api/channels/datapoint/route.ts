@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
     // Check if the apiKey exists and ensure it has a valid channelId
     const apiKey = await prisma.apiKey.findUnique({
-      where: { id: api_key },
+      where: { apiKey: api_key },
       include: { channel: true },
     });
 

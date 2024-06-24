@@ -40,6 +40,7 @@ export async function GET(
     // Find a data points
     const dataPoint = await prisma.dataPoint.findMany({
       where: { channelId: channel.id },
+      orderBy: { createdAt: "desc" },
     });
 
     if (dataPoint === null || dataPoint.length === 0)

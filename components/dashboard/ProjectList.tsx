@@ -1,19 +1,26 @@
-import useMediaQuery from "@/hooks/useMediaQuery";
-import { Card, Text } from "@radix-ui/themes";
-import Link from "next/link";
+import prisma from "@/prisma/client";
+import { Link, Table } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
 
 interface Channel {
-  id: number;
+  id: string;
   name: string;
   description: string;
-  lastSeen: Date | null;
-  lastSeenDateTime: Date;
+  latitude: string | null;
+  longitude: string | null;
+  createdAt: Date;
 }
+
+const formatDate = (date: Date) =>
+  new Intl.DateTimeFormat("en", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    weekday: "long",
+  }).format(new Date(date));
 
 const ProjectList = async () => {
   const [channels, setChannels] = useState<Channel[] | null>(null);
-  const isSmallScreens = useMediaQuery("(max-width: 760px)");
 
   useEffect(() => {
     const fetchChannels = async () => {
@@ -23,7 +30,11 @@ const ProjectList = async () => {
           throw new Error("Failed to fetch channels");
         }
         const channelsData: Channel[] = await res.json();
-        console.log("channelData", channelsData);
+
+        // Assuming createdAt in channelsData is a string, parse it into Date
+        channelsData.forEach((channel) => {
+          channel.createdAt = new Date(channel.createdAt);
+        });
 
         setChannels(channelsData);
       } catch (error) {
@@ -41,49 +52,59 @@ const ProjectList = async () => {
   }
 
   return (
-    <ul role="list">
-      {channels &&
-        channels.map((channel) => (
-          <li
-            key={channel.id}
-            className={`${
-              isSmallScreens ? "block" : "flex"
-            } justify-between gap-x-6 py-5 rounded-sm mt-2 padding-x border border-gray-200`}
-          >
-            <div className="flex min-w-0 gap-x-4">
-              <div className="min-w-0 flex-auto">
-                <Text className="text-lg font-semibold leading-6 text-primary-blue">
+    <div>
+      <Table.Root variant="surface" className="max-w-2xl">
+        <Table.Header>
+          <Table.Row>
+            <Table.ColumnHeaderCell>Channel</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className="hidden md:table-cell">
+              Description
+            </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className="hidden md:table-cell">
+              Latitude
+            </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className="hidden md:table-cell">
+              Longitude
+            </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className="hidden md:table-cell">
+              Created
+            </Table.ColumnHeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {channels.map((channel) => (
+            <Table.Row key={channel.id}>
+              {/* Add key prop */}
+              <Table.Cell className="min-w-32">
+                <div className="flex justify-between">
                   <Link href={`/dashboard/channels/${channel.id}`}>
                     {channel.name}
                   </Link>
-                </Text>
-                <Card className="prose mt-2 mb-2 truncate text-xs leading-5 text-gray-500">
-                  {channel.description}
-                </Card>
-              </div>
-            </div>
-            <div className="shrink-0 sm:flex sm:flex-col sm:items-end flex flex-auto">
-              {channel.lastSeen ? (
-                <Text className="mt-1 text-xs leading-5 text-gray-500">
-                  Last seen{" "}
-                  <time
-                    dateTime={channel.lastSeenDateTime?.toISOString() || ""}
-                  >
-                    {channel.lastSeen.toLocaleString()}
-                  </time>
-                </Text>
-              ) : (
-                <div className="mt-1 flex items-center gap-x-1.5 ml-2">
-                  {/* <div className="flex-none rounded-full bg-emerald-500/20 p-1">
-                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  </div>
-                  <p className="text-xs leading-5 text-gray-500">Online</p> */}
                 </div>
-              )}
-            </div>
-          </li>
-        ))}
-    </ul>
+                <div className="block md:hidden mt-3">
+                  {channel.description}
+                </div>
+                <div className="block md:hidden mt-3">
+                  {formatDate(channel.createdAt)}
+                </div>
+              </Table.Cell>
+              <Table.Cell className="hidden md:table-cell">
+                {channel.description}
+              </Table.Cell>
+              <Table.Cell className="hidden md:table-cell">
+                {channel.latitude || "N/A"}
+              </Table.Cell>
+              <Table.Cell className="hidden md:table-cell">
+                {channel.longitude || "N/A"}
+              </Table.Cell>
+              <Table.Cell className="hidden md:table-cell">
+                {formatDate(channel.createdAt)}
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table.Root>
+    </div>
   );
 };
 

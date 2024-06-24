@@ -1,4 +1,3 @@
-import Pagination from "@/components/dashboard/Pagination";
 import { Link, DeviceAction } from "@/components/device";
 import StatusBadge from "@/components/StatusBadge";
 import { Table } from "@radix-ui/themes";
@@ -86,10 +85,6 @@ const page = () => {
           ))}
         </Table.Body>
       </Table.Root>
-
-      <div>
-        <Pagination />
-      </div>
     </div>
   );
 };
