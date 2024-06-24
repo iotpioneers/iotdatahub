@@ -23,12 +23,12 @@ export default async function DashboardLayout({
       )}
 
       {/* Main content area */}
-      <div className="flex flex-col w-full  bg-gray-100 -mr-16">
+      <div className="flex flex-col w-full h-screen bg-gray-100 -mr-20">
         <Navbar />
 
         {/* Theme wrapper for main content */}
         <Theme>
-          <main className="flex w-full gap-1">
+          <main className="flex w-full gap-1 mr-5">
             {/* Adjust styles for the main content */}
             <div className={`relative ${isSmallScreens ? "w-full" : "ml-5"}`}>
               {children}
