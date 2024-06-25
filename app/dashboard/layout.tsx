@@ -6,7 +6,7 @@ import { Theme } from "@radix-ui/themes";
 import useMediaQuery from "@/hooks/useMediaQuery";
 import SideNavbar from "@/components/sidebar/SideNavbar";
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -14,28 +14,36 @@ export default async function DashboardLayout({
   const isSmallScreens = useMediaQuery("(max-width: 1200px)");
 
   return (
-    <section className="flex w-full">
-      {/* Sidebar (conditionally rendered based on screen size) */}
-      {!isSmallScreens && (
-        <aside className="ml-36">
-          <SideNavbar />
-        </aside>
-      )}
-
-      {/* Main content area */}
-      <div className="flex flex-col w-full -mr-16">
-        <Navbar />
-
-        {/* Theme wrapper for main content */}
-        <Theme>
-          <main className="flex w-full gap-1 mr-5">
-            {/* Adjust styles for the main content */}
-            <div className={`relative ${isSmallScreens ? "w-full" : "ml-5"}`}>
-              {children}
+    <html lang="en">
+      <body>
+        <section className="flex w-full min-h-screen">
+          {/* Sidebar (conditionally rendered based on screen size) */}
+          {!isSmallScreens && (
+            <div className="flex-shrink-0">
+              <aside className="fixed left-0 top-0 h-full">
+                <SideNavbar />
+              </aside>
             </div>
-          </main>
-        </Theme>
-      </div>
-    </section>
+          )}
+
+          {/* Main content area */}
+          <div
+            className={`flex flex-col ${!isSmallScreens ? "ml-64" : ""} w-full`}
+          >
+            <Navbar />
+
+            {/* Theme wrapper for main content */}
+            <Theme>
+              <main className="flex w-full p-4">
+                {/* Adjust styles for the main content */}
+                <div className={`relative ${isSmallScreens ? "w-full" : ""}`}>
+                  {children}
+                </div>
+              </main>
+            </Theme>
+          </div>
+        </section>
+      </body>
+    </html>
   );
 }

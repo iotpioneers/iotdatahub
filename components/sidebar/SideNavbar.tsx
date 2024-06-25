@@ -54,7 +54,7 @@ function SideNavbar() {
             </div>
             {/* setting  */}
             <div className="my-4 border-b border-gray-100 pb-4">
-              <Link href="#">
+              <Link href="/dashboard/subscription">
                 <div className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto">
                   <GiUpgrade className="text-2xl text-gray-600 group-hover:text-white " />
                   <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
@@ -81,7 +81,7 @@ function SideNavbar() {
                   </h3>
                 </div>
               </Link>
-              <Link href="">
+              <Link href="/api/auth/signout">
                 <div className="flex mb-2 justify-start items-center gap-4 pl-5 border border-gray-200 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto">
                   <MdOutlineLogout className="text-2xl text-gray-600 group-hover:text-white " />
                   <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">

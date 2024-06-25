@@ -3,6 +3,7 @@ import "./globals.css";
 import { Container, Theme } from "@radix-ui/themes";
 import AuthProvider from "./auth/Provider";
 import QueryClientProvider from "./QueryClientProvider";
+import Navbar from "@/components/Home/Navbar";
 
 export const metadata: Metadata = {
   title: "IoT service",
@@ -21,6 +22,7 @@ export default function RootLayout({
         <QueryClientProvider>
           <AuthProvider>
             <Theme accentColor="violet">
+              <Navbar />
               <main>
                 <Container>{children}</Container>
               </main>

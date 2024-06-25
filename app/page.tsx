@@ -10,7 +10,6 @@ import Navbar from "@/components/Home/Navbar";
 export default function Home() {
   return (
     <div className="mt-5">
-      <Navbar />
       <Hero />
       <ContactUs />
       <Footer />
