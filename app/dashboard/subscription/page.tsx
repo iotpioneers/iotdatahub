@@ -1,4 +1,5 @@
 import { Card, Flex, Heading, Text, Button } from "@radix-ui/themes";
+import Link from "next/link";
 import React from "react";
 
 const cardStyle = "flex flex-col justify-between p-5"; // Removed fixed height and width
@@ -6,7 +7,7 @@ const cardStyle = "flex flex-col justify-between p-5"; // Removed fixed height a
 const subscriptionPlans = [
   {
     name: "Free",
-    price: "USD $0/month",
+    price: "RWF 0/month",
     buttonText: "Your current plan",
     buttonDisabled: true,
     features: [
@@ -20,7 +21,7 @@ const subscriptionPlans = [
   },
   {
     name: "Standard",
-    price: "USD $20/month",
+    price: "RWF 1000/month",
     buttonText: "Upgrade to Standard",
     buttonDisabled: false,
     features: [
@@ -34,7 +35,7 @@ const subscriptionPlans = [
   },
   {
     name: "Premium",
-    price: "USD $25/month*",
+    price: "RWF 2000/month*",
     buttonText: "Upgrade to Premium",
     buttonDisabled: false,
     features: [
@@ -59,16 +60,18 @@ const UpgradePlanPage = () => {
             <Flex direction="column" gap="2">
               <Heading as="h3">{plan.name}</Heading>
               <Text size="2">{plan.price}</Text>
-              <Button
-                disabled={plan.buttonDisabled}
-                className={`mt-4 ${
-                  plan.buttonDisabled
-                    ? "bg-gray-200 text-gray-500"
-                    : "bg-blue-500 text-white"
-                } py-2 rounded`}
-              >
-                {plan.buttonText}
-              </Button>
+              <Link href="https://buy.stripe.com/test_28o3fF8wIbpn4LuaEE">
+                <Button
+                  disabled={plan.buttonDisabled}
+                  className={`mt-4 ${
+                    plan.buttonDisabled
+                      ? "bg-gray-200 text-gray-500"
+                      : "bg-blue-500 text-white"
+                  } py-2 rounded`}
+                >
+                  {plan.buttonText}
+                </Button>
+              </Link>
               {plan.features.map((feature, idx) => (
                 <Text key={idx}>{feature}</Text>
               ))}

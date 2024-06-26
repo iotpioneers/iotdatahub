@@ -43,6 +43,10 @@ module.exports = {
           100: "rgba(59,60,152,0.02)",
         },
         grey: "#747A88",
+        primary: "#6C63FF",
+        secondary: "#F5F5F5",
+        textColor: "#333333",
+        lightGray: "#E0E0E0",
       },
       backgroundImage: {
         "bg-img-1": "url('/img-1.png')",
