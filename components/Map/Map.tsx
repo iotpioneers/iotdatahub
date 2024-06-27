@@ -1,33 +1,25 @@
+"use client";
+
 import "leaflet/dist/leaflet.css";
-
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  useMap,
-  useMapEvents,
-} from "react-leaflet";
-
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet-defaulticon-compatibility";
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import styles from "./Map.module.css";
-import { useRouter } from "next/navigation";
 
-function Map() {
-  const mapPosition: any = [40, 0];
-
+function MapComponent() {
   return (
-    <div className="h-full">
+    <div className={styles.mapContainer}>
       <MapContainer
-        center={[40, 0]}
+        center={[-1.991900958762265, 30.09548102322638]}
         zoom={6}
         scrollWheelZoom={true}
-        className="w-full h-full"
+        className={styles.map}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
         />
-        <Marker position={[40, 0]}>
+        <Marker position={[-1.991900958762265, 30.09548102322638]}>
           <Popup>
             <span>🏙️</span> <span>Kicukiro - Rwanda</span>
           </Popup>
@@ -37,18 +29,4 @@ function Map() {
   );
 }
 
-function ChangeCenter({ position }: any) {
-  const map = useMap();
-  map.setView(position);
-  return null;
-}
-
-function DetectClick() {
-  const router = useRouter();
-
-  useMapEvents({
-    click: (e) => router.push(`form?lat=${e.latlng.lat}&lng=${e.latlng.lng}`),
-  });
-}
-
-export default Map;
+export default MapComponent;

@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import {
   MdRouter,
@@ -7,10 +6,7 @@ import {
   MdLightbulb,
   MdPrecisionManufacturing,
 } from "react-icons/md";
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import authOptions from "../api/auth/authOptions";
-import Chat from "@/components/Chat/Chat";
 import {
   ResponsiveContainer,
   CartesianGrid,
@@ -20,9 +16,11 @@ import {
   AreaChart,
   Area,
 } from "recharts";
-import { Button, Heading, Switch, Text, Avatar } from "@radix-ui/themes";
+import { Button, Heading, Switch, Text } from "@radix-ui/themes";
+import { Avatar } from "@radix-ui/react-avatar";
 import Link from "next/link";
 import { PlusIcon } from "@radix-ui/react-icons";
+import { useSession } from "next-auth/react";
 
 const dataLine = [
   { name: "Jan", value: 50 },
@@ -34,25 +32,26 @@ const dataLine = [
   { name: "Jul", value: 100 },
 ];
 
-const Dashboard = async () => {
-  const session = await getServerSession(authOptions);
-  if (!session) {
+const Dashboard = () => {
+  const { status, data: session } = useSession();
+
+  if (status === "unauthenticated") {
     return redirect("/login");
   }
 
   return (
-    <div className="min-h-screen font-sans text-gray-800 ">
+    <div className="min-h-screen font-sans text-gray-800">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
         {/* Welcome and Devices Section */}
         <div className="space-y-5">
           <div className="bg-orange-200 p-5 rounded-lg shadow-md">
             <div>
               <Heading as="h1" className="text-2xl font-bold mb-5">
-                Hello, Scarlett!
+                Hello, {session?.user?.name!}
               </Heading>
               <Text className="text-gray-600">
-                Welcome Home! The air quality is good & fresh you can go out
-                today.
+                Welcome to your personalized IoT dashboard. Here, you can manage
+                your devices, monitor data, and stay connected.
               </Text>
             </div>
           </div>
@@ -69,6 +68,7 @@ const Dashboard = async () => {
             </div>
 
             <div className="grid grid-cols-2 gap-5">
+              {/* Replace with actual device data */}
               <div className="bg-blue-500 text-white p-5 rounded-lg shadow-md flex flex-col justify-between h-32">
                 <div className="flex space-x-3 justify-between">
                   <MdPrecisionManufacturing className="h-6 w-6" />
@@ -103,56 +103,50 @@ const Dashboard = async () => {
 
         {/* Members, and Power Consumption Section */}
         <div className="space-y-5">
-          <div className="bg-white p-5 rounded-lg shadow-lg border">
-            <Heading as="h2" className="text-xl font-semibold mb-5">
-              Members
-            </Heading>
-            <div className="flex space-x-8 overflow-x-auto">
+          <div className="bg-white p-5 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-5">Members</h2>
+            <div className="flex space-x-5 overflow-x-auto overflow-hidden">
+              {/* Replace with actual member data */}
               <div className="flex flex-col items-center">
-                <Avatar
-                  fallback="S"
-                  className="h-10 w-10 bg-purple-500 rounded-full text-white flex items-center justify-center"
-                />
-                <div className="mt-2">Scarlett</div>
-                <Text className="text-green-500 text-sm">Admin</Text>
+                <Avatar className="h-10 w-10 bg-purple-500 rounded-full text-white flex items-center justify-center">
+                  E
+                </Avatar>
+                <div className="mt-2">Emmanuel</div>
+                <div className="text-green-500">Admin</div>
               </div>
               <div className="flex flex-col items-center">
-                <Avatar
-                  fallback="N"
-                  className="h-10 w-10 bg-red-500 rounded-full text-white flex items-center justify-center"
-                />
-                <Text className="mt-2">Nariya</Text>
-                <Text className="text-blue-500  text-sm">Full Access</Text>
+                <Avatar className="h-10 w-10 bg-red-500 rounded-full text-white flex items-center justify-center">
+                  B
+                </Avatar>
+                <div className="mt-2">Bruce</div>
+                <div className="text-purple-500">Member</div>
               </div>
               <div className="flex flex-col items-center">
-                <Avatar
-                  fallback="R"
-                  className="h-10 w-10 bg-green-500 rounded-full text-white flex items-center justify-center"
-                />
-                <Text className="mt-2">Riya</Text>
-                <Text className="text-blue-500  text-sm">Full Access</Text>
+                <Avatar className="h-10 w-10 bg-green-500 rounded-full text-white flex items-center justify-center">
+                  F
+                </Avatar>
+                <div className="mt-2">Florien</div>
+                <div className="text-purple-500">Member</div>
               </div>
               <div className="flex flex-col items-center">
-                <Avatar
-                  fallback="D"
-                  className="h-10 w-10 bg-orange-500 rounded-full text-white flex items-center justify-center"
-                />
-                <Text className="mt-2">Dad</Text>
-                <Text className="text-blue-500  text-sm">Full Access</Text>
+                <Avatar className="h-10 w-10 bg-orange-500 rounded-full text-white flex items-center justify-center">
+                  S
+                </Avatar>
+                <div className="mt-2">Steven</div>
+                <div className="text-purple-500">Member</div>
               </div>
               <div className="flex flex-col items-center">
-                <Avatar
-                  fallback="M"
-                  className="h-10 w-10 bg-teal-500 rounded-full text-white flex items-center justify-center"
-                />
-                <Text className="mt-2">Mom</Text>
-                <Text className="text-blue-500  text-sm">Full Access</Text>
+                <Avatar className="h-10 w-10 bg-teal-500 rounded-full text-white flex items-center justify-center">
+                  S
+                </Avatar>
+                <div className="mt-2">Sage</div>
+                <div className="text-purple-500">Member</div>
               </div>
             </div>
           </div>
 
           <div className="bg-white p-5 rounded-lg shadow-lg border">
-            <h2 className="text-xl font-semibold mb-5">Data Generateded</h2>
+            <h2 className="text-xl font-semibold mb-5">Data Generated</h2>
             <ResponsiveContainer width="100%" height={200}>
               <AreaChart
                 width={730}

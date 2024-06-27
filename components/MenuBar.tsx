@@ -3,9 +3,17 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { Dialog } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import NavigationMenuLinks from "./Home/NavigationMenuLinks/NavigationMenuLinks";
+import AvatarIcon from "./Home/AvatarIcon";
+import { Box, Button, Flex } from "@radix-ui/themes";
 
 const MenuBar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const closeMenu = () => {
+    console.log("Closed");
+    setMobileMenuOpen(false);
+  };
 
   return (
     <>
@@ -21,34 +29,19 @@ const MenuBar = () => {
 
       <Dialog
         open={mobileMenuOpen}
-        onClose={() => setMobileMenuOpen(false)}
-        className="fixed inset-0 z-50 overflow-y-auto bg-white"
+        onClose={() => {}} // Prevent closing by default
+        className="fixed inset-0 z-50 overflow-y-auto bg-white pt-5"
       >
-        <Dialog.Panel className="absolute top-0 right-0 p-4">
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen(false)}
-            className="p-2 text-gray-700"
-          >
-            <span className="sr-only">Close menu</span>
-            <XMarkIcon className="h-6 w-6" aria-hidden="true" />
-          </button>
+        <Button type="button" onClick={closeMenu}>
+          <XMarkIcon
+            className="h-12 w-12 ml-2 bg-zinc-500 border rounded-lg"
+            aria-hidden="true"
+          />
+        </Button>
+
+        <Dialog.Panel className="w-full h-screen md:-mt-12 bg-white">
+          <NavigationMenuLinks />
         </Dialog.Panel>
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <ul className="space-y-4">
-            <li>
-              <a href="#" className="text-gray-900">
-                Home
-              </a>
-            </li>
-            <li>
-              <a href="#" className="text-gray-900">
-                About
-              </a>
-            </li>
-            {/* Add more menu items */}
-          </ul>
-        </div>
       </Dialog>
     </>
   );

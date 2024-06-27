@@ -1,6 +1,6 @@
-// import React from 'react';
-
-import Map from "../Map/Map";
+import React from "react";
+import dynamic from "next/dynamic";
+const Map = dynamic(() => import("../Map/Map"), { ssr: false });
 
 const ContactUs = () => {
   return (
@@ -12,10 +12,7 @@ const ContactUs = () => {
         Any question or remarks? Just write us a message!
       </p>
       <div className="flex flex-wrap justify-around mt-10">
-        <div className="bg-blue-900 text-white p-8 rounded-lg w-full md:w-1/3 mb-6 md:mb-0">
-          {/* <Map /> */}
-        </div>
-        <div className="w-full md:w-1/2">
+        <div className="w-full md:w-1/2 md:pr-4">
           <form className="bg-white p-8 rounded-lg shadow-lg">
             <div className="mb-4">
               <label className="block text-gray-700">First Name</label>
@@ -68,6 +65,11 @@ const ContactUs = () => {
               Send Message
             </button>
           </form>
+        </div>
+        <div className="w-full md:w-1/2 md:pl-4 relative">
+          <div className="h-full rounded-lg overflow-hidden shadow-lg absolute inset-0">
+            <Map />
+          </div>
         </div>
       </div>
     </div>

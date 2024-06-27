@@ -1,32 +1,30 @@
-import { NAV_LINKS } from "@/constants";
+import React from "react";
 import Link from "next/link";
 import { Text } from "@radix-ui/themes";
 import { WifiIcon } from "@heroicons/react/24/outline";
 import AvatarIcon from "./AvatarIcon";
 import MenuBar from "../MenuBar";
+import NavigationMenuLinks from "./NavigationMenuLinks/NavigationMenuLinks";
 
 const Navbar = () => {
   return (
     <nav className="flexBetween max-container padding-container relative z-30 py-5 border-b navbar bg-green-50 rounded-sm max-h-16">
-      <Link href="/" className="flex font-extrabold text-2xl text-white">
-        <WifiIcon className="h-8 w-8" aria-hidden="true" />
-        <Text>Ten2Ten</Text>
-      </Link>
+      <div className="flex justify-center items-center">
+        <Link
+          href="/"
+          className="flex font-extrabold text-2xl text-white gap-1"
+        >
+          <WifiIcon className="h-8 w-8" aria-hidden="true" />
+          <Text>Ten2Ten</Text>
+        </Link>
 
-      <ul className="hidden h-full gap-12 lg:flex">
-        {NAV_LINKS.map((link) => (
-          <Link
-            href={link.href}
-            key={link.key}
-            className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
-          >
-            {link.label}
-          </Link>
-        ))}
-      </ul>
+        <div className="hidden h-full lg:flex">
+          <NavigationMenuLinks />
+        </div>
 
-      <div className="lg:flexCenter hidden z-50">
-        <AvatarIcon />
+        <div className="hidden lg:flex items-center -ml-80">
+          <AvatarIcon />
+        </div>
       </div>
 
       <MenuBar />
