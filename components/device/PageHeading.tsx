@@ -1,6 +1,5 @@
 "use client";
 
-import Loading from "@/app/loading";
 import { CalendarIcon, LinkIcon, MapPinIcon } from "@heroicons/react/20/solid";
 import { ChartPieIcon } from "@heroicons/react/24/solid";
 import ReactMarkdown from "react-markdown";
@@ -9,6 +8,7 @@ import { Box, Button, Card, Flex, Heading, Text } from "@radix-ui/themes";
 import { ChannelProps } from "@/types";
 import EditChannel from "../Channels/EditChannel";
 import ToastDemo from "../Toast/ToastDemo";
+import Loading from "@/app/loading";
 
 interface ChannelHeadingProps {
   channel: ChannelProps;

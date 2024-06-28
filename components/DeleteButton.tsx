@@ -3,13 +3,13 @@
 import { AlertDialog, Button, Flex } from "@radix-ui/themes";
 import React, { useState } from "react";
 import { TrashIcon } from "@heroicons/react/24/outline";
-import LoadingSkeleton from "./LoadingSkeleton";
+import Loading from "@/app/loading";
 
 const DeleteButton = () => {
   const [error, setError] = useState(false);
   const [isDeleting, setDeleting] = useState(false);
 
-  if (isDeleting) return <LoadingSkeleton />;
+  if (isDeleting) return <Loading />;
 
   return (
     <>

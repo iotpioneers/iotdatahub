@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import Navigation from "@/components/device/Navigation";
 import PageHeading from "@/components/device/PageHeading";
-import Loading from "@/app/loading";
 import { ChannelProps, DataPointProps, FieldProps } from "@/types";
+import Loading from "@/app/loading";
 
 interface Props {
   params: { id: string };

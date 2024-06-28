@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { channelSchema } from "@/validations/schema.validation";
 import ErrorMessage from "@/components/ErrorMessage";
-import LoadingSkeleton from "../LoadingSkeleton";
+import Loading from "@/app/loading";
 
 type ChannelForm = z.infer<typeof channelSchema>;
 
@@ -77,7 +77,7 @@ export default function ChannelForm() {
     }
   });
 
-  if (isSubmitting) return <LoadingSkeleton />;
+  if (isSubmitting) return <Loading />;
 
   return (
     <main className="overflow-hidden p-4">

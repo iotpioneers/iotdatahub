@@ -22,7 +22,6 @@ export default function RootLayout({
         <QueryClientProvider>
           <AuthProvider>
             <Theme accentColor="violet">
-              <Navbar />
               <main>
                 <Container>{children}</Container>
               </main>

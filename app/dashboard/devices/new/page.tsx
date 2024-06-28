@@ -15,7 +15,7 @@ import { z } from "zod";
 import { deviceSchema } from "@/validations/schema.validation";
 import ErrorMessage from "@/components/ErrorMessage";
 import BackButton from "@/components/BackButton";
-import LoadingSkeleton from "@/components/LoadingSkeleton";
+import Loading from "@/app/loading";
 
 type DeviceForm = z.infer<typeof deviceSchema>;
 
@@ -47,7 +47,7 @@ export default function Newdevice() {
     }
   });
 
-  if (isSubmitting) return <LoadingSkeleton />;
+  if (isSubmitting) return <Loading />;
 
   return (
     <main className="overflow-hidden p-4">

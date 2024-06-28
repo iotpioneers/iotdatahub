@@ -1,5 +1,5 @@
 import React from "react";
-import Skeleton from "@/components/Skeleton"; // Import your Skeleton component
+import Skeleton from "@/components/Skeleton";
 import { Disclosure } from "@headlessui/react";
 import Link from "next/link";
 

@@ -5,8 +5,8 @@ import LineChartComponent from "../charts/LineChartComponent";
 import AddChartComponent from "../charts/AddChartComponent";
 import useMediaQuery from "@/hooks/useMediaQuery";
 import { ChannelProps, DataPointProps, FieldProps } from "@/types";
-import Loading from "@/app/loading";
 import { Text } from "@radix-ui/themes";
+import Loading from "@/app/loading";
 
 // this will be receiving an object where the object will be containing the data and the type of chart we should load for it, the we shall use the switch case to render the correct chart
 // the also will be passed to the component as an array of object

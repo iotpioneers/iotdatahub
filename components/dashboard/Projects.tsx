@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ProjectList from "./ProjectList";
 import ChannelAction from "../device/ChannelAction";
 import { Heading, Text } from "@radix-ui/themes";
-import LoadingSkeleton from "../LoadingSkeleton";
+import Loading from "@/app/loading";
 
 interface Channel {
   id: number;
@@ -41,7 +41,7 @@ const Projects = () => {
     fetchChannels();
   }, []);
 
-  if (isLoading) return <LoadingSkeleton />;
+  if (isLoading) return <Loading />;
 
   return (
     <div className="padding-x padding-y max-width">
