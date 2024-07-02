@@ -10,11 +10,11 @@ import {
 } from "@mui/material";
 import React from "react";
 import useMeasure from "react-use-measure";
-import { section1Content } from "@/app/utils/content";
+import { heroSectionContent } from "@/app/utils/content";
 import Title from "../components/Title";
 import Image from "next/image";
 
-const { title, subtitle } = section1Content;
+const { title, subtitle, description } = heroSectionContent;
 interface CustomButtonProps {
   children: React.ReactNode;
   [x: string]: any;
@@ -36,18 +36,18 @@ const CustomButton: React.FC<CustomButtonProps> = ({ children, ...props }) => (
   </Button>
 );
 
-const Section1 = () => {
+const Hero = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   const [ref, { height }] = useMeasure();
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box sx={{ width: "100%", mb: "15rem" }}>
       {/* Main Background */}
       <Box sx={{ position: "fixed", zIndex: -10, top: 0, left: 0, right: 0 }}>
         <img
-          src="home_assets/section1/main-bg-0_1.webp"
+          src="home_assets/Backgrounds/main-bg-0_1.webp"
           style={{ width: "100%" }}
         />
       </Box>
@@ -65,13 +65,13 @@ const Section1 = () => {
         }}
       >
         <img
-          src="home_assets/section1/main-bg-0_1.webp"
+          src="home_assets/Backgrounds/main-bg-0_1.webp"
           style={{ width: "100%", opacity: 0 }}
         />
 
         {/* Star */}
         <img
-          src="home_assets/section1/main-bg-0-0.png"
+          src="home_assets/Backgrounds/main-bg-0-0.png"
           style={{
             position: "absolute",
             top: "30px",
@@ -114,16 +114,33 @@ const Section1 = () => {
           [theme.breakpoints.up("md")]: { mt: 6 },
         }}
       >
-        <Stack sx={{ height: "100%" }} justifyContent="center" color="white">
-          <Title variant="h1" sx={{ letterSpacing: "0.02em", mb: 1 }}>
+        <Stack sx={{ height: "100%" }} justifyContent="center" color="beige">
+          <Title variant="h1" sx={{ letterSpacing: "0.02em", mb: 1, mt: 5 }}>
             {title}
           </Title>
 
           <Title
             variant="h2"
-            sx={{ fontWeight: 500, letterSpacing: "0.05em", mb: 5 }}
+            sx={{
+              fontWeight: 500,
+              letterSpacing: "0.05em",
+              mb: 5,
+              width: "50%",
+            }}
           >
             {subtitle}
+          </Title>
+
+          <Title
+            variant="h5"
+            sx={{
+              fontWeight: 300,
+              letterSpacing: "0.05em",
+              mb: 5,
+              width: "50%",
+            }}
+          >
+            {description}
           </Title>
 
           {/*Rating Stars */}
@@ -141,16 +158,10 @@ const Section1 = () => {
                 />
               ))}
           </div>
-
-          <Stack
-            direction={{ xs: "column", md: "row" }}
-            alignItems="center"
-            spacing={4}
-          ></Stack>
         </Stack>
       </Container>
     </Box>
   );
 };
 
-export default Section1;
+export default Hero;

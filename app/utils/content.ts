@@ -6,33 +6,11 @@ import ChatIcon from "@mui/icons-material/Chat";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import GitHubIcon from "@mui/icons-material/GitHub";
 
-export const section1Content = {
+export const heroSectionContent = {
   title: "Seamless Connectivity: ",
   subtitle: "Empowering Data Insights for Better Decisions",
-};
-
-export const section2Content = {
-  items: [
-    { counter: 345, subtitle: "Data Sources Connected" },
-    {
-      counter: 345,
-      before: "$",
-      after: "B+",
-      subtitle: "Total Data Volume Analyzed",
-    },
-    {
-      counter: 4.4,
-      after: "M+",
-      subtitle: "Total Devices Managed",
-      decimals: true,
-    },
-    {
-      counter: 28.7,
-      after: "M+",
-      subtitle: "Data Transactions Processed",
-      decimals: true,
-    },
-  ],
+  description:
+    "Our platform instantly analyzes data from various IoT devices to provide actionable insights and ensure continuous data availability.",
 };
 
 export const section3Content = {
@@ -95,45 +73,44 @@ export const section4Content = {
   },
 };
 
-export const section5Content = {
-  BannerBgImage: "home_assets/section5/news-block-background.webp",
-  BannerBgImageMobile: "home_assets/section5/news-block-background-mobile.webp",
+export const CardContent = {
+  BannerBgImage: "home_assets/card_images/news-block-background.jpg",
   title: "IoT Fusion",
   subtitle:
     "The IoT Fusion upgrade enhances data analysis capabilities by integrating data from diverse IoT networks into a unified platform.",
 };
 
-export const section6Content = {
+export const OurFeaturesContent = {
   title: "Our IoT Solutions",
   ITEMS: [
     {
       title: "Data Aggregation Solution",
       subtitle:
         "Aggregate data from multiple IoT networks to optimize data insights.",
-      image: "home_assets/section6/aggregation-protocol.webp",
+      image: "home_assets/our_features_images/aggregation-protocol.png",
     },
     {
       title: "Real-time Monitoring Solution",
       subtitle:
         "Monitor IoT devices in real-time to ensure optimal performance.",
-      image: "home_assets/section6/limit-order-protocol.webp",
+      image: "home_assets/our_features_images/limit-order-protocol.jpg",
     },
     {
       title: "Predictive Analytics Solution",
       subtitle:
         "Utilize predictive analytics to forecast IoT device behavior and performance.",
-      image: "home_assets/section6/liquidity-protocol.webp",
+      image: "home_assets/our_features_images/liquidity-protocol.webp",
     },
     {
       title: "Data Security Solution",
       subtitle:
         "Implement advanced security measures to protect IoT data and devices.",
-      image: "home_assets/section6/earn_1.webp",
+      image: "home_assets/our_features_images/earn_1.webp",
     },
     {
       title: "Remote Management Solution",
       subtitle: "Manage IoT devices remotely to streamline operations.",
-      image: "home_assets/section6/rabbithole.webp",
+      image: "home_assets/our_features_images/rabbithole.webp",
     },
   ],
 };

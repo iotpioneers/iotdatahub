@@ -6,7 +6,7 @@ import theme from "./utils/theme";
 import Navbar from "@/components/Home/components/Navbars/MainNavbar";
 import Footer from "@/components/Home/components/Footers/MainFooter";
 import HomeBodySections from "@/components/Home/HomeBodySections";
-import HomeUpperSections from "@/components/Home/HomeUpperSections";
+import Hero from "@/components/Home/containers/Hero";
 
 export default function Home() {
   return (
@@ -19,7 +19,7 @@ export default function Home() {
 
         {/* Sections */}
 
-        <HomeUpperSections />
+        <Hero />
         <Box sx={{ bgcolor: "background.default", position: "relative" }}>
           <HomeBodySections />
 

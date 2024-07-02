@@ -69,10 +69,10 @@ const Navbar = () => {
           flexWrap="wrap"
         >
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-1">
             <img
               src="home_assets/logo.svg"
-              style={{ height: "100%", objectFit: "contain" }}
+              style={{ height: "25px", objectFit: "contain" }}
             />
             <Typography style={{ height: "100%" }}>Ten2Ten</Typography>
           </Link>

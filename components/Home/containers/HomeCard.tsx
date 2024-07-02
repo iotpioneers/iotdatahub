@@ -11,12 +11,12 @@ import {
 } from "@mui/material";
 import React from "react";
 import Title from "../components/Title";
-import { section5Content } from "@/app/utils/content";
+import { CardContent } from "@/app/utils/content";
 import OutlinedButton from "../components/Buttons/OutlinedButton";
 
-const { BannerBgImage, BannerBgImageMobile, title, subtitle } = section5Content;
+const { BannerBgImage, title, subtitle } = CardContent;
 
-const Section5 = () => {
+const HomeCard = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -25,7 +25,7 @@ const Section5 = () => {
       <Box
         sx={{
           position: "relative",
-          background: `url(${BannerBgImageMobile})`,
+          background: `url(${BannerBgImage})`,
           backgroundSize: "cover",
           py: 5,
           borderRadius: "30px",
@@ -54,10 +54,14 @@ const Section5 = () => {
       >
         <Grid container flexWrap="wrap-reverse" sx={{ px: { xs: 5, md: 8 } }}>
           <Grid item xs={12} md={5} lg={4}>
-            <Stack spacing={2} justifyContent="center" sx={{ height: "100%" }}>
+            <Stack
+              spacing={2}
+              justifyContent="center"
+              sx={{ height: "100%", mt: -5 }}
+            >
               <Title variant="h2">{title}</Title>
 
-              <Typography variant="body2" color="text.secondary" sx={{ pb: 3 }}>
+              <Typography variant="body1" color="text.primary" sx={{ pb: 3 }}>
                 {subtitle}
               </Typography>
 
@@ -81,4 +85,4 @@ const Section5 = () => {
   );
 };
 
-export default Section5;
+export default HomeCard;

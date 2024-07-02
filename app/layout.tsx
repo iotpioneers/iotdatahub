@@ -20,11 +20,9 @@ export default function RootLayout({
       <body>
         <QueryClientProvider>
           <AuthProvider>
-            <Theme accentColor="violet">
-              <main>
-                <Container>{children}</Container>
-              </main>
-            </Theme>
+            <main>
+              <Container>{children}</Container>
+            </main>
           </AuthProvider>
         </QueryClientProvider>
       </body>

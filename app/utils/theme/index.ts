@@ -5,7 +5,7 @@ import typography from "./typography";
 
 const theme = createTheme({
   palette: {
-    mode: "dark",
+    mode: "light",
     primary: {
       main: "#2f8af5",
     },
