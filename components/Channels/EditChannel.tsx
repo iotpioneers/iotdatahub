@@ -79,7 +79,7 @@ const EditChannel = () => {
     }
   });
 
-  if (isSubmitting) return <Loading />;
+  if (isSubmitting) return;
 
   return (
     <div>

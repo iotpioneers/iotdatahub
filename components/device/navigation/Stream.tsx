@@ -41,7 +41,7 @@ const Stream = ({ channelId }: Props) => {
   }, [channelData]);
 
   if (!channelData) {
-    return <Loading />;
+    return;
   }
 
   const { fields, dataPoint } = channelData;

@@ -1,3 +1,5 @@
+const { mauve, violet, blackA } = require("@radix-ui/colors");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -47,6 +49,9 @@ module.exports = {
         secondary: "#F5F5F5",
         textColor: "#333333",
         lightGray: "#E0E0E0",
+        ...mauve,
+        ...violet,
+        ...blackA,
       },
       backgroundImage: {
         "bg-img-1": "url('/img-1.png')",

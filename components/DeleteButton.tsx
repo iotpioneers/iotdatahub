@@ -9,7 +9,7 @@ const DeleteButton = () => {
   const [error, setError] = useState(false);
   const [isDeleting, setDeleting] = useState(false);
 
-  if (isDeleting) return <Loading />;
+  if (isDeleting) return;
 
   return (
     <>

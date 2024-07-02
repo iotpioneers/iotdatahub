@@ -1,12 +1,9 @@
 "use client";
 
 import { userSchema } from "@/validations/schema.validation";
-import {
-  ArrowDownOnSquareIcon,
-  ArrowDownTrayIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Heading, Text } from "@radix-ui/themes";
+import { Button, Heading } from "@radix-ui/themes";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,7 +15,9 @@ import { z } from "zod";
 type FormData = z.infer<typeof userSchema>;
 
 const Register = () => {
+  const [loading, setLoading] = useState(false);
   const [err, setErr] = useState();
+
   const route = useRouter();
   const {
     register,
@@ -29,6 +28,8 @@ const Register = () => {
   });
 
   const onSubmit = handleSubmit(async (data: FormData) => {
+    setLoading(true);
+
     const response = await fetch("/api/register", {
       method: "POST",
       headers: {
@@ -39,11 +40,13 @@ const Register = () => {
     const result = await response.json();
 
     if (response.ok) {
-      route.push("/login");
+      route.push("/dashboard");
       console.log(result.message);
+      setLoading(false);
     } else {
       console.log(result.message);
       setErr(result.message);
+      setLoading(false);
     }
   });
 
@@ -87,7 +90,7 @@ const Register = () => {
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
             </div>
-            <Text>{errors.name?.message}</Text>
+            <p className="text-red-500 text-sm">{errors.name?.message}</p>
           </div>
 
           <div>
@@ -106,7 +109,7 @@ const Register = () => {
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
             </div>
-            <Text>{errors.email?.message}</Text>
+            <p className="text-red-500 text-sm">{errors.email?.message}</p>
           </div>
 
           <div>
@@ -127,7 +130,7 @@ const Register = () => {
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
               />
             </div>
-            <Text>{errors.password?.message}</Text>
+            <p className="text-red-500 text-sm">{errors.password?.message}</p>
           </div>
           <div>
             <div className="flex items-center justify-between">
@@ -147,20 +150,27 @@ const Register = () => {
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
               />
             </div>
-            <Text>{errors.confirmPassword?.message}</Text>
+            <p className="text-red-500 text-sm">
+              {errors.confirmPassword?.message}
+            </p>
           </div>
 
           <div>
-            <Button className="flex w-full justify-center rounded-md bg-primary-blue px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-black items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-              <svg
-                className="animate-none h-5 w-5 items-center rounded-full bg-white mr-2"
-                viewBox="0 0 20 20"
-              >
-                <g transform="translate(2.5, 2.5)">
-                  <ArrowDownTrayIcon width={14} height={14} color="black" />
-                </g>
-              </svg>
-              Register
+            <Button
+              disabled={loading}
+              className="flex w-full justify-center rounded-md bg-primary-blue px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-black items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            >
+              {!loading && (
+                <svg
+                  className="animate-none h-5 w-5 items-center rounded-full bg-white mr-2"
+                  viewBox="0 0 20 20"
+                >
+                  <g transform="translate(2.5, 2.5)">
+                    <ArrowUpTrayIcon width={14} height={14} color="black" />
+                  </g>
+                </svg>
+              )}
+              {loading ? "Loading..." : "Register"}
             </Button>
           </div>
         </form>

@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(validation.error.errors, { status: 400 });
   }
 
-  const { name, description, fields } = validation.data;
+  const { name, description, fields, latitude, longitude } = validation.data;
 
   const apiKey = nanoid(16);
 
@@ -112,6 +112,8 @@ void loop() {
         fields: {
           create: formattedFields || [],
         },
+        latitude,
+        longitude,
         apiKeys: {
           create: {
             apiKey,

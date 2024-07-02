@@ -61,6 +61,15 @@ export const channelSchema = z.object({
     .min(1, "Description is required and cannot be empty")
     .max(65535, { message: "Description must be 65535 characters or less" }),
   fields: z.array(z.string()).min(1, "At least one field is required"),
+
+  latitude: z.preprocess(
+    (value) => parseFloat(value as string),
+    z.number().optional()
+  ),
+  longitude: z.preprocess(
+    (value) => parseFloat(value as string),
+    z.number().optional()
+  ),
   access: z.string().optional(),
 });
 
@@ -76,18 +85,18 @@ export const deviceSchema = z.object({
     .min(1, "Description is required and cannot be empty")
     .max(65535, { message: "Description must be 65535 characters or less" }),
 
-  channelId: z.string().min(1, "Channel ID is required and cannot be empty"),
+  channelId: z.string().min(1, "Channel is required and cannot be empty"),
 });
 
 // The schema for the api keys data
 export const apiKeySchema = z.object({
   apiKey: z.string().min(1, "API key is required and cannot be empty").max(255),
 
-  userId: z.string().min(1, "User ID is required and cannot be empty").max(255),
+  userId: z.string().min(1, "User is required and cannot be empty").max(255),
 
   channelId: z
     .string()
-    .min(1, "Channel ID is required and cannot be empty")
+    .min(1, "Channel is required and cannot be empty")
     .max(255),
 
   fields: z.array(z.string()).min(1),

@@ -24,7 +24,7 @@ const formatDate = (date: string) =>
 
 const PageHeading = ({ channel }: ChannelHeadingProps) => {
   if (!channel) {
-    return <Loading />;
+    return;
   }
 
   return (

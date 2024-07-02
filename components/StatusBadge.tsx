@@ -6,10 +6,9 @@ interface Status {
 }
 
 const StatusBadge = ({ status }: Status) => {
-  if (status === "active") return <Badge color="green">Active</Badge>;
-  if (status === "disabled") return <Badge color="red">Disabled</Badge>;
-  if (status === "disconnected")
-    return <Badge color="brown">Disconnected</Badge>;
+  if (status === "ONLINE") return <Badge color="green">Active</Badge>;
+  if (status === "OFFLINE") return <Badge color="red">OFFLINE</Badge>;
+
   return <Badge color="brown">{status}</Badge>;
 };
 

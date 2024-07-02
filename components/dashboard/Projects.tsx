@@ -41,7 +41,7 @@ const Projects = () => {
     fetchChannels();
   }, []);
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return;
 
   return (
     <div className="w-full">

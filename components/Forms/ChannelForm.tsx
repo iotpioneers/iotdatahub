@@ -1,17 +1,20 @@
 "use client";
 
 import { ChangeEvent, useState } from "react";
-import { ArchiveBoxXMarkIcon } from "@heroicons/react/24/outline";
+import {
+  ArchiveBoxXMarkIcon,
+  CloudArrowUpIcon,
+} from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { Button, Callout } from "@radix-ui/themes";
+import { Switch } from "@radix-ui/react-switch";
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { channelSchema } from "@/validations/schema.validation";
 import ErrorMessage from "@/components/ErrorMessage";
-import Loading from "@/app/loading";
 
 type ChannelForm = z.infer<typeof channelSchema>;
 
@@ -20,6 +23,7 @@ export default function ChannelForm() {
   const [fields, setFields] = useState<string[]>([""]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [isLatLongEnabled, setIsLatLongEnabled] = useState<boolean>(false); // State for latitude and longitude toggle
 
   const {
     register,
@@ -47,6 +51,10 @@ export default function ChannelForm() {
       const newFields = fields.filter((_, i) => i !== index);
       setFields(newFields);
     }
+  };
+
+  const toggleLatLong = () => {
+    setIsLatLongEnabled(!isLatLongEnabled);
   };
 
   const onSubmit = handleSubmit(async (data) => {
@@ -81,8 +89,6 @@ export default function ChannelForm() {
       console.error("Error creating channel:", error);
     }
   });
-
-  if (isSubmitting) return <Loading />;
 
   return (
     <main className="overflow-hidden p-4">
@@ -158,6 +164,60 @@ export default function ChannelForm() {
           New Field
         </Button>
 
+        <div className="my-4 flex items-center">
+          <label className="block text-sm font-medium text-gray-700">
+            Add Location (Optional)
+          </label>
+          <Switch
+            checked={isLatLongEnabled}
+            onCheckedChange={toggleLatLong}
+            className="ml-3 relative inline-flex items-center h-6 rounded-full w-11 bg-gray-200 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-2"
+          >
+            <span
+              className={`${
+                isLatLongEnabled ? "translate-x-6" : "translate-x-1"
+              } inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
+            />
+          </Switch>
+        </div>
+
+        {isLatLongEnabled && (
+          <div className="mb-4 grid grid-cols-2 gap-4">
+            <div>
+              <label
+                className="block text-sm font-medium text-gray-700"
+                htmlFor="latitude"
+              >
+                Latitude
+              </label>
+              <input
+                type="number"
+                id="latitude"
+                step="any"
+                {...register("latitude")}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              />
+              <ErrorMessage>{errors.latitude?.message}</ErrorMessage>
+            </div>
+            <div>
+              <label
+                className="block text-sm font-medium text-gray-700"
+                htmlFor="longitude"
+              >
+                Longitude
+              </label>
+              <input
+                type="number"
+                id="longitude"
+                step="any"
+                {...register("longitude")}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              />
+              <ErrorMessage>{errors.longitude?.message}</ErrorMessage>
+            </div>
+          </div>
+        )}
+
         <div className="mb-4">
           <label
             className="block text-sm font-medium text-gray-700"
@@ -180,12 +240,20 @@ export default function ChannelForm() {
           />
           <ErrorMessage>{errors.description?.message}</ErrorMessage>
         </div>
+
         <Button
           type="submit"
-          className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium items-center text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           disabled={isSubmitting}
         >
-          Add Channel
+          {isSubmitting && (
+            <svg className="animate-pulse h-5 w-5 -mt-1" viewBox="0 0 21 21">
+              <g transform="translate(2.5, 2.5)">
+                <CloudArrowUpIcon width={20} height={20} color="white" />
+              </g>
+            </svg>
+          )}
+          {isSubmitting ? "Sending..." : "Add Channel"}
         </Button>
       </form>
     </main>

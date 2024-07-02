@@ -31,8 +31,6 @@ export default function ChannelDetails({ params }: Props) {
       );
       const channelData: ChannelData = await res.json();
 
-      console.log("channelData:--", channelData);
-
       setChannelData(channelData);
     };
 
@@ -40,7 +38,7 @@ export default function ChannelDetails({ params }: Props) {
   }, []);
 
   if (!channelData) {
-    return <Loading />;
+    return;
   }
 
   const { channel } = channelData;

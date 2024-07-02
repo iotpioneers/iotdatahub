@@ -60,7 +60,7 @@ const Dashboard = () => {
               <Heading as="h2" className="text-xl font-semibold">
                 My Devices
               </Heading>
-              <Link href="#">
+              <Link href="/dashboard/devices/new">
                 <Button variant="outline" className="w-10 h-10">
                   <PlusIcon className="w-4 h-4" /> Add Device
                 </Button>
