@@ -1,12 +1,10 @@
 "use client";
 import React from "react";
 import { redirect } from "next/navigation";
-import { Button, Heading, Text } from "@radix-ui/themes";
-import Link from "next/link";
 import { useSession } from "next-auth/react";
 import Skeleton from "@/components/Skeleton";
 
-const DashboardSkeleton = () => {
+const LoadingSkeleton = () => {
   const { status } = useSession();
 
   if (status === "unauthenticated") {
@@ -66,7 +64,7 @@ const DashboardSkeleton = () => {
   );
 };
 
-export default DashboardSkeleton;
+export default LoadingSkeleton;
 
 // "use client";
 

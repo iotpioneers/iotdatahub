@@ -9,10 +9,16 @@ interface Device {
   id: number;
   name: string;
   description: string;
-  channel: string;
   status: string;
-  createdAt: string;
+  createdAt: Date;
 }
+
+const formatDate = (date: Date) =>
+  new Intl.DateTimeFormat("en", {
+    day: "numeric",
+    month: "long",
+    year: "2-digit",
+  }).format(new Date(date));
 
 const DeviceLists = () => {
   const [devices, setDevices] = useState<Device[]>([]);
@@ -34,10 +40,10 @@ const DeviceLists = () => {
     fetchDevices();
   }, []);
 
-  if (!devices) return;
+  if (!devices) return null;
 
   return (
-    <div className="mt-5">
+    <div className="w-full mt-5">
       <DeviceAction />
       <Table.Root variant="surface">
         <Table.Header>
@@ -45,9 +51,6 @@ const DeviceLists = () => {
             <Table.ColumnHeaderCell>Device</Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell className="hidden md:table-cell">
               Description
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="hidden md:table-cell">
-              Channel
             </Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell className="hidden md:table-cell">
               Status
@@ -75,13 +78,10 @@ const DeviceLists = () => {
                 {device.description}
               </Table.Cell>
               <Table.Cell className="hidden md:table-cell">
-                {device.channel}
-              </Table.Cell>
-              <Table.Cell className="hidden md:table-cell">
                 <StatusBadge status={device.status} />
               </Table.Cell>
               <Table.Cell className="hidden md:table-cell min-w-32">
-                {device.createdAt}
+                {formatDate(device.createdAt)}
               </Table.Cell>
             </Table.Row>
           ))}

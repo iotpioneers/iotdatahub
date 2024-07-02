@@ -5,7 +5,7 @@ import BackButton from "../BackButton";
 
 const DeviceAction = () => {
   return (
-    <div className=" flex mb-5 justify-between mr-5">
+    <div className=" flex w-full mb-5 justify-between">
       <BackButton />
       <Button>
         <Link href="/dashboard/devices/new">New device</Link>
