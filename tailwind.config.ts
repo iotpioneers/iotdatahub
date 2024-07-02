@@ -56,6 +56,9 @@ module.exports = {
         "pattern-2": "url('/pattern-bg.png')",
         "hero-bg": "url('/hero-bg.png')",
       },
+      LogoImage: {
+        "logo-img": "url('/home_assets/logo.svg')",
+      },
       screens: {
         xs: "400px",
         "3xl": "1680px",

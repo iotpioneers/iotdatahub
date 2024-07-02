@@ -44,8 +44,8 @@ const Projects = () => {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="padding-x padding-y max-width">
-      {channels && channels.length === 0 && (
+    <div className="w-full">
+      {(!channels || channels.length === 0) && (
         <div className="mb-8 flex flex-col items-center text-center max-w-2xl mx-auto">
           <Heading as="h3" className="mb-5">
             Start by creating your first channel

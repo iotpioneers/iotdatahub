@@ -23,7 +23,11 @@ const AvatarIcon = () => {
         <Popover.Root>
           <Popover.Trigger>
             <Avatar className="h-10 w-10 bg-gray-500 rounded-full flex items-center justify-center">
-              <img src={session!.user!.image! || "/user.svg"} alt="Profile" />
+              <img
+                src={session!.user!.image! || "/user.svg"}
+                alt="Profile"
+                className="rounded-full"
+              />
             </Avatar>
           </Popover.Trigger>
           <Popover.Content className="bg-white border shadow-md rounded-lg z-50 px-5">

@@ -79,6 +79,8 @@ export const NAV_LINKS = [
   { href: "/contactus", key: "contact_us", label: "Contact Us" },
 ];
 
+export const NAVBAR_HEIGHT = 72;
+
 // CAMP SECTION
 export const PEOPLE_URL = [
   "/person-1.png",

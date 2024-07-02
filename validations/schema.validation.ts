@@ -75,10 +75,11 @@ export const deviceSchema = z.object({
     .string()
     .min(1, "Description is required and cannot be empty")
     .max(65535, { message: "Description must be 65535 characters or less" }),
-  channels: z.string().min(1, "At least one channel is required"),
+
+  channelId: z.string().min(1, "Channel ID is required and cannot be empty"),
 });
 
-// The schema for the device data
+// The schema for the api keys data
 export const apiKeySchema = z.object({
   apiKey: z.string().min(1, "API key is required and cannot be empty").max(255),
 
@@ -91,3 +92,55 @@ export const apiKeySchema = z.object({
 
   fields: z.array(z.string()).min(1),
 });
+
+// The schema for the organization data
+export const organizationSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Name is required and cannot be empty")
+    .max(255, { message: "Name must be 255 characters or less" }),
+  address: z
+    .string()
+    .min(1, "Address is required and cannot be empty")
+    .max(255, { message: "Address must be 255 characters or less" }),
+  areaOfInterest: z.enum(
+    [
+      "TECHNOLOGY",
+      "SCIENCE",
+      "HEALTH",
+      "FINANCE",
+      "EDUCATION",
+      "ART",
+      "ENVIRONMENT",
+      "SPORTS",
+      "POLITICS",
+      "ENTERTAINMENT",
+      "BUSINESS",
+      "CULTURE",
+      "TRAVEL",
+      "FOOD",
+    ],
+    { message: "Invalid area of interest" }
+  ),
+});
+
+// The schema for the pricing data
+export const subscriptionSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Name is required and cannot be empty")
+    .max(255, { message: "Name must be 255 characters or less" }),
+  description: z.string().optional(),
+  type: z.enum(["FREE", "PREMIUM", "ENTERPRISE"], {
+    message: "Invalid subscription type",
+  }),
+  price: z.number().min(0, "Price must be a non-negative number"),
+  maxChannels: z.number().min(0, "Max channels must be a non-negative number"),
+  maxMessagesPerYear: z
+    .number()
+    .min(0, "Max messages per year must be a non-negative number"),
+  features: z.array(z.string()).min(1, "At least one feature is required"),
+  activation: z.boolean().optional(),
+});
+
+// The schema for the pricing data

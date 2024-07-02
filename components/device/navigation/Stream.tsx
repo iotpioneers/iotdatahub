@@ -23,9 +23,7 @@ interface ChannelData {
 
 const Stream = ({ channelId }: Props) => {
   const isSmallScreens = useMediaQuery("(max-width: 1060px)");
-  const [channelDetails, setChannelDetails] = useState<ChannelData | null>(
-    null
-  );
+  const [channelData, setChannelData] = useState<ChannelData | null>(null);
 
   useEffect(() => {
     const fetchChannel = async () => {
@@ -36,17 +34,17 @@ const Stream = ({ channelId }: Props) => {
 
       console.log("channelData:--", channelData);
 
-      setChannelDetails(channelData);
+      setChannelData(channelData);
     };
 
     fetchChannel();
-  }, [channelDetails]);
+  }, [channelData]);
 
-  if (!channelDetails) {
+  if (!channelData) {
     return <Loading />;
   }
 
-  const { fields, dataPoint } = channelDetails;
+  const { fields, dataPoint } = channelData;
 
   return (
     <div

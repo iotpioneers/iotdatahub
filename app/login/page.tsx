@@ -161,7 +161,7 @@ const Login = () => {
                 callbackUrl: "http://localhost:3000/dashboard",
               })
             }
-            className="flex items-center font-bold hover:text-green-50"
+            className="flex w-full items-center font-bold hover:text-green-50"
           >
             Continue with
             <Image

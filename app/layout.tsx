@@ -3,10 +3,9 @@ import "./globals.css";
 import { Container, Theme } from "@radix-ui/themes";
 import AuthProvider from "./auth/Provider";
 import QueryClientProvider from "./QueryClientProvider";
-import Navbar from "@/components/Home/Navbar";
 
 export const metadata: Metadata = {
-  title: "IoT service",
+  title: "Ten2Ten",
   description:
     "Your one-stop destination for seamless and efficient IoT Plug and Play services. Our cutting-edge solutions empower businesses to effortlessly connect, manage, and optimize their IoT devices, enabling a smarter and more connected world.",
 };

@@ -53,7 +53,7 @@ const ProjectList = async () => {
 
   return (
     <div>
-      <Table.Root variant="surface" className="max-w-2xl">
+      <Table.Root variant="surface">
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeaderCell>Channel</Table.ColumnHeaderCell>
@@ -83,7 +83,7 @@ const ProjectList = async () => {
                 <div className="block md:hidden mt-3">
                   {channel.description}
                 </div>
-                <div className="block md:hidden mt-3">
+                <div className="block md:hidden mt-3 font-bold">
                   {formatDate(channel.createdAt)}
                 </div>
               </Table.Cell>

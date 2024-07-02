@@ -1,14 +1,15 @@
 import { Box } from "@radix-ui/themes";
-import React from "react";
 import Skeleton from "./Skeleton";
 
-const LoadingSkeleton = () => {
+const LoadingIssueDetailPage = () => {
   return (
-    <Box className="mx-5 max-w-xl">
-      <Skeleton height="2rem" />
-      <Skeleton height="20rem" />
+    <Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <Skeleton height={220} width={400} />
+      <Skeleton height={220} width={400} />
+      <Skeleton height={220} width={400} />
+      <Skeleton height={220} width={400} />
     </Box>
   );
 };
 
-export default LoadingSkeleton;
+export default LoadingIssueDetailPage;

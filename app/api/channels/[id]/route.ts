@@ -49,7 +49,6 @@ export async function PUT(
     data: {
       name: body.name,
       description: body.description,
-      deviceId: body.deviceId,
     },
   });
 

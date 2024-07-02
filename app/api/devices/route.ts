@@ -1,6 +1,5 @@
 import prisma from "@/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { nanoid } from "nanoid";
 import { getToken } from "next-auth/jwt";
 import { deviceSchema } from "@/validations/schema.validation";
 
@@ -33,25 +32,32 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(validation.error.errors, { status: 400 });
   }
 
-  const { name, description } = validation.data;
+  const { name, description, channelId } = validation.data;
 
-  const apiKey = nanoid(16);
+  // Validate the channelId
+  const channel = await prisma.channel.findUnique({
+    where: { id: channelId },
+  });
+
+  if (!channel) {
+    return NextResponse.json({ error: "Channel not found" }, { status: 404 });
+  }
 
   try {
-    // Create a new device and associate it with the user
+    // Create a new device and associate it with the user and channel
     const newDevice = await prisma.device.create({
       data: {
         name,
         description,
-        apiKey,
         userId: user.id,
+        channelId: channel.id,
       },
-      include: { user: true },
+      include: { user: true, channel: true },
     });
 
-    // Update the user's devices array
-    await prisma.user.update({
-      where: { id: user.id },
+    // Update the channel to add the new device to its devices array
+    await prisma.channel.update({
+      where: { id: channelId },
       data: { devices: { connect: { id: newDevice.id } } },
     });
 

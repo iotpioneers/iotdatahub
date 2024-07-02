@@ -45,18 +45,6 @@ const ExportChannelData = ({ channelId }: Props) => {
               <FaFileCsv /> CSV
             </div>
           </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() =>
-              handleDownload(
-                `/api/channels/${channelId}/export?format=xlsx`,
-                "data.xlsx"
-              )
-            }
-          >
-            <div className="flex items-center gap-5 cursor-pointer">
-              <FaFileExcel /> XLSX
-            </div>
-          </DropdownMenu.Item>
 
           <DropdownMenu.Separator />
 
@@ -70,18 +58,6 @@ const ExportChannelData = ({ channelId }: Props) => {
           >
             <div className="flex items-center gap-5 cursor-pointer">
               <GiBracers /> JSON
-            </div>
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() =>
-              handleDownload(
-                `/api/channels/${channelId}/export?format=txt`,
-                "data.txt"
-              )
-            }
-          >
-            <div className="flex items-center gap-5 cursor-pointer">
-              <TextAlignRightIcon /> TEXT
             </div>
           </DropdownMenu.Item>
         </DropdownMenu.Content>

@@ -20,7 +20,7 @@ export default function DashboardLayout({
           {/* Sidebar (conditionally rendered based on screen size) */}
           {!isSmallScreens && (
             <div className="flex-shrink-0">
-              <aside className="fixed left-0 top-0 h-full">
+              <aside className="fixed ml-2 top-0 h-full">
                 <SideNavbar />
               </aside>
             </div>

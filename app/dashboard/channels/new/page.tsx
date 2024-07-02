@@ -1,10 +1,10 @@
 import React from "react";
 import dynamic from "next/dynamic";
-import ChannelSkeleton from "./loading";
+import Loading from "@/app/loading";
 
 const ChannelForm = dynamic(() => import("@/components/Channels/ChannelForm"), {
   ssr: false,
-  loading: () => <ChannelSkeleton />,
+  loading: () => <Loading />,
 });
 
 const NewChannelPage = () => {

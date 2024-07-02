@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Navigation from "@/components/device/Navigation";
-import PageHeading from "@/components/device/PageHeading";
+import dynamic from "next/dynamic";
+import ChannelNavigation from "@/components/device/ChannelNavigation";
 import { ChannelProps, DataPointProps, FieldProps } from "@/types";
 import Loading from "@/app/loading";
 
@@ -15,10 +15,14 @@ interface ChannelData {
   dataPoint: DataPointProps[];
   fields: FieldProps[];
 }
-export default function Device({ params }: Props) {
-  const [channelDetails, setChannelDetails] = useState<ChannelData | null>(
-    null
-  );
+
+// Dynamic import for PageHeading to prevent SSR issues
+const PageHeading = dynamic(() => import("@/components/device/PageHeading"), {
+  ssr: false,
+});
+
+export default function ChannelDetails({ params }: Props) {
+  const [channelData, setChannelData] = useState<ChannelData | null>(null);
 
   useEffect(() => {
     const fetchChannel = async () => {
@@ -29,23 +33,24 @@ export default function Device({ params }: Props) {
 
       console.log("channelData:--", channelData);
 
-      setChannelDetails(channelData);
+      setChannelData(channelData);
     };
 
     fetchChannel();
-  }, [params.id]);
+  }, []);
 
-  if (!channelDetails) {
+  if (!channelData) {
     return <Loading />;
   }
 
-  const { channel } = channelDetails;
+  const { channel } = channelData;
 
   return (
     <main className="overflow-hidden">
+      {/* Render PageHeading dynamically */}
       <PageHeading channel={channel} />
       <div className="mt-10 border-t border-gray-200"></div>
-      <Navigation channelId={params.id} />
+      <ChannelNavigation channelId={params.id} />
     </main>
   );
 }

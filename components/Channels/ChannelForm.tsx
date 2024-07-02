@@ -68,7 +68,12 @@ export default function ChannelForm() {
       }
 
       const result = await response.json();
-      if (result) router.push(`/dashboard/channels/${result.id}`);
+
+      console.log("result:", result);
+
+      const { id } = result.newChannel;
+
+      if (result) router.push(`/dashboard/channels/${id}`);
       setIsSubmitting(false);
     } catch (error) {
       setIsSubmitting(false);

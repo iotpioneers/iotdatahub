@@ -8,26 +8,29 @@ import NavigationMenuLinks from "./NavigationMenuLinks/NavigationMenuLinks";
 
 const Navbar = () => {
   return (
-    <nav className="flexBetween max-container padding-container relative z-30 py-5 border-b navbar bg-green-50 rounded-sm max-h-16">
-      <div className="flex justify-center items-center">
-        <Link
-          href="/"
-          className="flex font-extrabold text-2xl text-white gap-1"
-        >
-          <WifiIcon className="h-8 w-8" aria-hidden="true" />
-          <Text>Ten2Ten</Text>
-        </Link>
+    <nav className="w-full z-50 py-5 border-b bg-green-50 rounded-sm max-h-20 mb-5 px-5">
+      <div className="flex items-center justify-between w-full">
+        <div className="flex-shrink-0">
+          <Link
+            href="/"
+            className="flex font-extrabold text-2xl text-white gap-1"
+          >
+            <WifiIcon className="h-8 w-8" aria-hidden="true" />
+            <Text>Ten2Ten</Text>
+          </Link>
+        </div>
 
-        <div className="hidden h-full lg:flex">
+        <div className="flex-grow hidden h-full lg:flex justify-center">
           <NavigationMenuLinks />
         </div>
 
-        <div className="hidden lg:flex items-center -ml-80">
+        <div className="flex-shrink-0 hidden lg:flex items-center">
           <AvatarIcon />
         </div>
       </div>
-
-      <MenuBar />
+      <div className="">
+        <MenuBar />
+      </div>
     </nav>
   );
 };
