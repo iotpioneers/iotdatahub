@@ -1,32 +1,12 @@
-import { Box, ThemeProvider } from "@mui/material";
 import React from "react";
-import CssBaseline from "@mui/material/CssBaseline";
+import { Box } from "@mui/material";
 
-import theme from "./utils/theme";
-import Navbar from "@/components/Home/components/Navbars/MainNavbar";
-import Footer from "@/components/Home/components/Footers/MainFooter";
 import HomeBodySections from "@/components/Home/HomeBodySections";
-import Hero from "@/components/Home/containers/Hero";
 
 export default function Home() {
   return (
     <div>
-      <ThemeProvider theme={theme}>
-        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-        <CssBaseline />
-        {/* Navbar */}
-        <Navbar />
-
-        {/* Sections */}
-
-        <Hero />
-        <Box sx={{ bgcolor: "background.default", position: "relative" }}>
-          <HomeBodySections />
-
-          {/* Footer */}
-          <Footer />
-        </Box>
-      </ThemeProvider>
+      <HomeBodySections />
     </div>
   );
 }

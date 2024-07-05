@@ -1,22 +1,31 @@
-import React from "react";
+import Benefits from "./components/Benefits";
+import Collaboration from "./components/Collaboration";
+import Footer from "./components/Footer";
+import Header from "./components/Header";
+import Hero from "./components/Hero";
+import Pricing from "./components/Pricing";
+import Roadmap from "./components/Roadmap";
+import Services from "./components/Services";
+import ButtonGradient from "@/components/Home/components/design/svg/ButtonGradient";
+import Navbar from "./Navbar";
 
-import HomeCard from "@/components/Home/containers/HomeCard";
-import Featues from "@/components/Home/containers/Featues";
-import Section7 from "@/components/Home/containers/Section7";
-import Section8 from "@/components/Home/containers/Section8";
-import Section9 from "@/components/Home/containers/Section9";
-import Section10 from "@/components/Home/containers/Section10";
-
-export default function HomeBodySections() {
+const App = () => {
   return (
-    <div>
-      {/* Body Sections */}
-      <Featues />
-      <HomeCard />
-      <Section7 />
-      <Section8 />
-      <Section9 />
-      <Section10 />
-    </div>
+    <>
+      <div className="pt-[4.75rem] lg:pt-[5.25rem] overflow-hidden">
+        <Navbar />
+        <Hero />
+        <Benefits />
+        <Collaboration />
+        <Services />
+        <Pricing />
+        <Roadmap />
+        <Footer />
+      </div>
+
+      <ButtonGradient />
+    </>
   );
-}
+};
+
+export default App;
