@@ -1,4 +1,11 @@
-const ChatBubbleWing = ({ className, pathClassName }) => {
+import React from "react";
+
+type ChatBubbleWingProps = {
+  className?: string;
+  pathClassName?: string;
+};
+
+const ChatBubbleWing = ({ className, pathClassName }: ChatBubbleWingProps) => {
   return (
     <svg
       className={`${className || ""}`}

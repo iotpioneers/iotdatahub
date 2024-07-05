@@ -1,34 +1,34 @@
 export const navigation = [
   {
     id: "0",
-    title: "Features",
-    url: "#features",
+    title: "Developers",
+    url: "#",
   },
   {
     id: "1",
-    title: "Pricing",
-    url: "#pricing",
+    title: "Features",
+    url: "#",
   },
   {
     id: "2",
-    title: "How to use",
-    url: "#how-to-use",
+    title: "About",
+    url: "#",
   },
   {
     id: "3",
-    title: "Roadmap",
-    url: "#roadmap",
+    title: "Pricing",
+    url: "/pricing",
   },
   {
     id: "4",
     title: "New account",
-    url: "#signup",
+    url: "/register",
     onlyMobile: true,
   },
   {
     id: "5",
     title: "Sign in",
-    url: "#login",
+    url: "/login",
     onlyMobile: true,
   },
 ];
@@ -41,17 +41,9 @@ export const heroIcons = [
 ];
 
 export const notificationImages = [
-  "notification/image-4.png",
-  "notification/image-3.png",
-  "notification/image-2.png",
-];
-
-export const companyLogos = [
-  "yourlogo.svg",
-  "yourlogo.svg",
-  "yourlogo.svg",
-  "yourlogo.svg",
-  "yourlogo.svg",
+  "notification/image-4.jpeg",
+  "notification/image-3.jpeg",
+  "notification/image-2.jpeg",
 ];
 
 export const brainwaveServices = [

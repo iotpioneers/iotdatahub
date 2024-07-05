@@ -1,4 +1,8 @@
-const brackets = (position) =>
+import React from "react";
+
+type BracketsParams = "left" | "right";
+
+const Brackets = (position: BracketsParams) =>
   position === "left" ? (
     <svg
       width="5"
@@ -42,4 +46,4 @@ const brackets = (position) =>
     </svg>
   );
 
-export default brackets;
+export default Brackets;

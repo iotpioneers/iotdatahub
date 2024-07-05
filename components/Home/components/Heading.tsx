@@ -1,6 +1,14 @@
+import React from "react";
 import TagLine from "./Tagline";
 
-const Heading = ({ className, title, text, tag }) => {
+type HeadingProps = {
+  className?: string;
+  title?: string;
+  text?: string;
+  tag?: string;
+};
+
+const Heading = ({ className, title, text, tag }: HeadingProps) => {
   return (
     <div
       className={`${className} max-w-[50rem] mx-auto mb-12 lg:mb-20 md:text-center`}

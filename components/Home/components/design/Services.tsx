@@ -1,4 +1,4 @@
-import ChatBubbleWing from "../../components/design/svg/ChatBubbleWing";
+import ChatBubbleWing from "./svg/ChatBubbleWing";
 
 export const Gradient = () => {
   return (

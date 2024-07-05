@@ -1,6 +1,11 @@
-import brackets from "../components/design/svg/Brackets";
+import brackets from "./design/svg/Brackets";
 
-const TagLine = ({ className, children }) => {
+type TagLineProps = {
+  className?: string;
+  children: React.ReactNode;
+};
+
+const TagLine = ({ className, children }: TagLineProps) => {
   return (
     <div className={`tagline flex items-center ${className || ""}`}>
       {brackets("left")}

@@ -28,7 +28,7 @@ const ListItem = React.forwardRef<HTMLAnchorElement, ListItemProps>(
 
 const NavigationMenuLinks = () => {
   return (
-    <div className="w-full">
+    <div className="lg:w-full lg:block hidden my-5">
       <NavigationMenu.Root className="NavigationMenuRoot">
         <NavigationMenu.List className="NavigationMenuList">
           {/* Developers Section */}

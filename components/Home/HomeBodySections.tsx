@@ -7,13 +7,12 @@ import Pricing from "./components/Pricing";
 import Roadmap from "./components/Roadmap";
 import Services from "./components/Services";
 import ButtonGradient from "@/components/Home/components/design/svg/ButtonGradient";
-import Navbar from "./Navbar";
 
 const App = () => {
   return (
     <>
       <div className="pt-[4.75rem] lg:pt-[5.25rem] overflow-hidden">
-        <Navbar />
+        <Header />
         <Hero />
         <Benefits />
         <Collaboration />
