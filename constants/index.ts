@@ -65,8 +65,8 @@ export const roadmap = [
     id: "0",
     title: "Mobile App Integration",
     text: "Develop a mobile application that seamlessly integrates with IoT devices, allowing users to control and monitor their devices from anywhere.",
-    date: "May 2023",
-    status: "done",
+    date: "Aug 2024",
+    status: "progress",
     imageUrl: "roadmap/image-1.png",
     colorful: true,
   },
@@ -74,25 +74,25 @@ export const roadmap = [
     id: "1",
     title: "Cloud Data Storage",
     text: "Implement cloud data storage to ensure all device data is securely stored and accessible in real-time.",
-    date: "May 2023",
-    status: "progress",
-    imageUrl: "roadmap/image-2.png",
+    date: "May 2024",
+    status: "done",
+    imageUrl: "roadmap/image-2.avif",
   },
   {
     id: "2",
     title: "Advanced Analytics",
     text: "Provide advanced analytics features to analyze device data and gain insights for better decision-making.",
-    date: "May 2023",
-    status: "done",
-    imageUrl: "roadmap/image-3.png",
+    date: "Jul 2024",
+    status: "progress",
+    imageUrl: "roadmap/image-4.jpg",
   },
   {
     id: "3",
     title: "API Integrations",
     text: "Allow integration with third-party APIs to extend the functionality and capabilities of the IoT platform.",
-    date: "May 2023",
+    date: "Sept 2024",
     status: "progress",
-    imageUrl: "roadmap/image-4.png",
+    imageUrl: "roadmap/image-5.jpg",
   },
 ];
 
@@ -217,7 +217,7 @@ export const benefits = [
     text: "Monitor your IoT devices in real-time from anywhere in the world.",
     backgroundUrl: "./src/assets/benefits/card-1.svg",
     iconUrl: "benefits/icon-1.svg",
-    imageUrl: "benefits/image-2.png",
+    imageUrl: "benefits/image-1.jpeg",
   },
   {
     id: "1",
@@ -225,7 +225,7 @@ export const benefits = [
     text: "Gain insights into your device data with powerful analytics tools.",
     backgroundUrl: "./src/assets/benefits/card-2.svg",
     iconUrl: "benefits/icon-2.svg",
-    imageUrl: "benefits/image-2.png",
+    imageUrl: "benefits/image-2.jpg",
     light: true,
   },
   {
@@ -234,7 +234,7 @@ export const benefits = [
     text: "Integrate your IoT devices with other platforms and services effortlessly.",
     backgroundUrl: "./src/assets/benefits/card-3.svg",
     iconUrl: "benefits/icon-3.svg",
-    imageUrl: "benefits/image-2.png",
+    imageUrl: "benefits/image-3.jpg",
   },
   {
     id: "3",
@@ -242,7 +242,7 @@ export const benefits = [
     text: "Ensure your IoT devices perform reliably with our robust platform.",
     backgroundUrl: "./src/assets/benefits/card-4.svg",
     iconUrl: "benefits/icon-4.svg",
-    imageUrl: "benefits/image-2.png",
+    imageUrl: "benefits/image-4.jpg",
     light: true,
   },
   {
@@ -251,7 +251,7 @@ export const benefits = [
     text: "Tailor the platform to fit your specific IoT project needs.",
     backgroundUrl: "./src/assets/benefits/card-5.svg",
     iconUrl: "benefits/icon-1.svg",
-    imageUrl: "benefits/image-2.png",
+    imageUrl: "benefits/image-5.jpg",
   },
   {
     id: "5",
@@ -259,7 +259,7 @@ export const benefits = [
     text: "Scale your IoT projects seamlessly as your needs grow.",
     backgroundUrl: "./src/assets/benefits/card-6.svg",
     iconUrl: "benefits/icon-2.svg",
-    imageUrl: "benefits/image-2.png",
+    imageUrl: "benefits/image-6.jpg",
   },
 ];
 

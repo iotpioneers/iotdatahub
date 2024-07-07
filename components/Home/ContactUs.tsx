@@ -1,6 +1,5 @@
 import React from "react";
-import dynamic from "next/dynamic";
-const Map = dynamic(() => import("../Map/Map"), { ssr: false });
+import Map from "../Map/Map";
 
 const ContactUs = () => {
   return (

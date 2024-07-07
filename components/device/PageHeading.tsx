@@ -8,7 +8,6 @@ import { Box, Button, Card, Flex, Heading, Text } from "@radix-ui/themes";
 import { ChannelProps } from "@/types";
 import EditChannel from "../Channels/EditChannel";
 import ToastDemo from "../Toast/ToastDemo";
-import Loading from "@/app/loading";
 
 interface ChannelHeadingProps {
   channel: ChannelProps;

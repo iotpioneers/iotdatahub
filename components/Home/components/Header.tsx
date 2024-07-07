@@ -37,8 +37,11 @@ const Header = () => {
       }`}
     >
       <div className="flex items-center px-5 lg:px-7.5 xl:px-10 max-lg:py-4">
-        <a className="flex w-[12rem] xl:mr-8 gap-2 items-center" href="#hero">
-          <WifiIcon className="h-8 w-8" aria-hidden="true" />
+        <a
+          className="flex w-[12rem] xl:mr-8 gap-2 items-center text-gray-10 font-bold"
+          href="/"
+        >
+          <WifiIcon className="animate-pulse h-8 w-8" aria-hidden="true" />
           <p>Ten2Ten</p>
         </a>
 
@@ -72,7 +75,7 @@ const Header = () => {
         >
           New account
         </a>
-        <Button className="hidden lg:flex" href="#login">
+        <Button className="hidden lg:flex" href="/login">
           Sign in
         </Button>
 

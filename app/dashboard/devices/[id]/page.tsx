@@ -1,15 +1,17 @@
-import dynamic from "next/dynamic";
+import { Suspense } from "react";
+import DeviceDetails from "../_components/DeviceDetails";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface Props {
   params: { id: string };
 }
 
-const DeviceDetails = dynamic(() => import("../_components/DeviceDetails"), {
-  ssr: false,
-});
-
 const DeviceDetailsPage = async ({ params }: Props) => {
-  return <DeviceDetails params={params} />;
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <DeviceDetails params={params} />;
+    </Suspense>
+  );
 };
 
 export default DeviceDetailsPage;

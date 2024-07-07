@@ -3,13 +3,11 @@
 import { AlertDialog, Button, Flex } from "@radix-ui/themes";
 import React, { useState } from "react";
 import { TrashIcon } from "@heroicons/react/24/outline";
-import Loading from "@/app/loading";
+import LoadingSpinner from "./LoadingSpinner";
 
 const DeleteButton = () => {
   const [error, setError] = useState(false);
   const [isDeleting, setDeleting] = useState(false);
-
-  if (isDeleting) return;
 
   return (
     <>
@@ -20,6 +18,7 @@ const DeleteButton = () => {
           </Button>
         </AlertDialog.Trigger>
         <AlertDialog.Content>
+          {isDeleting && <LoadingSpinner />}
           <AlertDialog.Title>Confirm Deletion</AlertDialog.Title>
           <AlertDialog.Description>
             Are you sure you want to delete this ? This action cannot be undone.

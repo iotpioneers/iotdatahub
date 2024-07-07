@@ -20,7 +20,7 @@ const PricingList = () => {
               <>
                 <div className="h3">$</div>
                 <div className="text-[5.5rem] leading-none font-bold">
-                  {item.price}
+                  <div className="flex">{item.price}</div>
                 </div>
               </>
             )}
@@ -28,7 +28,11 @@ const PricingList = () => {
 
           <Button
             className="w-full mb-6"
-            href={item.price ? "/pricing" : "mailto:contact@jsmastery.pro"}
+            href={
+              item.price
+                ? "https://buy.stripe.com/test_28o3fF8wIbpn4LuaEE"
+                : "mailto:contact@ten2ten.pro"
+            }
             white={!!item.price}
           >
             {item.price ? "Get started" : "Contact us"}

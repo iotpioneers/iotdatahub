@@ -16,7 +16,7 @@ export default function DashboardLayout({
   return (
     <html lang="en">
       <body>
-        <section className="flex w-full min-h-screen">
+        <section className="flex w-full bg-n-1 min-h-screen">
           {/* Sidebar (conditionally rendered based on screen size) */}
           {!isSmallScreens && (
             <div className="flex-shrink-0">

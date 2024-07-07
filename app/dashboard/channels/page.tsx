@@ -1,11 +1,12 @@
+import React, { Suspense } from "react";
 import Projects from "@/components/dashboard/Projects";
-import React from "react";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const ChannelsPage = () => {
   return (
-    <div>
+    <Suspense fallback={<LoadingSpinner />}>
       <Projects />
-    </div>
+    </Suspense>
   );
 };
 

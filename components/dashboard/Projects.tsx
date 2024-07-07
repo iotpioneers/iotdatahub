@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import ProjectList from "./ProjectList";
 import ChannelAction from "../device/ChannelAction";
 import { Heading, Text } from "@radix-ui/themes";
-import Loading from "@/app/loading";
 
 interface Channel {
   id: number;

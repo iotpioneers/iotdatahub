@@ -1,9 +1,10 @@
 import React from "react";
 import dynamic from "next/dynamic";
-import Loading from "@/app/loading";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const ChannelForm = dynamic(() => import("@/components/Forms/ChannelForm"), {
   ssr: false,
+  loading: () => <LoadingSpinner />,
 });
 
 const NewChannelPage = () => {

@@ -1,12 +1,19 @@
 import React from "react";
-import { Box } from "@mui/material";
 
-import HomeBodySections from "@/components/Home/HomeBodySections";
+import HomeBody from "@/components/Home/HomeBody";
+import { Metadata } from "next";
 
 export default function Home() {
   return (
     <div>
-      <HomeBodySections />
+      <HomeBody />
     </div>
   );
 }
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Ten2Ten - Home",
+  description: "Explore our latest features",
+};

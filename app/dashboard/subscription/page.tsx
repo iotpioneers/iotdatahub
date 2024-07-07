@@ -7,7 +7,7 @@ const cardStyle = "flex flex-col justify-between p-5"; // Removed fixed height a
 const subscriptionPlans = [
   {
     name: "Free",
-    price: "RWF 0/month",
+    price: "$ 0",
     buttonText: "Your current plan",
     buttonDisabled: true,
     features: [
@@ -21,7 +21,7 @@ const subscriptionPlans = [
   },
   {
     name: "Standard",
-    price: "RWF 1000/month",
+    price: "$ 99.9 monthly",
     buttonText: "Upgrade to Standard",
     buttonDisabled: false,
     features: [
@@ -34,8 +34,8 @@ const subscriptionPlans = [
     ],
   },
   {
-    name: "Premium",
-    price: "RWF 2000/month*",
+    name: "Entreprise",
+    price: "$ 999.9 annually*",
     buttonText: "Upgrade to Premium",
     buttonDisabled: false,
     features: [

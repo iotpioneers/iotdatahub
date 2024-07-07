@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
 import ChannelNavigation from "@/components/device/ChannelNavigation";
 import { ChannelProps, DataPointProps, FieldProps } from "@/types";
-import Loading from "@/app/loading";
+import PageHeading from "@/components/device/PageHeading";
 
 interface Props {
   params: { id: string };
@@ -15,11 +14,6 @@ interface ChannelData {
   dataPoint: DataPointProps[];
   fields: FieldProps[];
 }
-
-// Dynamic import for PageHeading to prevent SSR issues
-const PageHeading = dynamic(() => import("@/components/device/PageHeading"), {
-  ssr: false,
-});
 
 export default function ChannelDetails({ params }: Props) {
   const [channelData, setChannelData] = useState<ChannelData | null>(null);

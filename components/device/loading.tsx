@@ -1,5 +1,4 @@
-import { Button, Skeleton, Table } from "@radix-ui/themes";
-import Link from "./Link";
+import { Skeleton, Table } from "@radix-ui/themes";
 
 const LoadingPage = () => {
   const devices = [1, 2, 3, 4, 5];

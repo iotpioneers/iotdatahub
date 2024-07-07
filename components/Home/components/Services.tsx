@@ -27,11 +27,11 @@ const Services = () => {
                 width={800}
                 alt="Smartest AI"
                 height={730}
-                src="services/service-1.png"
+                src="services/service-1.jpg"
               />
             </div>
 
-            <div className="relative z-1 max-w-[17rem] ml-auto">
+            <div className="relative z-1 max-w-[17rem] font-bold ml-auto">
               <h4 className="h4 mb-4">Real-time Data Insights</h4>
               <p className="body-2 mb-[3rem] text-n-3">
                 Leverage AI-powered analytics for actionable insights and
@@ -57,7 +57,7 @@ const Services = () => {
             <div className="relative min-h-[39rem] border border-n-1/10 rounded-3xl overflow-hidden">
               <div className="absolute inset-0">
                 <img
-                  src="services/service-2.png"
+                  src="services/service-3.avif"
                   className="h-full w-full object-cover"
                   width={630}
                   height={750}
@@ -110,7 +110,7 @@ const Services = () => {
 
               <div className="relative h-[20rem] bg-n-8 rounded-xl overflow-hidden md:h-[25rem]">
                 <img
-                  src="services/service-3.png"
+                  src="services/service-4.jpeg"
                   className="w-full h-full object-cover"
                   width={520}
                   height={400}
