@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { FaGoogle } from "react-icons/fa6";
 import { z } from "zod";
 
 type FormData = z.infer<typeof userSchema>;

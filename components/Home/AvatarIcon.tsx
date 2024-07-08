@@ -24,7 +24,7 @@ const AvatarIcon = () => {
           <Popover.Trigger>
             <Avatar className="h-10 w-10 bg-gray-500 rounded-full flex items-center justify-center">
               <img
-                src={session!.user!.image! || "/user.svg"}
+                src={session!.user!.image! || "user.svg"}
                 alt="Profile"
                 className="rounded-full"
               />
@@ -33,7 +33,7 @@ const AvatarIcon = () => {
           <Popover.Content className="bg-white border shadow-md rounded-lg z-50 px-5">
             <Flex gap="4">
               <Box className="m-0 p-2">
-                <Heading size="2" as="h3" className="mt-2 mb-3">
+                <Heading size="2" as="h3" className="mt-2 mb-3 text-n-8">
                   {session!.user!.email}
                 </Heading>
                 <div className="grid">
@@ -48,18 +48,6 @@ const AvatarIcon = () => {
             </Flex>
           </Popover.Content>
         </Popover.Root>
-      )}
-
-      {status === "unauthenticated" && (
-        <Button className="gap-3 rounded-3xl">
-          <Link
-            href="/login"
-            className="flex bold-16 whitespace-nowrap cursor-pointer items-center gap-2"
-          >
-            Signin
-            <ArrowRightIcon className="h-4 w-4 bold-16" />
-          </Link>
-        </Button>
       )}
     </IconButton>
   );

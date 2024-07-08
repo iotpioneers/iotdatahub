@@ -42,11 +42,12 @@ model Session {
 
 model VerificationToken {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  identifier String
+  email      String
+  identifier String?
   token      String
   expires    DateTime
 
-  @@unique([identifier, token])
+  @@unique([email, token])
 }
 
 model Authenticator {

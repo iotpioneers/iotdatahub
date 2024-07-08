@@ -9,8 +9,11 @@ import { HamburgerMenu } from "./design/Header";
 import { useState } from "react";
 import { WifiIcon } from "@heroicons/react/24/outline";
 import NavigationMenuLinks from "../NavigationMenuLinks/NavigationMenuLinks";
+import AvatarIcon from "../AvatarIcon";
+import { useSession } from "next-auth/react";
 
 const Header = () => {
+  const { status, data: session } = useSession();
   const [openNavigation, setOpenNavigation] = useState(false);
 
   const toggleNavigation = () => {
@@ -68,15 +71,23 @@ const Header = () => {
 
           <HamburgerMenu />
         </nav>
+        {status === "unauthenticated" && (
+          <>
+            <a
+              href="/register"
+              className="button hidden mr-4 ml-4 text-n-1/50 transition-colors hover:text-n-1 lg:block"
+            >
+              New account
+            </a>
+          </>
+        )}
 
-        <a
-          href="/register"
-          className="button hidden mr-4 ml-4 text-n-1/50 transition-colors hover:text-n-1 lg:block"
+        {status === "authenticated" && <AvatarIcon />}
+        <Button
+          className="hidden lg:flex"
+          href={status === "authenticated" ? "/dashboard" : "/login"}
         >
-          New account
-        </a>
-        <Button className="hidden lg:flex" href="/login">
-          Sign in
+          {status === "authenticated" ? "Dashboard" : "Sign in"}
         </Button>
 
         <Button

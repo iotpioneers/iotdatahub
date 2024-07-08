@@ -129,16 +129,6 @@ const NavigationMenuLinks = () => {
               Pricing
             </NavigationMenu.Link>
           </NavigationMenu.Item>
-
-          {/* Dashboard Section */}
-          <NavigationMenu.Item>
-            <NavigationMenu.Link
-              className="NavigationMenuLink"
-              href="/dashboard"
-            >
-              Dashboard
-            </NavigationMenu.Link>
-          </NavigationMenu.Item>
         </NavigationMenu.List>
 
         <div className="ViewportPosition">

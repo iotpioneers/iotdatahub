@@ -14,16 +14,16 @@ const Hero = () => {
 
   return (
     <Section
-      className="pt-[12rem] -mt-[5.25rem]"
+      className="pt-[12rem] lg:-mt-[9.25rem] md:mt-[1.25rem] -mt-[12.25rem] bg-slate-200 lg:max-h-screen"
       crosses
       crossesOffset="lg:translate-y-[5.25rem]"
       customPaddings
       id="hero"
     >
-      <div className="container relative" ref={parallaxRef}>
-        <div className="md:grid  xs:flex">
-          <div className="relative z-1 max-w-[62rem] mx-auto text-center mb-[3.875rem] xs:mb-3 xs:-mt-8 md:mb-20 lg:mb-[6.25rem]">
-            <h1 className="h1 mb-2">
+      <div className="container relative lg:mt-36" ref={parallaxRef}>
+        <div className="lg:flex  md:grid">
+          <div className="relative z-1 max-w-[62rem] mx-auto text-center mb-[3.875rem] xs:mb- xs:-mt-28 md:mb-20 lg:mb-[6.25rem]">
+            <h1 className="h1 mb-2 text-gray-50">
               Cutt edge with{"  "}
               <span className="inline-block relative">
                 Ten2Ten{" "}
@@ -42,7 +42,7 @@ const Hero = () => {
               Get started
             </Button>
           </div>
-          <div className="relative max-w-[23rem] mx-auto md:max-w-5xl xl:mb-24">
+          <div className="relative max-w-[23rem] mx-auto md:max-w-5xl xl:mb-20 xs:-mt-10 lg:-mt-24">
             <div className="relative z-1 p-0.5 rounded-2xl bg-conic-gradient">
               <div className="relative bg-n-8 rounded-[1rem]">
                 <div className="h-[1.4rem] bg-n-10 rounded-t-[0.9rem]" />
@@ -53,20 +53,10 @@ const Hero = () => {
                     className="w-full scale-[1.7] translate-y-[8%] md:scale-[1] md:-translate-y-[10%] lg:-translate-y-[23%]"
                     width={1024}
                     height={490}
-                    alt="AI"
+                    alt="hero_bg_image"
                   />
 
                   <Generating className="brainabsolute left-4 right-4 bottom-5 md:left-1/2 md:right-auto md:bottom-8 md:w-[31rem] md:-translate-x-1/2" />
-
-                  <ScrollParallax isAbsolutelyPositioned>
-                    <ul className="hidden absolute -left-[5.5rem] bottom-[7.5rem] px-1 py-1 bg-n-9/40 backdrop-blur border border-n-1/10 rounded-2xl xl:flex">
-                      {heroIcons.map((icon, index) => (
-                        <li className="p-5" key={index}>
-                          <img src={icon} width={24} height={25} alt={icon} />
-                        </li>
-                      ))}
-                    </ul>
-                  </ScrollParallax>
 
                   <ScrollParallax isAbsolutelyPositioned>
                     <Notification
