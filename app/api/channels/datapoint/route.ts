@@ -4,9 +4,9 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   const urlSearchParams = new URLSearchParams(request.url.split("?")[1]);
   const api_key = urlSearchParams.get("api_key");
-  const fieldNumber = Array.from(urlSearchParams.keys())
-    .filter((key) => key.startsWith("field"))
-    .map((key) => Number(key.split("field")[1]))[0];
+  const fieldEntries = Array.from(urlSearchParams.entries()).filter(([key]) =>
+    key.startsWith("field")
+  );
 
   try {
     if (!api_key) {
@@ -26,46 +26,58 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid API_Key" }, { status: 404 });
     }
 
-    // Find the corresponding field name based on fieldNumber
-    const fieldName = apiKey.fields[fieldNumber - 1];
+    const dataPoints = [];
+    const errors = [];
 
-    if (!fieldName) {
-      return NextResponse.json({ error: "Field not found" }, { status: 404 });
+    for (const [fieldKey, fieldValue] of fieldEntries) {
+      const fieldNumber = Number(fieldKey.split("field")[1]);
+      const fieldName = apiKey.fields[fieldNumber - 1];
+
+      if (!fieldName) {
+        errors.push({ fieldNumber, error: `Field ${fieldNumber} not found` });
+        continue; // Skip processing this field
+      }
+
+      const fieldExist = await prisma.field.findFirst({
+        where: { name: fieldName },
+      });
+
+      if (!fieldExist) {
+        errors.push({ fieldNumber, error: `Field ${fieldNumber} not found` });
+        continue; // Skip processing this field
+      }
+
+      const numericValue = parseInt(fieldValue, 10);
+
+      if (isNaN(numericValue)) {
+        errors.push({
+          fieldNumber,
+          error: `Invalid value for field ${fieldNumber}`,
+        });
+        continue; // Skip processing this field
+      }
+
+      // Create a new data point with the provided value
+      const newDataPoint = await prisma.dataPoint.create({
+        data: {
+          value: numericValue,
+          fieldId: fieldExist.id,
+          channelId: apiKey.channelId,
+        },
+      });
+
+      dataPoints.push(newDataPoint);
     }
 
-    const fieldExist = await prisma.field.findFirst({
-      where: { name: fieldName },
-    });
-
-    if (!fieldExist) {
-      return NextResponse.json({ error: "Field not found" }, { status: 404 });
+    if (errors.length > 0) {
+      return NextResponse.json({ errors }, { status: 400 });
     }
 
-    // Extract field value from query parameters
-    const fieldValue = urlSearchParams.get(`field${fieldNumber}`);
-    const numericValue = parseInt(fieldValue || "", 10);
-
-    if (isNaN(numericValue)) {
-      return NextResponse.json(
-        { error: "Invalid field value" },
-        { status: 400 }
-      );
-    }
-
-    // Create a new data point with the provided value
-    const newDataPoint = await prisma.dataPoint.create({
-      data: {
-        value: numericValue,
-        fieldId: fieldExist.id,
-        channelId: apiKey.channelId,
-      },
-    });
-
-    return NextResponse.json(newDataPoint, { status: 201 });
+    return NextResponse.json(dataPoints, { status: 201 });
   } catch (error) {
-    console.error("Error storing data in channel field:", error);
+    console.error("Error storing data in channel fields:", error);
     return NextResponse.json(
-      { error: "Error storing data in channel field" },
+      { error: "Error storing data in channel fields" },
       { status: 500 }
     );
   }

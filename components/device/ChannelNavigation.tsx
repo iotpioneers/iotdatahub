@@ -7,15 +7,27 @@ import { AdjustmentsVerticalIcon } from "@heroicons/react/16/solid";
 import Stream from "./navigation/Stream";
 import CodeSnippet from "./navigation/CodeSnippet";
 import ExportChannelData from "../Channels/ExportChannelData";
+import { ApiKeys } from "./navigation";
+import { DataPointProps, FieldProps } from "@/types";
 
 interface Props {
   channelId: string;
+  dataPoint: DataPointProps[];
+  fields: FieldProps[];
+  sampleCodes: string;
+  apiKey: string;
 }
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
 }
 
-const ChannelNavigation = ({ channelId }: Props) => {
+const ChannelNavigation = ({
+  channelId,
+  fields,
+  dataPoint,
+  sampleCodes,
+  apiKey,
+}: Props) => {
   return (
     <div className="bg-white">
       <header className="relative bg-white">
@@ -105,10 +117,13 @@ const ChannelNavigation = ({ channelId }: Props) => {
           </div>
           <Tab.Panels as={Fragment}>
             <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
-              <Stream channelId={channelId} />
+              <Stream fields={fields} dataPoint={dataPoint} />
             </Tab.Panel>
             <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
-              <CodeSnippet />
+              <CodeSnippet sampleCodes={sampleCodes} />
+            </Tab.Panel>
+            <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
+              <ApiKeys apiKey={apiKey} />
             </Tab.Panel>
           </Tab.Panels>
         </Tab.Group>

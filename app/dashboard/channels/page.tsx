@@ -1,13 +1,8 @@
-import React, { Suspense } from "react";
-import Projects from "@/components/dashboard/Projects";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import React from "react";
+import ChannelList from "./_components/ChannelList";
 
 const ChannelsPage = () => {
-  return (
-    <Suspense fallback={<LoadingSpinner />}>
-      <Projects />
-    </Suspense>
-  );
+  return <ChannelList />;
 };
 
 export default ChannelsPage;

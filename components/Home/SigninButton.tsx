@@ -12,8 +12,6 @@ const SigninButton = () => {
 
   const { status, data: session } = useSession();
 
-  console.log(session);
-
   const handleSignIn = () => router.push("/login");
   return (
     <Box>

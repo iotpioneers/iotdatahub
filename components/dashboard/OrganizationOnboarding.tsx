@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Button, Heading, Text } from "@radix-ui/themes";
 
 // Define the enum AreaOfInterest
@@ -23,7 +22,6 @@ enum AreaOfInterest {
 }
 
 interface FormData {
-  termsAccepted: boolean;
   orgName: string;
   orgAddress: string;
   areaOfInterest: AreaOfInterest | "";
@@ -34,7 +32,6 @@ interface FormData {
 const OrganizationOnboarding: React.FC = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
-    termsAccepted: false,
     orgName: "",
     orgAddress: "",
     areaOfInterest: "",
@@ -51,70 +48,77 @@ const OrganizationOnboarding: React.FC = () => {
   };
 
   const submitForm = () => {
-    console.log("Form submitted:", formData);
     // Handle form submission logic here
   };
 
   return (
-    <div className="flex min-h-96 items-center justify-between bg-gray-30 rounded-sm p-5 z-10">
+    <div className="fixed top-12 left-1/2 transform -translate-x-1/2 w-full max-w-3xl min-h-96 justify-between bg-black rounded-lg p-5 z-50 mx-2 xs:mx-0">
       {step === 1 && (
-        <div className="mb-5">
+        <div className="grid">
           <Heading
             as="h2"
             className="font-bold text-gray-10 text-center text-4xl mb-5"
           >
-            which feature do you need more?
+            Which feature do you need more?
           </Heading>
-          <div className="flex w-full justify-between mb-5 gap-5">
+          <div className="flex w-full justify-between mb-5 gap-5 xs:gap-2">
             <div className="grid">
-              <Text className="text-gray-10">
+              <Text className="text-gray-10 font-semibold">
                 For makers <br />
                 <br />
               </Text>
               <img
                 src="makers.jpg"
                 alt="makers"
-                className="w-56 h-56 rounded-md"
+                className="w-56 h-56 md:min-w-80 rounded-md"
               />
             </div>
             <div className="grid">
-              <Text className="text-gray-10">
+              <Text className="text-gray-10 font-semibold">
                 For businesses <br />
                 <br />
               </Text>
               <img
                 src="businesses.jpg"
                 alt="businesses"
-                className="w-56 h-56 rounded-md"
+                className="w-56 h-56 md:min-w-80 rounded-md"
               />
             </div>
           </div>
-
-          <Button
-            className="bg-blue-500 text-white py-5 px-4 rounded my-5"
-            onClick={nextStep}
-          >
-            Next
-          </Button>
+          <div className="flex items-end">
+            <Button
+              className="bg-blue-500 text-white py-5 px-4 rounded my-5"
+              onClick={nextStep}
+            >
+              Next
+            </Button>
+          </div>
         </div>
       )}
       {step === 2 && (
-        <div className="text-center">
-          <Heading
-            as="h2"
-            className="font-bold text-black text-center text-4xl mb-5"
-          >
-            What are your preferences?
-          </Heading>
-          <ul className="grid sm:grid-cols-2 lg:grid-cols-3 w-full p-2 mb-4 rounded">
-            {Object.values(AreaOfInterest).map((interest) => (
-              <li key={interest} value={interest}>
-                <input type="radio" name={interest} id={interest} />
-                {interest}
-              </li>
-            ))}
-          </ul>
-          <div className="flex justify-between">
+        <div className="grid">
+          <div>
+            <Heading
+              as="h2"
+              className="font-bold text-gray-10 text-center text-4xl mb-5 lg:mb-10"
+            >
+              What are your preferences?
+            </Heading>
+            <ul className="grid xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 w-full p-2 mb-4 rounded gap-5">
+              {Object.values(AreaOfInterest).map((interest) => (
+                <li
+                  key={interest}
+                  value={interest}
+                  className="flex items-center text-gray-10 font-semibold text-lg gap-2"
+                >
+                  <input type="radio" name={interest} id={interest} />
+                  {interest}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="flex items-end justify-between">
             <Button
               className="bg-gray-500 text-white py-2 px-4 rounded"
               onClick={prevStep}
@@ -125,7 +129,7 @@ const OrganizationOnboarding: React.FC = () => {
               className="bg-blue-500 text-white py-2 px-4 rounded"
               onClick={submitForm}
             >
-              Submit
+              Done
             </Button>
           </div>
         </div>

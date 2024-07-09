@@ -23,7 +23,32 @@ export async function GET(
     where: { channelId: channel.id },
   });
 
-  return NextResponse.json({ channel, dataPoint, fields });
+  // Find a api key with the channel
+  const apiKey = await prisma.apiKey.findFirst({
+    where: { channelId: channel.id },
+  });
+
+  if (!apiKey)
+    return NextResponse.json({ error: "API Key not found" }, { status: 404 });
+
+  // Find a sample codes with the channel
+  const sampleCodes = await prisma.sampleCodes.findFirst({
+    where: { apiKeyId: apiKey.id },
+  });
+
+  if (!sampleCodes)
+    return NextResponse.json(
+      { error: "Sample codes not found" },
+      { status: 404 }
+    );
+
+  return NextResponse.json({
+    channel,
+    dataPoint,
+    fields,
+    apiKey: apiKey.apiKey,
+    sampleCodes: sampleCodes.codes,
+  });
 }
 
 export async function PUT(

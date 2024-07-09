@@ -1,5 +1,3 @@
-// device/ChannelAction.tsx
-
 import { Button } from "@radix-ui/themes";
 import Link from "next/link";
 import React, { useState } from "react";

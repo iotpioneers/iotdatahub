@@ -8,9 +8,11 @@ import { Box, Button, Card, Flex, Heading, Text } from "@radix-ui/themes";
 import { ChannelProps } from "@/types";
 import EditChannel from "../Channels/EditChannel";
 import ToastDemo from "../Toast/ToastDemo";
+import LoadingSpinner from "../LoadingSpinner";
 
 interface ChannelHeadingProps {
   channel: ChannelProps;
+  dataReceived: number;
 }
 
 const formatDate = (date: string) =>
@@ -18,12 +20,11 @@ const formatDate = (date: string) =>
     day: "numeric",
     month: "long",
     year: "numeric",
-    weekday: "long",
   }).format(new Date(date));
 
-const PageHeading = ({ channel }: ChannelHeadingProps) => {
+const PageHeading = ({ channel, dataReceived }: ChannelHeadingProps) => {
   if (!channel) {
-    return;
+    return <LoadingSpinner />;
   }
 
   return (
@@ -46,7 +47,7 @@ const PageHeading = ({ channel }: ChannelHeadingProps) => {
               className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
               aria-hidden="true"
             />
-            Generated 120k
+            Generated {dataReceived} data
           </div>
           <div className="mt-2 flex items-center text-sm text-gray-500">
             <CalendarIcon

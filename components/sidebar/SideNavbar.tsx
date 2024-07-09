@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { GiHamburgerMenu, GiUpgrade } from "react-icons/gi";
+import React, { useState } from "react";
+import { GiUpgrade } from "react-icons/gi";
 import { Disclosure } from "@headlessui/react";
 import {
   MdOutlineSpaceDashboard,
@@ -15,6 +15,12 @@ import { WifiIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
 function SideNavbar() {
+  const [activeLink, setActiveLink] = useState("");
+
+  const handleSetActiveLink = (link: string) => {
+    setActiveLink(link);
+  };
+
   return (
     <div>
       <Disclosure as="nav">
@@ -28,65 +34,100 @@ function SideNavbar() {
             </h1>
             <div className="my-4 border-b border-gray-100 pb-4">
               <Link href="/dashboard">
-                <div className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto">
-                  <MdOutlineSpaceDashboard className="text-2xl text-gray-600 group-hover:text-white " />
-                  <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
-                    Dashboard
-                  </h3>
+                <div
+                  className={`flex mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
+                    activeLink === "/dashboard"
+                      ? "bg-gray-900 text-white"
+                      : "hover:bg-gray-900 text-gray-600"
+                  }`}
+                  onClick={() => handleSetActiveLink("/dashboard")}
+                >
+                  <MdOutlineSpaceDashboard className="text-2xl text-gray-600" />
+                  <h3 className="text-base font-semibold">Dashboard</h3>
                 </div>
               </Link>
               <Link href="/dashboard/devices">
-                <div className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto">
-                  <MdOutlineDevices className="text-2xl text-gray-600 group-hover:text-white " />
-                  <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
-                    Devices
-                  </h3>
+                <div
+                  className={`flex mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
+                    activeLink === "/dashboard/devices"
+                      ? "bg-gray-900 text-white"
+                      : "hover:bg-gray-900 text-gray-600"
+                  }`}
+                  onClick={() => handleSetActiveLink("/dashboard/devices")}
+                >
+                  <MdOutlineDevices className="text-2xl text-gray-600" />
+                  <h3 className="text-base font-semibold">Devices</h3>
                 </div>
               </Link>
               <Link href="/dashboard/channels">
-                <div className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto">
-                  <BiNetworkChart className="text-2xl text-gray-600 group-hover:text-white " />
-                  <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
-                    Channels
-                  </h3>
+                <div
+                  className={`flex mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
+                    activeLink === "/dashboard/channels"
+                      ? "bg-gray-900 text-white"
+                      : "hover:bg-gray-900 text-gray-600"
+                  }`}
+                  onClick={() => handleSetActiveLink("/dashboard/channels")}
+                >
+                  <BiNetworkChart className="text-2xl text-gray-600" />
+                  <h3 className="text-base font-semibold">Channels</h3>
                 </div>
               </Link>
             </div>
             {/* setting  */}
             <div className="my-4 border-b border-gray-100 pb-4">
               <Link href="/dashboard/subscription">
-                <div className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto">
-                  <GiUpgrade className="text-2xl text-gray-600 group-hover:text-white " />
-                  <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
-                    Upgrade Plan
-                  </h3>
+                <div
+                  className={`flex mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
+                    activeLink === "/dashboard/subscription"
+                      ? "bg-gray-900 text-white"
+                      : "hover:bg-gray-900 text-gray-600"
+                  }`}
+                  onClick={() => handleSetActiveLink("/dashboard/subscription")}
+                >
+                  <GiUpgrade className="text-2xl text-gray-600" />
+                  <h3 className="text-base font-semibold">Upgrade Plan</h3>
                 </div>
               </Link>
               <Link href="#">
-                <div className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto">
-                  <MdOutlineAnalytics className="text-2xl text-gray-600 group-hover:text-white " />
-                  <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
-                    Analytics
-                  </h3>
+                <div
+                  className={`flex mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
+                    activeLink === "/dashboard/analytics"
+                      ? "bg-gray-900 text-white"
+                      : "hover:bg-gray-900 text-gray-600"
+                  }`}
+                  onClick={() => handleSetActiveLink("/dashboard/analytics")}
+                >
+                  <MdOutlineAnalytics className="text-2xl text-gray-600" />
+                  <h3 className="text-base font-semibold">Analytics</h3>
                 </div>
               </Link>
             </div>
             {/* logout */}
             <div className="my-4">
               <Link href="#">
-                <div className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto">
-                  <MdOutlineSettings className="text-2xl text-gray-600 group-hover:text-white " />
-                  <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
-                    Settings
-                  </h3>
+                <div
+                  className={`flex mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
+                    activeLink === "/dashboard/settings"
+                      ? "bg-gray-900 text-white"
+                      : "hover:bg-gray-900 text-gray-600"
+                  }`}
+                  onClick={() => handleSetActiveLink("/dashboard/settings")}
+                >
+                  <MdOutlineSettings className="text-2xl text-gray-600" />
+                  <h3 className="text-base font-semibold">Settings</h3>
                 </div>
               </Link>
               <Link href="/api/auth/signout">
-                <div className="flex mb-2 justify-start items-center gap-4 pl-5 border border-gray-200 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto">
-                  <MdOutlineLogout className="text-2xl text-gray-600 group-hover:text-white " />
-                  <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
-                    Logout
-                  </h3>
+                <div
+                  className={`flex mb-2 justify-start items-center gap-4 pl-5 border border-gray-200 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
+                    activeLink === "/api/auth/signout"
+                      ? "bg-gray-900 text-white"
+                      : "hover:bg-gray-900 text-gray-600"
+                  }`}
+                  onClick={() => handleSetActiveLink("/api/auth/signout")}
+                >
+                  <MdOutlineLogout className="text-2xl text-gray-600" />
+                  <h3 className="text-base font-semibold">Logout</h3>
                 </div>
               </Link>
             </div>

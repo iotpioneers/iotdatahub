@@ -3,8 +3,10 @@ import OrganizationOnboarding from "@/components/dashboard/OrganizationOnboardin
 
 const Dashboard = () => {
   return (
-    <OrganizationOnboarding />
-    // <DashboardOverview />
+    <>
+      <DashboardOverview />
+      <OrganizationOnboarding />
+    </>
   );
 };
 

@@ -47,7 +47,6 @@ const LoginForm = () => {
       console.error("Error", response.error);
       setError(response?.error);
     } else {
-      console.log("Success", response);
       router.push("/dashboard");
     }
   };

@@ -42,10 +42,8 @@ const RegisterForm = () => {
 
     if (response.ok) {
       route.push("/dashboard");
-      console.log(result.message);
       setLoading(false);
     } else {
-      console.log(result.message);
       setErr(result.message);
       setLoading(false);
     }

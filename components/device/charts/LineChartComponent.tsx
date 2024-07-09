@@ -1,24 +1,33 @@
-import React from "react";
-import useMediaQuery from "@/hooks/useMediaQuery";
+import React, { PureComponent } from "react";
 import {
-  LineChart,
-  Line,
+  ScatterChart,
+  Scatter,
   XAxis,
   YAxis,
+  ZAxis,
   CartesianGrid,
   Tooltip,
   Legend,
-  Brush,
+  ResponsiveContainer,
 } from "recharts";
+
+const data01 = [
+  { x: 10, y: 30 },
+  { x: 30, y: 200 },
+  { x: 45, y: 100 },
+  { x: 50, y: 400 },
+  { x: 70, y: 150 },
+  { x: 100, y: 250 },
+];
+
 import { DataPointProps } from "@/types";
 
 interface LineChartProps {
-  chartData: DataPointProps[];
+  chartData?: DataPointProps[];
+  field?: string;
 }
 
-const LineChartComponent = ({ chartData }: LineChartProps) => {
-  const isSmallScreens = useMediaQuery("(max-width: 480px)");
-
+const LineChartComponent = ({ chartData = [], field = "" }: LineChartProps) => {
   const data = chartData.map((dataPoint) => {
     const formatDate = (date: string) =>
       new Intl.DateTimeFormat("en", {
@@ -32,27 +41,30 @@ const LineChartComponent = ({ chartData }: LineChartProps) => {
       value: dataPoint.value,
     };
   });
-
   return (
-    <LineChart
-      width={isSmallScreens ? 300 : 500}
-      height={300}
-      data={data}
-      margin={{
-        top: 5,
-        right: 30,
-        left: 20,
-        bottom: 5,
-      }}
-    >
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="timestamp" />
-      <YAxis />
-      <Tooltip />
-      <Legend />
-      <Line type="monotone" dataKey="value" stroke="#0000ff" strokeWidth={2} />
-      <Brush />
-    </LineChart>
+    <div>
+      <h2 className="text-2xl font-semibold items-center justify-center mb-5">
+        {field}
+      </h2>
+      <ResponsiveContainer width="100%" height={400}>
+        <ScatterChart
+          margin={{
+            top: 20,
+            right: 20,
+            bottom: 20,
+            left: 20,
+          }}
+        >
+          <CartesianGrid />
+          <XAxis type="category" dataKey="timestamp" name="timestamp" />
+          <YAxis type="number" dataKey="value" name="data_point" />
+          <ZAxis type="number" range={[100]} />
+          <Tooltip cursor={{ strokeDasharray: "3 3" }} />
+          <Legend />
+          <Scatter data={data} fill="#82ca9d" line shape="diamond" />
+        </ScatterChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 

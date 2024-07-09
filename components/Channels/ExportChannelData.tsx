@@ -1,8 +1,7 @@
 import React from "react";
 import { Button, DropdownMenu } from "@radix-ui/themes";
 
-import { FaFileCsv, FaFileExcel } from "react-icons/fa6";
-import { TextAlignRightIcon } from "@radix-ui/react-icons";
+import { FaFileCsv } from "react-icons/fa6";
 import { GiBracers } from "react-icons/gi";
 
 interface Props {

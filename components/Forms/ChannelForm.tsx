@@ -77,8 +77,6 @@ export default function ChannelForm() {
 
       const result = await response.json();
 
-      console.log("result:", result);
-
       const { id } = result.newChannel;
 
       if (result) router.push(`/dashboard/channels/${id}`);

@@ -50,12 +50,10 @@ export default function DeviceForm() {
           throw new Error("Failed to create channel");
         }
         const channelsData: Channel[] = await response.json();
-        console.log("channelData", channelsData);
 
         setChannels(channelsData);
       } catch (error) {
         console.error("Error fetching channels:", error);
-        // Handle error state or retry logic if needed
       } finally {
         setIsSubmitting(false);
       }
