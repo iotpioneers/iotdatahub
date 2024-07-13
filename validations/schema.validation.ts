@@ -35,8 +35,8 @@ export const userSchema = z
 
     email: z
       .string()
-      .email("Invalid email format")
-      .min(1, "Email is required and cannot be empty"),
+      .min(1, "Email is required and cannot be empty")
+      .email("Invalid email format"),
 
     password: passwordValidation,
 
@@ -45,6 +45,30 @@ export const userSchema = z
     }),
   })
   .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords must match",
+    path: ["confirmPassword"],
+  });
+
+// The schema for the forgot password
+export const ForgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .min(1, "Email is required and cannot be empty")
+    .email("Invalid email format"),
+});
+
+// The schema for the reset password
+export const ResetPasswordSchema = z
+  .object({
+    currentPassword: passwordValidation,
+
+    newPassword: passwordValidation,
+
+    confirmPassword: z.string().min(8, {
+      message: "Confirm Password must be at least 8 characters long",
+    }),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Passwords must match",
     path: ["confirmPassword"],
   });
@@ -111,7 +135,11 @@ export const organizationSchema = z.object({
   address: z
     .string()
     .min(1, "Address is required and cannot be empty")
-    .max(255, { message: "Address must be 255 characters or less" }),
+    .max(255, { message: "Address must be 255 characters or less" })
+    .optional(),
+  type: z.enum(["PERSONAL", "ENTREPRISE"], {
+    message: "Invalid organization type",
+  }),
   areaOfInterest: z.enum(
     [
       "TECHNOLOGY",

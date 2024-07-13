@@ -204,10 +204,12 @@ model Subscription {
 }
 
 model Organization {
-  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
   name           String
-  address        String
+  address        String?
+  type           OrganizationType @default(PERSONAL)
   areaOfInterest AreaOfInterest
+  userId         String           @unique @db.ObjectId
   users          User[]
 
   createdAt DateTime @default(now())
@@ -227,6 +229,11 @@ enum Access {
 enum DeviceStatus {
   ONLINE
   OFFLINE
+}
+
+enum OrganizationType {
+  PERSONAL
+  ENTREPRISE
 }
 
 enum AreaOfInterest {

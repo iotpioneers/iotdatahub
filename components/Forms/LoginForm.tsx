@@ -11,6 +11,7 @@ import * as Yup from "yup";
 import { Heading } from "@radix-ui/themes";
 import Image from "next/image";
 import { ArrowRightEndOnRectangleIcon } from "@heroicons/react/24/outline";
+import { FaGoogle } from "react-icons/fa6";
 
 const schema = Yup.object().shape({
   email: Yup.string()
@@ -51,10 +52,10 @@ const LoginForm = () => {
     }
   };
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="relative bg-grey p-6 rounded-md shadow-md max-w-md w-full mx-4 mt-8 mb-0">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100">
+      <div className="relative  bg-white  p-6 rounded-md shadow-md max-w-md w-full mx-4 mt-8 mb-0">
         <div className="flex gap-3 text-lime-600">
-          <Heading className=" mb-5 text-center">
+          <Heading className=" mb-5 text-center text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white ">
             Sign in to your account
           </Heading>
           <span className="relative flex h-3 w-3">
@@ -118,7 +119,7 @@ const LoginForm = () => {
               Remember me
             </label>
             <a
-              href="#forgot-password"
+              href="/forgot-password"
               className="text-sm text-blue-600 hover:underline"
             >
               Forgot Password?
@@ -129,28 +130,31 @@ const LoginForm = () => {
             <Button
               disabled={loading}
               type="submit"
-              className="flex w-full justify-center items-center rounded-lg bg-gray-950 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 mb-5"
+              className="flex w-full justify-center items-center rounded-lg  bg-blue-600 hover:bg-blue-700  px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 mb-5"
             >
-              {loading ? "Loading..." : "Sign in"}
+              {loading ? "Signing you in please wait..." : "Sign in"}
             </Button>
           </div>
         </form>
 
-        <div className="flex w-full flex-col space-y-2 border-2 rounded-lg items-center mt-2">
+        <div className="flex items-center py-2">
+          <div className="w-full bg-slate-950 h-[1px]"></div>
+          <span className="mx-2 text-slate-950">or</span>
+          <div className="w-full bg-slate-950 h-[1px]"></div>
+        </div>
+        <div className="">
           <Button
+            type="button"
+            className="w-full text-slate-950 bg-slate-400 hover:bg-slate-500 focus:ring-4 focus:outline-none focus:ring-slate-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center justify-center flex items-center dark:focus:ring-slate-100 me-2 mb-4 border border-slate-200"
             onClick={() =>
               signIn("google", {
-                callbackUrl: "http://localhost:3000/dashboard",
+                callbackUrl: "/dashboard",
               })
             }
-            className="flex items-center font-bold hover:text-green-50"
           >
-            <p className="flex justify-center items-center gap-3">
-              Continue with
-              <span className="flex justify-center rounded-md text-sky-400 py-1.5 text-sm font-semibold leading-6 shadow-sm hover:text-slate-50 animate-pulse items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                Google
-              </span>
-            </p>
+            {/* Icon */}
+            <FaGoogle className="mr-2 text-yellow-600 w-4 h-4" />
+            Sign in with Google
           </Button>
         </div>
         <div className="flex text-center mt-4">

@@ -3,6 +3,7 @@ import "./globals.css";
 import { Container } from "@radix-ui/themes";
 import AuthProvider from "./auth/Provider";
 import QueryClientProvider from "./QueryClientProvider";
+// import Header from "@/components/Home/components/Header";
 
 export const metadata: Metadata = {
   title: "Ten2Ten",
@@ -20,6 +21,7 @@ export default function RootLayout({
       <body>
         <QueryClientProvider>
           <AuthProvider>
+            {/* <Header /> */}
             <main>
               <Container>{children}</Container>
             </main>

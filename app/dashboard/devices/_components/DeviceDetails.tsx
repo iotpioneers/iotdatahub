@@ -55,7 +55,7 @@ const DeviceDetails = async ({ params }: Props) => {
   }, [params.id]);
 
   if (loading || !device) {
-    return <LoadingSpinner />;
+    return;
   }
 
   return (

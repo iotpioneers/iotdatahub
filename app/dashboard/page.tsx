@@ -1,11 +1,11 @@
 import DashboardOverview from "@/components/dashboard/DashboardOverview";
-import OrganizationOnboarding from "@/components/dashboard/OrganizationOnboarding";
+import OrganizationOnboardingCreation from "@/components/dashboard/OrganizationOnboardingCreation";
 
 const Dashboard = () => {
   return (
     <>
+      <OrganizationOnboardingCreation />
       <DashboardOverview />
-      <OrganizationOnboarding />
     </>
   );
 };

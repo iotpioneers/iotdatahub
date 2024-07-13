@@ -14,15 +14,15 @@ const Hero = () => {
 
   return (
     <Section
-      className="pt-[12rem] lg:-mt-[9.25rem] md:mt-[1.25rem] -mt-[12.25rem] bg-slate-200 lg:max-h-screen"
+      className="pt-[12rem] lg:-mt-[9.25rem] md:mt-[1.25rem] xs:-mt-[5.25rem] -mt-[12.25rem] bg-slate-200 lg:max-h-screen"
       crosses
       crossesOffset="lg:translate-y-[5.25rem]"
       customPaddings
       id="hero"
     >
       <div className="container relative lg:mt-36" ref={parallaxRef}>
-        <div className="lg:flex  md:grid">
-          <div className="relative z-1 max-w-[62rem] mx-auto text-center mb-[3.875rem] xs:mb- xs:-mt-28 md:mb-20 lg:mb-[6.25rem]">
+        <div className="lg:flex md:grid lg:mt-12 xs:mt-1">
+          <div className="relative z-1 max-w-[62rem] mx-auto text-center mb-[3.875rem] xs:-mt-28 md:mb-20 lg:mb-[6.25rem]">
             <h1 className="h1 mb-2 text-gray-50">
               Cutt edge with{"  "}
               <span className="inline-block relative">

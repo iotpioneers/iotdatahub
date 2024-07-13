@@ -14,6 +14,16 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const userEmail = token.email as string;
+
+  const user = await prisma.user.findUnique({
+    where: { email: userEmail },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
   // Validate the request body against the schema
   const validation = organizationSchema.safeParse(body);
 
@@ -21,15 +31,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(validation.error.errors, { status: 400 });
   }
 
-  const { name, address, areaOfInterest } = validation.data;
+  const { name, address, type, areaOfInterest } = validation.data;
 
   try {
     const newOrganization = await prisma.organization.create({
       data: {
         name,
-        address,
+        address: address || "N/A",
+        type,
         areaOfInterest,
+        userId: user.id,
       },
+      include: { users: true },
     });
 
     return NextResponse.json(newOrganization, { status: 201 });

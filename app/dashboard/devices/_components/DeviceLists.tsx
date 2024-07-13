@@ -43,7 +43,7 @@ const DeviceLists = () => {
   if (!devices) return null;
 
   return (
-    <div className="w-full mt-5">
+    <div className="w-full min-w-72 mt-5">
       <DeviceAction />
       <Table.Root variant="surface">
         <Table.Header>

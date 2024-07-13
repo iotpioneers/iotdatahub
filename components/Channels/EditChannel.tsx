@@ -79,7 +79,7 @@ const EditChannel = () => {
     }
   });
 
-  if (isSubmitting) return <LoadingSpinner />;
+  if (isSubmitting) return;
 
   return (
     <div>

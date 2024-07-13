@@ -11,7 +11,6 @@ import {
   MdOutlineLogout,
 } from "react-icons/md";
 import { BiNetworkChart } from "react-icons/bi";
-import { WifiIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
 function SideNavbar() {
@@ -22,13 +21,17 @@ function SideNavbar() {
   };
 
   return (
-    <div>
+    <div className="relative hidden lg:flex">
       <Disclosure as="nav">
         <div className="p-6 w-1/2 h-screen bg-white z-20 fixed top-0 -left-96 lg:left-0 lg:w-60 peer-focus:left-0 peer:transition ease-out delay-150 duration-200 border-r border-gray-10 border-5">
           <div className="flex flex-col justify-start item-center">
             <h1 className="text-base text-center cursor-pointer font-bold text-blue-900 border-b border-gray-100 pb-4 w-full">
               <Link href="/" className="flex">
-                <WifiIcon className="h-6 w-6 mx-2" aria-hidden="true" />
+                <img
+                  src="logo.svg"
+                  alt="logo"
+                  className="h-8 w-8 text-gray-10"
+                />
                 <span className="hover:text-zinc-950">Ten2Ten</span>
               </Link>
             </h1>
@@ -104,7 +107,7 @@ function SideNavbar() {
             </div>
             {/* logout */}
             <div className="my-4">
-              <Link href="#">
+              <Link href="/dashboard/settings">
                 <div
                   className={`flex mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
                     activeLink === "/dashboard/settings"

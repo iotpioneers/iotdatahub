@@ -50,10 +50,12 @@ const RegisterForm = () => {
   });
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="relative bg-grey p-6 rounded-md shadow-md max-w-md w-full mx-4 mt-8 mb-0">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100">
+      <div className="relative bg-white p-6 rounded-md shadow-md max-w-md w-full mx-4 mt-8 mb-0">
         <div className="flex gap-3 text-lime-600">
-          <Heading className=" mb-5 text-center">Create Account</Heading>
+          <Heading className=" mb-5 text-center text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+            Create a new account
+          </Heading>
           <span className="relative flex h-3 w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-green-50"></span>
@@ -79,7 +81,7 @@ const RegisterForm = () => {
             <div className="mt-1">
               <input
                 id="name"
-                {...register("name")}
+                {...register("name", { required: true })}
                 type="text"
                 autoComplete="name"
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -100,7 +102,7 @@ const RegisterForm = () => {
                 id="email"
                 type="email"
                 autoComplete="email"
-                {...register("email")}
+                {...register("email", { required: true })}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
             </div>
@@ -121,7 +123,8 @@ const RegisterForm = () => {
                 id="password"
                 type="password"
                 autoComplete="current-password"
-                {...register("password")}
+                {...register("password", { required: true })}
+                placeholder="••••••••"
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
               />
             </div>
@@ -140,8 +143,8 @@ const RegisterForm = () => {
               <input
                 id="Repassword"
                 type="password"
-                {...register("confirmPassword")}
-                autoComplete="current-password"
+                {...register("confirmPassword", { required: true })}
+                placeholder="••••••••"
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
               />
             </div>
@@ -153,29 +156,34 @@ const RegisterForm = () => {
           <div className="flex w-full flex-col space-y-2 border-2 rounded-lg items-center mt-2">
             <Button
               disabled={loading}
-              className="flex w-full justify-center rounded-md bg-primary-blue py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-black items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+              className="flex w-full justify-center rounded-md  py-1.5 text-sm font-semibold leading-6 bg-blue-600 hover:bg-blue-700 text-white shadow-sm items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
             >
-              {loading ? "Loading..." : "Register"}
+              {loading ? "Registering you in please wait..." : "Register"}
             </Button>
           </div>
         </form>
-        <div className="flex w-full flex-col space-y-2 border-2 rounded-lg items-center mt-2">
+
+        <div className="flex items-center py-2">
+          <div className="w-full bg-slate-950 h-[1px]"></div>
+          <span className="mx-2 text-slate-950">or</span>
+          <div className="w-full bg-slate-950 h-[1px]"></div>
+        </div>
+        <div className="">
           <Button
+            type="button"
+            className="w-full text-slate-950 bg-slate-400 hover:bg-slate-500 focus:ring-4 focus:outline-none focus:ring-slate-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center justify-center flex items-center dark:focus:ring-slate-100 me-2 mb-4 border border-slate-200"
             onClick={() =>
               signIn("google", {
-                callbackUrl: "http://localhost:3000/dashboard",
+                callbackUrl: "/dashboard",
               })
             }
-            className="flex items-center font-bold hover:text-green-50"
           >
-            <p className="flex justify-center items-center gap-3">
-              Continue with
-              <span className="flex justify-center rounded-md text-sky-400 py-1.5 text-sm font-semibold leading-6 shadow-sm hover:text-slate-50 animate-pulse items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                Google
-              </span>
-            </p>
+            {/* Icon */}
+            <FaGoogle className="mr-2 text-yellow-600 w-4 h-4" />
+            Sign in with Google
           </Button>
         </div>
+
         <div className="flex text-center mt-4">
           <p className="text-sm text-gray-950">
             Already Have Account?

@@ -3,8 +3,16 @@
 import { useEffect, useState } from "react";
 import ChannelNavigation from "@/components/device/ChannelNavigation";
 import { ChannelProps, DataPointProps, FieldProps } from "@/types";
-import PageHeading from "@/components/device/PageHeading";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import dynamic from "next/dynamic";
+
+const ChannelDetailsHeading = dynamic(
+  () => import("@/components/device/ChannelDetailsHeading"),
+  {
+    ssr: false,
+    loading: () => <LoadingSpinner />,
+  }
+);
 
 interface ChannelData {
   channel: ChannelProps;
@@ -31,14 +39,17 @@ export default function ChannelDetails({ channelID }: { channelID: string }) {
   }, []);
 
   if (!channelData) {
-    return <LoadingSpinner />;
+    return;
   }
 
   const { channel, dataPoint, fields, apiKey, sampleCodes } = channelData;
 
   return (
     <main className="overflow-hidden">
-      <PageHeading channel={channel} dataReceived={dataPoint.length} />
+      <ChannelDetailsHeading
+        channel={channel}
+        dataReceived={dataPoint.length}
+      />
       <div className="mt-10 border-t border-gray-200"></div>
       <ChannelNavigation
         channelId={channelID}

@@ -41,7 +41,7 @@ const ChannelList = () => {
 
   // Render loading spinner while fetching channels
   if (isLoading || channels === null) {
-    return <LoadingSpinner />;
+    return;
   }
 
   return (

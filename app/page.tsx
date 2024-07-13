@@ -1,8 +1,8 @@
 import React from "react";
 
-import HomeBody from "@/components/Home/HomeBody";
 import { Metadata } from "next";
 import Header from "@/components/Home/components/Header";
+import HomeBody from "@/components/Home/HomeBody";
 
 export default function Home() {
   return (

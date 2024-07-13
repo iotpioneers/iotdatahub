@@ -22,9 +22,12 @@ const formatDate = (date: string) =>
     year: "numeric",
   }).format(new Date(date));
 
-const PageHeading = ({ channel, dataReceived }: ChannelHeadingProps) => {
+const ChannelDetailsHeading = ({
+  channel,
+  dataReceived,
+}: ChannelHeadingProps) => {
   if (!channel) {
-    return <LoadingSpinner />;
+    return;
   }
 
   return (
@@ -93,4 +96,4 @@ const PageHeading = ({ channel, dataReceived }: ChannelHeadingProps) => {
   );
 };
 
-export default PageHeading;
+export default ChannelDetailsHeading;

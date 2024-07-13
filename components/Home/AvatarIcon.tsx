@@ -2,32 +2,30 @@
 
 import React from "react";
 import { useSession } from "next-auth/react";
-import {
-  Flex,
-  Box,
-  Heading,
-  IconButton,
-  Popover,
-  Button,
-} from "@radix-ui/themes";
+import { Flex, Box, Heading, IconButton, Popover } from "@radix-ui/themes";
 import Link from "next/link";
-import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { Avatar } from "@radix-ui/react-avatar";
 
 const AvatarIcon = () => {
   const { status, data: session } = useSession();
 
+  // const username_letter = session!.user!.name!.split("")[0];
+
   return (
-    <IconButton color="crimson" variant="ghost" className="mr-5 z-50">
+    <IconButton color="crimson" variant="ghost" className="z-10">
       {status === "authenticated" && (
         <Popover.Root>
           <Popover.Trigger>
             <Avatar className="h-10 w-10 bg-gray-500 rounded-full flex items-center justify-center">
-              <img
-                src={session!.user!.image! || "user.svg"}
-                alt="Profile"
-                className="rounded-full"
-              />
+              {session!.user!.image ? (
+                <img
+                  src={session!.user!.image}
+                  alt="Profile"
+                  className="rounded-full"
+                />
+              ) : (
+                session!.user!.name!.split("")[0].toUpperCase()
+              )}
             </Avatar>
           </Popover.Trigger>
           <Popover.Content className="bg-white border shadow-md rounded-lg z-50 px-5">
