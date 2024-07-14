@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { GiUpgrade } from "react-icons/gi";
+import { GiOrganigram, GiUpgrade } from "react-icons/gi";
 import { Disclosure } from "@headlessui/react";
 import {
   MdOutlineSpaceDashboard,
@@ -12,6 +12,7 @@ import {
 } from "react-icons/md";
 import { BiNetworkChart } from "react-icons/bi";
 import Link from "next/link";
+import { HiViewGrid } from "react-icons/hi";
 
 function SideNavbar() {
   const [activeLink, setActiveLink] = useState("");
@@ -35,7 +36,7 @@ function SideNavbar() {
                 <span className="hover:text-zinc-950">Ten2Ten</span>
               </Link>
             </h1>
-            <div className="my-4 border-b border-gray-100 pb-4">
+            <div className="my-2 border-b border-gray-100 pb-4">
               <Link href="/dashboard">
                 <div
                   className={`flex mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
@@ -45,8 +46,8 @@ function SideNavbar() {
                   }`}
                   onClick={() => handleSetActiveLink("/dashboard")}
                 >
-                  <MdOutlineSpaceDashboard className="text-2xl text-gray-600" />
-                  <h3 className="text-base font-semibold">Dashboard</h3>
+                  <HiViewGrid className="text-2xl text-gray-600" />
+                  <h3 className="text-base font-semibold">Overview</h3>
                 </div>
               </Link>
               <Link href="/dashboard/devices">
@@ -77,7 +78,7 @@ function SideNavbar() {
               </Link>
             </div>
             {/* setting  */}
-            <div className="my-4 border-b border-gray-100 pb-4">
+            <div className="my-2 border-b border-gray-100 pb-4">
               <Link href="/dashboard/subscription">
                 <div
                   className={`flex mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
@@ -104,9 +105,22 @@ function SideNavbar() {
                   <h3 className="text-base font-semibold">Analytics</h3>
                 </div>
               </Link>
+              <Link href="#">
+                <div
+                  className={`flex mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
+                    activeLink === "/dashboard/analytics"
+                      ? "bg-gray-900 text-white"
+                      : "hover:bg-gray-900 text-gray-600"
+                  }`}
+                  onClick={() => handleSetActiveLink("/dashboard/analytics")}
+                >
+                  <GiOrganigram className="text-2xl text-gray-600" />
+                  <h3 className="text-base font-semibold">Organization</h3>
+                </div>
+              </Link>
             </div>
             {/* logout */}
-            <div className="my-4">
+            <div className="my-2">
               <Link href="/dashboard/settings">
                 <div
                   className={`flex mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${

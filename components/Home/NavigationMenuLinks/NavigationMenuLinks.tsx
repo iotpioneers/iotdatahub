@@ -38,19 +38,16 @@ const NavigationMenuLinks = () => {
             </NavigationMenu.Trigger>
             <NavigationMenu.Content className="NavigationMenuContent">
               <ul className="List one">
-                <ListItem title="Tech Support" href="/tech-support">
+                <ListItem title="Tech Support" href="#">
                   Get assistance with technical issues.
                 </ListItem>
-                <ListItem
-                  title="Developer Resources"
-                  href="/developer-resources"
-                >
+                <ListItem title="Developer Resources" href="#">
                   Explore resources for developers.
                 </ListItem>
-                <ListItem title="Documentation" href="/documentation">
+                <ListItem title="Documentation" href="#">
                   Access API and user documentation.
                 </ListItem>
-                <ListItem title="Featured Hardware" href="/featured-hardware">
+                <ListItem title="Featured Hardware" href="#">
                   Discover featured IoT hardware.
                 </ListItem>
               </ul>
@@ -64,16 +61,16 @@ const NavigationMenuLinks = () => {
             </NavigationMenu.Trigger>
             <NavigationMenu.Content className="NavigationMenuContent">
               <ul className="List one">
-                <ListItem title="HVAC" href="/hvac">
+                <ListItem title="HVAC" href="#">
                   Manage HVAC systems efficiently.
                 </ListItem>
-                <ListItem title="Smart Farming" href="/smart-farming">
+                <ListItem title="Smart Farming" href="#">
                   Optimize agricultural processes.
                 </ListItem>
-                <ListItem title="Smart Cities" href="/smart-cities">
+                <ListItem title="Smart Cities" href="#">
                   Implement IoT solutions in urban environments.
                 </ListItem>
-                <ListItem title="Smart Home" href="/smart-home">
+                <ListItem title="Smart Home" href="#">
                   Enhance home automation with IoT.
                 </ListItem>
               </ul>
@@ -87,19 +84,19 @@ const NavigationMenuLinks = () => {
             </NavigationMenu.Trigger>
             <NavigationMenu.Content className="NavigationMenuContent">
               <ul className="List two">
-                <ListItem title="Channels" href="/channels">
+                <ListItem title="Channels" href="#">
                   Manage and configure IoT device channels.
                 </ListItem>
-                <ListItem title="Devices" href="/devices">
+                <ListItem title="Devices" href="#">
                   View and manage IoT devices.
                 </ListItem>
-                <ListItem title="API Keys" href="/api-keys">
+                <ListItem title="API Keys" href="#">
                   Generate and manage API keys for secure access.
                 </ListItem>
-                <ListItem title="Data Visualization" href="/data-visualization">
+                <ListItem title="Data Visualization" href="#">
                   Visualize and analyze IoT data.
                 </ListItem>
-                <ListItem title="Analytics" href="/analytics">
+                <ListItem title="Analytics" href="#">
                   Perform analytics on IoT data points.
                 </ListItem>
               </ul>
@@ -113,10 +110,10 @@ const NavigationMenuLinks = () => {
             </NavigationMenu.Trigger>
             <NavigationMenu.Content className="NavigationMenuContent">
               <ul className="List one">
-                <ListItem title="About Us" href="/about-us">
+                <ListItem title="About Us" href="#">
                   Learn more about our company.
                 </ListItem>
-                <ListItem title="Blogs" href="/blogs">
+                <ListItem title="Blogs" href="#">
                   Read our latest blogs and updates.
                 </ListItem>
               </ul>

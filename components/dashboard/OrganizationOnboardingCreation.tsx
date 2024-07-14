@@ -4,8 +4,6 @@ import { useState } from "react";
 import { Button, Callout, Heading, Text } from "@radix-ui/themes";
 import { nanoid } from "nanoid";
 import { useRouter } from "next/navigation";
-import ErrorMessage from "../ErrorMessage";
-import { z } from "zod";
 import { organizationSchema } from "@/validations/schema.validation";
 
 // Define the enum AreaOfInterest

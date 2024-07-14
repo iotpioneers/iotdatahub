@@ -18,7 +18,7 @@ const Pricing = () => {
             />
           </div>
         </div>
-        <div className="flex -mt-20">
+        <div className="flex mt-16 lg:-mt-20">
           <Heading
             tag="Get started with Ten2Ten"
             title="Find the right pricing package"

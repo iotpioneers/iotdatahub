@@ -44,7 +44,7 @@ const DashboardOverview = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
         {/* Welcome and Devices Section */}
         <div className="space-y-5">
-          <div className="bg-orange-200 p-5 rounded-lg shadow-md">
+          <div className="bg-orange-200 p-5 rounded-lg shadow-md mx-5 xs:mx-0">
             <div>
               <Heading as="h1" className="text-2xl font-bold mb-5">
                 Hello, {session?.user?.name!}
@@ -60,8 +60,14 @@ const DashboardOverview = () => {
               <Heading as="h2" className="text-xl font-semibold">
                 My Devices
               </Heading>
-              <Button variant="outline" className="w-10 h-10">
-                <Link href="/dashboard/devices/new">
+              <Button
+                variant="outline"
+                className="flex w-36 h-10 justify-center items-center bg-slate-200 rounded-md"
+              >
+                <Link
+                  href="/dashboard/devices/new"
+                  className="flex w-full h-full justify-center items-center gap-3"
+                >
                   <PlusIcon className="w-4 h-4" /> Add Device
                 </Link>
               </Button>

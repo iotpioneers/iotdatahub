@@ -7,7 +7,7 @@ import LoadingSpinner from "./LoadingSpinner";
 
 const DeleteButton = () => {
   const [error, setError] = useState(false);
-  const [isDeleting, setDeleting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   return (
     <>

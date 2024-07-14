@@ -9,8 +9,6 @@ import { Avatar } from "@radix-ui/react-avatar";
 const AvatarIcon = () => {
   const { status, data: session } = useSession();
 
-  // const username_letter = session!.user!.name!.split("")[0];
-
   return (
     <IconButton color="crimson" variant="ghost" className="z-10">
       {status === "authenticated" && (

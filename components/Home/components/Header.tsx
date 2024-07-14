@@ -1,16 +1,14 @@
 "use client";
 
+import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
-
 import { navigation } from "@/constants";
 import Button from "./Button";
 import MenuSvg from "./design/svg/MenuSvg";
 import { HamburgerMenu } from "./design/Header";
-import { useState } from "react";
-import { WifiIcon } from "@heroicons/react/24/outline";
 import NavigationMenuLinks from "../NavigationMenuLinks/NavigationMenuLinks";
 import AvatarIcon from "../AvatarIcon";
-import { useSession } from "next-auth/react";
 
 const Header = () => {
   const { status, data: session } = useSession();
@@ -39,18 +37,18 @@ const Header = () => {
         openNavigation ? "bg-n-8" : "bg-n-8/90 backdrop-blur-sm"
       }`}
     >
-      <div className="flex items-center px-5 lg:px-7.5 xl:px-10 max-lg:py-4">
+      <div className="flex items-center px-1 sm:px-5  lg:px-7.5 xl:px-10 max-lg:py-4">
         <div className="flex w-full justify-between items-center">
           <div>
             <a
-              className="flex w-[12rem] xl:mr-8 gap-2 items-center text-gray-10 font-bold"
+              className="flex md:w-[12rem] xl:mr-8 gap-2 items-center text-gray-10 font-bold"
               href="/"
             >
               <img src="logo.svg" alt="logo" className="h-8 w-8 text-gray-10" />
               <p>Ten2Ten</p>
             </a>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-0 md:gap-2">
             <nav
               className={`${
                 openNavigation ? "flex" : "hidden"
@@ -82,17 +80,18 @@ const Header = () => {
               New account
             </a>
 
-            <Button
-              className="flex"
-              href={status === "authenticated" ? "/dashboard" : "/login"}
-            >
-              {status === "authenticated" ? "Dashboard" : "Sign in"}
-            </Button>
-
+            {status !== "loading" && (
+              <Button
+                className="flex -mr-4 xs:mr-1 "
+                href={status === "authenticated" ? "/dashboard" : "/login"}
+              >
+                {status === "authenticated" ? "Dashboard" : "Sign in"}
+              </Button>
+            )}
             {status === "authenticated" && <AvatarIcon />}
 
             <Button
-              className="ml-auto lg:hidden"
+              className="ml-1 lg:hidden"
               px="px-3"
               onClick={toggleNavigation}
             >

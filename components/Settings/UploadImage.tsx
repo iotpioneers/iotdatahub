@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { CldImage, CldUploadWidget } from "next-cloudinary";
 import { MdUploadFile } from "react-icons/md";
+import { UploadCloud } from "lucide-react";
 
 interface CloudinaryResult {
   public_id: string;
@@ -32,11 +33,10 @@ const UploadImage = () => {
         {({ open }) => {
           return (
             <button
-              className="flex button bg-mauve12 justify-center items-center text-2xl rounded-full p-2 mt-2"
+              className="flex bg-n-2 text-xs justify-center items-center rounded-full p-1 gap-1"
               onClick={() => open()}
             >
-              <MdUploadFile width={24} height={24} color="white" />
-              Upload
+              <UploadCloud width={18} height={18} color="white" /> upload
             </button>
           );
         }}
