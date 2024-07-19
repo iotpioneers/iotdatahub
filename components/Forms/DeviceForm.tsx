@@ -180,7 +180,10 @@ export default function DeviceForm() {
             disabled={isSubmitting}
           >
             {isSubmitting && (
-              <svg className="animate-pulse h-5 w-5 -mt-1" viewBox="0 0 21 21">
+              <svg
+                className="animate-pulse h-5 w-5 -mt-1 mr-1"
+                viewBox="0 0 21 21"
+              >
                 <g transform="translate(2.5, 2.5)">
                   <CloudArrowUpIcon width={20} height={20} color="white" />
                 </g>

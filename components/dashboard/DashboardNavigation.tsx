@@ -6,7 +6,7 @@ const DashboardNavigation = () => {
   return (
     <div className="flex bg-white">
       <SideNavbar />
-      <div className="flex flex-col flex-grow lg:ml-64 mx-5 sm:mx-2">
+      <div className="flex flex-col flex-grow lg:ml-64 mb-5">
         <Navbar />
       </div>
     </div>

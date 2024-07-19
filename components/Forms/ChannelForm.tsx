@@ -94,7 +94,9 @@ export default function ChannelForm() {
       <div className="mt-10 border-t border-gray-200"></div>
       {error && (
         <Callout.Root color="red" className="mb-5">
-          <Callout.Text>{error}</Callout.Text>
+          <Callout.Text className="bg-red-300 p-2 rounded-lg mt-1">
+            {error}
+          </Callout.Text>
         </Callout.Root>
       )}
       <form className="mt-6" onSubmit={onSubmit}>
@@ -155,7 +157,7 @@ export default function ChannelForm() {
 
         <Button
           type="button"
-          className="inline-flex justify-center rounded-md"
+          className="inline-flex bg-slate-400 justify-center rounded-md p-1"
           onClick={addNewField}
           disabled={fields.length >= 6}
         >
@@ -241,7 +243,7 @@ export default function ChannelForm() {
 
         <Button
           type="submit"
-          className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium items-center text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 gap-1 text-sm font-medium items-center text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           disabled={isSubmitting}
         >
           {isSubmitting && (

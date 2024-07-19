@@ -1,11 +1,11 @@
 import DashboardOverview from "@/components/Dashboard/DashboardOverview";
-// import OrganizationOnboardingCreation from "@/components/dashboard/OrganizationOnboardingCreation";
+import OrganizationOnboardingCreation from "@/components/Dashboard/OrganizationOnboardingCreation";
 import { Metadata } from "next";
 
-const Dashboard = () => {
+const Dashboard = async () => {
   return (
     <>
-      {/* <OrganizationOnboardingCreation /> */}
+      <OrganizationOnboardingCreation />
       <DashboardOverview />
     </>
   );

@@ -1,6 +1,6 @@
 import { Button } from "@radix-ui/themes";
 import React from "react";
-import { Link } from "./device";
+import Link from "@/components/Link";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 
 const EditButton = () => {

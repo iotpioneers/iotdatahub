@@ -1,10 +1,13 @@
 import React from "react";
 import { Metadata } from "next";
 import "../globals.css";
-import { Container } from "@radix-ui/themes";
 import DashboardNavigation from "@/components/Dashboard/DashboardNavigation";
 import AuthProvider from "../auth/Provider";
 import QueryClientProvider from "../QueryClientProvider";
+import { UserProvider } from "@/contexts/user-context";
+import { LocalizationProvider } from "@/components/core/localization-provider";
+import { ThemeProvider } from "@/components/core/theme-provider/theme-provider";
+import { Container } from "@radix-ui/themes";
 
 export const metadata: Metadata = {
   title: "Ten2Ten",
@@ -19,13 +22,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-white">
+      <body>
         <QueryClientProvider>
           <AuthProvider>
-            <DashboardNavigation />
-            <div className="flex flex-col flex-gro lg:ml-64 xs:mx-2">
-              <Container>{children}</Container>
-            </div>
+            <UserProvider>
+              <LocalizationProvider>
+                <UserProvider>
+                  <DashboardNavigation />
+                  <div className="flex flex-col flex-gro lg:ml-64 xs:mx-2">
+                    <Container>{children}</Container>
+                  </div>
+                </UserProvider>
+              </LocalizationProvider>
+            </UserProvider>
           </AuthProvider>
         </QueryClientProvider>
       </body>

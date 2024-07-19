@@ -72,6 +72,8 @@ model User {
   emailVerified  DateTime?
   image          String?
   password       String?
+  position       String?
+  isNew          Boolean         @default(true)
   role           Role            @default(USER)
   accounts       Account[]
   sessions       Session[]
@@ -211,14 +213,38 @@ model Organization {
   areaOfInterest AreaOfInterest
   userId         String           @unique @db.ObjectId
   users          User[]
+  members        Member[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
 }
 
+model Member {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  email          String
+  phone          String?
+  country        String?
+  avatar         String?
+  access         MemberAccess @default(VIEWER)
+  organizationId String       @db.ObjectId
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  @@unique([email, organizationId])
+}
+
 enum Role {
   USER
   ADMIN
+}
+
+enum MemberAccess {
+  VIEWER
+  COMMENTER
+  EDITOR
 }
 
 enum Access {
@@ -229,6 +255,7 @@ enum Access {
 enum DeviceStatus {
   ONLINE
   OFFLINE
+  DISCONNECTED
 }
 
 enum OrganizationType {

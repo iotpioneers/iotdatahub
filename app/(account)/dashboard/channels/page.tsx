@@ -1,8 +1,13 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ChannelList from "./_components/ChannelList";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const ChannelsPage = () => {
-  return <ChannelList />;
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <ChannelList />;
+    </Suspense>
+  );
 };
 
 export default ChannelsPage;

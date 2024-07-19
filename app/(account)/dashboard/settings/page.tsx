@@ -1,17 +1,19 @@
-import React from "react";
-import UserProfile from "@/components/Settings/UserProfile";
+import * as React from "react";
+import type { Metadata } from "next";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 
-const SettingsPage = () => {
+import { Notifications } from "@/components/Dashboard/settings/notifications";
+import { UpdatePasswordForm } from "@/components/Dashboard/settings/update-password-form";
+
+export default function Page(): React.JSX.Element {
   return (
-    <section className="bg-white dark:bg-gray-900">
-      <div className="w-full lg:w-3/5 bg-slate-100 justify-center items-center p-5">
-        <h1 className="text-3xl text-n-8 font-bold justify-center items-center mb-10">
-          Settings
-        </h1>
-        <UserProfile />
+    <Stack spacing={3}>
+      <div>
+        <Typography variant="h4">Settings</Typography>
       </div>
-    </section>
+      <Notifications />
+      <UpdatePasswordForm />
+    </Stack>
   );
-};
-
-export default SettingsPage;
+}

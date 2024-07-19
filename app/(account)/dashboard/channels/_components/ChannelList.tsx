@@ -3,8 +3,9 @@
 import { Suspense, useEffect, useState } from "react";
 import ProjectList from "./ProjectList";
 import { Heading, Text } from "@radix-ui/themes";
-import ChannelAction from "@/components/Channels/ChannelAction";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import Link from "next/link";
+import { Button } from "@mui/material";
 
 interface Channel {
   id: number;
@@ -39,18 +40,18 @@ const ChannelList = () => {
     fetchChannels();
   }, []);
 
-  // Render loading spinner while fetching channels
-  if (isLoading || channels === null) {
-    return;
-  }
-
   return (
     <div className="w-full">
+      <Link href="/dashboard/channels/new">
+        <Button className="button bg-gray-600 p-3 rounded-md">
+          New Device
+        </Button>
+      </Link>
       <Suspense fallback={<LoadingSpinner />}>
-        {channels.length === 0 && (
+        {channels && channels.length === 0 && (
           <div className="mb-8 flex flex-col items-center text-center max-w-2xl mx-auto">
             <Heading as="h3" className="mb-5">
-              Start by creating your first channel
+              No saved channels yet.
             </Heading>
             <Text className="m-5">
               Channels serve as a fundamental structure for organizing and
@@ -59,16 +60,17 @@ const ChannelList = () => {
               humidity). Channels are templates assigned to devices,
               facilitating efficient data management and monitoring.
             </Text>
+            <Text className="m-5">
+              Start by creating your channels, you'll see them here. Not sure
+              where to start?{" "}
+              <Link href="/dashboard/channels/new">
+                Create your first channel →
+              </Link>
+            </Text>
           </div>
         )}
-      </Suspense>
 
-      <div className="flex justify-between items-center mb-8">
-        <ChannelAction />
-      </div>
-
-      <Suspense fallback={<LoadingSpinner />}>
-        {channels.length > 0 && <ProjectList />}
+        {channels && channels.length > 0 && <ProjectList />}
       </Suspense>
     </div>
   );

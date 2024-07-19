@@ -6,7 +6,6 @@ import { Heading, Card, Text } from "@radix-ui/themes";
 import DeleteButton from "@/components/DeleteButton";
 import EditButton from "@/components/EditButton";
 import StatusBadge from "@/components/StatusBadge";
-import LoadingSpinner from "@/components/LoadingSpinner";
 interface Props {
   params: { id: string };
 }

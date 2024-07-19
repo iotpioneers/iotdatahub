@@ -47,7 +47,6 @@ const ProjectList = async () => {
   }, []);
 
   if (channels === null || channels.length === 0) {
-    // Loading state or placeholder content while fetching channels
     return null;
   }
 

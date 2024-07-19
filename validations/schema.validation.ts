@@ -180,4 +180,18 @@ export const subscriptionSchema = z.object({
   activation: z.boolean().optional(),
 });
 
-// The schema for the pricing data
+export const memberSchema = z.object({
+  name: z.string().min(1, "Name is required and cannot be empty").max(255, {
+    message: "Name must be 255 characters or less",
+  }),
+  email: z
+    .string()
+    .min(1, "Email is required and cannot be empty")
+    .email("Invalid email format"),
+  phone: z.string().optional(),
+  country: z.string().optional(),
+  avatar: z.string().url("Invalid URL format").optional(),
+  access: z.enum(["VIEWER", "COMMENTER", "EDITOR"], {
+    message: "Invalid member access",
+  }),
+});

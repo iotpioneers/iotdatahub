@@ -1,42 +1,110 @@
 "use client";
 
-import useMediaQuery from "@/hooks/useMediaQuery";
-import { Bars3Icon, WifiIcon } from "@heroicons/react/24/outline";
+import * as React from "react";
+import Badge from "@mui/material/Badge";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import Stack from "@mui/material/Stack";
+import Tooltip from "@mui/material/Tooltip";
+import { Bell as BellIcon } from "@phosphor-icons/react/dist/ssr/Bell";
+import { MagnifyingGlass as MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
+import { Users as UsersIcon } from "@phosphor-icons/react/dist/ssr/Users";
+
+import { usePopover } from "@/hooks/use-popover";
+
+import { UserPopover } from "./layout/user-popover";
 import Link from "next/link";
-import React from "react";
-import AvatarIcon from "../Home/AvatarIcon";
-import NotificationIcon from "./NotificationIcon";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { Avatar } from "@mui/material";
 
 const Navbar = () => {
-  const isSmallScreens = useMediaQuery("(max-width: 1200px)");
+  const { status, data: session } = useSession();
+  const userPopover = usePopover<HTMLDivElement>();
+
+  const router = useRouter();
+
+  if (status === "unauthenticated") router.push("/login");
 
   return (
-    <nav className="flex flex-col sm:flex-row items-center justify-between my-2 pb-2 border-b">
-      <div className="flex items-center justify-between w-full ">
-        <div className="flex items-center gap-5">
-          <div className="flex lg:hidden w-10 h-10 justify-center items-center hover:bg-slate-300 hover:rounded-full rounded-md border-2 ">
-            <Bars3Icon className="h-6 w-6 text-zinc-950" />
-          </div>
-
-          <Link
-            href="/"
-            className="lg:hidden flex justify-center items-center text-n-7"
-          >
-            <img src="logo.svg" alt="logo" className="h-8 w-8 text-gray-10" />
-            <span className="hover:text-zinc-950 text-xl">Ten2Ten</span>
-          </Link>
-        </div>
-
-        <div className="flex gap-2 items-center">
-          <div className="flex w-10 h-10 justify-center items-center hover:bg-slate-300 hover:rounded-full">
-            <NotificationIcon />
-          </div>
-          <div className="flexCenter z-50">
-            <AvatarIcon />
-          </div>
-        </div>
-      </div>
-    </nav>
+    <React.Fragment>
+      <Box
+        component="header"
+        sx={{
+          borderBottom: "1px solid var(--mui-palette-divider)",
+          backgroundColor: "var(--mui-palette-background-paper)",
+          position: "sticky",
+          top: 0,
+          zIndex: "var(--mui-zIndex-appBar)",
+        }}
+      >
+        <Stack
+          direction="row"
+          spacing={2}
+          sx={{
+            alignItems: "center",
+            justifyContent: "space-between",
+            minHeight: "64px",
+            px: 2,
+          }}
+        >
+          <Stack sx={{ alignItems: "center" }} direction="row" spacing={2}>
+            <h1 className="flex lg:hidden text-base text-center justify-center cursor-pointer font-bold text-blue-900 border-gray-100 w-full">
+              <Link href="/" className="flex justify-center items-center">
+                <img
+                  src="logo.svg"
+                  alt="logo"
+                  className="h-8 w-8 text-gray-10"
+                />
+                <span className="hover:text-zinc-950">Ten2Ten</span>
+              </Link>
+            </h1>
+          </Stack>
+          <Stack sx={{ alignItems: "center" }} direction="row" spacing={2}>
+            <Tooltip title="Search">
+              <IconButton>
+                <MagnifyingGlassIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Members">
+              <IconButton>
+                <UsersIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Notifications">
+              <Badge badgeContent={4} color="success" variant="standard">
+                <IconButton>
+                  <BellIcon />
+                </IconButton>
+              </Badge>
+            </Tooltip>
+            {status === "authenticated" && (
+              <Avatar
+                onClick={userPopover.handleOpen}
+                ref={userPopover.anchorRef}
+                sx={{ cursor: "pointer" }}
+              >
+                {session!.user!.image ? (
+                  <img
+                    onClick={userPopover.handleOpen}
+                    src={session!.user!.image}
+                    alt="Profile"
+                    className="rounded-full"
+                  />
+                ) : (
+                  session!.user!.name!.split("")[0].toUpperCase()
+                )}
+              </Avatar>
+            )}
+          </Stack>
+        </Stack>
+      </Box>
+      <UserPopover
+        anchorEl={userPopover.anchorRef.current}
+        onClose={userPopover.handleClose}
+        open={userPopover.open}
+      />
+    </React.Fragment>
   );
 };
 

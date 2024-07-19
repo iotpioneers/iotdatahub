@@ -1,16 +1,13 @@
 "use client";
 
 import { userSchema } from "@/validations/schema.validation";
-import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Heading } from "@radix-ui/themes";
 import { signIn } from "next-auth/react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaGoogle } from "react-icons/fa6";
 import { z } from "zod";
 
 type FormData = z.infer<typeof userSchema>;
