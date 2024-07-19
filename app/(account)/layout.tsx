@@ -6,7 +6,6 @@ import AuthProvider from "../auth/Provider";
 import QueryClientProvider from "../QueryClientProvider";
 import { UserProvider } from "@/contexts/user-context";
 import { LocalizationProvider } from "@/components/core/localization-provider";
-import { ThemeProvider } from "@/components/core/theme-provider/theme-provider";
 import { Container } from "@radix-ui/themes";
 
 export const metadata: Metadata = {
@@ -27,12 +26,10 @@ export default function RootLayout({
           <AuthProvider>
             <UserProvider>
               <LocalizationProvider>
-                <UserProvider>
-                  <DashboardNavigation />
-                  <div className="flex flex-col flex-gro lg:ml-64 xs:mx-2">
-                    <Container>{children}</Container>
-                  </div>
-                </UserProvider>
+                <DashboardNavigation />
+                <div className="flex flex-col flex-gro lg:ml-64 xs:mx-2">
+                  <Container>{children}</Container>
+                </div>
               </LocalizationProvider>
             </UserProvider>
           </AuthProvider>
