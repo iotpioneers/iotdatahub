@@ -1,30 +1,26 @@
 "use client";
 
 import * as React from "react";
+import Avatar from "@mui/material/Avatar";
 import Badge from "@mui/material/Badge";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import { Bell as BellIcon } from "@phosphor-icons/react/dist/ssr/Bell";
+import { List as ListIcon } from "@phosphor-icons/react/dist/ssr/List";
 import { MagnifyingGlass as MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
 import { Users as UsersIcon } from "@phosphor-icons/react/dist/ssr/Users";
 
-import { UsePopover } from "@/hooks/usePopover";
+import { usePopover } from "@/hooks/use-popover";
 
-import { UserPopover } from "./layout/userPopover";
-import Link from "next/link";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { Avatar } from "@mui/material";
+import { MobileNav } from "./MobileNav";
+import { UserPopover } from "./userPopover";
 
-const Navbar = () => {
-  const { status, data: session } = useSession();
-  const userPopover = UsePopover<HTMLDivElement>();
+export function MainNav(): React.JSX.Element {
+  const [openNav, setOpenNav] = React.useState<boolean>(false);
 
-  const router = useRouter();
-
-  if (status === "unauthenticated") router.push("/login");
+  const userPopover = usePopover<HTMLDivElement>();
 
   return (
     <React.Fragment>
@@ -49,53 +45,39 @@ const Navbar = () => {
           }}
         >
           <Stack sx={{ alignItems: "center" }} direction="row" spacing={2}>
-            <h1 className="flex lg:hidden text-base text-center justify-center cursor-pointer font-bold text-blue-900 border-gray-100 w-full">
-              <Link href="/" className="flex justify-center items-center">
-                <img
-                  src="logo.svg"
-                  alt="logo"
-                  className="h-5 w-5 text-gray-10"
-                />
-                <span className="hover:text-zinc-950">ARTISAN</span>
-              </Link>
-            </h1>
-          </Stack>
-          <Stack sx={{ alignItems: "center" }} direction="row" spacing={2}>
+            <IconButton
+              onClick={(): void => {
+                setOpenNav(true);
+              }}
+              sx={{ display: { lg: "none" } }}
+            >
+              <ListIcon />
+            </IconButton>
             <Tooltip title="Search">
               <IconButton>
                 <MagnifyingGlassIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Members">
+          </Stack>
+          <Stack sx={{ alignItems: "center" }} direction="row" spacing={2}>
+            <Tooltip title="Contacts">
               <IconButton>
                 <UsersIcon />
               </IconButton>
             </Tooltip>
             <Tooltip title="Notifications">
-              <Badge badgeContent={4} color="success" variant="standard">
+              <Badge badgeContent={4} color="success" variant="dot">
                 <IconButton>
                   <BellIcon />
                 </IconButton>
               </Badge>
             </Tooltip>
-            {status === "authenticated" && (
-              <Avatar
-                onClick={userPopover.handleOpen}
-                ref={userPopover.anchorRef}
-                sx={{ cursor: "pointer" }}
-              >
-                {session!.user!.image ? (
-                  <img
-                    onClick={userPopover.handleOpen}
-                    src={session!.user!.image}
-                    alt="Profile"
-                    className="rounded-full"
-                  />
-                ) : (
-                  session!.user!.name!.split("")[0].toUpperCase()
-                )}
-              </Avatar>
-            )}
+            <Avatar
+              onClick={userPopover.handleOpen}
+              ref={userPopover.anchorRef}
+              src="/user.svg"
+              sx={{ cursor: "pointer" }}
+            />
           </Stack>
         </Stack>
       </Box>
@@ -104,8 +86,12 @@ const Navbar = () => {
         onClose={userPopover.handleClose}
         open={userPopover.open}
       />
+      <MobileNav
+        onClose={() => {
+          setOpenNav(false);
+        }}
+        open={openNav}
+      />
     </React.Fragment>
   );
-};
-
-export default Navbar;
+}

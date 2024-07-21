@@ -1,4 +1,5 @@
-import prisma from "@/prisma/client";
+"use client";
+
 import { Link, Table } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
 

@@ -12,6 +12,6 @@ const Register = () => {
 export default Register;
 
 export const metadata: Metadata = {
-  title: "Ten2Ten - Register",
+  title: "ARTISAN - Register",
   description: "Create a new account",
 };

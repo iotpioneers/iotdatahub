@@ -45,7 +45,7 @@ const Header = () => {
               href="/"
             >
               <img src="logo.svg" alt="logo" className="h-8 w-8 text-gray-10" />
-              <p>Ten2Ten</p>
+              <p>ARTISAN</p>
             </a>
           </div>
           <div className="flex items-center gap-0 md:gap-2">

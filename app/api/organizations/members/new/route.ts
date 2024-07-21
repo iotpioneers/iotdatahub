@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/client";
-import { access } from "fs";
 import { memberSchema } from "@/validations/schema.validation";
+import { getToken } from "next-auth/jwt";
 
 export async function POST(
   request: NextRequest,
@@ -10,11 +10,29 @@ export async function POST(
   try {
     const body = await request.json();
 
-    const organizationId = params.id;
+    const token = await getToken({ req: request });
 
-    // Check if the organization exists
-    const organization = await prisma.organization.findUnique({
-      where: { id: organizationId },
+    if (!token) {
+      return NextResponse.json(
+        { error: "User not authenticated" },
+        { status: 401 }
+      );
+    }
+
+    const userEmail = token.email as string;
+
+    const user = await prisma.user.findUnique({
+      where: { email: userEmail },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const organization = await prisma.organization.findFirst({
+      where: {
+        userId: user.id,
+      },
     });
 
     if (!organization) {
@@ -30,14 +48,12 @@ export async function POST(
       return NextResponse.json(validation.error.errors, { status: 400 });
     }
 
-    // Parse the request body
     const { name, email, phone, country, avatar, access } = body;
 
-    // Check if the email is already used by a member in the organization
     const existingMember = await prisma.member.findFirst({
       where: {
         email: email,
-        organizationId: organizationId,
+        organizationId: organization.id,
       },
     });
 
@@ -50,7 +66,6 @@ export async function POST(
       );
     }
 
-    // Create a new member
     const member = await prisma.member.create({
       data: {
         name,
@@ -59,7 +74,7 @@ export async function POST(
         country,
         avatar,
         access: access || "VIEWER",
-        organizationId,
+        organizationId: organization.id,
       },
     });
 

@@ -2,16 +2,27 @@
 
 import * as React from "react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import "easymde/dist/easymde.min.css";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { memberSchema } from "@/validations/schema.validation";
+
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import { Plus as PlusIcon } from "@phosphor-icons/react/dist/ssr/Plus";
+import { Plus as PlusIcon } from "@phosphor-icons/react";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import Grid from "@mui/material/Grid";
 import Avatar from "@mui/material/Avatar";
-import Input from "@mui/material/Input";
 import Typography from "@mui/material/Typography";
+import { Callout } from "@radix-ui/themes";
+import { Member, AddMemberProps } from "@/types";
+import ErrorMessage from "@/components/ErrorMessage";
+import UploadImage from "@/components/UploadImage";
+
+type MemberFormData = z.infer<typeof memberSchema>;
 
 const style = {
   position: "absolute" as "absolute",
@@ -37,56 +48,75 @@ const formStyle = {
 };
 
 const accessType = [
-  { value: "VIEWER", label: "Viewer" },
-  { value: "COMMENTER", label: "Commenter" },
-  { value: "EDITOR", label: "Editor" },
+  { value: "VIEWER", label: "View" },
+  { value: "COMMENTER", label: "Comment" },
+  { value: "EDITOR", label: "Edit" },
 ];
 
-const AddMember = () => {
+const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [avatar, setAvatar] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [phone, setPhone] = useState("");
-  const [street, setStreet] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [country, setCountry] = useState("");
-  const [access, setAccess] = useState("Viewer");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [access, setAccess] = useState<"VIEWER" | "COMMENTER" | "EDITOR">(
+    "VIEWER"
+  );
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+  };
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setAvatar(file);
-      setAvatarPreview(URL.createObjectURL(file));
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<MemberFormData>({
+    resolver: zodResolver(memberSchema),
+  });
+
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      setIsSubmitting(true);
+
+      const memberData = {
+        ...data,
+        avatar: avatarUrl || "",
+      };
+
+      const response = await fetch("/api/organizations/members/new", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(memberData),
+      });
+
+      console.log("response:", response);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError("Failed to add new member:");
+        setError(errorData.error);
+        console.error("Error data:", errorData);
+        throw new Error(errorData.error);
+      }
+
+      const result: Member = await response.json();
+
+      if (result) {
+        console.log("Member added successfully", result);
+        onNewMember(result);
+        handleClose();
+      }
+      setIsSubmitting(false);
+    } catch (error: any) {
+      setIsSubmitting(false);
+      setError(error.message);
+      console.error("Error creating member:", error);
     }
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const newMember = {
-      id: `USR-${Math.floor(Math.random() * 1000)
-        .toString()
-        .padStart(3, "0")}`,
-      name,
-      avatar: avatarPreview || "",
-      email,
-      phone,
-      address: {
-        city,
-        country,
-        state,
-        street,
-      },
-      access,
-    };
-    console.log(newMember);
-    handleClose();
-  };
+  });
 
   return (
     <div>
@@ -107,18 +137,26 @@ const AddMember = () => {
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Add a New Member
           </Typography>
+          {error && (
+            <Callout.Root
+              color="red"
+              className="h-10 flex justify-center text-center font-semibold items-center rounded-lg bg-red-500 mb-5"
+            >
+              <Callout.Text>{error}</Callout.Text>
+            </Callout.Root>
+          )}
           <Box sx={formStyle}>
-            <form noValidate onSubmit={handleSubmit}>
+            <form noValidate onSubmit={onSubmit}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
                     margin="normal"
                     label="Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    {...register("name")}
                     required
                   />
+                  <ErrorMessage>{errors.name?.message}</ErrorMessage>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
@@ -126,28 +164,28 @@ const AddMember = () => {
                     margin="normal"
                     label="Email"
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    {...register("email")}
                     required
                   />
+                  <ErrorMessage>{errors.email?.message}</ErrorMessage>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
                     margin="normal"
                     label="Phone"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    {...register("phone")}
                   />
+                  <ErrorMessage>{errors.phone?.message}</ErrorMessage>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
                     margin="normal"
                     label="Country"
-                    value={country}
-                    onChange={(e) => setCountry(e.target.value)}
+                    {...register("country")}
                   />
+                  <ErrorMessage>{errors.country?.message}</ErrorMessage>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
@@ -156,9 +194,18 @@ const AddMember = () => {
                     select
                     label="Access"
                     value={access}
-                    onChange={(e) => setAccess(e.target.value)}
+                    {...register("access")}
+                    onChange={(event) => {
+                      const selectedAccess = event.target.value as
+                        | "VIEWER"
+                        | "COMMENTER"
+                        | "EDITOR";
+                      setAccess(selectedAccess);
+                      setValue("access", selectedAccess); // Update form value
+                    }}
                     required
                   >
+                    <ErrorMessage>{errors.access?.message}</ErrorMessage>
                     {accessType.map((access) => (
                       <MenuItem key={access.value} value={access.value}>
                         {access.label}
@@ -172,16 +219,13 @@ const AddMember = () => {
                   </Typography>
                   <Box display="flex" alignItems="center">
                     <Avatar
-                      src={avatarPreview || ""}
+                      src={avatarUrl || ""}
                       alt="Avatar Preview"
                       sx={{ width: 56, height: 56, marginRight: 2 }}
                     />
-                    <Input
-                      type="file"
-                      onChange={handleAvatarChange}
-                      inputProps={{ accept: "image/*" }}
-                    />
+                    <UploadImage onUpload={setAvatarUrl} />
                   </Box>
+                  <ErrorMessage>{errors.avatar?.message}</ErrorMessage>
                 </Grid>
               </Grid>
               <Button
@@ -189,6 +233,7 @@ const AddMember = () => {
                 variant="contained"
                 color="primary"
                 style={{ marginTop: 20 }}
+                disabled={isSubmitting}
               >
                 Add Member
               </Button>

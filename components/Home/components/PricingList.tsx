@@ -31,7 +31,7 @@ const PricingList = () => {
             href={
               item.price
                 ? "https://buy.stripe.com/test_28o3fF8wIbpn4LuaEE"
-                : "mailto:contact@ten2ten.pro"
+                : "mailto:contact@ARTISAN.pro"
             }
             white={!!item.price}
           >

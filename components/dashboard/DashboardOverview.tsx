@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import {
   MdRouter,
@@ -19,8 +20,15 @@ import {
 import { Button, Heading, Switch, Text } from "@radix-ui/themes";
 import { Avatar } from "@radix-ui/react-avatar";
 import Link from "next/link";
-import { PlusIcon } from "@radix-ui/react-icons";
+import { DropdownMenuIcon, PlusIcon } from "@radix-ui/react-icons";
 import { useSession } from "next-auth/react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@radix-ui/react-dropdown-menu";
+import { IconButton, TextField } from "@mui/material";
 
 const dataLine = [
   { name: "Jan", value: 50 },
@@ -32,7 +40,23 @@ const dataLine = [
   { name: "Jul", value: 100 },
 ];
 
-const DashboardOverview = () => {
+interface Organization {
+  areaOfInterest: string;
+  createdAt: Date;
+  id: string;
+  name: string;
+  type: string;
+  updatedAt: Date;
+  userId: string;
+}
+
+interface DashboardOverviewProps {
+  organization: Organization | null;
+}
+
+const DashboardOverview: React.FC<DashboardOverviewProps> = ({
+  organization,
+}) => {
   const { status, data: session } = useSession();
 
   if (status === "unauthenticated") {
@@ -110,6 +134,25 @@ const DashboardOverview = () => {
         {/* Members, and Power Consumption Section */}
         <div className="space-y-5">
           <div className="bg-white p-5 rounded-lg shadow-md">
+            <div className="flex justify-between items-center mb-5">
+              <h1 className="flex items-center text-xl font-semibold gap-2">
+                ORGANIZATION
+                <div className="flex items-center">
+                  <TextField value={organization?.name} className="mr-2" />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <IconButton>
+                        <DropdownMenuIcon className="w-6 h-6" />
+                      </IconButton>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem>Edit</DropdownMenuItem>
+                      <DropdownMenuItem>Learn more</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </h1>
+            </div>
             <h2 className="text-xl font-semibold mb-5">Members</h2>
             <div className="flex space-x-5 overflow-x-auto overflow-hidden">
               {/* Replace with actual member data */}

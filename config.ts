@@ -8,7 +8,7 @@ export interface Config {
 
 export const config: Config = {
   site: {
-    name: "Ten2Ten",
+    name: "ARTISAN",
     description: "",
     themeColor: "#090a0b",
     url: getSiteURL(),

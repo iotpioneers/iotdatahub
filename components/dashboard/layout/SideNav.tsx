@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
-import Drawer from "@mui/material/Drawer";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { ArrowSquareUpRight as ArrowSquareUpRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowSquareUpRight";
@@ -18,48 +17,39 @@ import { isNavItemActive } from "@/lib/is-nav-item-active";
 import { Logo } from "@/components/core/logo";
 
 import { navItems } from "./config";
-import { navIcons } from "./nav-icons";
+import { navIcons } from "./NavIcons";
 
-export interface MobileNavProps {
-  onClose?: () => void;
-  open?: boolean;
-  items?: NavItemConfig[];
-}
-
-export function MobileNav({
-  open,
-  onClose,
-}: MobileNavProps): React.JSX.Element {
+export function SideNav(): React.JSX.Element {
   const pathname = usePathname();
 
   return (
-    <Drawer
-      PaperProps={{
-        sx: {
-          "--MobileNav-background": "var(--mui-palette-neutral-950)",
-          "--MobileNav-color": "var(--mui-palette-common-white)",
-          "--NavItem-color": "var(--mui-palette-neutral-300)",
-          "--NavItem-hover-background": "rgba(255, 255, 255, 0.04)",
-          "--NavItem-active-background": "var(--mui-palette-primary-main)",
-          "--NavItem-active-color": "var(--mui-palette-primary-contrastText)",
-          "--NavItem-disabled-color": "var(--mui-palette-neutral-500)",
-          "--NavItem-icon-color": "var(--mui-palette-neutral-400)",
-          "--NavItem-icon-active-color":
-            "var(--mui-palette-primary-contrastText)",
-          "--NavItem-icon-disabled-color": "var(--mui-palette-neutral-600)",
-          bgcolor: "var(--MobileNav-background)",
-          color: "var(--MobileNav-color)",
-          display: "flex",
-          flexDirection: "column",
-          maxWidth: "100%",
-          scrollbarWidth: "none",
-          width: "var(--MobileNav-width)",
-          zIndex: "var(--MobileNav-zIndex)",
-          "&::-webkit-scrollbar": { display: "none" },
-        },
+    <Box
+      sx={{
+        "--SideNav-background": "var(--mui-palette-neutral-950)",
+        "--SideNav-color": "var(--mui-palette-common-white)",
+        "--NavItem-color": "var(--mui-palette-neutral-300)",
+        "--NavItem-hover-background": "rgba(255, 255, 255, 0.04)",
+        "--NavItem-active-background": "var(--mui-palette-primary-main)",
+        "--NavItem-active-color": "var(--mui-palette-primary-contrastText)",
+        "--NavItem-disabled-color": "var(--mui-palette-neutral-500)",
+        "--NavItem-icon-color": "var(--mui-palette-neutral-400)",
+        "--NavItem-icon-active-color":
+          "var(--mui-palette-primary-contrastText)",
+        "--NavItem-icon-disabled-color": "var(--mui-palette-neutral-600)",
+        bgcolor: "var(--SideNav-background)",
+        color: "var(--SideNav-color)",
+        display: { xs: "none", lg: "flex" },
+        flexDirection: "column",
+        height: "100%",
+        left: 0,
+        maxWidth: "100%",
+        position: "fixed",
+        scrollbarWidth: "none",
+        top: 0,
+        width: "var(--SideNav-width)",
+        zIndex: "var(--SideNav-zIndex)",
+        "&::-webkit-scrollbar": { display: "none" },
       }}
-      onClose={onClose}
-      open={open}
     >
       <Stack spacing={2} sx={{ p: 3 }}>
         <Box
@@ -130,7 +120,7 @@ export function MobileNav({
           Pro version
         </Button>
       </Stack>
-    </Drawer>
+    </Box>
   );
 }
 

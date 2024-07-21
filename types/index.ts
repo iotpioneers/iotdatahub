@@ -25,3 +25,20 @@ export interface FieldProps {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Member {
+  country: string;
+  avatar: string;
+  access: string;
+  createdAt: Date;
+  id: string;
+  name: string;
+  email: string;
+  updatedAt: Date;
+  userId: string;
+  organizationId: string;
+}
+
+export interface AddMemberProps {
+  onNewMember: (newMember: Member) => void;
+}

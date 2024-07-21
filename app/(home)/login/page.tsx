@@ -12,6 +12,6 @@ const Login = () => {
 export default Login;
 
 export const metadata: Metadata = {
-  title: "Ten2Ten - Login",
+  title: "ARTISAN - Login",
   description: "Signin to your account",
 };

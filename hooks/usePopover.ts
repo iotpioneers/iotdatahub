@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 interface PopoverController<T> {
   anchorRef: React.MutableRefObject<T | null>;
@@ -8,7 +8,7 @@ interface PopoverController<T> {
   open: boolean;
 }
 
-export function usePopover<T = HTMLElement>(): PopoverController<T> {
+export function UsePopover<T = HTMLElement>(): PopoverController<T> {
   const anchorRef = React.useRef<T>(null);
   const [open, setOpen] = React.useState<boolean>(false);
 

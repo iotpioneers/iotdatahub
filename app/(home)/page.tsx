@@ -10,6 +10,6 @@ export default function Home() {
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Ten2Ten - Home",
+  title: "ARTISAN - Home",
   description: "Explore our latest features",
 };

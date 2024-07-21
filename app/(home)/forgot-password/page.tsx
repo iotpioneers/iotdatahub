@@ -1,4 +1,3 @@
-import ForgotPasswordForm from "@/components/Settings/ForgotPasswordForm";
 import { Metadata } from "next";
 
 export default function ForgotPassword() {
@@ -10,7 +9,6 @@ export default function ForgotPassword() {
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white text-center">
               Forgot Password
             </h1>
-            <ForgotPasswordForm />
           </div>
         </div>
       </div>
@@ -19,6 +17,6 @@ export default function ForgotPassword() {
 }
 
 export const metadata: Metadata = {
-  title: "Ten2Ten - Forgot Password",
+  title: "ARTISAN - Forgot Password",
   description: "Provide account email to restore your forgotten password",
 };

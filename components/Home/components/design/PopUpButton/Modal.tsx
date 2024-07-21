@@ -39,7 +39,7 @@ const Modal: React.FC<ModalProps> = ({ open, setOpen }) => {
             Hello There 🖐🏻
           </h5>
           <span className="text-md text-blue-500 font-inter font-medium tracking-tight pt-4">
-            Ask us anything about Ten2Ten.
+            Ask us anything about ARTISAN.
           </span>
           <div className="pt-8 mr-5">
             <form onSubmit={handleSubmit}>

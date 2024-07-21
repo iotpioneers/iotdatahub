@@ -6,7 +6,7 @@ import QueryClientProvider from "../QueryClientProvider";
 import Header from "@/components/Home/components/Header";
 
 export const metadata: Metadata = {
-  title: "Ten2Ten",
+  title: "ARTISAN",
   description:
     "Your one-stop destination for seamless and efficient IoT Plug and Play services. Our cutting-edge solutions empower businesses to effortlessly connect, manage, and optimize their IoT devices, enabling a smarter and more connected world.",
 };
