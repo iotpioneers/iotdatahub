@@ -179,12 +179,14 @@ const DeviceTable = () => {
           },
         }}
       >
-        <DataGrid
-          autoHeight
-          rows={devices}
-          columns={columns}
-          components={{ Toolbar: GridToolbar }}
-        />
+        {devices && devices.length !== 0 && (
+          <DataGrid
+            autoHeight
+            rows={devices}
+            columns={columns}
+            components={{ Toolbar: GridToolbar }}
+          />
+        )}
       </Box>
     </Box>
   );

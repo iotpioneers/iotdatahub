@@ -14,7 +14,9 @@ const nextConfig = {
     ];
   },
   webpack: (config) => {
-    config.externals = [...config.externals, "bcrypt"];
+    config.externals = config.externals
+      ? [...config.externals, "bcrypt"]
+      : ["bcrypt"];
     return config;
   },
 };

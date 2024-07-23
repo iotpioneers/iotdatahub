@@ -12,7 +12,7 @@ const Generating = ({ className }: GeneratingProps) => {
       } text-base`}
     >
       <img className="w-5 h-5 mr-4" src="loading.png" alt="Loading" />
-      Let's build brighter future with ARTISAN
+      Let's build brighter future with IoTDataCenter
     </div>
   );
 };

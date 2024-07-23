@@ -17,6 +17,6 @@ export default function ForgotPassword() {
 }
 
 export const metadata: Metadata = {
-  title: "ARTISAN - Forgot Password",
+  title: "IoTDataCenter - Forgot Password",
   description: "Provide account email to restore your forgotten password",
 };

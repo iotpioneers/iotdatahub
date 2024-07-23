@@ -84,7 +84,7 @@ export default function DeviceForm() {
 
       console.log("result:", result);
 
-      if (result) router.push(`/dashboard/devices/${result.id}`);
+      if (result) router.push("/dashboard/organization");
       setIsSubmitting(false);
     } catch (error) {
       setIsSubmitting(false);

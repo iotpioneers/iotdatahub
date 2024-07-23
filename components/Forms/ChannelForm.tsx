@@ -68,6 +68,8 @@ export default function ChannelForm() {
         body: JSON.stringify(data),
       });
 
+      console.log("Response:", response);
+
       if (!response.ok) {
         const errorData = await response.json();
         setError("Failed to create channel");
@@ -253,7 +255,7 @@ export default function ChannelForm() {
               </g>
             </svg>
           )}
-          {isSubmitting ? "Sending..." : "Add Channel"}
+          {isSubmitting ? "Creating a new channel..." : "Add Channel"}
         </Button>
       </form>
     </main>

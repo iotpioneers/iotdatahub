@@ -18,6 +18,7 @@ import TableEmptyRows from "../_components/TableEmptyRows";
 import UserTableToolbar from "../_components/UserTableToolbar";
 import AddMember from "../_components/members/AddMember";
 import { emptyRows, applyFilter, getComparator } from "../_components/utils";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 // Define the types for organization
 interface Organization {
@@ -89,7 +90,7 @@ const OrganizationMembers = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner />;
   }
 
   if (!hasOrganization || !organization) {

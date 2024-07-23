@@ -1,12 +1,9 @@
-import * as React from 'react';
-import type { Metadata } from 'next';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Unstable_Grid2';
-import { AccountInfo } from '@/components/Dashboard/account/account-info';
-import { AccountDetailsForm } from '@/components/Dashboard/account/account-details-form';
-
-
+import * as React from "react";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Unstable_Grid2";
+import { AccountInfo } from "@/components/Dashboard/account/account-info";
+import { AccountDetailsForm } from "@/components/Dashboard/account/account-details-form";
 
 export default function Page(): React.JSX.Element {
   return (

@@ -9,6 +9,6 @@ const PricingPage = () => {
 export default PricingPage;
 
 export const metadata: Metadata = {
-  title: "ARTISAN - Pricing",
+  title: "IoTDataCenter - Pricing",
   description: "Explore our latest pricing",
 };

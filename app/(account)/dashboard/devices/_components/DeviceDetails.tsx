@@ -68,12 +68,6 @@ const DeviceDetails = async ({ params }: Props) => {
           </Flex>
           <Card>{device.description}</Card>
         </Box>
-        <Box>
-          <Flex direction="column" gap="4">
-            <EditButton />
-            <DeleteButton />
-          </Flex>
-        </Box>
       </Grid>
     </div>
   );

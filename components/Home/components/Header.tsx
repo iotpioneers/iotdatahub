@@ -34,18 +34,25 @@ const Header = () => {
   return (
     <div
       className={`fixed top-0 left-0 w-full z-10  border-b border-n-6 lg:bg-n-8/90 lg:backdrop-blur-sm ${
-        openNavigation ? "bg-n-8" : "bg-n-8/90 backdrop-blur-sm"
+        openNavigation ? "bg-n-10" : "bg-n-6/5 backdrop-blur-sm"
       }`}
     >
       <div className="flex items-center px-1 sm:px-5  lg:px-7.5 xl:px-10 max-lg:py-4">
         <div className="flex w-full justify-between items-center">
-          <div>
+          <div className="ml-1 xs:ml-5">
             <a
-              className="flex md:w-[12rem] xl:mr-8 gap-2 items-center text-gray-10 font-bold"
+              className="block justify-center md:w-[12rem] xl:mr-8 gap-2 items-center text-gray-10 font-bold"
               href="/"
             >
-              <img src="logo.svg" alt="logo" className="h-8 w-8 text-gray-10" />
-              <p>ARTISAN</p>
+              <div className="flex items-center">
+                <img
+                  src="logo.svg"
+                  alt="logo"
+                  className="h-8 w-8 float-left float mr-2"
+                  color="white"
+                />
+                <p className="text-slate-600">IoTDataCenter</p>
+              </div>
             </a>
           </div>
           <div className="flex items-center gap-0 md:gap-2">
@@ -75,9 +82,9 @@ const Header = () => {
 
             <a
               href="/register"
-              className="button hidden ml-8 text-n-1/50 transition-colors hover:text-n-1 lg:block"
+              className="button hidden ml-8 text-green-500 transition-colors hover:text-n-1 lg:block"
             >
-              New account
+              SIGN UP
             </a>
 
             {status !== "loading" && (
@@ -85,7 +92,7 @@ const Header = () => {
                 className="flex -mr-4 xs:mr-1 "
                 href={status === "authenticated" ? "/dashboard" : "/login"}
               >
-                {status === "authenticated" ? "Dashboard" : "Sign in"}
+                {status === "authenticated" ? "DASHBOARD" : "SIGN IN"}
               </Button>
             )}
             {status === "authenticated" && <AvatarIcon />}

@@ -56,7 +56,7 @@ const Navbar = () => {
                   alt="logo"
                   className="h-5 w-5 text-gray-10"
                 />
-                <span className="hover:text-zinc-950">ARTISAN</span>
+                <span className="hover:text-zinc-950">IoTDataCenter</span>
               </Link>
             </h1>
           </Stack>

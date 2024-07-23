@@ -8,7 +8,7 @@ export interface Config {
 
 export const config: Config = {
   site: {
-    name: "ARTISAN",
+    name: "IoTDataCenter",
     description: "",
     themeColor: "#090a0b",
     url: getSiteURL(),

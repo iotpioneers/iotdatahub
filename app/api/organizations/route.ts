@@ -25,7 +25,6 @@ export async function POST(request: NextRequest) {
     if (!user) {
       throw new Error("User not found");
     }
-    console.log("User:", user);
 
     // Validate the request body against the schema
     const validation = organizationSchema.safeParse(body);
@@ -55,8 +54,35 @@ export async function POST(request: NextRequest) {
       include: { users: true },
     });
 
-    console.log("New Organization:", newOrganization);
-    return NextResponse.json(newOrganization, { status: 201 });
+    const existingMember = await prisma.member.findFirst({
+      where: {
+        email: userEmail,
+        organizationId: newOrganization.id,
+      },
+    });
+
+    if (existingMember) {
+      return NextResponse.json(
+        {
+          error: "A member with this email already exists in the organization",
+        },
+        { status: 400 }
+      );
+    }
+
+    const member = await prisma.member.create({
+      data: {
+        name,
+        email: userEmail,
+        avatar: user.image,
+        access: "EDITOR",
+        organizationId: newOrganization.id,
+        phone: "",
+        country: "",
+      },
+    });
+
+    return NextResponse.json({ newOrganization, member }, { status: 201 });
   } catch (error) {
     console.log("Error:", error);
     return NextResponse.json(

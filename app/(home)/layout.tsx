@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
+import ClientRootLayout from "@/app/ClientRootLayout";
+
 import "../globals.css";
 import { Container } from "@radix-ui/themes";
-import AuthProvider from "../auth/Provider";
-import QueryClientProvider from "../QueryClientProvider";
+
 import Header from "@/components/Home/components/Header";
 
 export const metadata: Metadata = {
-  title: "ARTISAN",
+  title: "IoTDataCenter",
   description:
     "Your one-stop destination for seamless and efficient IoT Plug and Play services. Our cutting-edge solutions empower businesses to effortlessly connect, manage, and optimize their IoT devices, enabling a smarter and more connected world.",
 };
@@ -19,14 +20,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <QueryClientProvider>
-          <AuthProvider>
-            <Header />
-            <main>
-              <Container>{children}</Container>
-            </main>
-          </AuthProvider>
-        </QueryClientProvider>
+        <ClientRootLayout>
+          <Header />
+          <main>
+            <Container>{children}</Container>
+          </main>
+        </ClientRootLayout>
       </body>
     </html>
   );

@@ -50,12 +50,26 @@ interface Organization {
   userId: string;
 }
 
+interface Member {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  country: string;
+  avatar: string;
+  access: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 interface DashboardOverviewProps {
   organization: Organization | null;
+  members: Member[] | null;
 }
 
 const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   organization,
+  members,
 }) => {
   const { status, data: session } = useSession();
 
@@ -153,44 +167,40 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 </div>
               </h1>
             </div>
-            <h2 className="text-xl font-semibold mb-5">Members</h2>
+            <h2 className="text-xl font-semibold mb-5">
+              {members && members.length > 1
+                ? `${members.length} Members`
+                : "Member"}
+            </h2>
             <div className="flex space-x-5 overflow-x-auto overflow-hidden">
-              {/* Replace with actual member data */}
-              <div className="flex flex-col items-center">
-                <Avatar className="h-10 w-10 bg-purple-500 rounded-full text-white flex items-center justify-center">
-                  E
-                </Avatar>
-                <div className="mt-2">Emmanuel</div>
-                <div className="text-green-500">Admin</div>
-              </div>
-              <div className="flex flex-col items-center">
-                <Avatar className="h-10 w-10 bg-red-500 rounded-full text-white flex items-center justify-center">
-                  B
-                </Avatar>
-                <div className="mt-2">Bruce</div>
-                <div className="text-purple-500">Member</div>
-              </div>
-              <div className="flex flex-col items-center">
-                <Avatar className="h-10 w-10 bg-green-500 rounded-full text-white flex items-center justify-center">
-                  F
-                </Avatar>
-                <div className="mt-2">Florien</div>
-                <div className="text-purple-500">Member</div>
-              </div>
-              <div className="flex flex-col items-center">
-                <Avatar className="h-10 w-10 bg-orange-500 rounded-full text-white flex items-center justify-center">
-                  S
-                </Avatar>
-                <div className="mt-2">Steven</div>
-                <div className="text-purple-500">Member</div>
-              </div>
-              <div className="flex flex-col items-center">
-                <Avatar className="h-10 w-10 bg-teal-500 rounded-full text-white flex items-center justify-center">
-                  S
-                </Avatar>
-                <div className="mt-2">Sage</div>
-                <div className="text-purple-500">Member</div>
-              </div>
+              {/* Dynamically render members */}
+              {members?.map((member) => (
+                <div key={member.id} className="flex flex-col items-center">
+                  <Avatar className="h-10 w-10 bg-purple-500 rounded-full text-white flex items-center justify-center">
+                    {member.avatar ? (
+                      <img
+                        src={member.avatar}
+                        alt={member.name}
+                        className="h-full w-full object-cover rounded-full"
+                      />
+                    ) : (
+                      member.name.charAt(0).toUpperCase()
+                    )}
+                  </Avatar>
+                  <div className="mt-2">{member.name}</div>
+                  <div
+                    className={`${
+                      member.access === "VIEWER"
+                        ? "bg-slate-900"
+                        : member.access === "COMMENTER"
+                        ? "bg-red-950"
+                        : "bg-green-500"
+                    } rounded-md px-2 py-1 text-white text-xs items-center`}
+                  >
+                    {member.access}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 

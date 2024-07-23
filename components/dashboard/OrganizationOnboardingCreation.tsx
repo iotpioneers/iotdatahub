@@ -91,7 +91,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
       console.log("New organization created:", newOrganization);
 
       // Navigate to the dashboard or any other page after successful creation
-      router.push("/dashboard/devices");
+      router.push("/dashboard/channels");
     } catch (error) {
       setError("Error creating organization");
     }

@@ -12,6 +12,6 @@ const Login = () => {
 export default Login;
 
 export const metadata: Metadata = {
-  title: "ARTISAN - Login",
+  title: "IoTDataCenter - Login",
   description: "Signin to your account",
 };

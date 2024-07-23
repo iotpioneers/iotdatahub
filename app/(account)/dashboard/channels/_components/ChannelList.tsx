@@ -42,33 +42,21 @@ const ChannelList = () => {
 
   return (
     <div className="w-full">
-      <Link href="/dashboard/channels/new">
-        <Button className="button bg-gray-600 p-3 rounded-md">
-          New Device
-        </Button>
-      </Link>
       <Suspense fallback={<LoadingSpinner />}>
-        {channels && channels.length === 0 && (
-          <div className="mb-8 flex flex-col items-center text-center max-w-2xl mx-auto">
-            <Heading as="h3" className="mb-5">
-              No saved channels yet.
-            </Heading>
-            <Text className="m-5">
-              Channels serve as a fundamental structure for organizing and
-              storing data. Each channel can accommodate various data fields,
-              each capable of holding different data types (e.g., temperature,
-              humidity). Channels are templates assigned to devices,
-              facilitating efficient data management and monitoring.
-            </Text>
-            <Text className="m-5">
-              Start by creating your channels, you'll see them here. Not sure
-              where to start?{" "}
-              <Link href="/dashboard/channels/new">
-                Create your first channel →
-              </Link>
-            </Text>
-          </div>
-        )}
+        <div className="mb-8 flex flex-col items-center text-center max-w-2xl mx-auto">
+          <Text className="m-5">
+            Channels serve as a fundamental structure for organizing and storing
+            data. Each channel can accommodate various data fields, each capable
+            of holding different data types (e.g., temperature, humidity).
+            Channels are templates assigned to devices, facilitating efficient
+            data management and monitoring.
+          </Text>
+          <Link href="/dashboard/channels/new">
+            <Button className="button bg-gray-600 p-3 rounded-md">
+              New Channel
+            </Button>
+          </Link>
+        </div>
 
         {channels && channels.length > 0 && <ProjectList />}
       </Suspense>

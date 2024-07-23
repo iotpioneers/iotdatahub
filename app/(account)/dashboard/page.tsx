@@ -14,9 +14,22 @@ interface Organization {
   userId: string;
 }
 
+interface Member {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  country: string;
+  avatar: string;
+  access: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 const Dashboard = () => {
   const [hasOrganization, setHasOrganization] = useState<boolean | null>(null);
   const [organization, setOrganization] = useState<Organization | null>(null);
+  const [members, setMembers] = useState<Member[] | null>(null);
 
   useEffect(() => {
     const checkOrganizationStatus = async () => {
@@ -33,6 +46,7 @@ const Dashboard = () => {
         const data = await response.json();
         setHasOrganization(data.hasOrganization);
         setOrganization(data.organization);
+        setMembers(data.members);
       } catch (error) {
         console.error("Error fetching organization status:", error);
       }
@@ -42,7 +56,7 @@ const Dashboard = () => {
   }, []);
 
   if (hasOrganization === null) {
-    return <div>Loading...</div>; // Show a loading state while checking the status
+    return;
   }
 
   return (
@@ -50,7 +64,7 @@ const Dashboard = () => {
       {!hasOrganization ? (
         <OrganizationOnboardingCreation />
       ) : (
-        <DashboardOverview organization={organization} />
+        <DashboardOverview organization={organization} members={members} />
       )}
     </>
   );
@@ -61,6 +75,6 @@ export default Dashboard;
 // export const dynamic = "force-dynamic";
 
 // export const metadata: Metadata = {
-//   title: "ARTISAN - Dashboard",
+//   title: "IoTDataCenter - Dashboard",
 //   description: "Explore our latest features",
 // };

@@ -4,11 +4,9 @@ import { CalendarIcon, LinkIcon, MapPinIcon } from "@heroicons/react/20/solid";
 import { ChartPieIcon } from "@heroicons/react/24/solid";
 import ReactMarkdown from "react-markdown";
 import BackButton from "../BackButton";
-import { Box, Button, Card, Flex, Heading, Text } from "@radix-ui/themes";
+import { Box, Button, Card, Flex, Heading } from "@radix-ui/themes";
 import { ChannelProps } from "@/types";
 import EditChannel from "./EditChannel";
-import ToastDemo from "../Toast/ToastDemo";
-import LoadingSpinner from "../LoadingSpinner";
 
 interface ChannelHeadingProps {
   channel: ChannelProps;
@@ -82,14 +80,6 @@ const ChannelDetailsHeading = ({
               Link
             </Button>
           </Flex>
-          <Card size="1">
-            <a href="#">
-              <Text as="div" color="gray" size="2">
-                To send data to your channel, you have to use the API key
-              </Text>
-            </a>
-          </Card>
-          <ToastDemo title="Get started" />
         </Box>
       </div>
     </div>

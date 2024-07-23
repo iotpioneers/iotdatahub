@@ -10,6 +10,6 @@ export default function Home() {
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "ARTISAN - Home",
+  title: "IoTDataCenter - Home",
   description: "Explore our latest features",
 };
