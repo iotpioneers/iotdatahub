@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
 
     const member = await prisma.member.create({
       data: {
-        name,
+        name: user.firstname + user.lastname,
         email: userEmail,
         avatar: user.image,
         access: "EDITOR",

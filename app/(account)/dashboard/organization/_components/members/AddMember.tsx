@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import { useState } from "react";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 import { useForm } from "react-hook-form";
 import "easymde/dist/easymde.min.css";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -61,6 +63,18 @@ const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
   const [access, setAccess] = useState<"VIEWER" | "COMMENTER" | "EDITOR">(
     "VIEWER"
   );
+  const [showResult, setShowResult] = React.useState(false);
+
+  const handleCloseResult = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setShowResult(false);
+  };
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -108,7 +122,11 @@ const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
       if (result) {
         console.log("Member added successfully", result);
         onNewMember(result);
-        handleClose();
+        setShowResult(true);
+        setIsSubmitting(false);
+        setTimeout(() => {
+          handleClose();
+        }, 1000);
       }
       setIsSubmitting(false);
     } catch (error: any) {
@@ -120,6 +138,21 @@ const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
 
   return (
     <div>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={showResult}
+        autoHideDuration={6000}
+        onClose={handleCloseResult}
+      >
+        <Alert
+          onClose={handleCloseResult}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          Member added successfully
+        </Alert>
+      </Snackbar>
       <Button
         startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />}
         variant="outlined"
@@ -223,6 +256,7 @@ const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
                       alt="Avatar Preview"
                       sx={{ width: 56, height: 56, marginRight: 2 }}
                     />
+
                     <UploadImage onUpload={setAvatarUrl} />
                   </Box>
                   <ErrorMessage>{errors.avatar?.message}</ErrorMessage>

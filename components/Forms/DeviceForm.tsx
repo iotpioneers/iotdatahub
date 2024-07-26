@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 import { Controller, useForm } from "react-hook-form";
 import { Button, Callout, Flex } from "@radix-ui/themes";
 import SimpleMDE from "react-simplemde-editor";
@@ -27,6 +29,18 @@ export default function DeviceForm() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [channels, setChannels] = useState<Channel[] | null>(null);
+  const [open, setOpen] = React.useState(false);
+
+  const handleCloseResult = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   const {
     register,
@@ -84,8 +98,13 @@ export default function DeviceForm() {
 
       console.log("result:", result);
 
-      if (result) router.push("/dashboard/organization");
-      setIsSubmitting(false);
+      if (result) {
+        setOpen(true);
+        setIsSubmitting(false);
+        setTimeout(() => {
+          router.push("/dashboard/organization");
+        }, 1000);
+      }
     } catch (error) {
       setIsSubmitting(false);
       setError("An unexpected error occurred.");
@@ -95,6 +114,21 @@ export default function DeviceForm() {
 
   return (
     <main className="overflow-hidden p-4">
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleCloseResult}
+      >
+        <Alert
+          onClose={handleCloseResult}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          Device created successfully
+        </Alert>
+      </Snackbar>
       <Flex gap={"3"}>
         <h1>Add a new device</h1>
       </Flex>

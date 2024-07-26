@@ -53,6 +53,8 @@ declare module "@mui/material/styles" {
     };
     typography: {
       customInput: object;
+      pxToRem;
+      fontWeightBold: string;
     };
     menuSelected: string;
     menuSelectedBack: string;

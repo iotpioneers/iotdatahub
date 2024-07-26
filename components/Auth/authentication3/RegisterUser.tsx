@@ -1,5 +1,7 @@
+"use client";
+
 import { Theme } from "@mui/material/styles";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 // material-ui
 import Divider from "@mui/material/Divider";
@@ -88,14 +90,14 @@ const Register = () => {
                       alignItems="center"
                       xs={12}
                     >
-                      <Typography
-                        component={Link}
-                        to="/pages/login/login3"
-                        variant="subtitle1"
-                        sx={{ textDecoration: "none" }}
-                      >
-                        Already have an account?
-                      </Typography>
+                      <Link href="/auth">
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ textDecoration: "none" }}
+                        >
+                          Already have an account?
+                        </Typography>
+                      </Link>
                     </Grid>
                   </Grid>
                 </Grid>

@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react";
 import ChannelNavigation from "@/components/Channels/ChannelNavigation";
 import { ChannelProps, DataPointProps, FieldProps } from "@/types";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import dynamic from "next/dynamic";
+import LoadingProgressBar from "@/components/LoadingProgressBar";
 
 const ChannelDetailsHeading = dynamic(
   () => import("@/components/Channels/ChannelDetailsHeading"),
   {
     ssr: false,
-    loading: () => <LoadingSpinner />,
+    loading: () => <LoadingProgressBar />,
   }
 );
 

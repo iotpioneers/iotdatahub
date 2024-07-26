@@ -21,25 +21,24 @@ const passwordValidation = z
     },
     {
       message:
-        "Password must include at least one uppercase letter, lowercase letter, number, and a special character",
+        "Password must include uppercase and lowercase letter, number, and a special character",
     }
   );
 
 // The schema for the user data
 export const userSchema = z
   .object({
-    name: z
-      .string()
-      .min(1, "Username is required and cannot be empty")
-      .max(255, { message: "Username must be 255 characters or less" }),
-
+    firstname: z.string().max(255).min(1, "Firstname is required"),
+    lastname: z.string().max(255).min(1, "Lastname is required"),
     email: z
       .string()
-      .min(1, "Email is required and cannot be empty")
-      .email("Invalid email format"),
+      .min(1, "Email is required")
+      .email("Must be a valid email"),
 
+    country: z.string().max(255).min(1, "Country is required"),
+    phonenumber: z.string().max(255).min(1, "Phone is required"),
+    image: z.string().optional(),
     password: passwordValidation,
-
     confirmPassword: z.string().min(8, {
       message: "Confirm Password must be at least 8 characters long",
     }),
@@ -51,10 +50,7 @@ export const userSchema = z
 
 // The schema for the forgot password
 export const ForgotPasswordSchema = z.object({
-  email: z
-    .string()
-    .min(1, "Email is required and cannot be empty")
-    .email("Invalid email format"),
+  email: z.string().min(1, "Email is required").email("Invalid email format"),
 });
 
 // The schema for the reset password
@@ -77,23 +73,17 @@ export const ResetPasswordSchema = z
 export const channelSchema = z.object({
   name: z
     .string()
-    .min(1, "Name is required and cannot be empty")
+    .min(1, "Name is required")
     .max(255, { message: "Name must be 255 characters or less" }),
 
   description: z
     .string()
-    .min(1, "Description is required and cannot be empty")
+    .min(1, "Description is required")
     .max(65535, { message: "Description must be 65535 characters or less" }),
   fields: z.array(z.string()).min(1, "At least one field is required"),
 
-  latitude: z.preprocess(
-    (value) => parseFloat(value as string),
-    z.number().optional()
-  ),
-  longitude: z.preprocess(
-    (value) => parseFloat(value as string),
-    z.number().optional()
-  ),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   access: z.string().optional(),
 });
 
@@ -101,27 +91,24 @@ export const channelSchema = z.object({
 export const deviceSchema = z.object({
   name: z
     .string()
-    .min(1, "Name is required and cannot be empty")
+    .min(1, "Name is required")
     .max(255, { message: "Name must be 255 characters or less" }),
 
   description: z
     .string()
-    .min(1, "Description is required and cannot be empty")
+    .min(1, "Description is required")
     .max(65535, { message: "Description must be 65535 characters or less" }),
 
-  channelId: z.string().min(1, "Channel is required and cannot be empty"),
+  channelId: z.string().min(1, "Channel is required"),
 });
 
 // The schema for the api keys data
 export const apiKeySchema = z.object({
-  apiKey: z.string().min(1, "API key is required and cannot be empty").max(255),
+  apiKey: z.string().min(1, "API key is required").max(255),
 
-  userId: z.string().min(1, "User is required and cannot be empty").max(255),
+  userId: z.string().min(1, "User is required").max(255),
 
-  channelId: z
-    .string()
-    .min(1, "Channel is required and cannot be empty")
-    .max(255),
+  channelId: z.string().min(1, "Channel is required").max(255),
 
   fields: z.array(z.string()).min(1),
 });
@@ -130,42 +117,26 @@ export const apiKeySchema = z.object({
 export const organizationSchema = z.object({
   name: z
     .string()
-    .min(1, "Name is required and cannot be empty")
+    .min(1, "Name is required")
     .max(255, { message: "Name must be 255 characters or less" }),
   address: z
     .string()
-    .min(1, "Address is required and cannot be empty")
+    .min(1, "Address is required")
     .max(255, { message: "Address must be 255 characters or less" })
     .optional(),
   type: z.enum(["PERSONAL", "ENTREPRISE"], {
     message: "Invalid organization type",
   }),
-  areaOfInterest: z.enum(
-    [
-      "TECHNOLOGY",
-      "SCIENCE",
-      "HEALTH",
-      "FINANCE",
-      "EDUCATION",
-      "ART",
-      "ENVIRONMENT",
-      "SPORTS",
-      "POLITICS",
-      "ENTERTAINMENT",
-      "BUSINESS",
-      "CULTURE",
-      "TRAVEL",
-      "FOOD",
-    ],
-    { message: "Invalid area of interest" }
-  ),
+  areaOfInterest: z
+    .array(z.string())
+    .min(1, "At least one area of interest is required"),
 });
 
 // The schema for the pricing data
 export const subscriptionSchema = z.object({
   name: z
     .string()
-    .min(1, "Name is required and cannot be empty")
+    .min(1, "Name is required")
     .max(255, { message: "Name must be 255 characters or less" }),
   description: z.string().optional(),
   type: z.enum(["FREE", "PREMIUM", "ENTERPRISE"], {
@@ -181,13 +152,10 @@ export const subscriptionSchema = z.object({
 });
 
 export const memberSchema = z.object({
-  name: z.string().min(1, "Name is required and cannot be empty").max(255, {
+  name: z.string().min(1, "Name is required").max(255, {
     message: "Name must be 255 characters or less",
   }),
-  email: z
-    .string()
-    .min(1, "Email is required and cannot be empty")
-    .email("Invalid email format"),
+  email: z.string().min(1, "Email is required").email("Invalid email format"),
   phone: z.string().optional(),
   country: z.string().optional(),
   avatar: z.string().url("Invalid URL format").optional(),

@@ -10,13 +10,13 @@ import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useSession } from "next-auth/react";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import LoadingProgressBar from "@/components/LoadingProgressBar";
 
 export function AccountInfo(): React.JSX.Element {
   const { status, data: session } = useSession();
 
   if (status === "loading") {
-    return <LoadingSpinner />;
+    return <LoadingProgressBar />;
   }
 
   return (

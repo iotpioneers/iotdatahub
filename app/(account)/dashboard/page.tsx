@@ -1,80 +1,21 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import DashboardOverview from "@/components/Dashboard/DashboardOverview";
-import OrganizationOnboardingCreation from "@/components/Dashboard/OrganizationOnboardingCreation";
-
-interface Organization {
-  areaOfInterest: string;
-  createdAt: Date;
-  id: string;
-  name: string;
-  type: string;
-  updatedAt: Date;
-  userId: string;
-}
-
-interface Member {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  country: string;
-  avatar: string;
-  access: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { Metadata } from "next";
+import UserDashboardOverview from "./_components/UserDashboardOverview";
+import { Suspense } from "react";
+import LoadingProgressBar from "@/components/LoadingProgressBar";
 
 const Dashboard = () => {
-  const [hasOrganization, setHasOrganization] = useState<boolean | null>(null);
-  const [organization, setOrganization] = useState<Organization | null>(null);
-  const [members, setMembers] = useState<Member[] | null>(null);
-
-  useEffect(() => {
-    const checkOrganizationStatus = async () => {
-      try {
-        const response = await fetch("/api/organizations/status", {
-          method: "GET",
-        });
-
-        if (!response.ok) {
-          console.error("Error fetching organization status");
-          return;
-        }
-
-        const data = await response.json();
-        setHasOrganization(data.hasOrganization);
-        setOrganization(data.organization);
-        setMembers(data.members);
-      } catch (error) {
-        console.error("Error fetching organization status:", error);
-      }
-    };
-
-    checkOrganizationStatus();
-  }, []);
-
-  if (hasOrganization === null) {
-    return;
-  }
-
   return (
-    <>
-      {!hasOrganization ? (
-        <OrganizationOnboardingCreation />
-      ) : (
-        <DashboardOverview organization={organization} members={members} />
-      )}
-    </>
+    <Suspense fallback={<LoadingProgressBar />}>
+      <UserDashboardOverview />;
+    </Suspense>
   );
 };
 
 export default Dashboard;
 
-// export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
-// export const metadata: Metadata = {
-//   title: "IoTDataCenter - Dashboard",
-//   description: "Explore our latest features",
-// };
+export const metadata: Metadata = {
+  title: "IoTDataCenter - Dashboard",
+  description: "Explore our latest features",
+};

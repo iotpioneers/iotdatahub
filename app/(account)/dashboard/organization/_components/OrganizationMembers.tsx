@@ -18,7 +18,7 @@ import TableEmptyRows from "../_components/TableEmptyRows";
 import UserTableToolbar from "../_components/UserTableToolbar";
 import AddMember from "../_components/members/AddMember";
 import { emptyRows, applyFilter, getComparator } from "../_components/utils";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import LoadingProgressBar from "@/components/LoadingProgressBar";
 
 // Define the types for organization
 interface Organization {
@@ -90,7 +90,7 @@ const OrganizationMembers = () => {
   };
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <LoadingProgressBar />;
   }
 
   if (!hasOrganization || !organization) {
@@ -196,7 +196,7 @@ const OrganizationMembers = () => {
                 headLabel={[
                   { id: "name", label: "Name" },
                   { id: "email", label: "Email" },
-                  { id: "country", label: "Country" },
+                  { id: "address", label: "Address" },
                   { id: "access", label: "Access" },
                   { id: "date", label: "Joined" },
                   { id: "actions", label: "" },

@@ -83,14 +83,14 @@ const Login = () => {
                       alignItems="center"
                       xs={12}
                     >
-                      <Typography
-                        component={Link}
-                        href="/register"
-                        variant="subtitle1"
-                        sx={{ textDecoration: "none" }}
-                      >
-                        Don&apos;t have an account?
-                      </Typography>
+                      <Link href="/register">
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ textDecoration: "none" }}
+                        >
+                          Don&apos;t have an account?
+                        </Typography>
+                      </Link>
                     </Grid>
                   </Grid>
                 </Grid>

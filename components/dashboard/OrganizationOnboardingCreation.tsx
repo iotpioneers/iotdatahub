@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 import { Button, Callout, Heading, Text } from "@radix-ui/themes";
 import { nanoid } from "nanoid";
 import { useRouter } from "next/navigation";
@@ -30,8 +32,26 @@ const OrganizationOnboardingCreation: React.FC = () => {
   const [organizationType, setOrganizationType] = useState<
     "PERSONAL" | "ENTREPRISE" | ""
   >("");
-  const [selectedAreaOfInterest, setSelectedAreaOfInterest] =
-    useState<string>("");
+  const [selectedAreasOfInterest, setSelectedAreasOfInterest] = useState<
+    string[]
+  >([]);
+  const [customAreaOfInterest, setCustomAreaOfInterest] = useState<string>("");
+  const [areasOfInterest, setAreasOfInterest] = useState<string[]>(
+    Object.values(AreaOfInterest)
+  );
+  const [loading, setLoading] = useState<boolean>(false);
+  const [open, setOpen] = React.useState(false);
+
+  const handleCloseResult = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   const router = useRouter();
 
@@ -48,7 +68,34 @@ const OrganizationOnboardingCreation: React.FC = () => {
   const handleAreaOfInterestChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setSelectedAreaOfInterest(event.target.value);
+    const value = event.target.value;
+    setSelectedAreasOfInterest((prevSelectedAreas) =>
+      prevSelectedAreas.includes(value)
+        ? prevSelectedAreas.filter((area) => area !== value)
+        : [...prevSelectedAreas, value]
+    );
+  };
+
+  // Function to handle custom area of interest input change
+  const handleCustomAreaOfInterestChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setCustomAreaOfInterest(event.target.value.toUpperCase());
+  };
+
+  // Function to add custom area of interest
+  const addCustomAreaOfInterest = () => {
+    if (
+      customAreaOfInterest &&
+      !areasOfInterest.includes(customAreaOfInterest)
+    ) {
+      setAreasOfInterest((prevAreas) => [...prevAreas, customAreaOfInterest]);
+      setSelectedAreasOfInterest((prevSelectedAreas) => [
+        ...prevSelectedAreas,
+        customAreaOfInterest,
+      ]);
+      setCustomAreaOfInterest("");
+    }
   };
 
   // Function to go back to previous step
@@ -58,22 +105,25 @@ const OrganizationOnboardingCreation: React.FC = () => {
 
   // Function to submit organization data
   const handleSubmit = async () => {
+    setLoading(true);
     const organizationData = {
       name: organizationName,
       address: "N/A",
       type: organizationType,
-      areaOfInterest: selectedAreaOfInterest,
+      areaOfInterest: selectedAreasOfInterest,
     };
 
     const validation = organizationSchema.safeParse(organizationData);
 
+    console.log("validation", validation);
     if (!validation.success) {
       setError(validation.error.errors.map((err) => err.message).join(", "));
+      setLoading(false);
       return;
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/organizations", {
+      const response = await fetch("/api/organizations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -81,24 +131,48 @@ const OrganizationOnboardingCreation: React.FC = () => {
         body: JSON.stringify(organizationData),
       });
 
+      console.log("response", response);
+
       if (!response.ok) {
         const errorData = await response.json();
         setError(errorData.error || "Error creating organization");
+        setLoading(false);
         return;
       }
 
       const newOrganization = await response.json();
       console.log("New organization created:", newOrganization);
 
-      // Navigate to the dashboard or any other page after successful creation
-      router.push("/dashboard/channels");
+      setOpen(true);
+      setLoading(false);
+      setTimeout(() => {
+        router.push("/dashboard/channels");
+      }, 1000);
     } catch (error) {
       setError("Error creating organization");
+      setLoading(false);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-5">
+    <div className="flex items-center justify-center min-h-screen px-5 -mt-12">
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleCloseResult}
+      >
+        <Alert
+          onClose={handleCloseResult}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          Your preferences has been saved successfully
+        </Alert>
+      </Snackbar>
       <div className="bg-n-9 rounded-lg p-5 max-w-3xl w-full min-h-96 mx-5">
         {error && (
           <Callout.Root color="red" className="mb-5">
@@ -115,7 +189,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
             </Heading>
             <div className="flex w-full justify-between mb-5 gap-5 xs:gap-2">
               <div
-                className="grid"
+                className="grid cursor-pointer"
                 onClick={() => selectOrganizationType("PERSONAL")}
               >
                 <Text className="text-gray-10 font-semibold">
@@ -125,11 +199,11 @@ const OrganizationOnboardingCreation: React.FC = () => {
                 <img
                   src="makers.jpg"
                   alt="makers"
-                  className="w-56 h-56 md:min-w-80 rounded-md cursor-pointer"
+                  className="w-56 h-56 md:min-w-80 rounded-md"
                 />
               </div>
               <div
-                className="grid"
+                className="grid cursor-pointer"
                 onClick={() => selectOrganizationType("ENTREPRISE")}
               >
                 <Text className="text-gray-10 font-semibold">
@@ -139,7 +213,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
                 <img
                   src="businesses.jpg"
                   alt="businesses"
-                  className="w-56 h-56 md:min-w-80 rounded-md cursor-pointer"
+                  className="w-56 h-56 md:min-w-80 rounded-md"
                 />
               </div>
             </div>
@@ -155,23 +229,39 @@ const OrganizationOnboardingCreation: React.FC = () => {
                 What are your preferences?
               </Heading>
               <ul className="grid xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 w-full p-2 mb-4 rounded gap-5">
-                {Object.values(AreaOfInterest).map((interest) => (
+                {areasOfInterest.map((interest) => (
                   <li
                     key={interest}
                     value={interest}
                     className="flex items-center text-gray-10 font-semibold text-lg gap-2"
                   >
                     <input
-                      type="radio"
+                      type="checkbox"
                       id={interest}
                       value={interest}
-                      name="areaOfInterest"
+                      checked={selectedAreasOfInterest.includes(interest)}
                       onChange={handleAreaOfInterestChange}
                     />
                     {interest}
                   </li>
                 ))}
               </ul>
+              <div className="flex justify-center items-center gap-2 mb-4">
+                <input
+                  type="text"
+                  value={customAreaOfInterest}
+                  onChange={handleCustomAreaOfInterestChange}
+                  placeholder="Add your own area of interest"
+                  className="px-3 py-2 border rounded"
+                />
+                <Button
+                  type="button"
+                  className="bg-blue-500 text-white py-2 px-4 rounded"
+                  onClick={addCustomAreaOfInterest}
+                >
+                  Add
+                </Button>
+              </div>
             </div>
 
             <div className="flex items-end justify-between">
@@ -182,10 +272,13 @@ const OrganizationOnboardingCreation: React.FC = () => {
                 Back
               </Button>
               <Button
+                type="submit"
                 className="bg-blue-500 text-white py-2 px-4 rounded"
                 onClick={handleSubmit}
+                disabled={loading}
+                style={{ zIndex: 10 }}
               >
-                Done
+                {loading ? "Submitting..." : "Done"}
               </Button>
             </div>
           </div>

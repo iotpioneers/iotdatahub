@@ -1,6 +1,8 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useState } from "react";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 import {
   ArchiveBoxXMarkIcon,
   CloudArrowUpIcon,
@@ -24,7 +26,18 @@ export default function ChannelForm() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [isLatLongEnabled, setIsLatLongEnabled] = useState<boolean>(false); // State for latitude and longitude toggle
+  const [open, setOpen] = React.useState(false);
 
+  const handleCloseResult = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
   const {
     register,
     control,
@@ -68,8 +81,6 @@ export default function ChannelForm() {
         body: JSON.stringify(data),
       });
 
-      console.log("Response:", response);
-
       if (!response.ok) {
         const errorData = await response.json();
         setError("Failed to create channel");
@@ -81,8 +92,13 @@ export default function ChannelForm() {
 
       const { id } = result.newChannel;
 
-      if (result) router.push(`/dashboard/channels/${id}`);
-      setIsSubmitting(false);
+      if (result) {
+        setOpen(true);
+        setIsSubmitting(false);
+        setTimeout(() => {
+          router.push(`/dashboard/channels/${id}`);
+        }, 1000);
+      }
     } catch (error) {
       setIsSubmitting(false);
       setError("An unexpected error occurred.");
@@ -92,6 +108,21 @@ export default function ChannelForm() {
 
   return (
     <main className="overflow-hidden p-4">
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleCloseResult}
+      >
+        <Alert
+          onClose={handleCloseResult}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          Channel created successfully
+        </Alert>
+      </Snackbar>
       <h1>Add a new channel</h1>
       <div className="mt-10 border-t border-gray-200"></div>
       {error && (

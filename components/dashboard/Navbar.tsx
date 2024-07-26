@@ -7,8 +7,6 @@ import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import { Bell as BellIcon } from "@phosphor-icons/react/dist/ssr/Bell";
-import { MagnifyingGlass as MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
-import { Users as UsersIcon } from "@phosphor-icons/react/dist/ssr/Users";
 
 import { UsePopover } from "@/hooks/usePopover";
 
@@ -20,6 +18,7 @@ import { Avatar } from "@mui/material";
 
 const Navbar = () => {
   const { status, data: session } = useSession();
+  console.log("session", session);
   const userPopover = UsePopover<HTMLDivElement>();
 
   const router = useRouter();
@@ -50,27 +49,17 @@ const Navbar = () => {
         >
           <Stack sx={{ alignItems: "center" }} direction="row" spacing={2}>
             <h1 className="flex lg:hidden text-base text-center justify-center cursor-pointer font-bold text-blue-900 border-gray-100 w-full">
-              <Link href="/" className="flex justify-center items-center">
+              <Link href="/" className="flex justify-center items-center gap-1">
                 <img
                   src="logo.svg"
                   alt="logo"
-                  className="h-5 w-5 text-gray-10"
+                  className="h-6 w-6 text-gray-10"
                 />
                 <span className="hover:text-zinc-950">IoTDataCenter</span>
               </Link>
             </h1>
           </Stack>
           <Stack sx={{ alignItems: "center" }} direction="row" spacing={2}>
-            <Tooltip title="Search">
-              <IconButton>
-                <MagnifyingGlassIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Members">
-              <IconButton>
-                <UsersIcon />
-              </IconButton>
-            </Tooltip>
             <Tooltip title="Notifications">
               <Badge badgeContent={4} color="success" variant="standard">
                 <IconButton>
@@ -84,16 +73,12 @@ const Navbar = () => {
                 ref={userPopover.anchorRef}
                 sx={{ cursor: "pointer" }}
               >
-                {session!.user!.image ? (
-                  <img
-                    onClick={userPopover.handleOpen}
-                    src={session!.user!.image}
-                    alt="Profile"
-                    className="rounded-full"
-                  />
-                ) : (
-                  session!.user!.name!.split("")[0].toUpperCase()
-                )}
+                <img
+                  onClick={userPopover.handleOpen}
+                  src={session!.user!.image || "/user.svg"}
+                  alt="Profile"
+                  className="rounded-full"
+                />
               </Avatar>
             )}
           </Stack>

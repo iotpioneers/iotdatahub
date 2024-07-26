@@ -94,7 +94,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
   return (
     <div className="flex flex-col justify-start item-center">
       <h1 className="text-base text-center justify-center cursor-pointer font-bold text-blue-900 border-b border-gray-100 pb-6 w-full">
-        <Link href="/" className="flex justify-center items-center">
+        <Link href="/" className="flex justify-center items-center gap-1">
           <img src="logo.svg" alt="logo" className="h-8 w-8 text-gray-10" />
           <span className="hover:text-zinc-950">IoTDataCenter</span>
         </Link>

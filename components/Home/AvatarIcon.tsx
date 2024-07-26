@@ -14,16 +14,12 @@ const AvatarIcon = () => {
       {status === "authenticated" && (
         <Popover.Root>
           <Popover.Trigger>
-            <Avatar className="h-10 w-10 bg-gray-500 rounded-full flex items-center justify-center">
-              {session!.user!.image ? (
-                <img
-                  src={session!.user!.image}
-                  alt="Profile"
-                  className="rounded-full"
-                />
-              ) : (
-                session!.user!.name!.split("")[0].toUpperCase()
-              )}
+            <Avatar className="h-10 w-10 bg-gray-100 border-n-6 border-2 rounded-full flex items-center justify-center">
+              <img
+                src={session!.user!.image || "/user.svg"}
+                alt="Profile"
+                className="rounded-full"
+              />
             </Avatar>
           </Popover.Trigger>
           <Popover.Content className="bg-white border shadow-md rounded-lg z-50 px-5">

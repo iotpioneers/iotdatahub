@@ -1,12 +1,7 @@
 import Section from "./Section";
 import Heading from "./Heading";
-import { brainwaveServices, brainwaveServicesIcons } from "@/constants";
-import {
-  PhotoChatMessage,
-  Gradient,
-  VideoBar,
-  VideoChatMessage,
-} from "./design/Services";
+import { IoTDataCenterServices, IoTDataCenterServicesIcons } from "@/constants";
+import { Gradient, VideoBar } from "./design/Services";
 
 import Generating from "./Generating";
 
@@ -32,19 +27,18 @@ const Services = () => {
             </div>
 
             <div className="relative z-1 max-w-[17rem] font-bold ml-auto">
-              <h4 className="h4 mb-4 text-n-4">Real-time Data Insights</h4>
-              <p className="body-2 mb-[3rem] text-n-7 font-semibold">
-                Leverage AI-powered analytics for actionable insights and
-                decision-making.
-              </p>
+              <h4 className="h4 mb-4 text-color-1">Real-time Data Insights</h4>
+
               <ul className="body-2">
-                {brainwaveServices.map((item, index) => (
+                {IoTDataCenterServices.map((item, index) => (
                   <li
                     key={index}
                     className="flex items-start py-4 border-t border-n-6"
                   >
                     <img width={24} height={24} src="check.svg" />
-                    <p className="ml-4 text-slate-50 font-extrabold">{item}</p>
+                    <p className="ml-4 text-black text-lg font-extrabold">
+                      {item}
+                    </p>
                   </li>
                 ))}
               </ul>
@@ -66,26 +60,24 @@ const Services = () => {
               </div>
 
               <div className="absolute inset-0 flex flex-col justify-end p-8 bg-gradient-to-b from-n-8/0 to-n-8/90 lg:p-15">
-                <h4 className="h4 mb-4">Device Management</h4>
+                <h4 className="h4  text-n-1 mb-4">Device Management</h4>
                 <p className="body-2 mb-[3rem] text-n-3">
                   Streamline operations with efficient device management
                   solutions.
                 </p>
               </div>
-
-              <PhotoChatMessage />
             </div>
 
             <div className="p-4 bg-n-7 rounded-3xl overflow-hidden lg:min-h-[46rem]">
               <div className="py-12 px-4 xl:px-8">
-                <h4 className="h4 mb-4">Data Visualization</h4>
+                <h4 className="h4 text-n-1 mb-4">Data Visualization</h4>
                 <p className="body-2 mb-[2rem] text-n-3">
                   Visualize complex data with intuitive dashboards for informed
                   decision-making.
                 </p>
 
                 <ul className="flex items-center justify-between">
-                  {brainwaveServicesIcons.map((item, index) => (
+                  {IoTDataCenterServicesIcons.map((item, index) => (
                     <li
                       key={index}
                       className={`rounded-2xl flex items-center justify-center ${
@@ -117,7 +109,6 @@ const Services = () => {
                   alt="Scary robot"
                 />
 
-                <VideoChatMessage />
                 <VideoBar />
               </div>
             </div>

@@ -187,7 +187,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                       member.name.charAt(0).toUpperCase()
                     )}
                   </Avatar>
-                  <div className="mt-2">{member.name}</div>
+                  <div className="mt-2">{member.name.split(" ")[0]}</div>
                   <div
                     className={`${
                       member.access === "VIEWER"

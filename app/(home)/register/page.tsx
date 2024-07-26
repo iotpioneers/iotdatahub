@@ -1,10 +1,10 @@
-import RegisterForm from "@/components/Forms/RegisterForm";
+import RegisterUser from "@/components/Auth/authentication3/RegisterUser";
 import { Metadata } from "next";
 
 const Register = () => {
   return (
-    <div className="mt-12">
-      <RegisterForm />;
+    <div className="mt-8">
+      <RegisterUser />
     </div>
   );
 };

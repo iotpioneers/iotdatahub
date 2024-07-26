@@ -29,7 +29,11 @@ const UploadImage: React.FC<UploadImageProps> = ({ onUpload }) => {
         }}
       >
         {({ open }) => (
-          <button className="btn btn-primary" onClick={() => open()}>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => open()}
+          >
             Upload an Image
           </button>
         )}

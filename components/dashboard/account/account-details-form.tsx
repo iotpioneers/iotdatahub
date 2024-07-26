@@ -14,7 +14,7 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import Select from "@mui/material/Select";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useSession } from "next-auth/react";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import LoadingProgressBar from "@/components/LoadingProgressBar";
 
 const states = [
   { value: "musanze", label: "Musanze" },
@@ -27,7 +27,7 @@ export function AccountDetailsForm(): React.JSX.Element {
   const { status, data: session } = useSession();
 
   if (status === "loading") {
-    return <LoadingSpinner />;
+    return <LoadingProgressBar />;
   }
 
   return (

@@ -34,7 +34,7 @@ const Header = () => {
   return (
     <div
       className={`fixed top-0 left-0 w-full z-10  border-b border-n-6 lg:bg-n-8/90 lg:backdrop-blur-sm ${
-        openNavigation ? "bg-n-10" : "bg-n-6/5 backdrop-blur-sm"
+        openNavigation ? "bg-n-5" : "bg-n-4 backdrop-blur-sm"
       }`}
     >
       <div className="flex items-center px-1 sm:px-5  lg:px-7.5 xl:px-10 max-lg:py-4">
@@ -51,7 +51,7 @@ const Header = () => {
                   className="h-8 w-8 float-left float mr-2"
                   color="white"
                 />
-                <p className="text-slate-600">IoTDataCenter</p>
+                <p className="text-slate-950">IoTDataCenter</p>
               </div>
             </a>
           </div>
@@ -79,13 +79,6 @@ const Header = () => {
 
               <HamburgerMenu />
             </nav>
-
-            <a
-              href="/register"
-              className="button hidden ml-8 text-green-500 transition-colors hover:text-n-1 lg:block"
-            >
-              SIGN UP
-            </a>
 
             {status !== "loading" && (
               <Button

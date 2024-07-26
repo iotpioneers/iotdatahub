@@ -143,7 +143,7 @@ const DeviceTable = () => {
 
   return (
     <Box m="20px">
-      <HeadingTexts title="Devices" subtitle="Managing the members devices" />
+      <HeadingTexts title="Devices" subtitle="Managing devices" />
       <Button className="button bg-gray-600 p-3 rounded-md">
         <Link href="/dashboard/devices/new">New Device</Link>
       </Button>

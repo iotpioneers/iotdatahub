@@ -67,8 +67,11 @@ model Authenticator {
 
 model User {
   id             String          @id @default(auto()) @map("_id") @db.ObjectId
-  name           String
+  firstname      String
+  lastname       String
   email          String          @unique
+  country        String
+  phonenumber    String
   emailVerified  DateTime?
   image          String?
   password       String?
@@ -210,7 +213,7 @@ model Organization {
   name           String
   address        String?
   type           OrganizationType @default(PERSONAL)
-  areaOfInterest AreaOfInterest
+  areaOfInterest String[]
   userId         String           @db.ObjectId
   users          User[]
   members        Member[]
@@ -263,23 +266,6 @@ enum DeviceStatus {
 enum OrganizationType {
   PERSONAL
   ENTREPRISE
-}
-
-enum AreaOfInterest {
-  TECHNOLOGY
-  SCIENCE
-  HEALTH
-  FINANCE
-  EDUCATION
-  ART
-  ENVIRONMENT
-  SPORTS
-  POLITICS
-  ENTERTAINMENT
-  BUSINESS
-  CULTURE
-  TRAVEL
-  FOOD
 }
 
 enum SubscriptionType {

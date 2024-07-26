@@ -1,7 +1,8 @@
 "use client";
 
-import { Link, Table } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import Link from "next/link"; // Import Link from Next.js
 
 interface Channel {
   id: string;
@@ -20,7 +21,7 @@ const formatDate = (date: Date) =>
     weekday: "long",
   }).format(new Date(date));
 
-const ProjectList = async () => {
+const ProjectList = () => {
   const [channels, setChannels] = useState<Channel[] | null>(null);
 
   useEffect(() => {
@@ -51,58 +52,31 @@ const ProjectList = async () => {
     return null;
   }
 
+  const columns: GridColDef[] = [
+    {
+      field: "name",
+      headerName: "Channel",
+      width: 150,
+      renderCell: (params: GridRenderCellParams) => (
+        <Link href={`/dashboard/channels/${params.row.id}`}>
+          {params.value}
+        </Link>
+      ),
+    },
+    { field: "description", headerName: "Description", width: 300 },
+    { field: "latitude", headerName: "Latitude", width: 150 },
+    { field: "longitude", headerName: "Longitude", width: 150 },
+  ];
+
   return (
-    <div>
-      <Table.Root variant="surface">
-        <Table.Header>
-          <Table.Row>
-            <Table.ColumnHeaderCell>Channel</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="hidden md:table-cell">
-              Description
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="hidden md:table-cell">
-              Latitude
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="hidden md:table-cell">
-              Longitude
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="hidden md:table-cell">
-              Created
-            </Table.ColumnHeaderCell>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {channels.map((channel) => (
-            <Table.Row key={channel.id}>
-              <Table.Cell className="min-w-32">
-                <div className="flex justify-between">
-                  <Link href={`/dashboard/channels/${channel.id}`}>
-                    {channel.name}
-                  </Link>
-                </div>
-                <div className="block md:hidden mt-3">
-                  {channel.description}
-                </div>
-                <div className="block md:hidden mt-3 font-bold">
-                  {formatDate(channel.createdAt)}
-                </div>
-              </Table.Cell>
-              <Table.Cell className="hidden md:table-cell">
-                {channel.description}
-              </Table.Cell>
-              <Table.Cell className="hidden md:table-cell">
-                {channel.latitude || "N/A"}
-              </Table.Cell>
-              <Table.Cell className="hidden md:table-cell">
-                {channel.longitude || "N/A"}
-              </Table.Cell>
-              <Table.Cell className="hidden md:table-cell">
-                {formatDate(channel.createdAt)}
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table.Root>
+    <div style={{ height: 600, width: "100%" }}>
+      <DataGrid
+        rows={channels}
+        columns={columns}
+        getRowId={(row) => row.id}
+        pagination
+        autoPageSize
+      />
     </div>
   );
 };

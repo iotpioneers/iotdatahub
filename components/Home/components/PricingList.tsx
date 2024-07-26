@@ -11,7 +11,7 @@ const PricingList = () => {
         >
           <h4 className="h4 mb-4">{item.title}</h4>
 
-          <p className="body-2 min-h-[4rem] mb-3 text-n-1/50">
+          <p className="body-2 min-h-[4rem] mb-3 text-n-1">
             {item.description}
           </p>
 
@@ -45,7 +45,7 @@ const PricingList = () => {
                 className="flex items-start py-5 border-t border-n-6"
               >
                 <img src="check.svg" width={24} height={24} alt="Check" />
-                <p className="body-2 ml-4">{feature}</p>
+                <p className="body-2 text-n-1 ml-4">{feature}</p>
               </li>
             ))}
           </ul>

@@ -13,10 +13,10 @@ import { SignOut as SignOutIcon } from "@phosphor-icons/react/dist/ssr/SignOut";
 import { User as UserIcon } from "@phosphor-icons/react/dist/ssr/User";
 
 import { paths } from "@/paths";
-import { authClient } from "@/lib/auth/client";
 import { logger } from "@/lib/default-logger";
 import { useUser } from "@/hooks/useUser";
 import { useSession } from "next-auth/react";
+import { Skeleton } from "@mui/material";
 
 export interface UserPopoverProps {
   anchorEl: Element | null;
@@ -50,7 +50,7 @@ export function UserPopover({
   }, [checkSession, router]);
 
   if (status === "loading") {
-    return <div>Loading...</div>;
+    return <Skeleton width={12} height={12} />;
   }
 
   return (

@@ -2,10 +2,10 @@
 
 import { Suspense, useEffect, useState } from "react";
 import ProjectList from "./ProjectList";
-import { Heading, Text } from "@radix-ui/themes";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import { Text } from "@radix-ui/themes";
 import Link from "next/link";
 import { Button } from "@mui/material";
+import LoadingProgressBar from "@/components/LoadingProgressBar";
 
 interface Channel {
   id: number;
@@ -40,24 +40,30 @@ const ChannelList = () => {
     fetchChannels();
   }, []);
 
+  if (isLoading) {
+    return <LoadingProgressBar />;
+  }
+
   return (
     <div className="w-full">
-      <Suspense fallback={<LoadingSpinner />}>
-        <div className="mb-8 flex flex-col items-center text-center max-w-2xl mx-auto">
-          <Text className="m-5">
+      <Link href="/dashboard/channels/new">
+        <Button className="button bg-gray-600 p-3 rounded-md">
+          Add New Channel
+        </Button>
+      </Link>
+      {(!channels || channels === null) && (
+        <div className="mb-8 w-full flex flex-row justify-between items-center text-center max-w-2xl mx-auto">
+          <Text>
             Channels serve as a fundamental structure for organizing and storing
             data. Each channel can accommodate various data fields, each capable
             of holding different data types (e.g., temperature, humidity).
             Channels are templates assigned to devices, facilitating efficient
             data management and monitoring.
           </Text>
-          <Link href="/dashboard/channels/new">
-            <Button className="button bg-gray-600 p-3 rounded-md">
-              New Channel
-            </Button>
-          </Link>
         </div>
+      )}
 
+      <Suspense fallback={<LoadingProgressBar />}>
         {channels && channels.length > 0 && <ProjectList />}
       </Suspense>
     </div>

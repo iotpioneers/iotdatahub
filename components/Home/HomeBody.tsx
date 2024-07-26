@@ -6,7 +6,6 @@ import Benefits from "./components/Benefits";
 import Collaboration from "./components/Collaboration";
 import Footer from "./components/Footer";
 import Hero from "./components/Hero";
-import Roadmap from "./components/Roadmap";
 import Services from "./components/Services";
 import ButtonGradient from "@/components/Home/components/design/svg/ButtonGradient";
 
@@ -26,7 +25,6 @@ const HomeBody = () => {
         <Benefits />
         <Collaboration />
         <Services />
-        <Roadmap />
         <Footer />
       </div>
 

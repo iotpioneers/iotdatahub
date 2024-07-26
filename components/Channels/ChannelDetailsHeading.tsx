@@ -3,10 +3,8 @@
 import { CalendarIcon, LinkIcon, MapPinIcon } from "@heroicons/react/20/solid";
 import { ChartPieIcon } from "@heroicons/react/24/solid";
 import ReactMarkdown from "react-markdown";
-import BackButton from "../BackButton";
 import { Box, Button, Card, Flex, Heading } from "@radix-ui/themes";
 import { ChannelProps } from "@/types";
-import EditChannel from "./EditChannel";
 
 interface ChannelHeadingProps {
   channel: ChannelProps;
@@ -67,8 +65,6 @@ const ChannelDetailsHeading = ({
       <div className="mt-5 flex lg:ml-4 lg:mt-0">
         <Box maxWidth="230px">
           <Flex gap="3" mb="5">
-            <BackButton />
-            <EditChannel />
             <Button
               type="button"
               className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"

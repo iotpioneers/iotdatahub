@@ -35,13 +35,13 @@ export const notificationImages = [
   "notification/image-2.jpeg",
 ];
 
-export const brainwaveServices = [
+export const IoTDataCenterServices = [
   "Device Control",
   "Data Visualization",
   "Real-Time Monitoring",
 ];
 
-export const brainwaveServicesIcons = [
+export const IoTDataCenterServicesIcons = [
   "recording-03.svg",
   "recording-01.svg",
   "disc-02.svg",

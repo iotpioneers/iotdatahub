@@ -1,10 +1,10 @@
 import React from "react";
 import dynamic from "next/dynamic";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import LoadingProgressBar from "@/components/LoadingProgressBar";
 
 const ChannelForm = dynamic(() => import("@/components/Forms/ChannelForm"), {
   ssr: false,
-  loading: () => <LoadingSpinner />,
+  loading: () => <LoadingProgressBar />,
 });
 
 const NewChannelPage = () => {

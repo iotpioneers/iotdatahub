@@ -1,9 +1,62 @@
-import { Theme } from "@mui/material/styles";
+interface ThemeColors {
+  primaryLight?: string;
+  primaryMain?: string;
+  primaryDark?: string;
+  primary200?: string;
+  primary800?: string;
+  secondaryLight?: string;
+  secondaryMain?: string;
+  secondaryDark?: string;
+  secondary200?: string;
+  secondary800?: string;
+  errorLight?: string;
+  errorMain?: string;
+  errorDark?: string;
+  orangeLight?: string;
+  orangeMain?: string;
+  orangeDark?: string;
+  warningLight?: string;
+  warningMain?: string;
+  warningDark?: string;
+  successLight?: string;
+  success200?: string;
+  successMain?: string;
+  successDark?: string;
+  grey50?: string;
+  grey100?: string;
+  grey500?: string;
+  grey600?: string;
+  grey700?: string;
+  grey900?: string;
+  darkTextPrimary?: string;
+  darkLevel1?: string;
+  darkLevel2?: string;
+  darkBackground?: string;
+  darkPaper?: string;
+  darkCard?: string;
+  darkDivider?: string;
+  darkTextSecondary?: string;
+  darkTextTertiary?: string;
+  darkTextQuaternary?: string;
+  darkTextQuinary?: string;
+  divider?: string;
+  paper: string;
+  backgroundDefault: string;
+}
 
-/**
- * Color intention that you want to used in your theme
- * @param {JsonObject} theme Theme customization object
- */
+interface Theme {
+  colors: ThemeColors;
+  darkTextPrimary: string;
+  darkTextSecondary: string;
+  textDark: string;
+  heading: string;
+  paper: string;
+  backgroundDefault: string;
+  background: string;
+  customization: {
+    navType?: string;
+  };
+}
 
 export default function themePalette(theme: Theme) {
   return {

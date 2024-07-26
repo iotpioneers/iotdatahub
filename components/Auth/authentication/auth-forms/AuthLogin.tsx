@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { configureStore } from "@reduxjs/toolkit";
 import { useSelector } from "react-redux";
+import { signIn } from "next-auth/react";
 
 // material-ui
 import { useTheme } from "@mui/material/styles";
@@ -21,49 +23,54 @@ import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 // third party
 import * as Yup from "yup";
-import { Formik, FormikHelpers, FormikProps } from "formik";
+import { Formik, FormikProps } from "formik";
 
 // project imports
 import AnimateButton from "../../AnimateButton";
 import reducer from "@/app/store/reducer";
+import LoadingProgressBar from "@/components/LoadingProgressBar";
 
 // assets
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import Link from "next/link";
 
-// ============================|| FIREBASE - LOGIN ||============================ //
+// ============================|| IoTDataHub - LOGIN ||============================ //
 
 const store = configureStore({ reducer });
 
 // Infer the type of store
-export type AppStore = typeof store;
+type AppStore = typeof store;
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<AppStore["getState"]>;
+type RootState = ReturnType<AppStore["getState"]>;
 
-// Define your submission handler
-const handleSubmit = (
-  values: { email: string; password: string; submit: null },
-  actions: FormikHelpers<{ email: string; password: string; submit: null }>
-) => {
-  console.log(values);
-  actions.setSubmitting(false);
-};
+const schema = Yup.object().shape({
+  email: Yup.string()
+    .email("Must be a valid email")
+    .required("Email is required"),
+  password: Yup.string().required("Password is required"),
+});
+
+type FormData = Yup.InferType<typeof schema>;
 
 const AuthLogin = ({ ...others }) => {
   const theme = useTheme();
+  const router = useRouter();
   const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
   const customization = useSelector((state: RootState) => state.customization);
+  const [loading, setLoading] = useState(false);
+  const [isGoogleSign, setIsGoogleSign] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(true);
-
-  const googleHandler = async () => {
-    console.error("Login");
-  };
-
   const [showPassword, setShowPassword] = useState(false);
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -74,12 +81,69 @@ const AuthLogin = ({ ...others }) => {
     event.preventDefault();
   };
 
+  const handleCloseResult = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  };
+
+  const googleHandler = async () => {
+    setIsGoogleSign(true);
+    signIn("google", {
+      callbackUrl: "/dashboard",
+    });
+  };
+
+  const loginUser = async (data: FormData) => {
+    setError(null);
+    setLoading(true);
+    const response = await signIn("credentials", {
+      email: data.email,
+      password: data.password,
+      redirect: false,
+      callbackUrl: "/dashboard",
+    });
+    setLoading(false);
+    if (response?.error) {
+      console.error("Error", response.error);
+      setError(response.error);
+      setOpen(true);
+    } else {
+      setError(null);
+      setOpen(true);
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1000);
+    }
+  };
+
   return (
     <>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleCloseResult}
+      >
+        <Alert
+          onClose={handleCloseResult}
+          severity={error ? "error" : "success"}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {error ? error : "User logged successfully"}
+        </Alert>
+      </Snackbar>
+
       <Grid container direction="column" justifyContent="center" spacing={2}>
         <Grid item xs={12}>
           <AnimateButton>
             <Button
+              type="button"
               disableElevation
               fullWidth
               onClick={googleHandler}
@@ -103,6 +167,7 @@ const AuthLogin = ({ ...others }) => {
               Sign in with Google
             </Button>
           </AnimateButton>
+          {isGoogleSign && <LoadingProgressBar />}
         </Grid>
         <Grid item xs={12}>
           <Box
@@ -162,7 +227,10 @@ const AuthLogin = ({ ...others }) => {
             .required("Email is required"),
           password: Yup.string().max(255).required("Password is required"),
         })}
-        onSubmit={handleSubmit}
+        onSubmit={(values, actions) => {
+          loginUser(values);
+          actions.setSubmitting(false);
+        }}
       >
         {({
           errors,
@@ -180,7 +248,7 @@ const AuthLogin = ({ ...others }) => {
               sx={{ ...theme.typography.customInput }}
             >
               <InputLabel htmlFor="outlined-adornment-email-login">
-                Email Address / Username
+                Email Address
               </InputLabel>
               <OutlinedInput
                 id="outlined-adornment-email-login"
@@ -259,13 +327,15 @@ const AuthLogin = ({ ...others }) => {
                 }
                 label="Remember me"
               />
-              <Typography
-                variant="subtitle1"
-                color="secondary"
-                sx={{ textDecoration: "none", cursor: "pointer" }}
-              >
-                Forgot Password?
-              </Typography>
+              <Link href="#">
+                <Typography
+                  variant="subtitle1"
+                  color="secondary"
+                  sx={{ textDecoration: "none", cursor: "pointer" }}
+                >
+                  Forgot Password?
+                </Typography>
+              </Link>
             </Stack>
             {errors.submit && (
               <Box sx={{ mt: 3 }}>
@@ -284,8 +354,9 @@ const AuthLogin = ({ ...others }) => {
                   variant="contained"
                   color="secondary"
                 >
-                  Sign in
+                  {loading ? "Signing you in please wait..." : "Sign in"}
                 </Button>
+                {loading && <LoadingProgressBar />}
               </AnimateButton>
             </Box>
           </form>

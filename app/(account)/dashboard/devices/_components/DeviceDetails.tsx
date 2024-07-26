@@ -3,8 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Flex, Grid } from "@radix-ui/themes";
 import { Heading, Card, Text } from "@radix-ui/themes";
-import DeleteButton from "@/components/DeleteButton";
-import EditButton from "@/components/EditButton";
 import StatusBadge from "@/components/StatusBadge";
 interface Props {
   params: { id: string };

@@ -1,5 +1,7 @@
 "use client";
 
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 import { Button } from "@radix-ui/themes";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
@@ -9,8 +11,6 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { Heading } from "@radix-ui/themes";
-import Image from "next/image";
-import { ArrowRightEndOnRectangleIcon } from "@heroicons/react/24/outline";
 import { FaGoogle } from "react-icons/fa6";
 
 const schema = Yup.object().shape({
@@ -26,6 +26,18 @@ const LoginForm = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<String | null>(null);
+  const [open, setOpen] = React.useState(false);
+
+  const handleCloseResult = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   const {
     register,
@@ -48,12 +60,31 @@ const LoginForm = () => {
       console.error("Error", response.error);
       setError(response?.error);
     } else {
-      router.push("/dashboard");
+      setOpen(true);
+      setLoading(false);
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1000);
     }
   };
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="relative  bg-white  p-6 rounded-md shadow-md max-w-md w-full mx-4 mt-8 mb-0">
+        <Snackbar
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          open={open}
+          autoHideDuration={6000}
+          onClose={handleCloseResult}
+        >
+          <Alert
+            onClose={handleCloseResult}
+            severity="success"
+            variant="filled"
+            sx={{ width: "100%" }}
+          >
+            User logged successfully
+          </Alert>
+        </Snackbar>
         <div className="flex gap-3 text-lime-600">
           <Heading className=" mb-5 text-center text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white ">
             Sign in to your account

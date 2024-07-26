@@ -1,13 +1,8 @@
 import { Theme } from "@mui/material/styles";
 
-/**
- * Typography used in theme
- * @param {JsonObject} theme theme customization object
- */
-
 export default function themeTypography(theme: Theme) {
   return {
-    fontFamily: theme?.customization?.fontFamily,
+    fontFamily: theme?.customization?.fontFamily || "Arial, sans-serif",
     h6: {
       fontWeight: 500,
       color: theme.heading,
@@ -65,7 +60,7 @@ export default function themeTypography(theme: Theme) {
       color: theme.darkTextPrimary,
     },
     button: {
-      textTransform: "capitalize",
+      textTransform: "capitalize" as const,
     },
     customInput: {
       marginTop: 1,
@@ -89,14 +84,14 @@ export default function themeTypography(theme: Theme) {
       },
     },
     mainContent: {
-      backgroundColor: theme.background,
+      backgroundColor: theme.background || "#ffffff",
       width: "100%",
       minHeight: "calc(100vh - 88px)",
       flexGrow: 1,
       padding: "20px",
       marginTop: "88px",
       marginRight: "20px",
-      borderRadius: `${theme?.customization?.borderRadius}px`,
+      borderRadius: `${theme?.customization?.borderRadius}px` || "4px",
     },
     menuCaption: {
       fontSize: "0.875rem",

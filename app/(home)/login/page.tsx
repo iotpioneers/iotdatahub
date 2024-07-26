@@ -1,17 +1,18 @@
-import LoginForm from "@/components/Forms/LoginForm";
+import React from "react";
+import AuthUser from "@/components/Auth/authentication3/AuthUser";
 import { Metadata } from "next";
 
-const Login = () => {
+const Auth = () => {
   return (
-    <div className="mt-12">
-      <LoginForm />;
+    <div className="mt-10">
+      <AuthUser />
     </div>
   );
 };
 
-export default Login;
+export default Auth;
 
 export const metadata: Metadata = {
-  title: "IoTDataCenter - Login",
+  title: "Login - IoTDataCenter",
   description: "Signin to your account",
 };
