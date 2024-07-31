@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { getToken } from "next-auth/jwt";
 import { channelSchema } from "@/validations/schema.validation";
+import { redirect } from "next/navigation";
 
 interface Field {
   name: string;
@@ -14,10 +15,7 @@ export async function POST(request: NextRequest) {
 
   // Check if the user is authenticated
   if (!token) {
-    return NextResponse.json(
-      { error: "User not authenticated" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
   const userEmail = token.email as string;
@@ -57,7 +55,7 @@ export async function POST(request: NextRequest) {
     const char* ssid = "YOUR_WIFI_SSID"; // Replace with your WiFi SSID
     const char* password = "YOUR_WIFI_PASSWORD"; // Replace with your WiFi password
     const char* server = "YOUR_SERVER_ADDRESS"; // Replace with your server address
-    String url = "/api/channels/datapoint?api_key=YOUR_API_KEY"; // Replace with your API key
+    String url = "/api/channels/datapoint?api_key=${apiKey}"; 
 
     #include <YOUR_WIFI_MODULE.h>  // Include the WiFi module library, e.g., ESP8266WiFi, WiFi.h
 
@@ -166,10 +164,7 @@ export async function GET(request: NextRequest) {
 
   // Check if token is null before proceeding
   if (!token) {
-    return NextResponse.json(
-      { error: "User not authenticated" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
   const userEmail = token.email as string;

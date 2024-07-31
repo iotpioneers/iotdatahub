@@ -14,7 +14,7 @@ const DeviceListingsPage = async () => {
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "IoTDataCenter - Device List",
+  title: "IoTDataHub - Device List",
   description: "View all project devices",
 };
 

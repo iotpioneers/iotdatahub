@@ -6,7 +6,7 @@ import LoadingProgressBar from "@/components/LoadingProgressBar";
 const Dashboard = () => {
   return (
     <Suspense fallback={<LoadingProgressBar />}>
-      <UserDashboardOverview />;
+      <UserDashboardOverview />
     </Suspense>
   );
 };
@@ -16,6 +16,6 @@ export default Dashboard;
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "IoTDataCenter - Dashboard",
+  title: "IoTDataHub - Dashboard",
   description: "Explore our latest features",
 };

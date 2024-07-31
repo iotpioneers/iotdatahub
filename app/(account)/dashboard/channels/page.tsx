@@ -5,7 +5,7 @@ import LoadingProgressBar from "@/components/LoadingProgressBar";
 const ChannelsPage = () => {
   return (
     <Suspense fallback={<LoadingProgressBar />}>
-      <ChannelList />;
+      <ChannelList />
     </Suspense>
   );
 };

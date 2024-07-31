@@ -5,7 +5,7 @@ import Stack from "@mui/material/Stack";
 import OrganizationMembers from "./_components/OrganizationMembers";
 
 export const metadata = {
-  title: `IoTDataCenter - Users | Dashboard `,
+  title: `IoTDataHub - Users | Dashboard `,
 } satisfies Metadata;
 
 export default function Page(): React.JSX.Element {

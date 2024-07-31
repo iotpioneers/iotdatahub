@@ -20,7 +20,7 @@ const Pricing = () => {
         </div>
         <div className="flex mt-16 lg:-mt-20">
           <Heading
-            tag="Get started with IoTDataCenter"
+            tag="Get started with IoTDataHub"
             title="Find the right pricing package"
           />
         </div>

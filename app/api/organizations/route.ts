@@ -16,14 +16,18 @@ export async function POST(request: NextRequest) {
     }
 
     const userEmail = token.email as string;
-    console.log("Token:", token);
 
     const user = await prisma.user.findUnique({
       where: { email: userEmail },
     });
 
     if (!user) {
-      throw new Error("User not found");
+      return NextResponse.json(
+        {
+          error: "User not found",
+        },
+        { status: 400 }
+      );
     }
 
     // Validate the request body against the schema

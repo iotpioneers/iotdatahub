@@ -18,7 +18,6 @@ import { Avatar } from "@mui/material";
 
 const Navbar = () => {
   const { status, data: session } = useSession();
-  console.log("session", session);
   const userPopover = UsePopover<HTMLDivElement>();
 
   const router = useRouter();
@@ -55,7 +54,7 @@ const Navbar = () => {
                   alt="logo"
                   className="h-6 w-6 text-gray-10"
                 />
-                <span className="hover:text-zinc-950">IoTDataCenter</span>
+                <span className="hover:text-zinc-950">IoTDataHub</span>
               </Link>
             </h1>
           </Stack>

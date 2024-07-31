@@ -2,6 +2,7 @@ import prisma from "@/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { deviceSchema } from "@/validations/schema.validation";
+import { redirect } from "next/navigation";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -9,10 +10,7 @@ export async function POST(request: NextRequest) {
 
   // Check if token is null before proceeding
   if (!token) {
-    return NextResponse.json(
-      { error: "User not authenticated" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
   const userEmail = token.email as string;
@@ -76,10 +74,7 @@ export async function GET(request: NextRequest) {
 
   // Check if token is null before proceeding
   if (!token) {
-    return NextResponse.json(
-      { error: "User not authenticated" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
   const userEmail = token.email as string;

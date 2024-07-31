@@ -9,7 +9,7 @@ interface Props {
 export default function ChannelDetailsPage({ params }: Props) {
   return (
     <Suspense fallback={<LoadingProgressBar />}>
-      <ChannelDetails channelID={params.id} />;
+      <ChannelDetails channelID={params.id} />
     </Suspense>
   );
 }

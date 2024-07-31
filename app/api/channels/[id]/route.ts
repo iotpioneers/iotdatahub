@@ -57,11 +57,6 @@ export async function PUT(
 ) {
   const body = await request.json();
 
-  const validation = channelSchema.safeParse(body);
-
-  if (!validation.success)
-    return NextResponse.json(validation.error.errors, { status: 400 });
-
   const channel = await prisma.channel.findUnique({
     where: { id: params.id },
   });
@@ -72,11 +67,16 @@ export async function PUT(
   const updatedchannel = await prisma.channel.update({
     where: { id: channel.id },
     data: {
-      name: body.name,
-      description: body.description,
+      name: body.name || channel.name,
+      description: body.description || channel.description,
     },
   });
 
+  if (!updatedchannel)
+    return NextResponse.json(
+      { error: "Failed to update channel" },
+      { status: 404 }
+    );
   return NextResponse.json(updatedchannel);
 }
 

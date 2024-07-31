@@ -7,7 +7,7 @@ import {
   ArchiveBoxXMarkIcon,
   CloudArrowUpIcon,
 } from "@heroicons/react/24/outline";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,10 +17,16 @@ import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
 import { channelSchema } from "@/validations/schema.validation";
 import ErrorMessage from "@/components/ErrorMessage";
+import { useSession } from "next-auth/react";
+import { createChannelRoom } from "@/lib/actions/room.actions";
 
 type ChannelForm = z.infer<typeof channelSchema>;
 
 export default function ChannelForm() {
+  const { status, data: session } = useSession();
+
+  if (status === "unauthenticated") redirect("/login");
+
   const router = useRouter();
   const [fields, setFields] = useState<string[]>([""]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -90,10 +96,24 @@ export default function ChannelForm() {
 
       const result = await response.json();
 
-      const { id } = result.newChannel;
+      const { id, name: channelName, description } = result.newChannel;
 
       if (result) {
+        const room = await createChannelRoom({
+          roomId: id,
+          username: session!.user!.name!,
+          email: session!.user!.email!,
+          title: channelName,
+          description,
+        });
+
+        if (!room) {
+          setError("Failed to create room");
+          throw new Error("Failed to create room");
+        }
+
         setOpen(true);
+
         setIsSubmitting(false);
         setTimeout(() => {
           router.push(`/dashboard/channels/${id}`);

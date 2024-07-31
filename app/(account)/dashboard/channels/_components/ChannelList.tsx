@@ -6,6 +6,7 @@ import { Text } from "@radix-ui/themes";
 import Link from "next/link";
 import { Button } from "@mui/material";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
+import Image from "next/image";
 
 interface Channel {
   id: number;
@@ -47,8 +48,9 @@ const ChannelList = () => {
   return (
     <div className="w-full">
       <Link href="/dashboard/channels/new">
-        <Button className="button bg-gray-600 p-3 rounded-md">
-          Add New Channel
+        <Button className="button bg-gray-600 p-3 rounded-md gap-1 mb-2">
+          <Image src="/assets/icons/add.svg" alt="add" width={24} height={24} />
+          <p className="block">Add New Channel</p>
         </Button>
       </Link>
       {(!channels || channels === null) && (

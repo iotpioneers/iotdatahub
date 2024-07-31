@@ -1,6 +1,6 @@
 import Section from "./Section";
 import Heading from "./Heading";
-import { IoTDataCenterServices, IoTDataCenterServicesIcons } from "@/constants";
+import { IoTDataHubServices, IoTDataHubServicesIcons } from "@/constants";
 import { Gradient, VideoBar } from "./design/Services";
 
 import Generating from "./Generating";
@@ -30,7 +30,7 @@ const Services = () => {
               <h4 className="h4 mb-4 text-color-1">Real-time Data Insights</h4>
 
               <ul className="body-2">
-                {IoTDataCenterServices.map((item, index) => (
+                {IoTDataHubServices.map((item, index) => (
                   <li
                     key={index}
                     className="flex items-start py-4 border-t border-n-6"
@@ -77,7 +77,7 @@ const Services = () => {
                 </p>
 
                 <ul className="flex items-center justify-between">
-                  {IoTDataCenterServicesIcons.map((item, index) => (
+                  {IoTDataHubServicesIcons.map((item, index) => (
                     <li
                       key={index}
                       className={`rounded-2xl flex items-center justify-center ${

@@ -37,8 +37,6 @@ export async function POST(req: Request, res: NextResponse) {
       image,
     } = validation.data;
 
-    console.log("body", body);
-
     const exist = await prisma.user.findUnique({
       where: { email },
     });

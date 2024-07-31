@@ -33,8 +33,8 @@ const Header = () => {
 
   return (
     <div
-      className={`fixed top-0 left-0 w-full z-10  border-b border-n-6 lg:bg-n-8/90 lg:backdrop-blur-sm ${
-        openNavigation ? "bg-n-5" : "bg-n-4 backdrop-blur-sm"
+      className={`fixed top-0 left-0 w-full z-10 lg:bg-slate-300 lg:backdrop-blur-sm ${
+        openNavigation ? "bg-slate-200" : "bg-slate-300 backdrop-blur-sm"
       }`}
     >
       <div className="flex items-center px-1 sm:px-5  lg:px-7.5 xl:px-10 max-lg:py-4">
@@ -51,7 +51,7 @@ const Header = () => {
                   className="h-8 w-8 float-left float mr-2"
                   color="white"
                 />
-                <p className="text-slate-950">IoTDataCenter</p>
+                <p className="text-slate-950">IoTDataHub</p>
               </div>
             </a>
           </div>

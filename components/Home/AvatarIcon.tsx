@@ -14,7 +14,7 @@ const AvatarIcon = () => {
       {status === "authenticated" && (
         <Popover.Root>
           <Popover.Trigger>
-            <Avatar className="h-10 w-10 bg-gray-100 border-n-6 border-2 rounded-full flex items-center justify-center">
+            <Avatar className="h-10 w-10 bg-gray-100 border-n-1 border-1 rounded-full flex items-center justify-center">
               <img
                 src={session!.user!.image || "/user.svg"}
                 alt="Profile"

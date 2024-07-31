@@ -9,6 +9,6 @@ const PricingPage = () => {
 export default PricingPage;
 
 export const metadata: Metadata = {
-  title: "IoTDataCenter - Pricing",
+  title: "IoTDataHub - Pricing",
   description: "Explore our latest pricing",
 };

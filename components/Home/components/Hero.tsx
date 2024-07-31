@@ -26,7 +26,7 @@ const Hero = () => {
             <h1 className="h1 mb-2 text-gray-50">
               Cutt edge with{"  "}
               <span className="inline-block relative">
-                IoTDataCenter{" "}
+                IoTDataHub{" "}
                 <img
                   src="hero/curve.png"
                   className="absolute top-full left-0 w-full xl:-mt-2"

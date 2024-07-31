@@ -8,10 +8,7 @@ export async function POST(request: NextRequest) {
   const token = await getToken({ req: request });
 
   if (!token) {
-    return NextResponse.json(
-      { error: "User not authenticated" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
   // Validate the request body against the schema

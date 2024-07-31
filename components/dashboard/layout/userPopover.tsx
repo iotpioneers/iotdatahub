@@ -17,6 +17,7 @@ import { logger } from "@/lib/default-logger";
 import { useUser } from "@/hooks/useUser";
 import { useSession } from "next-auth/react";
 import { Skeleton } from "@mui/material";
+import LoadingProgressBar from "@/components/LoadingProgressBar";
 
 export interface UserPopoverProps {
   anchorEl: Element | null;
@@ -50,7 +51,7 @@ export function UserPopover({
   }, [checkSession, router]);
 
   if (status === "loading") {
-    return <Skeleton width={12} height={12} />;
+    return <LoadingProgressBar />;
   }
 
   return (

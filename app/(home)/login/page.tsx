@@ -13,6 +13,6 @@ const Auth = () => {
 export default Auth;
 
 export const metadata: Metadata = {
-  title: "Login - IoTDataCenter",
+  title: "Login - IoTDataHub",
   description: "Signin to your account",
 };

@@ -9,7 +9,7 @@ interface Props {
 const DeviceDetailsPage = async ({ params }: Props) => {
   return (
     <Suspense fallback={<LoadingProgressBar />}>
-      <DeviceDetails params={params} />;
+      <DeviceDetails params={params} />
     </Suspense>
   );
 };

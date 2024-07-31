@@ -68,7 +68,7 @@ const AuthLogin = ({ ...others }) => {
   const [isGoogleSign, setIsGoogleSign] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-  const [checked, setChecked] = useState(true);
+  const [checked, setChecked] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => {
@@ -116,7 +116,7 @@ const AuthLogin = ({ ...others }) => {
       setError(null);
       setOpen(true);
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push("http://localhost:3000/dashboard");
       }, 1000);
     }
   };

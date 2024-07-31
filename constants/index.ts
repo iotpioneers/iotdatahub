@@ -35,13 +35,13 @@ export const notificationImages = [
   "notification/image-2.jpeg",
 ];
 
-export const IoTDataCenterServices = [
+export const IoTDataHubServices = [
   "Device Control",
   "Data Visualization",
   "Real-Time Monitoring",
 ];
 
-export const IoTDataCenterServicesIcons = [
+export const IoTDataHubServicesIcons = [
   "recording-03.svg",
   "recording-01.svg",
   "disc-02.svg",
