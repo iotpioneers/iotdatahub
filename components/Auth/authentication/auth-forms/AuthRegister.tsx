@@ -154,6 +154,8 @@ const AuthRegister = ({ ...others }) => {
       setOpen(true);
     } else {
       try {
+        setError(null);
+        setLoading(true);
         const response = await axios.post("/api/email/send", {
           userFullName: data.firstname + " " + data.lastname,
           userEmail: data.email,
@@ -163,22 +165,28 @@ const AuthRegister = ({ ...others }) => {
           console.error("Error sending verification email:", response);
           setError("Failed to send verification email");
           setOpen(true);
+          setLoading(false);
         }
 
         setError(null);
-        setOpen(true);
         setSuccess("Verification email sent");
-        setTimeout(() => {
-          router.push("/login");
-        }, 1000);
+        setOpen(true);
+        setLoading(false);
       } catch (error) {
         console.error("Error sending verification email:", error);
         setError("Failed to send verification email");
         setOpen(true);
+        setLoading(false);
       }
     }
 
     setSuccess("User registered successfully");
+    setOpen(true);
+    setLoading(false);
+
+    setTimeout(() => {
+      router.push("/dashboard");
+    }, 1000);
   };
 
   return (

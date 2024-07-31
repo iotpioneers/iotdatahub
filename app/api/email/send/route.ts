@@ -1,33 +1,22 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 import prisma from "@/prisma/client";
-import { NextResponse } from "next/server";
 
 type User = {
   userFullName: string;
   userEmail: string;
 };
 
-export const generateOTP = (expiryMinutes = 10) => {
-  const otp = crypto.randomInt(100000, 999999);
-  const expiryTime = new Date();
-  expiryTime.setMinutes(expiryTime.getMinutes() + expiryMinutes);
-
-  return {
-    token: otp.toString(),
-    expires: expiryTime,
-  };
-};
-
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const body: User = await req.json();
-
     const { userFullName, userEmail } = body;
 
     // Generate verification token
-    const { token, expires } = generateOTP();
+    const token = crypto.randomInt(100000, 999999).toString();
+    const expiryTime = new Date();
+    expiryTime.setMinutes(expiryTime.getMinutes() + 10);
 
     let config = {
       service: "gmail",
@@ -79,7 +68,7 @@ export async function POST(req: Request) {
     }
     .heading {
       color: #fff;
-      background-color: #13544e;
+      background-color: #888;
       width: 100%;
       border-radius: 2px;
       padding: 10px;
@@ -108,7 +97,7 @@ export async function POST(req: Request) {
       margin-top: 20px;
     }
     .button:hover {
-      background-color: #0f413b;
+      background-color: #323245;
     }
     .footer {
       margin-top: 20px;
@@ -135,7 +124,7 @@ export async function POST(req: Request) {
       <p>
         <a href="${
           process.env.NEXT_PUBLIC_BASE_URL
-        }/email/verify?token=${token}" class="button">Verify Email</a>
+        }/email/verify/${token}" class="button">Verify Email</a>
       </p>
       <p>If you did not create an account, no further action is required.</p>
     </div>
@@ -149,22 +138,14 @@ export async function POST(req: Request) {
 `,
     };
 
-    const info = await transporter.sendMail(message);
+    await transporter.sendMail(message);
 
-    if (info.response !== "250 2.0.0 OK") {
-      return NextResponse.json(
-        { error: "Error sending email" },
-        { status: 500 }
-      );
-    }
-
-    console.log("Message sent: %s", info);
     // Save token in the database
     await prisma.verificationToken.create({
       data: {
         email: userEmail,
         token,
-        expires,
+        expires: expiryTime,
       },
     });
 

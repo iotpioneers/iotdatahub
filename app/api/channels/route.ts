@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { getToken } from "next-auth/jwt";
 import { channelSchema } from "@/validations/schema.validation";
-import { redirect } from "next/navigation";
 
 interface Field {
   name: string;

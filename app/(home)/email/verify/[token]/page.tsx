@@ -1,32 +1,39 @@
-import { useRouter } from "next/router";
+"use client";
+
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import Head from "next/head";
 
-const VerifyEmail = () => {
+interface Props {
+  params: { token: string };
+}
+
+const VerifyEmail = ({ params }: Props) => {
   const router = useRouter();
-  const { token } = router.query;
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!token) {
+    setError("");
+    if (!params.token) {
       setError("Invalid verification link.");
       return;
     }
 
     const verifyEmail = async () => {
       try {
-        const response = await axios.get(`/api/email/verify?token=${token}`);
+        const response = await axios.get(`/api/email/verify/${params.token}`);
         console.log("Email verified:", response.data);
         setMessage(response.data.message);
+        router.push("/dashboard");
       } catch (err) {
         setError("An error occurred while verifying your email.");
       }
     };
 
     verifyEmail();
-  }, [token]);
+  }, [params.token]);
 
   return (
     <>

@@ -20,7 +20,9 @@ import AuthRegister from "../authentication/auth-forms/AuthRegister";
 // ===============================|| AUTH3 - REGISTER ||=============================== //
 
 const Register = () => {
-  const downMD = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
+  const RegisterUser = useMediaQuery((theme: Theme) =>
+    theme.breakpoints.down("md")
+  );
 
   return (
     <AuthWrapper1>
@@ -61,7 +63,7 @@ const Register = () => {
                           <Typography
                             color="secondary.main"
                             gutterBottom
-                            variant={downMD ? "h3" : "h2"}
+                            variant={RegisterUser ? "h3" : "h2"}
                           >
                             Sign up
                           </Typography>

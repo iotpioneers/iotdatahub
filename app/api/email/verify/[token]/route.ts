@@ -1,9 +1,8 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/client";
-import { NextResponse } from "next/server";
 
 export async function GET(
-  req: NextApiRequest,
+  req: NextRequest,
   { params }: { params: { token: string } }
 ) {
   try {
@@ -29,7 +28,7 @@ export async function GET(
     }
 
     // Update the user's emailVerified field
-    await prisma.user.update({
+    const user = await prisma.user.update({
       where: { email: verificationToken.email },
       data: { emailVerified: new Date() },
     });
