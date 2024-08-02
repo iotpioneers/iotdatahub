@@ -117,7 +117,7 @@ export default function ChannelForm() {
         setIsSubmitting(false);
         setTimeout(() => {
           router.push(`/dashboard/channels/${id}`);
-        }, 1000);
+        }, 100);
       }
     } catch (error) {
       setIsSubmitting(false);

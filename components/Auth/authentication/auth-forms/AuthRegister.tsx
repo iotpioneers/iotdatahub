@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { configureStore } from "@reduxjs/toolkit";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
 import axios from "axios";
 
 // material-ui
@@ -23,7 +22,6 @@ import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
@@ -44,15 +42,11 @@ import LoadingProgressBar from "@/components/LoadingProgressBar";
 // assets
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-
-// ===========================|| IoTDataHub - REGISTER ||=========================== //
+import CountryList from "./CountryList";
 
 const store = configureStore({ reducer });
 
-// Infer the type of store
 export type AppStore = typeof store;
-
-// Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<AppStore["getState"]>;
 
 type LevelType =
@@ -62,6 +56,13 @@ type LevelType =
     }
   | undefined;
 
+interface CountryType {
+  code: string;
+  label: string;
+  phone: string;
+  suggested?: boolean;
+}
+
 const schema = Yup.object().shape({
   firstname: Yup.string().max(255).required("Firstname is required"),
   lastname: Yup.string().max(255).required("Lastname is required"),
@@ -69,7 +70,8 @@ const schema = Yup.object().shape({
     .email("Must be a valid email")
     .max(255)
     .required("Email is required"),
-  country: Yup.string().max(255).required("Country is required"),
+  country: Yup.string().optional(),
+  phonecode: Yup.string().optional(),
   phonenumber: Yup.string().max(255).required("Phone is required"),
   password: Yup.string().min(8).max(255).required("Password is required"),
   confirmPassword: Yup.string()
@@ -79,29 +81,26 @@ const schema = Yup.object().shape({
 
 type FormData = Yup.InferType<typeof schema>;
 
-// ===========================|| IoTDataHub - REGISTER ||===========================
 const AuthRegister = ({ ...others }) => {
   const theme = useTheme();
-  const router = useRouter();
   const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
   const customization = useSelector((state: RootState) => state.customization);
   const [isGoogleSign, setIsGoogleSign] = useState(false);
-
   const [showPassword, setShowPassword] = useState(false);
   const [checked, setChecked] = useState(false);
-
   const [strength, setStrength] = useState(0);
   const [level, setLevel] = useState<LevelType>(undefined);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [open, setOpen] = React.useState(false);
+  const [selectedCountry, setSelectedCountry] = useState<CountryType | null>(
+    null
+  );
 
   const googleHandler = async () => {
     setIsGoogleSign(true);
-    signIn("google", {
-      callbackUrl: "/dashboard",
-    });
+    signIn("google", { callbackUrl: "/dashboard" });
   };
 
   const handleClickShowPassword = () => {
@@ -135,24 +134,27 @@ const AuthRegister = ({ ...others }) => {
   };
 
   const registerUser = async (data: FormData) => {
+    const phoneCode = selectedCountry?.phone || "";
+    const phoneNumber = data.phonenumber
+      ? `${phoneCode} ${data.phonenumber}`
+      : data.phonenumber;
+
     setError(null);
     setLoading(true);
+
     const response = await fetch("/api/register", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...data,
+        country: selectedCountry?.label || "",
+        phonenumber: phoneNumber,
+      }),
     });
 
     const result = await response.json();
-
     setLoading(false);
-    if (!response.ok) {
-      console.error("Error", response);
-      setError(result.message);
-      setOpen(true);
-    } else {
+    if (response.ok) {
       try {
         setError(null);
         setLoading(true);
@@ -168,9 +170,11 @@ const AuthRegister = ({ ...others }) => {
           setLoading(false);
         }
 
-        setError(null);
-        setSuccess("Verification email sent");
+        setSuccess(
+          `We have sent an email to your email account : ${data.email}. Please check your email and click on the link to verify your email address.`
+        );
         setOpen(true);
+        setLoading(false);
         setLoading(false);
       } catch (error) {
         console.error("Error sending verification email:", error);
@@ -179,14 +183,10 @@ const AuthRegister = ({ ...others }) => {
         setLoading(false);
       }
     }
+    console.error("Error", response);
 
-    setSuccess("User registered successfully");
+    setError(result.message);
     setOpen(true);
-    setLoading(false);
-
-    setTimeout(() => {
-      router.push("/dashboard");
-    }, 1000);
   };
 
   return (
@@ -203,7 +203,7 @@ const AuthRegister = ({ ...others }) => {
           variant="standard"
           sx={{ width: "100%" }}
         >
-          {error ? error : "User registered successfully"}
+          {error ? error : success}
         </Alert>
       </Snackbar>
 
@@ -238,14 +238,8 @@ const AuthRegister = ({ ...others }) => {
           {isGoogleSign && <LoadingProgressBar />}
         </Grid>
         <Grid item xs={12}>
-          <Box
-            sx={{
-              alignItems: "center",
-              display: "flex",
-            }}
-          >
+          <Box sx={{ alignItems: "center", display: "flex" }}>
             <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
-
             <Button
               variant="outlined"
               sx={{
@@ -263,7 +257,6 @@ const AuthRegister = ({ ...others }) => {
             >
               OR
             </Button>
-
             <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
           </Box>
         </Grid>
@@ -288,28 +281,13 @@ const AuthRegister = ({ ...others }) => {
           lastname: "",
           email: "",
           country: "",
+          phonecode: "",
           phonenumber: "",
           password: "",
           confirmPassword: "",
           submit: null,
         }}
-        validationSchema={Yup.object().shape({
-          firstname: Yup.string().max(255).required("Firstname is required"),
-          lastname: Yup.string().max(255).required("Lastname is required"),
-          email: Yup.string()
-            .email("Must be a valid email")
-            .max(255)
-            .required("Email is required"),
-          country: Yup.string().max(255).required("Country is required"),
-          phonenumber: Yup.string().max(255).required("Phone is required"),
-          password: Yup.string()
-            .min(8)
-            .max(255)
-            .required("Password is required"),
-          confirmPassword: Yup.string()
-            .oneOf([Yup.ref("password")], "Passwords must match")
-            .required("Confirm Password is required"),
-        })}
+        validationSchema={schema}
         onSubmit={(values, actions) => {
           registerUser(values);
           actions.setSubmitting(false);
@@ -409,36 +387,53 @@ const AuthRegister = ({ ...others }) => {
                 </FormHelperText>
               )}
             </FormControl>
-            <Grid container spacing={matchDownSM ? 0 : 2}>
-              <Grid item xs={12} sm={6}>
-                <FormControl
-                  fullWidth
-                  error={Boolean(touched.country && errors.country)}
-                  sx={{ ...theme.typography.customInput }}
+            <FormControl
+              fullWidth
+              error={Boolean(touched.country && errors.country)}
+              sx={{ ...theme.typography.customInput }}
+            >
+              <CountryList
+                selectedCountry={selectedCountry}
+                setSelectedCountry={(country) => {
+                  setSelectedCountry(country);
+                  handleChange({
+                    target: {
+                      name: "country",
+                      value: selectedCountry?.label,
+                    },
+                  });
+                }}
+              />
+
+              {touched.country && errors.country && (
+                <FormHelperText
+                  error
+                  id="standard-weight-helper-text--register"
                 >
-                  <InputLabel htmlFor="outlined-adornment-country-register">
-                    Country
-                  </InputLabel>
-                  <OutlinedInput
-                    id="outlined-adornment-country-register"
-                    type="text"
-                    value={values.country}
-                    name="country"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    inputProps={{}}
-                  />
-                  {touched.country && errors.country && (
-                    <FormHelperText
-                      error
-                      id="standard-weight-helper-text--register"
-                    >
-                      {errors.country}
-                    </FormHelperText>
-                  )}
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6}>
+                  {errors.country}
+                </FormHelperText>
+              )}
+            </FormControl>
+            <Grid container spacing={matchDownSM ? 0 : 2}>
+              {selectedCountry?.phone && (
+                <Grid item xs={12} sm={3}>
+                  <FormControl
+                    fullWidth
+                    sx={{ ...theme.typography.customInput }}
+                  >
+                    <InputLabel htmlFor="outlined-adornment-phonecode-register">
+                      Code
+                    </InputLabel>
+                    <OutlinedInput
+                      id="outlined-adornment-phonecode"
+                      type="text"
+                      value={`+ ${selectedCountry?.phone}`}
+                      name="phonecode"
+                    />
+                  </FormControl>
+                </Grid>
+              )}
+              <Grid item xs={12} sm={selectedCountry?.phone ? 9 : 12}>
                 <FormControl
                   fullWidth
                   error={Boolean(touched.phonenumber && errors.phonenumber)}
@@ -464,10 +459,9 @@ const AuthRegister = ({ ...others }) => {
                       {errors.phonenumber}
                     </FormHelperText>
                   )}
-                </FormControl>{" "}
+                </FormControl>
               </Grid>
             </Grid>
-
             <FormControl
               fullWidth
               error={Boolean(touched.password && errors.password)}
@@ -519,11 +513,7 @@ const AuthRegister = ({ ...others }) => {
                     <Grid item>
                       <Box
                         style={{ backgroundColor: level?.color }}
-                        sx={{
-                          width: 85,
-                          height: 8,
-                          borderRadius: "7px",
-                        }}
+                        sx={{ width: 85, height: 8, borderRadius: "7px" }}
                       ></Box>
                     </Grid>
                     <Grid item>

@@ -147,7 +147,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
       setLoading(false);
       setTimeout(() => {
         router.push("/dashboard/channels");
-      }, 1000);
+      }, 100);
     } catch (error) {
       setError("Error creating organization");
       setLoading(false);

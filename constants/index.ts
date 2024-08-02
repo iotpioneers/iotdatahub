@@ -175,22 +175,6 @@ export const benefits = [
     imageUrl: "benefits/image-4.jpg",
     light: true,
   },
-  {
-    id: "4",
-    title: "Customizable Solutions",
-    text: "Tailor the platform to fit your specific IoT project needs.",
-    backgroundUrl: "benefits/card-5.svg",
-    iconUrl: "benefits/icon-1.svg",
-    imageUrl: "benefits/image-5.jpg",
-  },
-  {
-    id: "5",
-    title: "Scalable Architecture",
-    text: "Scale your IoT projects seamlessly as your needs grow.",
-    backgroundUrl: "benefits/card-6.svg",
-    iconUrl: "benefits/icon-2.svg",
-    imageUrl: "benefits/image-6.jpg",
-  },
 ];
 
 export const socials = [

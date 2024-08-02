@@ -117,7 +117,7 @@ const AuthLogin = ({ ...others }) => {
       setOpen(true);
       setTimeout(() => {
         router.push("http://localhost:3000/dashboard");
-      }, 1000);
+      }, 100);
     }
   };
 

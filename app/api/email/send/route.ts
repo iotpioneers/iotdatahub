@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     // Generate verification token
     const token = crypto.randomInt(100000, 999999).toString();
     const expiryTime = new Date();
-    expiryTime.setMinutes(expiryTime.getMinutes() + 10);
+    expiryTime.setMinutes(expiryTime.getMinutes() + 30);
 
     let config = {
       service: "gmail",

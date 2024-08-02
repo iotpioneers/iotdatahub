@@ -103,7 +103,7 @@ export default function DeviceForm() {
         setIsSubmitting(false);
         setTimeout(() => {
           router.push("/dashboard/organization");
-        }, 1000);
+        }, 100);
       }
     } catch (error) {
       setIsSubmitting(false);

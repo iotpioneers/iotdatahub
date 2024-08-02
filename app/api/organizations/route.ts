@@ -8,6 +8,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const token = await getToken({ req: request });
 
+    console.log("Validation Success:", body);
+
     if (!token) {
       return NextResponse.json(
         { error: "User not authenticated" },
@@ -39,13 +41,6 @@ export async function POST(request: NextRequest) {
     }
 
     const { name, address, type, areaOfInterest } = validation.data;
-    console.log(
-      "name, address, type, areaOfInterest",
-      name,
-      address,
-      type,
-      areaOfInterest
-    );
 
     const newOrganization = await prisma.organization.create({
       data: {

@@ -126,7 +126,7 @@ const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
         setIsSubmitting(false);
         setTimeout(() => {
           handleClose();
-        }, 1000);
+        }, 100);
       }
       setIsSubmitting(false);
     } catch (error: any) {
@@ -251,12 +251,13 @@ const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
                     Image
                   </Typography>
                   <Box display="flex" alignItems="center">
-                    <Avatar
-                      src={avatarUrl || ""}
-                      alt="Avatar Preview"
-                      sx={{ width: 56, height: 56, marginRight: 2 }}
-                    />
-
+                    {avatarUrl && (
+                      <Avatar
+                        src={avatarUrl || ""}
+                        alt="Avatar Preview"
+                        sx={{ width: 56, height: 56, marginRight: 2 }}
+                      />
+                    )}
                     <UploadImage onUpload={setAvatarUrl} />
                   </Box>
                   <ErrorMessage>{errors.avatar?.message}</ErrorMessage>

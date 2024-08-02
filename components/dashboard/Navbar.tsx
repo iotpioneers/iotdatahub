@@ -1,12 +1,11 @@
 "use client";
 
 import * as React from "react";
-import Badge from "@mui/material/Badge";
 import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
-import Tooltip from "@mui/material/Tooltip";
-import { Bell as BellIcon } from "@phosphor-icons/react/dist/ssr/Bell";
+import SearchSection from "./Header/SearchSection";
+import NotificationSection from "./Header/NotificationSection";
+import ProfileSection from "./Header/ProfileSection";
 
 import { UsePopover } from "@/hooks/usePopover";
 
@@ -14,10 +13,9 @@ import { UserPopover } from "./layout/userPopover";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Avatar } from "@mui/material";
 
 const Navbar = () => {
-  const { status, data: session } = useSession();
+  const { status } = useSession();
   const userPopover = UsePopover<HTMLDivElement>();
 
   const router = useRouter();
@@ -59,27 +57,9 @@ const Navbar = () => {
             </h1>
           </Stack>
           <Stack sx={{ alignItems: "center" }} direction="row" spacing={2}>
-            <Tooltip title="Notifications">
-              <Badge badgeContent={4} color="success" variant="standard">
-                <IconButton>
-                  <BellIcon />
-                </IconButton>
-              </Badge>
-            </Tooltip>
-            {status === "authenticated" && (
-              <Avatar
-                onClick={userPopover.handleOpen}
-                ref={userPopover.anchorRef}
-                sx={{ cursor: "pointer" }}
-              >
-                <img
-                  onClick={userPopover.handleOpen}
-                  src={session!.user!.image || "/user.svg"}
-                  alt="Profile"
-                  className="rounded-full"
-                />
-              </Avatar>
-            )}
+            <SearchSection />
+            <NotificationSection />
+            {status === "authenticated" && <ProfileSection />}
           </Stack>
         </Stack>
       </Box>

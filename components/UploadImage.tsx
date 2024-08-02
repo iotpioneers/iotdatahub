@@ -1,5 +1,8 @@
 "use client";
 import React, { useState } from "react";
+import { styled } from "@mui/material/styles";
+import Button from "@mui/material/Button";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { CldImage, CldUploadWidget } from "next-cloudinary";
 
 interface CloudinaryResult {
@@ -10,6 +13,18 @@ interface CloudinaryResult {
 interface UploadImageProps {
   onUpload: (url: string) => void;
 }
+
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
 
 const UploadImage: React.FC<UploadImageProps> = ({ onUpload }) => {
   return (
@@ -29,13 +44,17 @@ const UploadImage: React.FC<UploadImageProps> = ({ onUpload }) => {
         }}
       >
         {({ open }) => (
-          <button
-            type="button"
-            className="btn btn-primary"
+          <Button
+            component="button"
+            role={undefined}
+            variant="outlined"
+            tabIndex={-1}
+            startIcon={<CloudUploadIcon />}
             onClick={() => open()}
           >
             Upload an Image
-          </button>
+            <VisuallyHiddenInput type="button" />
+          </Button>
         )}
       </CldUploadWidget>
     </>
