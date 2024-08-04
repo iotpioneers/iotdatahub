@@ -23,12 +23,7 @@ import Loader from "../Loader";
 import FloatingToolbarPlugin from "./plugins/FloatingToolbarPlugin";
 import { useThreads } from "@liveblocks/react/suspense";
 import Comments from "../Comments";
-import { DeleteModal } from "../DeleteModal";
 import { UserType } from "@/types";
-
-// Catch any errors that occur during Lexical updates and log them
-// or throw them as needed. If you don't throw them, Lexical will
-// try to recover gracefully without losing user data.
 
 export function Editor({
   roomId,
@@ -55,15 +50,12 @@ export function Editor({
 
   function Placeholder() {
     return (
-      <div className="editor-placeholder">
-        {content || "Enter some rich text..."}
-      </div>
+      <div className="editor-placeholder">{"Enter some rich text..."}</div>
     );
   }
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      {currentUserType === "editor" && <DeleteModal roomId={roomId} />}
       <div className="w-full mx-1">
         <div className="toolbar-wrapper flex justify-between">
           <ToolbarPlugin />

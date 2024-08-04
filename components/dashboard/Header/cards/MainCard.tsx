@@ -1,26 +1,35 @@
+import PropTypes from "prop-types";
 import React from "react";
+
+// material-ui
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 
-// Define the props for the MainCard component
+// constant
+const headerSX = {
+  "& .MuiCardHeader-action": { mr: 0 },
+};
+
+// Define an interface for the component's props
 interface MainCardProps {
   border?: boolean;
   boxShadow?: boolean;
   children?: React.ReactNode;
   content?: boolean;
   contentClass?: string;
-  contentSX?: React.CSSProperties;
+  contentSX?: object;
   darkTitle?: boolean;
   secondary?: React.ReactNode;
   shadow?: string | number;
-  sx?: React.CSSProperties;
+  sx?: object;
   title?: React.ReactNode;
 }
 
-// Define the MainCard component
+// ==============================|| CUSTOM MAIN CARD ||============================== //
+
 const MainCard = React.forwardRef<HTMLDivElement, MainCardProps>(
   (
     {
@@ -54,26 +63,22 @@ const MainCard = React.forwardRef<HTMLDivElement, MainCardProps>(
           ...sx,
         }}
       >
-        {/* Card header and action */}
+        {/* card header and action */}
         {!darkTitle && title && (
-          <CardHeader
-            sx={{ "& .MuiCardHeader-action": { mr: 0 } }}
-            title={title}
-            action={secondary}
-          />
+          <CardHeader sx={headerSX} title={title} action={secondary} />
         )}
         {darkTitle && title && (
           <CardHeader
-            sx={{ "& .MuiCardHeader-action": { mr: 0 } }}
+            sx={headerSX}
             title={<Typography variant="h3">{title}</Typography>}
             action={secondary}
           />
         )}
 
-        {/* Content & header divider */}
+        {/* content & header divider */}
         {title && <Divider />}
 
-        {/* Card content */}
+        {/* card content */}
         {content && (
           <CardContent sx={contentSX} className={contentClass}>
             {children}
@@ -84,5 +89,19 @@ const MainCard = React.forwardRef<HTMLDivElement, MainCardProps>(
     );
   }
 );
+
+MainCard.propTypes = {
+  border: PropTypes.bool,
+  boxShadow: PropTypes.bool,
+  children: PropTypes.node,
+  content: PropTypes.bool,
+  contentClass: PropTypes.string,
+  contentSX: PropTypes.object,
+  darkTitle: PropTypes.bool,
+  secondary: PropTypes.node,
+  shadow: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  sx: PropTypes.object,
+  title: PropTypes.node,
+};
 
 export default MainCard;

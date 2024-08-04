@@ -89,10 +89,6 @@ const OrganizationMembers = () => {
     setMembers((prevMembers) => [...prevMembers, newMember]);
   };
 
-  if (loading) {
-    return <LoadingProgressBar />;
-  }
-
   if (!hasOrganization || !organization) {
     return (
       <div>No organization found. Please create an organization first.</div>
@@ -166,6 +162,7 @@ const OrganizationMembers = () => {
 
   return (
     <Container>
+      {loading && <LoadingProgressBar />}
       <Stack
         direction="row"
         alignItems="center"

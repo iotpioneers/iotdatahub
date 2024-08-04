@@ -174,12 +174,7 @@ const ProfileSection = () => {
                   <Box sx={{ p: 2, pb: 0 }}>
                     <Stack>
                       <Stack direction="row" spacing={0.5} alignItems="center">
-                        <Typography variant="h4">Good Morning,</Typography>
-                        <Typography
-                          component="span"
-                          variant="h4"
-                          sx={{ fontWeight: 400 }}
-                        >
+                        <Typography variant="h4">
                           {session.user.name}
                         </Typography>
                       </Stack>
@@ -227,29 +222,6 @@ const ProfileSection = () => {
                       >
                         <CardContent>
                           <Grid container spacing={3} direction="column">
-                            <Grid item>
-                              <Grid
-                                item
-                                container
-                                alignItems="center"
-                                justifyContent="space-between"
-                              >
-                                <Grid item>
-                                  <Typography variant="subtitle1">
-                                    Start DND Mode
-                                  </Typography>
-                                </Grid>
-                                <Grid item>
-                                  <Switch
-                                    color="primary"
-                                    checked={sdm}
-                                    onChange={(e) => setSdm(e.target.checked)}
-                                    name="sdm"
-                                    size="small"
-                                  />
-                                </Grid>
-                              </Grid>
-                            </Grid>
                             <Grid item>
                               <Grid
                                 item

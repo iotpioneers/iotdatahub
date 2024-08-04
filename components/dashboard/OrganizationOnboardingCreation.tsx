@@ -183,7 +183,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
           <div className="grid">
             <Heading
               as="h2"
-              className="font-bold text-gray-10 text-center text-4xl mb-5"
+              className="font-bold text-gray-10 text-center text-md mb-5"
             >
               Which feature do you need more?
             </Heading>

@@ -4,24 +4,24 @@ import { nanoid } from "nanoid";
 import { liveblocks } from "../liveblocks";
 import { revalidatePath } from "next/cache";
 import { getAccessType, parseStringify } from "../utils";
-import { redirect } from "next/navigation";
 import {
   AccessType,
   CreateChannelRoomParams,
   RoomAccesses,
   ShareDocumentParams,
 } from "@/types";
+import axios from "axios";
 
 export const createChannelRoom = async ({
   roomId,
-  username,
+  creator,
   email,
   title,
   description,
 }: CreateChannelRoomParams) => {
   try {
     const metadata = {
-      creator: username,
+      creator,
       email,
       title,
       description,
@@ -116,7 +116,7 @@ export const getDocuments = async (email: string) => {
   }
 };
 
-export const updateDocumentAccess = async ({
+export const updateChannelAccess = async ({
   roomId,
   email,
   userType,
@@ -140,9 +140,9 @@ export const updateDocumentAccess = async ({
         subjectId: notificationId,
         activityData: {
           userType,
-          title: `You have been granted ${userType} access to the document by ${updatedBy.name}`,
+          title: `You have been granted ${userType} access to the channel by ${updatedBy.name}`,
           updatedBy: updatedBy.name,
-          avatar: updatedBy.avatar,
+          image: updatedBy.avatar,
           email: updatedBy.email,
         },
         roomId,
@@ -183,12 +183,31 @@ export const removeCollaborator = async ({
   }
 };
 
-export const deleteDocument = async (roomId: string) => {
+export const deleteChannel = async (channelId: string) => {
   try {
-    await liveblocks.deleteRoom(roomId);
+    const response = await axios.delete(
+      `http://localhost:3000/api/channels/${channelId}`
+    );
+
+    console.log("response", response);
+
+    if (response.status !== 200) {
+      console.log(
+        `Error happened while deleting a room: ${response.statusText}`
+      );
+    }
+
+    try {
+      await liveblocks.deleteRoom(channelId);
+
+      revalidatePath(`/dashboard/channels`);
+    } catch (error) {
+      console.log(`Error deleting room in liveblocks: ${error}`);
+    }
+
     revalidatePath("/");
-    redirect("/");
   } catch (error) {
-    console.log(`Error happened while deleting a room: ${error}`);
+    console.log(`Error happened while deleting a channel: ${error}`);
+    revalidatePath("/dashboard/channels");
   }
 };

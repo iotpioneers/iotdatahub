@@ -92,7 +92,10 @@ const Register = () => {
                       alignItems="center"
                       xs={12}
                     >
-                      <Link href="/auth">
+                      <Link
+                        href="/login"
+                        className="underline hover:text-emerald-600 hover:bg-slate-700 hover:p-2 hover:rounded-2xl "
+                      >
                         <Typography
                           variant="subtitle1"
                           sx={{ textDecoration: "none" }}

@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { Link } from "next/navigation";
+import { Link, useLocation } from "react-router-dom";
 
 // material-ui
 import { useTheme } from "@mui/material/styles";
@@ -13,7 +12,7 @@ import Typography from "@mui/material/Typography";
 import MuiBreadcrumbs from "@mui/material/Breadcrumbs";
 
 // project import
-import navigation from "menu-items";
+import navigation from "./MenuItems";
 
 // assets
 import { IconChevronRight, IconTallymark1 } from "@tabler/icons-react";

@@ -19,8 +19,6 @@ export async function GET(request: NextRequest) {
       where: { email: userEmail },
     });
 
-    console.log("User:", user);
-
     if (!user) {
       console.log("User not found in database");
       return NextResponse.json({ error: "User not found" }, { status: 404 });

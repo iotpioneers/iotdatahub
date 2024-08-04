@@ -28,8 +28,7 @@ const passwordValidation = z
 // The schema for the user data
 export const userSchema = z
   .object({
-    firstname: z.string().max(255).min(1, "Firstname is required"),
-    lastname: z.string().max(255).min(1, "Lastname is required"),
+    name: z.string().max(255).min(1, "Name is required"),
     email: z
       .string()
       .min(1, "Email is required")
@@ -81,9 +80,6 @@ export const channelSchema = z.object({
     .min(1, "Description is required")
     .max(65535, { message: "Description must be 65535 characters or less" }),
   fields: z.array(z.string()).min(1, "At least one field is required"),
-
-  latitude: z.number().optional(),
-  longitude: z.number().optional(),
   access: z.string().optional(),
 });
 

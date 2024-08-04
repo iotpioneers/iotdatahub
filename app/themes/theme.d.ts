@@ -56,6 +56,11 @@ declare module "@mui/material/styles" {
       pxToRem;
       fontWeightBold: string;
     };
+    orange: {
+      light: string;
+      main: string;
+      dark: string;
+    };
     menuSelected: string;
     menuSelectedBack: string;
     grey500: string;
@@ -77,6 +82,11 @@ declare module "@mui/material/styles" {
     };
     typography: {
       customInput?: object;
+    };
+    orange?: {
+      light?: string;
+      main?: string;
+      dark?: string;
     };
     menuSelected?: string;
     menuSelectedBack?: string;

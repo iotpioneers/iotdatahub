@@ -31,7 +31,7 @@ export interface FieldProps {
 
 export interface Member {
   country: string;
-  avatar: string;
+  avatar?: string;
   access: string;
   createdAt: Date;
   id: string;
@@ -67,7 +67,7 @@ export type RoomMetadata = {
 export type CreateChannelRoomParams = {
   roomId: string;
   email: string;
-  username: string;
+  creator: string;
   title: string;
   description: string;
 };
@@ -76,7 +76,7 @@ export type User = {
   id: string;
   name: string;
   email: string;
-  avatar: string;
+  avatar?: string;
   color: string;
   userType?: UserType;
 };
@@ -97,7 +97,7 @@ export type UserTypeSelectorParams = {
 export type ShareDocumentDialogProps = {
   roomId: string;
   collaborators: User[];
-  creatorId: string;
+  creator: string;
   currentUserType: UserType;
 };
 
@@ -109,7 +109,7 @@ export type HeaderProps = {
 export type CollaboratorProps = {
   roomId: string;
   email: string;
-  creatorId: string;
+  creator: string;
   collaborator: User;
   user: User;
 };

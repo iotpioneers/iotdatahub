@@ -26,10 +26,6 @@ const states = [
 export function AccountDetailsForm(): React.JSX.Element {
   const { status, data: session } = useSession();
 
-  if (status === "loading") {
-    return <LoadingProgressBar />;
-  }
-
   return (
     <form
       onSubmit={(event) => {
@@ -37,6 +33,7 @@ export function AccountDetailsForm(): React.JSX.Element {
       }}
     >
       <Card>
+        {status === "loading" && <LoadingProgressBar />}
         <CardHeader subheader="The information can be edited" title="Profile" />
         <Divider />
         <CardContent>

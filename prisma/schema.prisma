@@ -67,8 +67,7 @@ model Authenticator {
 
 model User {
   id             String          @id @default(auto()) @map("_id") @db.ObjectId
-  firstname      String
-  lastname       String
+  name           String
   email          String          @unique
   country        String
   phonenumber    String
@@ -114,8 +113,6 @@ model Channel {
   id          String      @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String?
-  latitude    Float?
-  longitude   Float?
   access      Access      @default(PRIVATE)
   fields      Field[]
   dataPoints  DataPoint[]
@@ -184,12 +181,13 @@ model SampleCodes {
   codes     String
   apiKeyId  String   @db.ObjectId
   apiKey    ApiKey   @relation(fields: [apiKeyId], references: [id])
+  channelId String   @db.ObjectId
+  channel   Channel  @relation(fields: [channelId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
-  Channel   Channel? @relation(fields: [channelId], references: [id])
-  channelId String?  @db.ObjectId
 
   @@index([apiKeyId])
+  @@index([channelId])
 }
 
 model Subscription {

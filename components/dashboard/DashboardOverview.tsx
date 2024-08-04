@@ -85,7 +85,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           <div className="bg-orange-200 p-5 rounded-lg shadow-md mx-5 xs:mx-0">
             <div>
               <Heading as="h1" className="text-2xl font-bold mb-5">
-                Hello, {session?.user?.name!}
+                Hello, {session!.user!.name}
               </Heading>
               <Text className="text-gray-600">
                 Welcome to your personalized IoT dashboard. Here, you can manage

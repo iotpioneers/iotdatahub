@@ -11,8 +11,7 @@ import { redirect, useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Callout } from "@radix-ui/themes";
-import { Switch } from "@radix-ui/react-switch";
+import { Button } from "@radix-ui/themes";
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
 import { channelSchema } from "@/validations/schema.validation";
@@ -31,7 +30,6 @@ export default function ChannelForm() {
   const [fields, setFields] = useState<string[]>([""]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [isLatLongEnabled, setIsLatLongEnabled] = useState<boolean>(false); // State for latitude and longitude toggle
   const [open, setOpen] = React.useState(false);
 
   const handleCloseResult = (
@@ -72,10 +70,6 @@ export default function ChannelForm() {
     }
   };
 
-  const toggleLatLong = () => {
-    setIsLatLongEnabled(!isLatLongEnabled);
-  };
-
   const onSubmit = handleSubmit(async (data) => {
     try {
       setIsSubmitting(true);
@@ -98,10 +92,12 @@ export default function ChannelForm() {
 
       const { id, name: channelName, description } = result.newChannel;
 
+      console.log("result", result);
+
       if (result) {
         const room = await createChannelRoom({
           roomId: id,
-          username: session!.user!.name!,
+          creator: session!.user!.name!,
           email: session!.user!.email!,
           title: channelName,
           description,
@@ -115,9 +111,8 @@ export default function ChannelForm() {
         setOpen(true);
 
         setIsSubmitting(false);
-        setTimeout(() => {
-          router.push(`/dashboard/channels/${id}`);
-        }, 100);
+        setError("");
+        router.push(`/dashboard/channels/${id}`);
       }
     } catch (error) {
       setIsSubmitting(false);
@@ -136,22 +131,15 @@ export default function ChannelForm() {
       >
         <Alert
           onClose={handleCloseResult}
-          severity="success"
+          severity={error ? "error" : "success"}
           variant="filled"
           sx={{ width: "100%" }}
         >
-          Channel created successfully
+          {error ? error : "Channel created successfully"}
         </Alert>
       </Snackbar>
       <h1>Add a new channel</h1>
       <div className="mt-10 border-t border-gray-200"></div>
-      {error && (
-        <Callout.Root color="red" className="mb-5">
-          <Callout.Text className="bg-red-300 p-2 rounded-lg mt-1">
-            {error}
-          </Callout.Text>
-        </Callout.Root>
-      )}
       <form className="mt-6" onSubmit={onSubmit}>
         <div className="mb-4">
           <label
@@ -216,60 +204,6 @@ export default function ChannelForm() {
         >
           New Field
         </Button>
-
-        <div className="my-4 flex items-center">
-          <label className="block text-sm font-medium text-gray-700">
-            Add Location (Optional)
-          </label>
-          <Switch
-            checked={isLatLongEnabled}
-            onCheckedChange={toggleLatLong}
-            className="ml-3 relative inline-flex items-center h-6 rounded-full w-11 bg-gray-200 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-2"
-          >
-            <span
-              className={`${
-                isLatLongEnabled ? "translate-x-6" : "translate-x-1"
-              } inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
-            />
-          </Switch>
-        </div>
-
-        {isLatLongEnabled && (
-          <div className="mb-4 grid grid-cols-2 gap-4">
-            <div>
-              <label
-                className="block text-sm font-medium text-gray-700"
-                htmlFor="latitude"
-              >
-                Latitude
-              </label>
-              <input
-                type="number"
-                id="latitude"
-                step="any"
-                {...register("latitude")}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              />
-              <ErrorMessage>{errors.latitude?.message}</ErrorMessage>
-            </div>
-            <div>
-              <label
-                className="block text-sm font-medium text-gray-700"
-                htmlFor="longitude"
-              >
-                Longitude
-              </label>
-              <input
-                type="number"
-                id="longitude"
-                step="any"
-                {...register("longitude")}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              />
-              <ErrorMessage>{errors.longitude?.message}</ErrorMessage>
-            </div>
-          </div>
-        )}
 
         <div className="mb-4">
           <label

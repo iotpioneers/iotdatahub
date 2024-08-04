@@ -10,6 +10,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { date } from "zod";
 
 interface DataPointProps {
   id: string;
@@ -23,11 +24,13 @@ interface LineChartProps {
 }
 
 const LineChartComponent = ({ chartData = [], field = "" }: LineChartProps) => {
-  const data = chartData.map((dataPoint) => {
+  let data = [];
+
+  data = chartData.map((dataPoint) => {
     const formatDate = (date: string) =>
       new Intl.DateTimeFormat("en", {
-        hour: "numeric",
-        minute: "numeric",
+        day: "numeric",
+        month: "long",
       }).format(new Date(date));
 
     return {
@@ -37,14 +40,18 @@ const LineChartComponent = ({ chartData = [], field = "" }: LineChartProps) => {
     };
   });
 
+  if (data.length === 0) {
+    data = [
+      {
+        key: "1",
+        timestamp: new Date().toDateString(),
+        value: 0,
+      },
+    ];
+  }
+
   return (
     <div>
-      <h2 className="text-2xl font-semibold items-center justify-center mb-5">
-        {field}
-      </h2>
-      {data.length === 0 && (
-        <div className="text-center text-gray-500">No data available</div>
-      )}
       <ResponsiveContainer width="100%" height={400}>
         <ScatterChart
           margin={{

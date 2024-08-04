@@ -6,12 +6,8 @@ import { User } from "@/types/user";
 
 export const getUsersByEmails = async ({ userIds }: { userIds: string[] }) => {
   try {
-    const response = await fetch("http://localhost:3000/api/users/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userIds }),
+    const response = await fetch("http://localhost:3000/api/users", {
+      method: "GET",
     });
 
     if (!response.ok) {
@@ -21,13 +17,11 @@ export const getUsersByEmails = async ({ userIds }: { userIds: string[] }) => {
 
     const data = await response.json();
 
-    console.log("users", data);
-
     if (!data) return;
 
     const users = data.map((user: User) => ({
       id: user.id,
-      name: `${user.firstname} ${user.lastname}`,
+      name: user.name,
       email: user.email,
       avatar: user.image,
     }));

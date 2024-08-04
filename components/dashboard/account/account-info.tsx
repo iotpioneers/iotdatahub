@@ -15,12 +15,9 @@ import LoadingProgressBar from "@/components/LoadingProgressBar";
 export function AccountInfo(): React.JSX.Element {
   const { status, data: session } = useSession();
 
-  if (status === "loading") {
-    return <LoadingProgressBar />;
-  }
-
   return (
     <Card>
+      {status === "loading" && <LoadingProgressBar />}
       <CardContent>
         <Stack spacing={2} sx={{ alignItems: "center" }}>
           <div>

@@ -96,7 +96,7 @@ const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
 
       const memberData = {
         ...data,
-        avatar: avatarUrl || "",
+        image: avatarUrl || "",
       };
 
       const response = await fetch("/api/organizations/members/new", {

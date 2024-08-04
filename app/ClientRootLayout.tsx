@@ -9,12 +9,15 @@ import { useSelector } from "react-redux";
 import { Theme } from "@radix-ui/themes";
 import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline, StyledEngineProvider } from "@mui/material";
+import {
+  ClientSideSuspense,
+  LiveblocksProvider,
+} from "@liveblocks/react/suspense";
 
 // project imports
 
 import AuthProvider from "@/app/auth/Provider";
 import QueryClientProvider from "@/app/QueryClientProvider";
-import { UserProvider } from "@/contexts/user-context";
 import { LocalizationProvider } from "@/components/core/localization-provider";
 import reducer from "@/app/store/reducer";
 
@@ -39,6 +42,7 @@ import themes from "@/app/themes";
 
 // style + assets
 import "@/app/styles/scss/style.scss";
+import LoadingProgressBar from "@/components/LoadingProgressBar";
 const store = configureStore({ reducer });
 
 // Infer the type of store
@@ -58,16 +62,18 @@ export default function RootLayout({
     <Provider store={store}>
       <QueryClientProvider>
         <AuthProvider>
-          <UserProvider>
-            <LocalizationProvider>
-              <StyledEngineProvider injectFirst>
-                <ThemeProvider theme={themes(customization)}>
-                  <CssBaseline />
-                  <Theme>{children}</Theme>
-                </ThemeProvider>
-              </StyledEngineProvider>
-            </LocalizationProvider>
-          </UserProvider>
+          <LocalizationProvider>
+            <StyledEngineProvider injectFirst>
+              <ThemeProvider theme={themes(customization)}>
+                <CssBaseline />
+                <Theme>
+                  <ClientSideSuspense fallback={<LoadingProgressBar />}>
+                    {children}
+                  </ClientSideSuspense>
+                </Theme>
+              </ThemeProvider>
+            </StyledEngineProvider>
+          </LocalizationProvider>
         </AuthProvider>
       </QueryClientProvider>
     </Provider>

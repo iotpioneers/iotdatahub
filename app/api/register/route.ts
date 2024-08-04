@@ -1,23 +1,13 @@
 import { PrismaClient } from "@prisma/client";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { userSchema } from "@/validations/schema.validation";
 
 const prisma = new PrismaClient();
 
-type TUser = {
-  firstname: string;
-  lastname: string;
-  email: string;
-  country: string;
-  phonenumber: string;
-  password: string;
-  image?: string;
-};
-
-export async function POST(req: Request, res: NextResponse) {
+export async function POST(req: NextRequest, res: NextResponse) {
   try {
-    const body: TUser = await req.json();
+    const body = await req.json();
 
     // Validate the request body against the schema
     const validation = userSchema.safeParse(body);
@@ -33,15 +23,8 @@ export async function POST(req: Request, res: NextResponse) {
       );
     }
 
-    const {
-      firstname,
-      lastname,
-      email,
-      country,
-      phonenumber,
-      password,
-      image,
-    } = validation.data;
+    const { name, email, country, phonenumber, password, image } =
+      validation.data;
 
     const exist = await prisma.user.findUnique({
       where: { email },
@@ -58,8 +41,7 @@ export async function POST(req: Request, res: NextResponse) {
 
     const user = await prisma.user.create({
       data: {
-        firstname,
-        lastname,
+        name,
         email,
         country,
         phonenumber,
@@ -69,7 +51,7 @@ export async function POST(req: Request, res: NextResponse) {
     });
 
     return NextResponse.json(
-      { message: "User created successfully", user },
+      { message: "Registration successful", user },
       { status: 201 }
     );
   } catch (error) {

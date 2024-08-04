@@ -45,12 +45,6 @@ const Header = () => {
               href="/"
             >
               <div className="flex items-center">
-                <img
-                  src="logo.svg"
-                  alt="logo"
-                  className="h-8 w-8 float-left float mr-2"
-                  color="white"
-                />
                 <p className="text-slate-950">IoTDataHub</p>
               </div>
             </a>
@@ -82,13 +76,16 @@ const Header = () => {
 
             {status !== "loading" && (
               <Button
-                className="flex -mr-4 xs:mr-1 "
+                className="flex  xs:mr-1 "
                 href={status === "authenticated" ? "/dashboard" : "/login"}
               >
                 {status === "authenticated" ? "DASHBOARD" : "SIGN IN"}
               </Button>
             )}
-            {status === "authenticated" && <AvatarIcon />}
+
+            <div className="hidden xs:block">
+              {status === "authenticated" && <AvatarIcon />}
+            </div>
 
             <Button
               className="ml-1 lg:hidden"

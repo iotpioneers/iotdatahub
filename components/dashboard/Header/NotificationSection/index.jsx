@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
-// material-ui
 import { useTheme } from "@mui/material/styles";
 import Avatar from "@mui/material/Avatar";
 import Badge from "@mui/material/Badge";
@@ -22,50 +20,28 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ButtonBase from "@mui/material/ButtonBase";
-
-// third-party
-import PerfectScrollbar from "react-perfect-scrollbar";
-
-// project imports
-import MainCard from "../cards/MainCard";
 import Transitions from "../extended/Transitions";
 import NotificationList from "./NotificationList";
-
-// assets
 import { IconBell } from "@tabler/icons-react";
+import PerfectScrollbar from "react-perfect-scrollbar";
+import MainCard from "../cards/MainCard";
+import { useUnreadInboxNotificationsCount } from "@liveblocks/react/suspense";
 
 // notification status options
 const status = [
-  {
-    value: "all",
-    label: "All Notification",
-  },
-  {
-    value: "new",
-    label: "New",
-  },
-  {
-    value: "unread",
-    label: "Unread",
-  },
-  {
-    value: "other",
-    label: "Other",
-  },
+  { value: "all", label: "All Notification" },
+  { value: "new", label: "New" },
+  { value: "unread", label: "Unread" },
+  { value: "other", label: "Other" },
 ];
-
-// ==============================|| NOTIFICATION ||============================== //
 
 const NotificationSection = () => {
   const theme = useTheme();
   const matchesXs = useMediaQuery(theme.breakpoints.down("md"));
-
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
-  /**
-   * anchorRef is used on different componets and specifying one type leads to other components throwing an error
-   * */
   const anchorRef = useRef(null);
+  const { count } = useUnreadInboxNotificationsCount();
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -101,7 +77,7 @@ const NotificationSection = () => {
           },
         }}
       >
-        <ButtonBase sx={{ borderRadius: "12px" }}>
+        <ButtonBase sx={{ borderRadius: "24px" }}>
           <Avatar
             variant="rounded"
             sx={{
@@ -122,7 +98,7 @@ const NotificationSection = () => {
             color="inherit"
           >
             <Tooltip title="Notifications">
-              <Badge badgeContent={4} color="info" variant="standard">
+              <Badge badgeContent={count} color="info" variant="standard">
                 <IconButton>
                   <IconBell stroke={1.5} size="1.3rem" />
                 </IconButton>
@@ -138,6 +114,7 @@ const NotificationSection = () => {
         role={undefined}
         transition
         disablePortal
+        sx={{ zIndex: theme.zIndex.drawer + 2 }}
         popperOptions={{
           modifiers: [
             {
@@ -179,7 +156,7 @@ const NotificationSection = () => {
                             </Typography>
                             <Chip
                               size="small"
-                              label="01"
+                              label={count}
                               sx={{
                                 color: theme.palette.background.default,
                                 bgcolor: theme.palette.warning.dark,
@@ -202,7 +179,7 @@ const NotificationSection = () => {
                       <PerfectScrollbar
                         style={{
                           height: "100%",
-                          maxHeight: "calc(100vh - 205px)",
+                          maxHeight: "calc(100vh - 20px)",
                           overflowX: "hidden",
                         }}
                       >
@@ -234,6 +211,7 @@ const NotificationSection = () => {
                             <Divider sx={{ my: 0 }} />
                           </Grid>
                         </Grid>
+
                         <NotificationList />
                       </PerfectScrollbar>
                     </Grid>

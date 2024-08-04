@@ -43,6 +43,7 @@ import LoadingProgressBar from "@/components/LoadingProgressBar";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import CountryList from "./CountryList";
+import { useRouter } from "next/navigation";
 
 const store = configureStore({ reducer });
 
@@ -85,6 +86,7 @@ const AuthRegister = ({ ...others }) => {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
   const customization = useSelector((state: RootState) => state.customization);
+
   const [isGoogleSign, setIsGoogleSign] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -92,11 +94,14 @@ const AuthRegister = ({ ...others }) => {
   const [level, setLevel] = useState<LevelType>(undefined);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [open, setOpen] = React.useState(false);
   const [selectedCountry, setSelectedCountry] = useState<CountryType | null>(
     null
   );
+
+  const router = useRouter();
 
   const googleHandler = async () => {
     setIsGoogleSign(true);
@@ -147,42 +152,55 @@ const AuthRegister = ({ ...others }) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...data,
+        name: data.firstname + " " + data.lastname,
         country: selectedCountry?.label || "",
         phonenumber: phoneNumber,
       }),
     });
 
     const result = await response.json();
-    setLoading(false);
-    if (response.ok) {
-      try {
-        setError(null);
-        setLoading(true);
-        const response = await axios.post("/api/email/send", {
-          userFullName: data.firstname + " " + data.lastname,
-          userEmail: data.email,
-        });
 
-        if (response.status !== 200) {
-          console.error("Error sending verification email:", response);
-          setError("Failed to send verification email");
-          setOpen(true);
-          setLoading(false);
-        }
+    console.log("result", result);
 
-        setSuccess(
-          `We have sent an email to your email account : ${data.email}. Please check your email and click on the link to verify your email address.`
-        );
-        setOpen(true);
-        setLoading(false);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error sending verification email:", error);
+    if (!response.ok) {
+      setLoading(false);
+      setError(result.message);
+      setOpen(true);
+      return;
+    }
+
+    setInfo(
+      "Registration successful. Please wait while we  check your email for verification."
+    );
+    try {
+      setError(null);
+      setLoading(true);
+      const response = await axios.post("/api/email/send", {
+        userFullName: data.firstname + " " + data.lastname,
+        userEmail: data.email,
+      });
+
+      if (response.status !== 200) {
+        console.error("Error sending verification email:", response);
         setError("Failed to send verification email");
         setOpen(true);
         setLoading(false);
       }
+
+      setSuccess(
+        `We have sent an email to your email account : ${data.email}. Please check your email and click on the link to verify your email address.`
+      );
+      setOpen(true);
+      setLoading(false);
+      setError(null);
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error sending verification email:", error);
+      setError("Failed to send verification email");
+      setOpen(true);
+      setLoading(false);
     }
+
     console.error("Error", response);
 
     setError(result.message);
@@ -199,11 +217,13 @@ const AuthRegister = ({ ...others }) => {
       >
         <Alert
           onClose={handleCloseResult}
-          severity={error ? "error" : "success"}
+          severity={error ? "error" : info ? "info" : "success"}
           variant="standard"
           sx={{ width: "100%" }}
         >
-          {error ? error : success}
+          {error && error}
+          {info && info}
+          {success && success}
         </Alert>
       </Snackbar>
 

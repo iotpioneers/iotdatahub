@@ -34,7 +34,7 @@ const LoadingProgressBar = () => {
   }, []);
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box sx={{ width: "100%" }} margin={1}>
       <LinearProgress variant="buffer" value={progress} valueBuffer={buffer} />
     </Box>
   );

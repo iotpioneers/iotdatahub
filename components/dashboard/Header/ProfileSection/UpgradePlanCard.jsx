@@ -4,9 +4,9 @@ import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Grid";
-import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import Link from "next/link";
 
 // project imports
 
@@ -63,8 +63,7 @@ const UpgradePlanCard = () => {
             <Stack direction="row">
               <Link
                 sx={{ textDecoration: "none" }}
-                href="https://links.codedthemes.com/hsqll"
-                target="_blank"
+                href="/dashboard/subscription"
               >
                 <AnimateButton>
                   <Button

@@ -21,14 +21,14 @@ export async function POST(request: NextRequest) {
     throw new Error("User not found");
   }
 
-  const { id, firstname, lastname, email, image } = userFound;
+  const { id, name, email, image } = userFound;
 
   // Get the current user from your database
   const user = {
     id,
     info: {
       id,
-      name: `${firstname} ${lastname}`,
+      name: name,
       email: email,
       avatar: image!,
       color: getUserColor(id),

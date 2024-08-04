@@ -3,23 +3,14 @@
 import { useEffect, useState } from "react";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import Link from "next/link"; // Import Link from Next.js
+import { DeleteModal } from "@/components/DeleteModal";
 
 interface Channel {
   id: string;
   name: string;
   description: string;
-  latitude: string | null;
-  longitude: string | null;
   createdAt: Date;
 }
-
-const formatDate = (date: Date) =>
-  new Intl.DateTimeFormat("en", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    weekday: "long",
-  }).format(new Date(date));
 
 const ProjectList = () => {
   const [channels, setChannels] = useState<Channel[] | null>(null);
@@ -58,14 +49,24 @@ const ProjectList = () => {
       headerName: "Channel",
       width: 150,
       renderCell: (params: GridRenderCellParams) => (
-        <Link href={`/dashboard/channels/${params.row.id}`}>
+        <Link
+          href={`/dashboard/channels/${params.row.id}`}
+          className="text-blue-500 hover:underline"
+        >
           {params.value}
         </Link>
       ),
     },
     { field: "description", headerName: "Description", width: 300 },
-    { field: "latitude", headerName: "Latitude", width: 150 },
-    { field: "longitude", headerName: "Longitude", width: 150 },
+    { field: "createdAt", headerName: "Created", width: 150 },
+    {
+      field: "action",
+      headerName: "",
+      width: 150,
+      renderCell: (params: GridRenderCellParams) => (
+        <DeleteModal roomId={params.row.id} />
+      ),
+    },
   ];
 
   return (

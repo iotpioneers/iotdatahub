@@ -3,14 +3,14 @@ import React, { useState } from "react";
 import UserTypeSelector from "./UserTypeSelector";
 import {
   removeCollaborator,
-  updateDocumentAccess,
+  updateChannelAccess,
 } from "@/lib/actions/room.actions";
 import { CollaboratorProps, UserType } from "@/types";
 import { Button } from "@mui/material";
 
 const Collaborator = ({
   roomId,
-  creatorId,
+  creator,
   collaborator,
   email,
   user,
@@ -21,7 +21,7 @@ const Collaborator = ({
   const shareDocumentHandler = async (type: string) => {
     setLoading(true);
 
-    await updateDocumentAccess({
+    await updateChannelAccess({
       roomId,
       email,
       userType: type as UserType,
@@ -43,27 +43,27 @@ const Collaborator = ({
     <li className="flex items-center justify-between gap-2 py-3">
       <div className="flex gap-2">
         <Image
-          src={collaborator.avatar}
+          src={(collaborator.avatar as string) || "user.svg"}
           alt={collaborator.name}
           width={36}
           height={36}
           className="size-9 rounded-full"
         />
         <div>
-          <p className="line-clamp-1 text-sm font-semibold leading-4 text-white">
+          <p className="line-clamp-1 text-sm text-slate-950 font-semibold leading-4">
             {collaborator.name}
             <span className="text-10-regular pl-2 text-blue-100">
               {loading && "updating..."}
             </span>
           </p>
-          <p className="text-sm font-light text-blue-100">
+          <p className="text-sm font-light text-gray-500">
             {collaborator.email}
           </p>
         </div>
       </div>
 
-      {creatorId === collaborator.id ? (
-        <p className="text-sm text-blue-100">Owner</p>
+      {creator === collaborator.name ? (
+        <p className="text-sm text-slate-800">Owner</p>
       ) : (
         <div className="flex items-center">
           <UserTypeSelector

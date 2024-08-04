@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/client";
-import { channelSchema } from "@/validations/schema.validation";
 
 export async function GET(
   request: NextRequest,
@@ -33,7 +32,7 @@ export async function GET(
 
   // Find a sample codes with the channel
   const sampleCodes = await prisma.sampleCodes.findFirst({
-    where: { apiKeyId: apiKey.id },
+    where: { channelId: channel.id },
   });
 
   if (!sampleCodes)
@@ -84,6 +83,22 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  await prisma.sampleCodes.deleteMany({
+    where: { channelId: params.id },
+  });
+
+  await prisma.apiKey.deleteMany({
+    where: { channelId: params.id },
+  });
+
+  await prisma.dataPoint.deleteMany({
+    where: { channelId: params.id },
+  });
+
+  await prisma.field.deleteMany({
+    where: { channelId: params.id },
+  });
+
   const channel = await prisma.channel.delete({
     where: { id: params.id },
   });

@@ -1,6 +1,6 @@
 import prisma from "@/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { nanoid } from "nanoid";
+import { ObjectId } from "mongodb";
 import { getToken } from "next-auth/jwt";
 import { channelSchema } from "@/validations/schema.validation";
 
@@ -35,10 +35,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(validation.error.errors, { status: 400 });
   }
 
-  const { name, description, fields, latitude, longitude } = validation.data;
+  const { name, description, fields } = validation.data;
 
-  // Generate a new API key
-  const apiKey = nanoid(16);
+  // Generate a new valid ObjectID for apiKey
+  const apiKey = new ObjectId().toHexString();
 
   try {
     // Format the fields data as Prisma expects
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
     }
     `;
 
-    // Create a new channel with formatted fields data and associate it with the user
+    // Create a new channel
     const newChannel = await prisma.channel.create({
       data: {
         name,
@@ -121,25 +121,39 @@ export async function POST(request: NextRequest) {
         fields: {
           create: formattedFields || [],
         },
-        latitude,
-        longitude,
         apiKeys: {
           create: {
             apiKey,
             userId: user.id,
             fields: formattedFields?.map((field) => field.name) || [],
-            SampleCodes: {
-              create: [
-                {
-                  codes: sampleCodes,
-                },
-              ],
-            },
           },
         },
       },
       include: { user: true },
     });
+
+    if (!newChannel) {
+      return NextResponse.json(
+        { error: "Error creating channel" },
+        { status: 500 }
+      );
+    }
+
+    // Create SampleCodes using the newly created channel's ID
+    const channelSampleCodes = await prisma.sampleCodes.create({
+      data: {
+        codes: sampleCodes,
+        apiKeyId: apiKey,
+        channelId: newChannel.id,
+      },
+    });
+
+    if (!channelSampleCodes) {
+      return NextResponse.json(
+        { error: "Error creating sample codes" },
+        { status: 500 }
+      );
+    }
 
     // Update the user's channels array
     await prisma.user.update({

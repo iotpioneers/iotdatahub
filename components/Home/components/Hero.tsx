@@ -43,7 +43,7 @@ const Hero = () => {
               />
             </ScrollParallax>
             <div className="relative z-1 max-w-[42rem] mx-auto text-center mb-[3.875rem] xs:-mt-28 md:mb-20 lg:mb-[6.25rem]">
-              <h1 className="h1 mb-2 text-gray-50">
+              <h1 className="h6 md:h1 mb-2 text-gray-50">
                 Cutt edge with
                 <span className="inline-block relative">
                   {" "}
@@ -56,7 +56,7 @@ const Hero = () => {
                     alt="Curve"
                   />
                 </span>
-                for&nbsp;seamless and efficient&nbsp; IoT Plug and Play services{" "}
+                for&nbsp;seamless and efficient&nbsp; IoT Plug and Play services
               </h1>
               <Button href="/pricing" white>
                 Get started

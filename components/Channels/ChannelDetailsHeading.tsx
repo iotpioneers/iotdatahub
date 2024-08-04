@@ -5,10 +5,8 @@ import { ClientSideSuspense, RoomProvider } from "@liveblocks/react/suspense";
 import Image from "next/image";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import { CalendarIcon, LinkIcon, MapPinIcon } from "@heroicons/react/20/solid";
+import { CalendarIcon } from "@heroicons/react/20/solid";
 import { ChartPieIcon } from "@heroicons/react/24/solid";
-import ReactMarkdown from "react-markdown";
-import { Box, Button, Card, Flex } from "@radix-ui/themes";
 import { ChannelProps } from "@/types";
 import { Input } from "@/components/ui/input";
 
@@ -18,20 +16,15 @@ import { redirect } from "next/navigation";
 import { getUsersByEmails } from "@/lib/actions/user.actions";
 import { User } from "@/types/user";
 import { ViewIcon } from "lucide-react";
-import { Editor } from "../editor/Editor";
 import Loader from "../Loader";
+import { dateConverter } from "@/lib/utils";
+
+import InviteMember from "./collaboration/InviteMember";
 
 interface ChannelHeadingProps {
   channel: ChannelProps;
   dataReceived: number;
 }
-
-const formatDate = (date: string) =>
-  new Intl.DateTimeFormat("en", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date(date));
 
 const ChannelDetailsHeading = ({
   channel,
@@ -51,6 +44,8 @@ const ChannelDetailsHeading = ({
     "viewer"
   );
   const [showResult, setShowResult] = useState(false);
+  const [usersData, setUsersData] = useState<[]>([]);
+  const [room, setRoom] = useState<any>(null);
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
@@ -136,35 +131,32 @@ const ChannelDetailsHeading = ({
       throw new Error("User email is not defined");
     }
 
-    const room = await getChannelRoom({
+    const roomData = await getChannelRoom({
       roomId: channel.id,
       userId: currentUserEmail,
     });
 
-    if (!room) return;
+    if (!roomData) return;
 
-    // const userIds = Object.keys(room.usersAccesses);
-    // const users = await getUsersByEmails({ userIds });
+    setRoom(roomData);
 
-    // if (!users || users.length === 0) return;
+    const userIds = Object.keys(roomData.usersAccesses);
+    const users = await getUsersByEmails({ userIds });
 
-    // const usersData = users.map((user: User) => {
-    //   if (!user.email) {
-    //     return {
-    //       ...user,
-    //       userType: "viewer",
-    //     };
-    //   }
+    if (!users || users.length === 0) return;
 
-    //   return {
-    //     ...user,
-    //     userType: room.usersAccesses[user.email]?.includes("room:write")
-    //       ? "editor"
-    //       : "viewer",
-    //   };
-    // });
+    const usersData = users.map((user: User) => ({
+      ...user,
+      userType: roomData.usersAccesses[user!.email as string]?.includes(
+        "room:write"
+      )
+        ? "editor"
+        : "viewer",
+    }));
 
-    const currentUserType = room.usersAccesses[currentUserEmail]?.includes(
+    setUsersData(usersData);
+
+    const currentUserType = roomData.usersAccesses[currentUserEmail]?.includes(
       "room:write"
     )
       ? "editor"
@@ -232,7 +224,7 @@ const ChannelDetailsHeading = ({
                 />
               )}
 
-              {currentUserType !== "editor" && !editing && (
+              {currentUserType !== "editor" && (
                 <p className="view-only-tag">
                   <ViewIcon width={12} height={12} /> View only
                 </p>
@@ -241,13 +233,6 @@ const ChannelDetailsHeading = ({
             </div>
 
             <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-              <div className="mt-2 flex items-center text-sm text-gray-500">
-                <MapPinIcon
-                  className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                  aria-hidden="true"
-                />
-                Kicukiro, Rwanda
-              </div>
               <div className="mt-2 flex items-center text-sm text-gray-500">
                 <ChartPieIcon
                   className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
@@ -260,15 +245,18 @@ const ChannelDetailsHeading = ({
                   className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                   aria-hidden="true"
                 />
-                Created on {formatDate(channel.createdAt)}
+                Created about {dateConverter(channel.createdAt)}
               </div>
             </div>
             <div className="mt-5">
-              <Editor
-                roomId={channel.id}
-                currentUserType={currentUserType}
-                content={channel.description}
-              />
+              {room && (
+                <InviteMember
+                  roomId={channel.id}
+                  collaborators={usersData}
+                  creator={room.metadata.creator || ""}
+                  currentUserType={currentUserType}
+                />
+              )}
             </div>
           </div>
         </div>

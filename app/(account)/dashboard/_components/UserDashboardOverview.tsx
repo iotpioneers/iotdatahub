@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import DashboardOverview from "@/components/Dashboard/DashboardOverview";
 import OrganizationOnboardingCreation from "@/components/Dashboard/OrganizationOnboardingCreation";
+import LoadingProgressBar from "@/components/LoadingProgressBar";
 
 interface Organization {
   areaOfInterest: string;
@@ -30,10 +31,12 @@ const UserDashboardOverview = () => {
   const [hasOrganization, setHasOrganization] = useState<boolean | null>(null);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [members, setMembers] = useState<Member[] | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkOrganizationStatus = async () => {
       try {
+        setLoading(true);
         const response = await fetch("/api/organizations/status", {
           method: "GET",
         });
@@ -42,6 +45,7 @@ const UserDashboardOverview = () => {
           console.error("Error fetching organization status");
           return;
         }
+        setLoading(false);
 
         const data = await response.json();
         setHasOrganization(data.hasOrganization);
@@ -61,11 +65,9 @@ const UserDashboardOverview = () => {
 
   return (
     <>
-      {!hasOrganization ? (
-        <OrganizationOnboardingCreation />
-      ) : (
-        <DashboardOverview organization={organization} members={members} />
-      )}
+      {loading && <LoadingProgressBar />}
+      <DashboardOverview organization={organization} members={members} />
+      {!hasOrganization && <OrganizationOnboardingCreation />}
     </>
   );
 };

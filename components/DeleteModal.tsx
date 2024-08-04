@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 
-import { deleteDocument } from "@/lib/actions/room.actions";
+import { deleteChannel } from "@/lib/actions/room.actions";
 
 import {
   Dialog,
@@ -18,19 +18,26 @@ import {
 
 import { Button } from "@mui/material";
 import { DeleteModalProps } from "@/types";
+import LoadingProgressBar from "./LoadingProgressBar";
 
 export const DeleteModal = ({ roomId }: DeleteModalProps) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>("");
 
-  const deleteDocumentHandler = async () => {
+  const deleteChannelHandler = async () => {
     setLoading(true);
 
     try {
-      await deleteDocument(roomId);
+      await deleteChannel(roomId);
+
       setOpen(false);
+      setLoading(false);
     } catch (error) {
       console.log("Error notif:", error);
+      setError("Failed to delete channel");
+      setLoading(false);
+      setOpen(true);
     }
 
     setLoading(false);
@@ -39,7 +46,7 @@ export const DeleteModal = ({ roomId }: DeleteModalProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="min-w-9 justify-center items-center gap-1 rounded-xl bg-slate-600 p-2 transition-all my-2">
+        <Button className="min-w-9 justify-center items-center gap-1 rounded-xl  p-2 transition-all my-2">
           <Image
             src="/assets/icons/delete.svg"
             alt="delete"
@@ -47,7 +54,6 @@ export const DeleteModal = ({ roomId }: DeleteModalProps) => {
             height={20}
             className="mt-1"
           />
-          Delete Channel
         </Button>
       </DialogTrigger>
       <DialogContent className="shad-dialog">
@@ -73,12 +79,13 @@ export const DeleteModal = ({ roomId }: DeleteModalProps) => {
 
           <Button
             variant="contained"
-            onClick={deleteDocumentHandler}
+            onClick={deleteChannelHandler}
             className="gradient-red w-full"
           >
             {loading ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
+        {loading && <LoadingProgressBar />}
       </DialogContent>
     </Dialog>
   );

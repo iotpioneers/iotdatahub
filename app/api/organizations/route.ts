@@ -8,8 +8,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const token = await getToken({ req: request });
 
-    console.log("Validation Success:", body);
-
     if (!token) {
       return NextResponse.json(
         { error: "User not authenticated" },
@@ -71,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     const member = await prisma.member.create({
       data: {
-        name: user.firstname + user.lastname,
+        name: user.name,
         email: userEmail,
         avatar: user.image,
         access: "EDITOR",
