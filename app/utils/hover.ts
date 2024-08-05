@@ -1,12 +1,22 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, RefObject } from "react";
 
-export default function hover3d(ref, { x = 0, y = 0, z = 0 }) {
+interface Hover3DProps {
+  ref: RefObject<HTMLElement>;
+  x?: number;
+  y?: number;
+  z?: number;
+}
+
+export default function hover3d(
+  ref: RefObject<HTMLElement>,
+  { x = 0, y = 0, z = 0 }: Hover3DProps
+) {
   const [coords, setCoords] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
 
-  const handleMouseMove = (e) => {
-    const { offsetWidth: width, offsetHeight: height } = ref.current;
+  const handleMouseMove = (e: MouseEvent) => {
+    const { offsetWidth: width, offsetHeight: height } = ref.current!;
     const { clientX, clientY } = e;
 
     const x = (clientX - width / 2) / width;
@@ -26,14 +36,14 @@ export default function hover3d(ref, { x = 0, y = 0, z = 0 }) {
   React.useEffect(() => {
     const { current } = ref;
 
-    current.addEventListener("mousemove", handleMouseMove);
-    current.addEventListener("mouseenter", handleMouseEnter);
-    current.addEventListener("mouseleave", handleMouseLeave);
+    current!.addEventListener("mousemove", handleMouseMove);
+    current!.addEventListener("mouseenter", handleMouseEnter);
+    current!.addEventListener("mouseleave", handleMouseLeave);
 
     return () => {
-      current.removeEventListener("mousemove", handleMouseMove);
-      current.removeEventListener("mouseenter", handleMouseEnter);
-      current.removeEventListener("mouseleave", handleMouseLeave);
+      current!.removeEventListener("mousemove", handleMouseMove);
+      current!.removeEventListener("mouseenter", handleMouseEnter);
+      current!.removeEventListener("mouseleave", handleMouseLeave);
     };
   }, [ref]);
 

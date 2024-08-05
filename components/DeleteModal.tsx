@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/Actions/dialog";
 
 import { Button } from "@mui/material";
 import { DeleteModalProps } from "@/types";

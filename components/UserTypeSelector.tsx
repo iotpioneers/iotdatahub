@@ -4,7 +4,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/Actions/select";
 import { UserType, UserTypeSelectorParams } from "@/types";
 
 const UserTypeSelector = ({

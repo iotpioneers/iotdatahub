@@ -34,7 +34,7 @@ interface Organization {
 // Define the types for member
 interface Member {
   country: string;
-  avatar: string;
+  avatar?: string;
   access: string;
   createdAt: Date;
   id: string;
@@ -209,7 +209,7 @@ const OrganizationMembers = () => {
                       email={row.email}
                       role={row.access}
                       country={row.country}
-                      avatarUrl={row.avatar}
+                      avatarUrl={row.avatar || "user.svg"}
                       createdAt={row.createdAt}
                       selected={selected.indexOf(row.name) !== -1}
                       handleClick={(event) => handleClick(event, row.name)}

@@ -26,6 +26,7 @@ import { IconBell } from "@tabler/icons-react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import MainCard from "../cards/MainCard";
 import { useUnreadInboxNotificationsCount } from "@liveblocks/react/suspense";
+import Link from "next/link";
 
 // notification status options
 const status = [
@@ -40,15 +41,15 @@ const NotificationSection = () => {
   const matchesXs = useMediaQuery(theme.breakpoints.down("md"));
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
-  const anchorRef = useRef(null);
+  const anchorRef = useRef<HTMLButtonElement | null>(null);
   const { count } = useUnreadInboxNotificationsCount();
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
   };
 
-  const handleClose = (event) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+  const handleClose = (event: MouseEvent | TouchEvent) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target as Node)) {
       return;
     }
     setOpen(false);
@@ -57,12 +58,12 @@ const NotificationSection = () => {
   const prevOpen = useRef(open);
   useEffect(() => {
     if (prevOpen.current === true && open === false) {
-      anchorRef.current.focus();
+      anchorRef.current?.focus();
     }
     prevOpen.current = open;
   }, [open]);
 
-  const handleChange = (event) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event?.target.value) setValue(event?.target.value);
   };
 
@@ -79,6 +80,7 @@ const NotificationSection = () => {
       >
         <ButtonBase sx={{ borderRadius: "24px" }}>
           <Avatar
+            component="button"
             variant="rounded"
             sx={{
               ...theme.typography.commonAvatar,
@@ -165,13 +167,11 @@ const NotificationSection = () => {
                           </Stack>
                         </Grid>
                         <Grid item>
-                          <Typography
-                            to="#"
-                            variant="subtitle2"
-                            color="primary"
-                          >
-                            Mark as all read
-                          </Typography>
+                          <Link href="#">
+                            <Typography variant="subtitle2" color="primary">
+                              Mark as all read
+                            </Typography>
+                          </Link>
                         </Grid>
                       </Grid>
                     </Grid>

@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useSelector } from "react-redux";
 
 // material-ui
-import { useTheme } from "@mui/material/styles";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -23,6 +22,7 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import Paper from "@mui/material/Paper";
 import Popper from "@mui/material/Popper";
 import Stack from "@mui/material/Stack";
+import { useTheme } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
 
@@ -30,21 +30,31 @@ import Typography from "@mui/material/Typography";
 import PerfectScrollbar from "react-perfect-scrollbar";
 
 // project imports
+import reducer from "@/app/store/reducer";
 import MainCard from "../cards/MainCard";
 import Transitions from "../extended/Transitions";
 import UpgradePlanCard from "./UpgradePlanCard";
 
 // assets
+import { configureStore } from "@reduxjs/toolkit";
 import {
   IconLogout,
   IconSearch,
   IconSettings,
   IconUser,
 } from "@tabler/icons-react";
-import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 // ==============================|| PROFILE MENU ||============================== //
+
+const store = configureStore({ reducer });
+
+// Infer the type of store
+export type AppStore = typeof store;
+
+// Infer the `RootState` and `AppDispatch` types from the store itself
+export type RootState = ReturnType<AppStore["getState"]>;
 
 const ProfileSection = () => {
   const { status, data: session } = useSession();
@@ -53,32 +63,34 @@ const ProfileSection = () => {
   if (status === "unauthenticated") router.push("/login");
 
   const theme = useTheme();
-  const customization = useSelector((state) => state.customization);
+  const customization = useSelector((state: RootState) => state.customization);
 
-  const [sdm, setSdm] = useState(true);
   const [value, setValue] = useState("");
   const [notification, setNotification] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [open, setOpen] = useState(false);
-  /**
-   * anchorRef is used on different componets and specifying one type leads to other components throwing an error
-   * */
-  const anchorRef = useRef(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
+
   const handleLogout = async () => {
     console.log("Logout");
   };
 
-  const handleClose = (event) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+  const handleClose = (event: MouseEvent | TouchEvent) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target as Node)) {
       return;
     }
     setOpen(false);
   };
 
-  const handleListItemClick = (event, index, route = "") => {
+  const handleListItemClick = (
+    event: React.MouseEvent,
+    index: number,
+    route = ""
+  ) => {
     setSelectedIndex(index);
-    handleClose(event);
+    handleClose(event as unknown as MouseEvent | TouchEvent); // Type assertion here
   };
+
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
   };
@@ -86,9 +98,8 @@ const ProfileSection = () => {
   const prevOpen = useRef(open);
   useEffect(() => {
     if (prevOpen.current === true && open === false) {
-      anchorRef.current.focus();
+      anchorRef.current?.focus();
     }
-
     prevOpen.current = open;
   }, [open]);
 
@@ -166,8 +177,8 @@ const ProfileSection = () => {
               <ClickAwayListener onClickAway={handleClose}>
                 <MainCard
                   border={false}
-                  elevation={16}
                   content={false}
+                  elevation={16}
                   boxShadow
                   shadow={theme.shadows[16]}
                 >
@@ -175,11 +186,11 @@ const ProfileSection = () => {
                     <Stack>
                       <Stack direction="row" spacing={0.5} alignItems="center">
                         <Typography variant="h4">
-                          {session.user.name}
+                          {session!.user!.name}
                         </Typography>
                       </Stack>
                       <Typography variant="subtitle2">
-                        {session.user.email}
+                        {session!.user!.email}
                       </Typography>
                     </Stack>
                     <OutlinedInput

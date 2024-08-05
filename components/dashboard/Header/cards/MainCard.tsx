@@ -26,6 +26,7 @@ interface MainCardProps {
   shadow?: string | number;
   sx?: object;
   title?: React.ReactNode;
+  elevation?: number;
 }
 
 // ==============================|| CUSTOM MAIN CARD ||============================== //
@@ -44,6 +45,7 @@ const MainCard = React.forwardRef<HTMLDivElement, MainCardProps>(
       shadow,
       sx = {},
       title,
+      elevation,
       ...others
     },
     ref
@@ -55,6 +57,12 @@ const MainCard = React.forwardRef<HTMLDivElement, MainCardProps>(
         sx={{
           border: border ? "1px solid" : "none",
           borderColor: "divider",
+          boxShadow: elevation
+            ? `${elevation}px ${elevation}px ${elevation * 2}px rgba(0,0,0,0.1)`
+            : boxShadow
+            ? shadow || "0 2px 14px 0 rgb(32 40 45 / 8%)"
+            : "inherit",
+
           ":hover": {
             boxShadow: boxShadow
               ? shadow || "0 2px 14px 0 rgb(32 40 45 / 8%)"

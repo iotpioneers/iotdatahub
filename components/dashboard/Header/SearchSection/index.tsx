@@ -1,10 +1,9 @@
 "use client";
 
 import PropTypes from "prop-types";
-import { useState, forwardRef } from "react";
+import { forwardRef, useState } from "react";
 
 // material-ui
-import { useTheme } from "@mui/material/styles";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -12,6 +11,7 @@ import Grid from "@mui/material/Grid";
 import InputAdornment from "@mui/material/InputAdornment";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Popper from "@mui/material/Popper";
+import { useTheme } from "@mui/material/styles";
 
 // third-party
 import PopupState, { bindPopper, bindToggle } from "material-ui-popup-state";
@@ -26,29 +26,42 @@ import {
   IconX,
 } from "@tabler/icons-react";
 
-const HeaderAvatar = forwardRef(({ children, ...others }, ref) => {
-  const theme = useTheme();
+interface HeaderAvatarProps {
+  children?: React.ReactNode;
+  [key: string]: any;
+}
 
-  return (
-    <Avatar
-      ref={ref}
-      variant="rounded"
-      sx={{
-        ...theme.typography.commonAvatar,
-        ...theme.typography.mediumAvatar,
-        bgcolor: "secondary.light",
-        color: "secondary.dark",
-        "&:hover": {
-          bgcolor: "secondary.dark",
-          color: "secondary.light",
-        },
-      }}
-      {...others}
-    >
-      {children}
-    </Avatar>
-  );
-});
+interface MobileSearchProps {
+  value: string;
+  setValue: (value: string) => void;
+  popupState: any;
+}
+
+const HeaderAvatar = forwardRef<HTMLDivElement, HeaderAvatarProps>(
+  ({ children, ...others }, ref) => {
+    const theme = useTheme();
+
+    return (
+      <Avatar
+        ref={ref}
+        variant="rounded"
+        sx={{
+          ...theme.typography.commonAvatar,
+          ...theme.typography.mediumAvatar,
+          bgcolor: "secondary.light",
+          color: "secondary.dark",
+          "&:hover": {
+            bgcolor: "secondary.dark",
+            color: "secondary.light",
+          },
+        }}
+        {...others}
+      >
+        {children}
+      </Avatar>
+    );
+  }
+);
 
 HeaderAvatar.propTypes = {
   children: PropTypes.node,
@@ -56,7 +69,7 @@ HeaderAvatar.propTypes = {
 
 // ==============================|| SEARCH INPUT - MOBILE||============================== //
 
-const MobileSearch = ({ value, setValue, popupState }) => {
+const MobileSearch = ({ value, setValue, popupState }: MobileSearchProps) => {
   const theme = useTheme();
 
   return (
@@ -139,16 +152,13 @@ const SearchSection = () => {
               >
                 {({ TransitionProps }) => (
                   <>
-                    <Transitions
-                      type="zoom"
-                      {...TransitionProps}
-                      sx={{ transformOrigin: "center left" }}
-                    >
+                    <Transitions type="zoom" {...TransitionProps}>
                       <Card
                         sx={{
                           bgcolor: "background.default",
                           border: 0,
                           boxShadow: "none",
+                          transformOrigin: "center left",
                         }}
                       >
                         <Box sx={{ p: 2 }}>

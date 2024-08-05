@@ -8,7 +8,7 @@ import Alert from "@mui/material/Alert";
 import { CalendarIcon } from "@heroicons/react/20/solid";
 import { ChartPieIcon } from "@heroicons/react/24/solid";
 import { ChannelProps } from "@/types";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/Actions/input";
 
 import { updateChannelRoom, getChannelRoom } from "@/lib/actions/room.actions";
 import { useSession } from "next-auth/react";

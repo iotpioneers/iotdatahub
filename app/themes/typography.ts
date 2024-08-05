@@ -1,6 +1,6 @@
-import { Theme } from "@mui/material/styles";
+import { CustomThemeProperties } from "./index";
 
-export default function themeTypography(theme: Theme) {
+export default function themeTypography(theme: CustomThemeProperties) {
   return {
     fontFamily: theme?.customization?.fontFamily || "Arial, sans-serif",
     h6: {

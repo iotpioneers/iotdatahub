@@ -13,12 +13,14 @@ const Hero = () => {
   const hero = useRef<HTMLDivElement>(null);
 
   const hoverHero = hover3d(hero, {
+    ref: hero,
     x: 30,
     y: -40,
     z: 30,
   });
 
   const imageHover = hover3d(hero, {
+    ref: hero,
     x: 20,
     y: -5,
     z: 11,
@@ -45,9 +47,8 @@ const Hero = () => {
             <div className="relative z-1 max-w-[42rem] mx-auto text-center mb-[3.875rem] xs:-mt-28 md:mb-20 lg:mb-[6.25rem]">
               <h1 className="h6 md:h1 mb-2 text-gray-50">
                 Cutt edge with
-                <span className="inline-block relative">
-                  {" "}
-                  IoTDataHub{" "}
+                <span className="inline-block relative mx-1">
+                  IoTDataHub
                   <img
                     src="hero/curve.png"
                     className="absolute top-full left-0 w-full xl:-mt-2"

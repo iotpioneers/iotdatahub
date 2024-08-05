@@ -4,7 +4,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@/components/Actions/popover";
 import {
   InboxNotification,
   InboxNotificationList,

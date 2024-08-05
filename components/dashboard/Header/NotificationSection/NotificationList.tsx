@@ -3,44 +3,23 @@
 import PropTypes from "prop-types";
 
 // material-ui
-import { useTheme } from "@mui/material/styles";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
-import ListItemText from "@mui/material/ListItemText";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import Divider from "@mui/material/Divider";
 import {
   InboxNotification,
   InboxNotificationList,
   LiveblocksUIConfig,
 } from "@liveblocks/react-ui";
-import {
-  useInboxNotifications,
-  useUnreadInboxNotificationsCount,
-} from "@liveblocks/react/suspense";
-import Image from "next/image";
+import { useInboxNotifications } from "@liveblocks/react/suspense";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
+import List from "@mui/material/List";
+import { useTheme } from "@mui/material/styles";
 
-// project-import
-import Chip from "../extended/Chip";
+interface ListItemWrapperProps {
+  children: React.ReactNode;
+}
 
-// assets
-import {
-  IconBrandTelegram,
-  IconBuildingStore,
-  IconMailbox,
-  IconPhoto,
-} from "@tabler/icons-react";
-
-const ListItemWrapper = ({ children }) => {
+const ListItemWrapper: React.FC<ListItemWrapperProps> = ({ children }) => {
   return (
     <Box
       sx={{
@@ -72,30 +51,6 @@ const NotificationList = () => {
   const unreadNotifications = inboxNotifications.filter(
     (notification) => !notification.readAt
   );
-
-  const chipSX = {
-    height: 24,
-    padding: "0 6px",
-  };
-  const chipErrorSX = {
-    ...chipSX,
-    color: theme.palette.orange.dark,
-    backgroundColor: theme.palette.orange.light,
-    marginRight: "5px",
-  };
-
-  const chipWarningSX = {
-    ...chipSX,
-    color: theme.palette.warning.dark,
-    backgroundColor: theme.palette.warning.light,
-  };
-
-  const chipSuccessSX = {
-    ...chipSX,
-    color: theme.palette.success.dark,
-    backgroundColor: theme.palette.success.light,
-    height: 28,
-  };
 
   return (
     <List
@@ -163,18 +118,24 @@ const NotificationList = () => {
                           <InboxNotification.Icon className="bg-transparent">
                             <Avatar
                               alt={
-                                props.inboxNotification.activities[0].data
-                                  .avatar
+                                typeof props.inboxNotification.activities[0]
+                                  .data.avatar === "string"
+                                  ? props.inboxNotification.activities[0].data
+                                      .avatar
+                                  : ""
                               }
                               src={
-                                props.inboxNotification.activities[0].data
-                                  .avatar || ""
+                                typeof props.inboxNotification.activities[0]
+                                  .data.avatar === "string"
+                                  ? props.inboxNotification.activities[0].data
+                                      .avatar
+                                  : ""
                               }
                             />
                           </InboxNotification.Icon>
                         }
                       >
-                        {/* {props.children} */}
+                        {props.children}
                       </InboxNotification.Custom>
                     ),
                   }}

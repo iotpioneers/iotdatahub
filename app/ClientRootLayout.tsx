@@ -51,11 +51,7 @@ export type AppStore = typeof store;
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<AppStore["getState"]>;
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+const ClientRootLayout = ({ children }: { children: React.ReactNode }) => {
   const customization = useSelector.withTypes<RootState>();
 
   return (
@@ -78,4 +74,6 @@ export default function RootLayout({
       </QueryClientProvider>
     </Provider>
   );
-}
+};
+
+export default ClientRootLayout;
