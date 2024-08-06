@@ -89,7 +89,7 @@ const OrganizationMembers = () => {
     setMembers((prevMembers) => [...prevMembers, newMember]);
   };
 
-  if (!hasOrganization || !organization) {
+  if (!hasOrganization && !organization) {
     return (
       <div>No organization found. Please create an organization first.</div>
     );

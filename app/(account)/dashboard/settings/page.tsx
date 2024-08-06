@@ -17,3 +17,11 @@ export default function Page(): React.JSX.Element {
     </Stack>
   );
 }
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Settings - IoTDataHub - Dashboard",
+  description:
+    "View and manage your account details, including notifications and password",
+};

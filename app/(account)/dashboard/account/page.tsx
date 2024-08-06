@@ -2,10 +2,11 @@ import * as React from "react";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Unstable_Grid2";
-import { AccountInfo } from "@/components/Dashboard/account/account-info";
-import { AccountDetailsForm } from "@/components/Dashboard/account/account-details-form";
+import { AccountInfo } from "@/components/Dashboard/account/AccountInfo";
+import { AccountDetailsForm } from "@/components/Dashboard/account/AccountDetailsForm";
+import { Metadata } from "next";
 
-export default function Page(): React.JSX.Element {
+export default function AccountPage(): React.JSX.Element {
   return (
     <Stack spacing={3}>
       <div>
@@ -22,3 +23,10 @@ export default function Page(): React.JSX.Element {
     </Stack>
   );
 }
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Account - IoTDataHub - Dashboard",
+  description: "Manage your account details",
+};

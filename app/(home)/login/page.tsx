@@ -12,6 +12,8 @@ const Auth = () => {
 
 export default Auth;
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Login - IoTDataHub",
   description: "Signin to your account",

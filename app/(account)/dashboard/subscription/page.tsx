@@ -1,4 +1,5 @@
 import { Button, Text } from "@radix-ui/themes";
+import { Metadata } from "next";
 import Link from "next/link";
 
 const subscriptionPlans = [
@@ -53,7 +54,7 @@ const subscriptionPlans = [
   },
 ];
 
-const PricingList = () => {
+export default function PricingList() {
   return (
     <div className="flex gap-[1rem] max-lg:flex-wrap">
       {subscriptionPlans.map((item) => (
@@ -110,6 +111,12 @@ const PricingList = () => {
       ))}
     </div>
   );
-};
+}
 
-export default PricingList;
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Pricing - IoTDataHub - Dashboard",
+  description:
+    "The pricing page of the IoTDataHub platform. Explore our latest pricing packages.",
+};

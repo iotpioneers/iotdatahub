@@ -24,6 +24,7 @@ export interface CustomThemeProperties {
   colors: typeof colors;
   heading: string;
   paper: string;
+  grey500?: string;
   backgroundDefault: string;
   background: string;
   darkTextPrimary: string;

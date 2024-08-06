@@ -74,8 +74,8 @@ export async function POST(request: NextRequest) {
         avatar: user.image,
         access: "EDITOR",
         organizationId: newOrganization.id,
-        phone: "",
-        country: "",
+        phone: user.phonenumber || "N/A",
+        country: user.country || "N/A",
       },
     });
 

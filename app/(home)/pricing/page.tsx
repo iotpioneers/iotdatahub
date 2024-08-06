@@ -8,6 +8,8 @@ const PricingPage = () => {
 
 export default PricingPage;
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "IoTDataHub - Pricing",
   description: "Explore our latest pricing",

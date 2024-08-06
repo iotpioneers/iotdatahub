@@ -1,14 +1,15 @@
 import React from "react";
-import dynamic from "next/dynamic";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
+import { Metadata } from "next";
+import ChannelForm from "@/components/Forms/ChannelForm";
 
-const ChannelForm = dynamic(() => import("@/components/Forms/ChannelForm"), {
-  ssr: false,
-  loading: () => <LoadingProgressBar />,
-});
-
-const NewChannelPage = () => {
+export default function NewChannelPage() {
   return <ChannelForm />;
-};
+}
 
-export default NewChannelPage;
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "New Channel - IoTDataHub - Dashboard",
+  description:
+    "Create a new channel for your project or device data storage location",
+};

@@ -115,25 +115,6 @@ body {
     @apply min-h-[92px] min-w-full flex-nowrap bg-slate-800 flex w-full items-center justify-between gap-2 px-4;
   }
 
-  .document-list-container {
-    @apply flex flex-col items-center mb-10 w-full gap-10 px-5;
-  }
-
-  .document-list-title {
-    @apply max-w-[730px] items-end flex w-full justify-between;
-  }
-
-  .document-list-item {
-    @apply flex items-center justify-between gap-4 rounded-lg bg-doc bg-cover p-5 shadow-xl;
-  }
-
-  .document-list-empty {
-    @apply flex w-full max-w-[730px] flex-col items-center justify-center gap-5 rounded-lg bg-slate-700 px-10 py-8;
-  }
-
-  .document-title-input {
-    @apply min-w-[78px] flex-1 border-none bg-transparent px-0 text-left text-base font-semibold leading-[24px] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:text-black sm:text-xl md:text-center !important;
-  }
   .view-only-tag {
     @apply flex justify-center items-center gap-1 rounded-md bg-slate-950/50 px-2 py-0.5 text-xs text-blue-100/50;
   }

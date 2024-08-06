@@ -25,6 +25,10 @@ const login = async (credentials: Credentials) => {
     throw new Error("User not found");
   }
 
+  if (user.emailVerified == null) {
+    throw new Error("Email not verified");
+  }
+
   const passwordMatch = await bcrypt.compare(
     credentials.password,
     user.password!

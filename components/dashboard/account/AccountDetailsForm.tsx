@@ -16,13 +16,6 @@ import Grid from "@mui/material/Unstable_Grid2";
 import { useSession } from "next-auth/react";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 
-const states = [
-  { value: "musanze", label: "Musanze" },
-  { value: "rubavu", label: "Rubavu" },
-  { value: "nyagatare", label: "Nyagatare" },
-  { value: "huye", label: "Huye" },
-] as const;
-
 export function AccountDetailsForm(): React.JSX.Element {
   const { status, data: session } = useSession();
 
@@ -42,7 +35,7 @@ export function AccountDetailsForm(): React.JSX.Element {
               <FormControl fullWidth required>
                 <InputLabel>First name</InputLabel>
                 <OutlinedInput
-                  defaultValue={session!.user!.name}
+                  defaultValue={session!.user!.name?.split(" ")[0]}
                   label="First name"
                   name="firstName"
                 />
@@ -52,7 +45,7 @@ export function AccountDetailsForm(): React.JSX.Element {
               <FormControl fullWidth required>
                 <InputLabel>Last name</InputLabel>
                 <OutlinedInput
-                  defaultValue={session!.user!.name}
+                  defaultValue={session!.user!.name?.split(" ")[1]}
                   label="Last name"
                   name="lastName"
                 />
@@ -70,31 +63,14 @@ export function AccountDetailsForm(): React.JSX.Element {
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth>
+                <InputLabel>Country</InputLabel>
+                <OutlinedInput label="Country" name="country" type="text" />
+              </FormControl>
+            </Grid>
+            <Grid md={6} xs={12}>
+              <FormControl fullWidth>
                 <InputLabel>Phone number</InputLabel>
                 <OutlinedInput label="Phone number" name="phone" type="tel" />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>State</InputLabel>
-                <Select
-                  defaultValue="Kigali"
-                  label="State"
-                  name="state"
-                  variant="outlined"
-                >
-                  {states.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>City</InputLabel>
-                <OutlinedInput label="City" />
               </FormControl>
             </Grid>
           </Grid>

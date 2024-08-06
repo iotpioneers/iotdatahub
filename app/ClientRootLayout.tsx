@@ -17,9 +17,10 @@ import {
 // project imports
 
 import AuthProvider from "@/app/auth/Provider";
+import reducer from "@/app/store/reducer";
 import QueryClientProvider from "@/app/QueryClientProvider";
 import { LocalizationProvider } from "@/components/core/localization-provider";
-import reducer from "@/app/store/reducer";
+import ThemedLayout from "./ThemedLayout";
 
 // google-fonts
 import "@fontsource/roboto/400.css";
@@ -42,33 +43,15 @@ import themes from "@/app/themes";
 
 // style + assets
 import "@/app/styles/scss/style.scss";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
-const store = configureStore({ reducer });
-
-// Infer the type of store
-export type AppStore = typeof store;
-
-// Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<AppStore["getState"]>;
+export const store = configureStore({ reducer });
 
 const ClientRootLayout = ({ children }: { children: React.ReactNode }) => {
-  const customization = useSelector.withTypes<RootState>();
-
   return (
     <Provider store={store}>
       <QueryClientProvider>
         <AuthProvider>
           <LocalizationProvider>
-            <StyledEngineProvider injectFirst>
-              <ThemeProvider theme={themes(customization)}>
-                <CssBaseline />
-                <Theme>
-                  <ClientSideSuspense fallback={<LoadingProgressBar />}>
-                    {children}
-                  </ClientSideSuspense>
-                </Theme>
-              </ThemeProvider>
-            </StyledEngineProvider>
+            <ThemedLayout>{children}</ThemedLayout>
           </LocalizationProvider>
         </AuthProvider>
       </QueryClientProvider>

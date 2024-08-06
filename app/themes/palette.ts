@@ -1,9 +1,24 @@
 import { PaletteOptions } from "@mui/material/styles";
 import { CustomThemeProperties } from "./index";
 
+interface CustomPaletteOptions extends PaletteOptions {
+  orange?: {
+    light: string;
+    main: string;
+    dark: string;
+  };
+  dark?: {
+    light: string;
+    main: string;
+    dark: string;
+    800: string;
+    900: string;
+  };
+}
+
 export default function themePalette(
   theme: CustomThemeProperties
-): PaletteOptions {
+): CustomPaletteOptions {
   return {
     mode: theme.customization?.navType || "light",
     common: {
