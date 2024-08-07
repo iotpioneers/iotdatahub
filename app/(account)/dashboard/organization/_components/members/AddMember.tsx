@@ -107,20 +107,16 @@ const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
         body: JSON.stringify(memberData),
       });
 
-      console.log("response:", response);
-
       if (!response.ok) {
         const errorData = await response.json();
         setError("Failed to add new member:");
         setError(errorData.error);
-        console.error("Error data:", errorData);
         throw new Error(errorData.error);
       }
 
       const result: Member = await response.json();
 
       if (result) {
-        console.log("Member added successfully", result);
         onNewMember(result);
         setShowResult(true);
         setIsSubmitting(false);
@@ -132,7 +128,6 @@ const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
     } catch (error: any) {
       setIsSubmitting(false);
       setError(error.message);
-      console.error("Error creating member:", error);
     }
   });
 

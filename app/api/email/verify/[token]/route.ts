@@ -38,7 +38,6 @@ export async function GET(
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error in email verification handler:", error);
     return NextResponse.json(
       { error: "Error verifying email" },
       { status: 500 }

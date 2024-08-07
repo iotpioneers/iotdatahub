@@ -154,7 +154,6 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error in email verification handler:", error);
     return NextResponse.json({ error: "Error sending email" }, { status: 500 });
   }
 }

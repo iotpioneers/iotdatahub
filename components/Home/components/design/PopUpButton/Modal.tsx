@@ -11,7 +11,6 @@ const Modal: React.FC<ModalProps> = ({ open, setOpen }) => {
   const [message, setMessage] = useState("");
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(message);
     setMessage("");
     setOpen(false);
   };

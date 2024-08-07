@@ -64,7 +64,6 @@ const EditChannel = () => {
       if (!response.ok) {
         const errorData = await response.json();
         setError("Failed to create channel");
-        console.error("Error data:", errorData);
         throw new Error("Failed to create channel");
       }
 
@@ -74,7 +73,6 @@ const EditChannel = () => {
     } catch (error) {
       setIsSubmitting(false);
       setError("An unexpected error occurred.");
-      console.error("Error creating channel:", error);
     }
   });
 

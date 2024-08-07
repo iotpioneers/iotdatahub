@@ -80,7 +80,6 @@ export async function POST(
 
     return NextResponse.json(member, { status: 201 });
   } catch (error) {
-    console.error("Error creating member of the organization:", error);
     return NextResponse.json(
       { error: "Error creating member of the organization" },
       { status: 500 }

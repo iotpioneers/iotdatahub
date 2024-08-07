@@ -55,19 +55,20 @@ export default function DeviceForm() {
     const fetchChannels = async () => {
       try {
         setIsSubmitting(true);
-        const response = await fetch("http://localhost:3000/api/channels");
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_BASE_URL + "/api/channels"
+        );
 
         if (!response.ok) {
           const errorData = await response.json();
           setError("Failed to create channel");
-          console.error("Error data:", errorData);
           throw new Error("Failed to create channel");
         }
         const channelsData: Channel[] = await response.json();
 
         setChannels(channelsData);
       } catch (error) {
-        console.error("Error fetching channels:", error);
+        return null;
       } finally {
         setIsSubmitting(false);
       }
@@ -90,13 +91,10 @@ export default function DeviceForm() {
       if (!response.ok) {
         const errorData = await response.json();
         setError("Failed to create device");
-        console.error("Error data:", errorData);
         throw new Error("Failed to create device");
       }
 
       const result = await response.json();
-
-      console.log("result:", result);
 
       if (result) {
         setOpen(true);
@@ -108,7 +106,6 @@ export default function DeviceForm() {
     } catch (error) {
       setIsSubmitting(false);
       setError("An unexpected error occurred.");
-      console.error("Error creating device:", error);
     }
   });
 

@@ -41,7 +41,7 @@ export const createChannelRoom = async ({
 
     return parseStringify(room);
   } catch (error) {
-    console.log(`Error happened while creating a room: ${error}`);
+    return;
   }
 };
 
@@ -63,7 +63,7 @@ export const getChannelRoom = async ({
 
     return parseStringify(room);
   } catch (error) {
-    console.log(`Error happened while getting a room: ${error}`);
+    throw new Error(error as string);
   }
 };
 
@@ -77,7 +77,7 @@ export const updateChannelRoom = async (roomId: string, title: string) => {
 
     if (updatedRoom) {
       const response = await fetch(
-        `http://localhost:3000/api/channels/${roomId}`,
+        process.env.NEXT_PUBLIC_BASE_URL + `/api/channels/${roomId}`,
         {
           method: "PUT",
           headers: {
@@ -89,9 +89,6 @@ export const updateChannelRoom = async (roomId: string, title: string) => {
         }
       );
       if (!response.ok) {
-        console.log(
-          `Error happened while updating a room: ${response.statusText}`
-        );
         return null;
       }
 
@@ -101,8 +98,7 @@ export const updateChannelRoom = async (roomId: string, title: string) => {
     }
     return null;
   } catch (error) {
-    console.log(`Error happened while updating a room: ${error}`);
-    return null; // Ensure a null value is returned in case of an error
+    return null;
   }
 };
 
@@ -112,7 +108,7 @@ export const getDocuments = async (email: string) => {
 
     return parseStringify(rooms);
   } catch (error) {
-    console.log(`Error happened while getting rooms: ${error}`);
+    return null;
   }
 };
 
@@ -152,7 +148,7 @@ export const updateChannelAccess = async ({
     revalidatePath(`/documents/${roomId}`);
     return parseStringify(room);
   } catch (error) {
-    console.log(`Error happened while updating a room access: ${error}`);
+    return null;
   }
 };
 
@@ -179,22 +175,18 @@ export const removeCollaborator = async ({
     revalidatePath(`/documents/${roomId}`);
     return parseStringify(updatedRoom);
   } catch (error) {
-    console.log(`Error happened while removing a collaborator: ${error}`);
+    return null;
   }
 };
 
 export const deleteChannel = async (channelId: string) => {
   try {
     const response = await axios.delete(
-      `http://localhost:3000/api/channels/${channelId}`
+      process.env.NEXT_PUBLIC_BASE_URL + `/api/channels/${channelId}`
     );
 
-    console.log("response", response);
-
     if (response.status !== 200) {
-      console.log(
-        `Error happened while deleting a room: ${response.statusText}`
-      );
+      return null;
     }
 
     try {
@@ -202,12 +194,11 @@ export const deleteChannel = async (channelId: string) => {
 
       revalidatePath(`/dashboard/channels`);
     } catch (error) {
-      console.log(`Error deleting room in liveblocks: ${error}`);
+      return null;
     }
 
     revalidatePath("/");
   } catch (error) {
-    console.log(`Error happened while deleting a channel: ${error}`);
     revalidatePath("/dashboard/channels");
   }
 };

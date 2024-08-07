@@ -164,7 +164,6 @@ export async function POST(request: NextRequest) {
     // Return the new channel and sample codes
     return NextResponse.json({ newChannel, sampleCodes }, { status: 201 });
   } catch (error) {
-    console.error("Error creating channel:", error);
     return NextResponse.json(
       { error: "Error creating channel" },
       { status: 500 }

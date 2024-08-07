@@ -24,15 +24,16 @@ const ChannelList = () => {
     const fetchChannels = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch("http://localhost:3000/api/channels");
+        const res = await fetch(
+          process.env.NEXT_PUBLIC_BASE_URL + "/api/channels"
+        );
         if (!res.ok) {
           throw new Error("Failed to fetch channels");
         }
         const channelsData: Channel[] = await res.json();
         setChannels(channelsData);
       } catch (error) {
-        console.error("Error fetching channels:", error);
-        // Handle error state or retry logic if needed
+        return null;
       } finally {
         setIsLoading(false);
       }

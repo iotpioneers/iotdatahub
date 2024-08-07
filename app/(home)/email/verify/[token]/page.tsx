@@ -24,7 +24,6 @@ const VerifyEmail = ({ params }: Props) => {
     const verifyEmail = async () => {
       try {
         const response = await axios.get(`/api/email/verify/${params.token}`);
-        console.log("Email verified:", response.data);
         setMessage(response.data.message);
         router.push("/dashboard");
       } catch (err) {

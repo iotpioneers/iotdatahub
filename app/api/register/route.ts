@@ -13,10 +13,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const validation = userSchema.safeParse(body);
 
     if (!validation.success) {
-      console.log(
-        "Validation Errors:",
-        validation.error.errors.map((err) => err.message)
-      );
       return NextResponse.json(
         validation.error.errors.map((err) => err.message),
         { status: 400 }

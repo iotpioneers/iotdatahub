@@ -34,14 +34,16 @@ const DeviceTable = () => {
   useEffect(() => {
     const fetchDevices = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/devices");
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_BASE_URL + "/api/devices"
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch devices");
         }
         const data: Device[] = await response.json();
         setDevices(data);
       } catch (error) {
-        console.error("Error fetching devices:", error);
+        return null;
       }
     };
 
@@ -52,17 +54,14 @@ const DeviceTable = () => {
 
   const handleEdit = (id: number) => {
     // Handle edit action
-    console.log(`Edit device with id: ${id}`);
   };
 
   const handleView = (id: number) => {
     // Handle view action
-    console.log(`View device with id: ${id}`);
   };
 
   const handleDelete = (id: number) => {
     // Handle delete action
-    console.log(`Delete device with id: ${id}`);
   };
 
   const columns: GridColDef[] = [

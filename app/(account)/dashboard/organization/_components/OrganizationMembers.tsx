@@ -76,7 +76,7 @@ const OrganizationMembers = () => {
 
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        return null;
       } finally {
         setLoading(false);
       }

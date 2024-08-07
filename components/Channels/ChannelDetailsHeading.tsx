@@ -93,7 +93,6 @@ const ChannelDetailsHeading = ({
       } catch (error) {
         setError((error as Error).message);
         setShowResult(true);
-        console.error(error);
       }
 
       setLoading(false);

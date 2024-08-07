@@ -61,7 +61,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newDevice, { status: 201 });
   } catch (error) {
-    console.error("Error creating device:", error);
     return NextResponse.json(
       { error: "Error creating device" },
       { status: 500 }

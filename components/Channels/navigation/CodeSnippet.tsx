@@ -15,7 +15,7 @@ const CodeSnippet = ({ sampleCodes }: { sampleCodes: string }) => {
         setCopied(false);
       }, 2000); // Hide the message after 2 seconds
     } catch (err) {
-      console.error("Failed to copy!", err);
+      return null;
     }
   };
 

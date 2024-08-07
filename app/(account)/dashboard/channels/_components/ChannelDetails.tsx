@@ -46,14 +46,13 @@ export default function ChannelDetails({ channelID }: { channelID: string }) {
       setError("");
       try {
         const res = await fetch(
-          `http://localhost:3000/api/channels/${channelID}`
+          process.env.NEXT_PUBLIC_BASE_URL + `/api/channels/${channelID}`
         );
 
         if (!res.ok) {
           const errorData = await res.json();
           setError("Failed to fetch channel");
           setIsLoading(false);
-          console.error("Error data:", errorData);
           return;
         }
 
@@ -67,7 +66,6 @@ export default function ChannelDetails({ channelID }: { channelID: string }) {
 
         setChannelData(channelData);
       } catch (error) {
-        console.error("Fetch error:", error);
         setError("An error occurred while fetching the channel");
       } finally {
         setIsLoading(false);

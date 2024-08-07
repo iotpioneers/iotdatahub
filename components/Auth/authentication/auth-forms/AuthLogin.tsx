@@ -109,13 +109,12 @@ const AuthLogin = ({ ...others }) => {
     });
     setLoading(false);
     if (response?.error) {
-      console.error("Error", response.error);
       setError(response.error);
       setOpen(true);
     } else {
       setError(null);
       setOpen(true);
-      router.push("http://localhost:3000/dashboard");
+      router.push(process.env.NEXT_PUBLIC_BASE_URL + "/dashboard");
     }
 
     setLoading(false);

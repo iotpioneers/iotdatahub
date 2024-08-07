@@ -34,7 +34,6 @@ export const DeleteModal = ({ roomId }: DeleteModalProps) => {
       setOpen(false);
       setLoading(false);
     } catch (error) {
-      console.log("Error notif:", error);
       setError("Failed to delete channel");
       setLoading(false);
       setOpen(true);

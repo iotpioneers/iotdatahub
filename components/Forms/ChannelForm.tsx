@@ -84,15 +84,12 @@ export default function ChannelForm() {
       if (!response.ok) {
         const errorData = await response.json();
         setError("Failed to create channel");
-        console.error("Error data:", errorData);
         throw new Error("Failed to create channel");
       }
 
       const result = await response.json();
 
       const { id, name: channelName, description } = result.newChannel;
-
-      console.log("result", result);
 
       if (result) {
         const room = await createChannelRoom({
@@ -117,7 +114,6 @@ export default function ChannelForm() {
     } catch (error) {
       setIsSubmitting(false);
       setError("An unexpected error occurred.");
-      console.error("Error creating channel:", error);
     }
   });
 

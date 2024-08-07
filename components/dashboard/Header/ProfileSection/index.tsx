@@ -72,7 +72,7 @@ const ProfileSection = () => {
   const anchorRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = async () => {
-    console.log("Logout");
+    router.push("/logout");
   };
 
   const handleClose = (event: MouseEvent | TouchEvent) => {

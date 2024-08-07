@@ -125,7 +125,6 @@ export async function GET(
     }
   } catch (e) {
     if (e instanceof Error) {
-      console.error(e);
       return new Response(e.message, {
         status: 400,
       });

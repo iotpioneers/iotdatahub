@@ -75,7 +75,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(dataPoints, { status: 201 });
   } catch (error) {
-    console.error("Error storing data in channel fields:", error);
     return NextResponse.json(
       { error: "Error storing data in channel fields" },
       { status: 500 }
@@ -138,7 +137,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(dataPoint, { status: 200 });
   } catch (error) {
-    console.error("Error fetching data point:", error);
     return NextResponse.json(
       { error: "Error fetching data point" },
       { status: 500 }

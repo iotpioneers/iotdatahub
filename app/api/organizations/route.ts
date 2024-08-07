@@ -34,7 +34,6 @@ export async function POST(request: NextRequest) {
     const validation = organizationSchema.safeParse(body);
 
     if (!validation.success) {
-      console.log("Validation Errors:", validation.error.errors);
       return NextResponse.json(validation.error.errors, { status: 400 });
     }
 
@@ -81,7 +80,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ newOrganization, member }, { status: 201 });
   } catch (error) {
-    console.log("Error:", error);
     return NextResponse.json(
       { error: "Error creating organization" },
       { status: 500 }

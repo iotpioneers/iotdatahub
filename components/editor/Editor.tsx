@@ -41,7 +41,6 @@ export function Editor({
     namespace: "Editor",
     nodes: [HeadingNode],
     onError: (error: Error) => {
-      console.error(error);
       throw error;
     },
     theme: Theme,

@@ -115,7 +115,6 @@ const OrganizationOnboardingCreation: React.FC = () => {
 
     const validation = organizationSchema.safeParse(organizationData);
 
-    console.log("validation", validation);
     if (!validation.success) {
       setError(validation.error.errors.map((err) => err.message).join(", "));
       setLoading(false);
@@ -131,8 +130,6 @@ const OrganizationOnboardingCreation: React.FC = () => {
         body: JSON.stringify(organizationData),
       });
 
-      console.log("response", response);
-
       if (!response.ok) {
         const errorData = await response.json();
         setError(errorData.error || "Error creating organization");
@@ -141,7 +138,6 @@ const OrganizationOnboardingCreation: React.FC = () => {
       }
 
       const newOrganization = await response.json();
-      console.log("New organization created:", newOrganization);
 
       setOpen(true);
       setLoading(false);

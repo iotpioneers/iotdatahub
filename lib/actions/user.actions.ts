@@ -6,12 +6,14 @@ import { User } from "@/types/user";
 
 export const getUsersByEmails = async ({ userIds }: { userIds: string[] }) => {
   try {
-    const response = await fetch("http://localhost:3000/api/users", {
-      method: "GET",
-    });
+    const response = await fetch(
+      process.env.NEXT_PUBLIC_BASE_URL + "/api/users",
+      {
+        method: "GET",
+      }
+    );
 
     if (!response.ok) {
-      console.log(`Error fetching users: ${response.statusText}`);
       return;
     }
 
@@ -32,7 +34,7 @@ export const getUsersByEmails = async ({ userIds }: { userIds: string[] }) => {
 
     return parseStringify(sortedUsers);
   } catch (error) {
-    console.log(`Error fetching users: ${error}`);
+    return null;
   }
 };
 
@@ -64,6 +66,6 @@ export const getDocumentUsers = async ({
 
     return parseStringify(users);
   } catch (error) {
-    console.log(`Error fetching document users: ${error}`);
+    return null;
   }
 };

@@ -42,7 +42,6 @@ const UserDashboardOverview = () => {
         });
 
         if (!response.ok) {
-          console.error("Error fetching organization status");
           return;
         }
         setLoading(false);
@@ -52,7 +51,7 @@ const UserDashboardOverview = () => {
         setOrganization(data.organization);
         setMembers(data.members);
       } catch (error) {
-        console.error("Error fetching organization status:", error);
+        return null;
       }
     };
 

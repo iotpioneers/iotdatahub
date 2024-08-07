@@ -75,22 +75,21 @@ const ApiKeys = ({ apiKey }: { apiKey: string }) => {
           <div className="text-sm mb-2">
             <p className="font-medium">Write a Channel Feed</p>
             <code className="block bg-gray-200 p-2 rounded-md mb-2">
-              POST
-              http://localhost:3000/api/channels/datapoint?api_key=6Q58HOU8V7C4E2U&field1=
+              POST BASE_URL +
+              /api/channels/datapoint?api_key=6Q58HOU8V7C4E2U&field1=
             </code>
           </div>
           <div className="text-sm mb-2">
             <p className="font-medium">Read a Channel Feed</p>
             <code className="block bg-gray-200 p-2 rounded-md mb-2">
-              GET
-              http://localhost:3000/api/channels/datapoint?api_key=8DWVL6VEZNWMP89
+              GET BASE_URL + /api/channels/datapoint?api_key=8DWVL6VEZNWMP89
             </code>
           </div>
           <div className="text-sm mb-2">
             <p className="font-medium">Read a Channel Field</p>
             <code className="block bg-gray-200 p-2 rounded-md mb-2">
-              GET
-              http://localhost:3000/api/channels/datapoint?api_key=8DWVL6VEZNWMP89&field1=
+              GET BASE_URL +
+              /api/channels/datapoint?api_key=8DWVL6VEZNWMP89&field1=
             </code>
           </div>
         </div>

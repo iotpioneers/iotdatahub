@@ -17,7 +17,6 @@ export async function POST(request: NextRequest) {
 
     const userEmail = token.email as string;
 
-    console.log("user", userEmail);
     const user = await prisma.user.findUnique({
       where: { email: userEmail },
     });
@@ -39,7 +38,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(users);
   } catch (error) {
-    console.log("Error:", error);
     return NextResponse.json(
       { error: "Error fetching users" },
       { status: 500 }

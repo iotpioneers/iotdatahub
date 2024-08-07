@@ -160,8 +160,6 @@ const AuthRegister = ({ ...others }) => {
 
     const result = await response.json();
 
-    console.log("result", result);
-
     if (!response.ok) {
       setLoading(false);
       setError(result.message);
@@ -181,7 +179,6 @@ const AuthRegister = ({ ...others }) => {
       });
 
       if (response.status !== 200) {
-        console.error("Error sending verification email:", response);
         setError("Failed to send verification email");
         setOpen(true);
         setLoading(false);
@@ -195,13 +192,10 @@ const AuthRegister = ({ ...others }) => {
       setError(null);
       router.push("/dashboard");
     } catch (error) {
-      console.error("Error sending verification email:", error);
       setError("Failed to send verification email");
       setOpen(true);
       setLoading(false);
     }
-
-    console.error("Error", response);
 
     setError(result.message);
     setOpen(true);

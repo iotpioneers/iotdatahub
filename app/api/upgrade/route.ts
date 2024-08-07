@@ -18,24 +18,21 @@ export async function POST(req: NextRequest) {
       process.env.STRIPE_WEBHOOK_SECRET!
     );
 
-    console.log("Event", event?.type);
     // charge.succeeded
     // payment_intent.succeeded
     // payment_intent.created
 
-    console.log(
-      res?.data?.object?.billing_details?.email, // email
-      res?.data?.object?.amount, // amount
-      JSON.stringify(res), // payment info
-      res?.type, // type
-      String(timeString), // time
-      String(dateTime), // date
-      res?.data?.object?.receipt_email, // email
-      res?.data?.object?.receipt_url, // url
-      JSON.stringify(res?.data?.object?.payment_method_details), // Payment method details
-      JSON.stringify(res?.data?.object?.billing_details), // Billing details
-      res?.data?.object?.currency // Currency
-    );
+    // res?.data?.object?.billing_details?.email, // email
+    // res?.data?.object?.amount, // amount
+    // JSON.stringify(res), // payment info
+    // res?.type, // type
+    // String(timeString), // time
+    // String(dateTime), // date
+    // res?.data?.object?.receipt_email, // email
+    // res?.data?.object?.receipt_url, // url
+    // JSON.stringify(res?.data?.object?.payment_method_details), // Payment method details
+    // JSON.stringify(res?.data?.object?.billing_details), // Billing details
+    // res?.data?.object?.currency // Currency
 
     return NextResponse.json({
       status: "sucess",
