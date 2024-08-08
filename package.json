@@ -83,6 +83,7 @@
     "stripe": "^16.0.0",
     "styled-components": "^6.0.0-rc.3",
     "tailwind-merge": "^2.3.0",
+    "use-sync-external-store": "^1.2.2",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.1/xlsx-0.20.1.tgz",
     "yup": "^1.4.0",
     "zod": "^3.23.8"

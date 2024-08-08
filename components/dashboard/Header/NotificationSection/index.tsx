@@ -212,7 +212,7 @@ const NotificationSection = () => {
                           </Grid>
                         </Grid>
 
-                        {/* <NotificationList /> */}
+                        <NotificationList />
                       </PerfectScrollbar>
                     </Grid>
                   </Grid>
