@@ -6,6 +6,7 @@ import Grid from "@mui/material/Unstable_Grid2";
 import { AccountDetailsForm } from "@/components/dashboard/account/AccountDetailsForm";
 import { AccountInfo } from "@/components/dashboard/account/AccountInfo";
 
+
 export default function AccountPage(): React.JSX.Element {
   return (
     <Stack spacing={3}>
