@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import ClientRootLayout from "@/app/ClientRootLayout";
 import "../globals.css";
 import { Container } from "@radix-ui/themes";
+
 import Provider from "../Provider";
 import DashboardNavigation from "@/components/dashboard/DashboardNavigation";
 
