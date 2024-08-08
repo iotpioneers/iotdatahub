@@ -1,26 +1,26 @@
 import { PrismaClient } from "@prisma/client";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
+import { userSchema } from "@/validations/schema.validation";
 
 const prisma = new PrismaClient();
 
-type TUser = {
-  username: string;
-  email: string;
-  password: string;
-};
-
-export async function POST(req: Request, res: NextResponse) {
+export async function POST(req: NextRequest, res: NextResponse) {
   try {
-    const body: TUser = await req.json();
-    const { username, email, password } = body;
+    const body = await req.json();
 
-    if (!username || !email || !password) {
+    // Validate the request body against the schema
+    const validation = userSchema.safeParse(body);
+
+    if (!validation.success) {
       return NextResponse.json(
-        { message: "Missing Required fields" },
+        validation.error.errors.map((err) => err.message),
         { status: 400 }
       );
     }
+
+    const { name, email, country, phonenumber, password, image } =
+      validation.data;
 
     const exist = await prisma.user.findUnique({
       where: { email },
@@ -33,18 +33,21 @@ export async function POST(req: Request, res: NextResponse) {
       );
     }
 
-    console.log(body);
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await prisma.user.create({
       data: {
-        username,
+        name,
         email,
+        country,
+        phonenumber,
         password: hashedPassword,
+        image,
       },
     });
 
     return NextResponse.json(
-      { message: "User created successfuly", user },
+      { message: "Registration successful", user },
       { status: 201 }
     );
   } catch (error) {

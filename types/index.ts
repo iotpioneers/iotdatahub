@@ -1,19 +1,131 @@
-import { MouseEventHandler } from "react";
+import { BaseMetadata } from "@liveblocks/client";
+import { ThreadData } from "@liveblocks/node";
 
-export interface CustomButtonProps {
+export interface ChannelProps {
+  id: string;
+  name: string;
+  description: string;
+  deviceId?: string | null;
+  access: "PUBLIC" | "PRIVATE";
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+}
+export interface DataPointProps {
+  id: string;
+  timestamp: string;
+  value: number;
+  fieldId: string;
+  channelId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface FieldProps {
+  id: string;
+  name: string;
+  description: string;
+  channelId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Member {
+  country: string;
+  avatar?: string;
+  access: string;
+  createdAt: Date;
+  id: string;
+  name: string;
+  email: string;
+  updatedAt: Date;
+  userId: string;
+  organizationId: string;
+}
+
+export interface AddMemberProps {
+  onNewMember: (newMember: Member) => void;
+}
+
+/* eslint-disable no-unused-vars */
+export type SearchParamProps = {
+  params: { [key: string]: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export type AccessType = ["room:write"] | ["room:read", "room:presence:write"];
+
+export type RoomAccesses = Record<string, AccessType>;
+
+export type UserType = "creator" | "editor" | "viewer";
+
+export type RoomMetadata = {
+  creatorId: string;
+  email: string;
   title: string;
-  containerStyles?: string;
-  handleClick?: MouseEventHandler<HTMLButtonElement>;
-  btnType?: "button" | "submit";
-  icon?: any;
-}
+};
 
-export interface SearchManufacturerProps {
-  manufacturer: string;
-  setManufacturer: (manufacturer: string) => void;
-}
+export type CreateChannelRoomParams = {
+  roomId: string;
+  email: string;
+  creator: string;
+  title: string;
+  description: string;
+};
 
-export interface CreateProjectProps {
-  createProject: boolean;
-  setCreateProject: (createProject: boolean) => void;
-}
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  color: string;
+  userType?: UserType;
+};
+
+export type ShareDocumentParams = {
+  roomId: string;
+  email: string;
+  userType: UserType;
+  updatedBy: User;
+};
+
+export type UserTypeSelectorParams = {
+  userType: string;
+  setUserType: React.Dispatch<React.SetStateAction<UserType>>;
+  onClickHandler?: (value: string) => void;
+};
+
+export type ShareDocumentDialogProps = {
+  roomId: string;
+  collaborators: User[];
+  creator: string;
+  currentUserType: UserType;
+};
+
+export type HeaderProps = {
+  children: React.ReactNode;
+  className?: string;
+};
+
+export type CollaboratorProps = {
+  roomId: string;
+  email: string;
+  creator: string;
+  collaborator: User;
+  user: User;
+};
+
+export type CollaborativeRoomProps = {
+  roomId: string;
+  roomMetadata: RoomMetadata;
+  users: User[];
+  currentUserType: UserType;
+};
+
+export type AddDocumentBtnProps = {
+  userId: string;
+  email: string;
+};
+
+export type DeleteModalProps = { roomId: string };
+
+export type ThreadWrapperProps = { thread: ThreadData<BaseMetadata> };
