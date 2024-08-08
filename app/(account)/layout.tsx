@@ -3,8 +3,8 @@ import { Metadata } from "next";
 import ClientRootLayout from "@/app/ClientRootLayout";
 import "../globals.css";
 import { Container } from "@radix-ui/themes";
-import DashboardNavigation from "../../components/Dashboard/DashboardNavigation";
 import Provider from "../Provider";
+import DashboardNavigation from "@/components/dashboard/DashboardNavigation";
 
 export const metadata: Metadata = {
   title: "IoTDataHub",

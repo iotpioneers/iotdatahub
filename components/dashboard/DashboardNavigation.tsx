@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "@/components/Dashboard/Navbar";
+import Navbar from "@/components/dashboard/Navbar";
 import SideNavbar from "@/components/Sidebar/SideNavbar";
 
 const DashboardNavigation = () => {
