@@ -152,7 +152,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               <h1 className="flex items-center text-xl font-semibold gap-2">
                 ORGANIZATION
                 <div className="flex items-center">
-                  <TextField value={organization?.name} className="mr-2" />
+                  <TextField value={organization?.name} className="mr-2 z-1" />
                   <DropdownMenu>
                     <DropdownMenuTrigger>
                       <IconButton>
