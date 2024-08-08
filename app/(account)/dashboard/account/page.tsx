@@ -1,10 +1,10 @@
+import { Metadata } from "next";
 import * as React from "react";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Unstable_Grid2";
-import { AccountInfo } from "@/components/Dashboard/account/AccountInfo";
-import { AccountDetailsForm } from "@/components/Dashboard/account/AccountDetailsForm";
-import { Metadata } from "next";
+import { AccountDetailsForm } from "../../../../components/Dashboard/account/AccountDetailsForm";
+import { AccountInfo } from "../../../../components/Dashboard/account/AccountInfo";
 
 export default function AccountPage(): React.JSX.Element {
   return (
