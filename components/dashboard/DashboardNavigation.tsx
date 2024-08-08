@@ -1,6 +1,6 @@
 import React from "react";
 import Navbar from "@/components/dashboard/Navbar";
-import SideNavbar from "@/components/Sidebar/SideNavbar";
+import SideNavbar from "@/components/sidebar/SideNavbar";
 
 const DashboardNavigation = () => {
   return (
