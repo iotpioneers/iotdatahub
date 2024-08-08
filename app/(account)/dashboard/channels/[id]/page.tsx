@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import ChannelDetails from "../_components/ChannelDetails";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface Props {
   params: { id: string };
@@ -8,7 +8,7 @@ interface Props {
 
 export default function ChannelDetailsPage({ params }: Props) {
   return (
-    <Suspense fallback={<LoadingProgressBar />}>
+    <Suspense fallback={<LoadingSpinner />}>
       <ChannelDetails channelID={params.id} />
     </Suspense>
   );

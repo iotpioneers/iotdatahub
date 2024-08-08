@@ -73,7 +73,10 @@ const schema = Yup.object().shape({
     .required("Email is required"),
   country: Yup.string().optional(),
   phonecode: Yup.string().optional(),
-  phonenumber: Yup.string().max(255).required("Phone is required"),
+  phonenumber: Yup.number()
+    .typeError("Must be a valid phone number")
+    .required("Phone is required"),
+
   password: Yup.string().min(8).max(255).required("Password is required"),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Passwords must match")
@@ -94,7 +97,6 @@ const AuthRegister = ({ ...others }) => {
   const [level, setLevel] = useState<LevelType>(undefined);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [open, setOpen] = React.useState(false);
   const [selectedCountry, setSelectedCountry] = useState<CountryType | null>(
@@ -167,9 +169,6 @@ const AuthRegister = ({ ...others }) => {
       return;
     }
 
-    setInfo(
-      "Registration successful. Please wait while we  check your email for verification."
-    );
     try {
       setError(null);
       setLoading(true);
@@ -190,7 +189,9 @@ const AuthRegister = ({ ...others }) => {
       setOpen(true);
       setLoading(false);
       setError(null);
-      router.push("/dashboard");
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 10000);
     } catch (error) {
       setError("Failed to send verification email");
       setOpen(true);
@@ -211,12 +212,11 @@ const AuthRegister = ({ ...others }) => {
       >
         <Alert
           onClose={handleCloseResult}
-          severity={error ? "error" : info ? "info" : "success"}
+          severity={error ? "error" : "success"}
           variant="standard"
           sx={{ width: "100%" }}
         >
           {error && error}
-          {info && info}
           {success && success}
         </Alert>
       </Snackbar>
@@ -296,7 +296,7 @@ const AuthRegister = ({ ...others }) => {
           email: "",
           country: "",
           phonecode: "",
-          phonenumber: "",
+          phonenumber: 0,
           password: "",
           confirmPassword: "",
           submit: null,
@@ -458,7 +458,7 @@ const AuthRegister = ({ ...others }) => {
                   </InputLabel>
                   <OutlinedInput
                     id="outlined-adornment-phonenumber-register"
-                    type="text"
+                    type="number"
                     value={values.phonenumber}
                     name="phonenumber"
                     onBlur={handleBlur}

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Button } from "@mui/material";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import Image from "next/image";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface Channel {
   id: number;
@@ -64,7 +65,7 @@ const ChannelList = () => {
         </div>
       )}
 
-      <Suspense fallback={<LoadingProgressBar />}>
+      <Suspense fallback={<LoadingSpinner />}>
         {channels && channels.length > 0 && <ProjectList />}
       </Suspense>
     </div>

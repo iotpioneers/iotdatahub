@@ -18,12 +18,12 @@ import {
   LiveblocksPlugin,
   useEditorStatus,
 } from "@liveblocks/react-lexical";
-import Loader from "../Loader";
 
 import FloatingToolbarPlugin from "./plugins/FloatingToolbarPlugin";
 import { useThreads } from "@liveblocks/react/suspense";
 import Comments from "../Comments";
 import { UserType } from "@/types";
+import LoadingSpinner from "../LoadingSpinner";
 
 export function Editor({
   roomId,
@@ -62,7 +62,7 @@ export function Editor({
 
         <div className="editor-wrapper flex flex-col items-center justify-start">
           {status === "not-loaded" || status === "loading" ? (
-            <Loader />
+            <LoadingSpinner />
           ) : (
             <div className="editor-inner min-h-[1100px] relative mb-5 h-fit w-full max-w-[800px] shadow-md lg:mb-10">
               <RichTextPlugin

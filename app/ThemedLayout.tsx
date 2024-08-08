@@ -6,9 +6,9 @@ import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline, StyledEngineProvider } from "@mui/material";
 import { Theme } from "@radix-ui/themes";
 import { ClientSideSuspense } from "@liveblocks/react/suspense";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
 import themes from "@/app/themes";
 import { store } from "./ClientRootLayout";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 // Infer the type of store
 type AppStore = typeof store;
@@ -28,7 +28,7 @@ const ThemedLayout = ({ children }: { children: React.ReactNode }) => {
       <ThemeProvider theme={themes(customization)}>
         <CssBaseline />
         <Theme>
-          <ClientSideSuspense fallback={<LoadingProgressBar />}>
+          <ClientSideSuspense fallback={<LoadingSpinner />}>
             {children}
           </ClientSideSuspense>
         </Theme>
