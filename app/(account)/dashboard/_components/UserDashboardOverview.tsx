@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
-import DashboardOverview from "@/components/Dashboard/DashboardOverview";
-import OrganizationOnboardingCreation from "@/components/Dashboard/OrganizationOnboardingCreation";
+import { useEffect, useState } from "react";
+import DashboardOverview from "@/components/dashboard/DashboardOverview";
+import OrganizationOnboardingCreation from "@/components/dashboard/OrganizationOnboardingCreation";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 
 interface Organization {
