@@ -16,7 +16,7 @@ import { redirect } from "next/navigation";
 import { getUsersByEmails } from "@/lib/actions/user.actions";
 import { User } from "@/types/user";
 import { ViewIcon } from "lucide-react";
-import Loader from "../Loader";
+import LoadingSpinner from "../LoadingSpinner";
 import { dateConverter } from "@/lib/utils";
 
 import InviteMember from "./collaboration/InviteMember";
@@ -170,7 +170,7 @@ const ChannelDetailsHeading = ({
 
   return (
     <RoomProvider id={channel.id}>
-      <ClientSideSuspense fallback={<Loader />}>
+      <ClientSideSuspense fallback={<LoadingSpinner />}>
         <div className="lg:flex lg:items-center lg:justify-between mt-12 padding-x padding-y max-width">
           <Snackbar
             anchorOrigin={{ vertical: "top", horizontal: "right" }}

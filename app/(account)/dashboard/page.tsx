@@ -2,10 +2,11 @@ import { Metadata } from "next";
 import UserDashboardOverview from "./_components/UserDashboardOverview";
 import { Suspense } from "react";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const Dashboard = () => {
   return (
-    <Suspense fallback={<LoadingProgressBar />}>
+    <Suspense fallback={<LoadingSpinner />}>
       <UserDashboardOverview />
     </Suspense>
   );

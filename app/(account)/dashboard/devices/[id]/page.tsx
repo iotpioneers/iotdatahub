@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import DeviceDetails from "../_components/DeviceDetails";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface Props {
   params: { id: string };
@@ -8,7 +8,7 @@ interface Props {
 
 const DeviceDetailsPage = async ({ params }: Props) => {
   return (
-    <Suspense fallback={<LoadingProgressBar />}>
+    <Suspense fallback={<LoadingSpinner />}>
       <DeviceDetails params={params} />
     </Suspense>
   );

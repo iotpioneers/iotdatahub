@@ -1,11 +1,11 @@
 import React, { Suspense } from "react";
 import ChannelList from "./_components/ChannelList";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
 import { Metadata } from "next";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const ChannelsPage = () => {
   return (
-    <Suspense fallback={<LoadingProgressBar />}>
+    <Suspense fallback={<LoadingSpinner />}>
       <ChannelList />
     </Suspense>
   );

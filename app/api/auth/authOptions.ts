@@ -21,9 +21,13 @@ const login = async (credentials: Credentials) => {
     where: { email: credentials.email },
   });
 
+  console.log("user", user);
+
   if (!user) {
     throw new Error("User not found");
   }
+
+  console.log("user.emailVerified", user.emailVerified);
 
   if (user.emailVerified == null) {
     throw new Error("Email not verified");

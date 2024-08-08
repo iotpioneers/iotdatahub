@@ -7,7 +7,7 @@ import {
   ClientSideSuspense,
   LiveblocksProvider,
 } from "@liveblocks/react/suspense";
-import Loader from "@/components/Loader";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { getUsersByEmails, getDocumentUsers } from "@/lib/actions/user.actions";
 
 const Provider = ({ children }: { children: ReactNode }) => {
@@ -33,7 +33,9 @@ const Provider = ({ children }: { children: ReactNode }) => {
         return roomUsers;
       }}
     >
-      <ClientSideSuspense fallback={<Loader />}>{children}</ClientSideSuspense>
+      <ClientSideSuspense fallback={<LoadingSpinner />}>
+        {children}
+      </ClientSideSuspense>
     </LiveblocksProvider>
   );
 };
