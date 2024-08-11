@@ -4,7 +4,7 @@ import ClientRootLayout from "@/app/ClientRootLayout";
 import "../globals.css";
 import { Container } from "@radix-ui/themes";
 
-import Provider from "../Provider";
+import CollaborationProvider from "../Provider";
 import DashboardNavigation from "@/components/dashboard/DashboardNavigation";
 
 export const metadata: Metadata = {
@@ -22,12 +22,12 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <ClientRootLayout>
-          <Provider>
+          <CollaborationProvider>
             <DashboardNavigation />
             <div className="flex flex-col flex-gro lg:ml-64 xs:mx-2">
               <Container>{children}</Container>
             </div>
-          </Provider>
+          </CollaborationProvider>
         </ClientRootLayout>
       </body>
     </html>

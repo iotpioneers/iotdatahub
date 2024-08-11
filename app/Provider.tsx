@@ -10,12 +10,18 @@ import {
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { getUsersById, getDocumentUsers } from "@/lib/actions/user.actions";
 
-const Provider = ({ children }: { children: ReactNode }) => {
+const CollaborationProvider = ({ children }: { children: ReactNode }) => {
   const { status, data: session } = useSession();
 
-  if (status === "unauthenticated") redirect("/login");
+  if (status !== "loading" && status === "unauthenticated") {
+    redirect("/login");
+  }
 
-  const userId = session!.user!.id;
+  if (!session || !session.user) {
+    return null;
+  }
+
+  const userId = session.user.id;
 
   return (
     <LiveblocksProvider
@@ -42,4 +48,4 @@ const Provider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export default Provider;
+export default CollaborationProvider;

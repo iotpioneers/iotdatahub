@@ -4,7 +4,11 @@ import Image from "next/image";
 const ActiveCollaborators = () => {
   const others = useOthers();
 
+  console.log("others", others);
+
   const collaborators = others.map((other) => other.info);
+
+  console.log("collaborators", collaborators);
 
   return (
     <ul className="collaborators-list">

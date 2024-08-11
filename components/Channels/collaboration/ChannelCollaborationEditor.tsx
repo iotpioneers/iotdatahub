@@ -21,18 +21,14 @@ import {
 
 import FloatingToolbarPlugin from "./plugins/FloatingToolbarPlugin";
 import { useThreads } from "@liveblocks/react/suspense";
-import Comments from "../Comments";
+import Comments from "../../Comments";
 import { UserType } from "@/types";
-import LoadingSpinner from "../LoadingSpinner";
+import LoadingSpinner from "../../LoadingSpinner";
 
-export function Editor({
-  roomId,
+export function ChannelCollaborationEditor({
   currentUserType,
-  content,
 }: {
-  roomId: string;
   currentUserType: UserType;
-  content: string;
 }) {
   const status = useEditorStatus();
   const { threads } = useThreads();

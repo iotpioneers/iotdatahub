@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useSelf } from "@liveblocks/react/suspense";
-import Button from "@mui/material/Button";
 import { styled } from "@mui/material/styles";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
@@ -17,6 +16,7 @@ import Typography from "@mui/material/Typography";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
+import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import { ShareDocumentDialogProps, UserType } from "@/types";
 import { User } from "@/types/user";
@@ -35,6 +35,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 const InviteMember = ({
   roomId,
+  channelId,
   collaborators,
   creator,
   currentUserType,
@@ -87,6 +88,7 @@ const InviteMember = ({
     try {
       await updateChannelAccess({
         roomId,
+        channelId,
         email,
         userType: userType as UserType,
         updatedBy: user.info,
@@ -178,7 +180,6 @@ const InviteMember = ({
                 onChange={accessChangeHandler}
               >
                 <MenuItem value="viewer">view</MenuItem>
-                <MenuItem value="commenter">comment</MenuItem>
                 <MenuItem value="editor">edit</MenuItem>
               </Select>
             </FormControl>
@@ -197,6 +198,7 @@ const InviteMember = ({
                 <Collaborator
                   key={collaborator.id}
                   roomId={roomId}
+                  channelId={channelId}
                   creator={creator}
                   email={collaborator.email}
                   collaborator={collaborator}

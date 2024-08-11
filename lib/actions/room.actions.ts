@@ -32,7 +32,7 @@ export const createOrganizationRoom = async ({
     const room = await liveblocks.createRoom(roomId, {
       metadata,
       usersAccesses,
-      defaultAccesses: [],
+      defaultAccesses: ["room:read", "room:presence:write"],
     });
 
     revalidatePath("/dashboard/organization");
@@ -46,17 +46,21 @@ export const createOrganizationRoom = async ({
 export const getRoomAccess = async ({
   roomId,
   userId,
+  userEmail,
 }: {
   roomId: string;
   userId: string;
+  userEmail: string;
 }) => {
   try {
     const room = await liveblocks.getRoom(roomId);
 
-    const hasAccess = Object.keys(room.usersAccesses).includes(userId);
+    const hasAccess = Object.keys(room.usersAccesses).includes(
+      userId || userEmail
+    );
 
     if (!hasAccess) {
-      throw new Error("You do not have access to this document");
+      throw new Error("You do not have access to this channel");
     }
 
     return parseStringify(room);
@@ -65,40 +69,21 @@ export const getRoomAccess = async ({
   }
 };
 
-export const updateChannelRoom = async (
-  roomId: string,
-  channelId: string,
-  title: string
-) => {
+export const updateChannelData = async (channelId: string, title: string) => {
   try {
-    const updatedRoom = await liveblocks.updateRoom(roomId, {
-      metadata: {
-        title,
-      },
+    const response = await axios.patch(`/api/channels/${channelId}`, {
+      name: title,
     });
 
-    if (updatedRoom) {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_BASE_URL + `/api/channels/${channelId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: title,
-          }),
-        }
-      );
-      if (!response.ok) {
-        return null;
-      }
-
-      revalidatePath(`/dashboard/channels/${channelId}`);
-
-      return parseStringify(updatedRoom);
+    if (response.status !== 200) {
+      return null;
     }
-    return null;
+
+    const updatedChannelData = response.data;
+
+    revalidatePath(`/dashboard/channels/${channelId}`);
+
+    return parseStringify(updatedChannelData);
   } catch (error) {
     return null;
   }
@@ -116,6 +101,7 @@ export const getDocuments = async (email: string) => {
 
 export const updateChannelAccess = async ({
   roomId,
+  channelId,
   email,
   userType,
   updatedBy,
@@ -143,11 +129,11 @@ export const updateChannelAccess = async ({
           image: updatedBy.avatar,
           email: updatedBy.email,
         },
-        roomId,
+        roomId: channelId,
       });
     }
 
-    revalidatePath(`/documents/${roomId}`);
+    revalidatePath(`/dashboard/channels/${channelId}`);
     return parseStringify(room);
   } catch (error) {
     return null;

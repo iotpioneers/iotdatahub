@@ -79,6 +79,7 @@ export type User = {
 
 export type ShareDocumentParams = {
   roomId: string;
+  channelId: string;
   email: string;
   userType: UserType;
   updatedBy: User;
@@ -92,6 +93,7 @@ export type UserTypeSelectorParams = {
 
 export type ShareDocumentDialogProps = {
   roomId: string;
+  channelId: string;
   collaborators: User[];
   creator: string;
   currentUserType: UserType;
@@ -104,17 +106,40 @@ export type HeaderProps = {
 
 export type CollaboratorProps = {
   roomId: string;
+  channelId: string;
   email: string;
   creator: string;
   collaborator: User;
   user: User;
 };
 
-export type CollaborativeRoomProps = {
+export type ChannelHeadingProps = {
   roomId: string;
   roomMetadata: RoomMetadata;
   users: User[];
   currentUserType: UserType;
+  channel: ChannelProps;
+  dataPoint: DataPointProps[];
+};
+
+export type ChannelNavigationProps = {
+  channelId: string;
+  dataPoint: DataPointProps[];
+  fields: FieldProps[];
+  sampleCodes: string;
+  apiKey: string;
+};
+
+export type ChannelCollaborativeRoomProps = {
+  roomId: string;
+  roomMetadata: RoomMetadata;
+  users: User[];
+  currentUserType: UserType;
+  channel: ChannelProps;
+  dataPoint: DataPointProps[];
+  fields: FieldProps[];
+  apiKey: string;
+  sampleCodes: string;
 };
 
 export type AddDocumentBtnProps = {

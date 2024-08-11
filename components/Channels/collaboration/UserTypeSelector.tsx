@@ -25,7 +25,7 @@ const UserTypeSelector = ({
       <SelectTrigger className="shad-select">
         <SelectValue />
       </SelectTrigger>
-      <SelectContent className="border-none bg-dark-200">
+      <SelectContent className="border-none bg-slate-950">
         <SelectItem value="viewer" className="shad-select-item">
           can view
         </SelectItem>

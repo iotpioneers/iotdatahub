@@ -1,55 +1,37 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { ClientSideSuspense, RoomProvider } from "@liveblocks/react/suspense";
 import Image from "next/image";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { CalendarIcon } from "@heroicons/react/20/solid";
 import { ChartPieIcon } from "@heroicons/react/24/solid";
-import { ChannelProps } from "@/types";
+import { ChannelHeadingProps } from "@/types";
 import { Input } from "@/components/Actions/input";
 
-import { updateChannelRoom, getRoomAccess } from "@/lib/actions/room.actions";
-import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
-import { getUsersById } from "@/lib/actions/user.actions";
-import { User } from "@/types/user";
+import { updateChannelData } from "@/lib/actions/room.actions";
 import { ViewIcon } from "lucide-react";
 import { dateConverter } from "@/lib/utils";
 
 import InviteMember from "./collaboration/InviteMember";
 import ActiveCollaborators from "./collaboration/ActiveCollaborators";
-import LoadingProgressBar from "../LoadingProgressBar";
-
-interface ChannelHeadingProps {
-  channel: ChannelProps;
-  dataReceived: number;
-}
 
 const ChannelDetailsHeading = ({
+  roomId,
+  roomMetadata,
+  users,
+  currentUserType,
   channel,
-  dataReceived,
+  dataPoint,
 }: ChannelHeadingProps) => {
-  const { status, data: session } = useSession();
-
-  if (status === "unauthenticated") {
-    redirect("/login");
-  }
-  const { id: userId } = session!.user;
-
-  const { id: channelId, organizationId: roomId } = channel;
+  const { id: channelId } = channel;
 
   const [channelTitle, setChannelTitle] = useState(channel?.name);
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
-  const [currentUserType, setCurrentUserType] = useState<"editor" | "viewer">(
-    "viewer"
-  );
+
   const [showResult, setShowResult] = useState(false);
-  const [usersData, setUsersData] = useState<[]>([]);
-  const [room, setRoom] = useState<any>(null);
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
@@ -69,198 +51,155 @@ const ChannelDetailsHeading = ({
     return null;
   }
 
-  // const updateChannelTitleHandler = async (
-  //   e: React.KeyboardEvent<HTMLInputElement>
-  // ) => {
-  //   if (e.key === "Enter") {
-  //     setLoading(true);
-  //     setError("");
+  const updateChannelTitleHandler = async (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Enter") {
+      setLoading(true);
+      setError("");
 
-  //     try {
-  //       if (channelTitle !== channel?.name) {
-  //         const updatedChannel = await updateChannelRoom(
-  //           roomId,
-  //           channelId,
-  //           channelTitle
-  //         );
+      try {
+        if (channelTitle !== channel?.name) {
+          const updatedChannel = await updateChannelData(
+            channelId,
+            channelTitle
+          );
 
-  //         if (!updatedChannel) {
-  //           setError("Failed to update channel");
-  //           setShowResult(true);
-  //           setEditing(false);
-  //           setLoading(false);
-  //           return;
-  //         }
+          if (!updatedChannel) {
+            setError("Failed to update channel");
+            setShowResult(true);
+            setEditing(false);
+            setLoading(false);
+            return;
+          }
 
-  //         setShowResult(true);
-  //         setEditing(false);
-  //       }
-  //     } catch (error) {
-  //       setError((error as Error).message);
-  //       setShowResult(true);
-  //     }
+          setShowResult(true);
+          setEditing(false);
+        }
+      } catch (error) {
+        setError((error as Error).message);
+        setShowResult(true);
+      }
 
-  //     setLoading(false);
-  //   }
-  // };
+      setLoading(false);
+    }
+  };
 
-  // useEffect(() => {
-  //   const handleClickOutside = (e: MouseEvent) => {
-  //     if (
-  //       containerRef.current &&
-  //       !containerRef.current.contains(e.target as Node)
-  //     ) {
-  //       setEditing(false);
-  //       updateChannelRoom(roomId, channelId, channelTitle);
-  //     }
-  //   };
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setEditing(false);
+        updateChannelData(channelId, channelTitle);
+      }
+    };
 
-  //   document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
 
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, [channel!.id, channelTitle]);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [channel!.id, channelTitle]);
 
-  // useEffect(() => {
-  //   if (editing && inputRef.current) {
-  //     inputRef.current.focus();
-  //   }
-  // }, [editing]);
-
-  // const fetchData = async () => {
-  //   const roomData = await getRoomAccess({
-  //     roomId,
-  //     userId,
-  //   });
-
-  //   if (!roomData) return;
-
-  //   setRoom(roomData);
-
-  //   const userIds = Object.keys(roomData.usersAccesses);
-  //   const users = await getUsersById({ userIds });
-
-  //   if (!users || users.length === 0) return;
-
-  //   const usersData = users.map((user: User) => ({
-  //     ...user,
-  //     userType: roomData.usersAccesses[userId as string]?.includes("room:write")
-  //       ? "editor"
-  //       : "viewer",
-  //   }));
-
-  //   setUsersData(usersData);
-
-  //   const currentUserType = roomData.usersAccesses[userId]?.includes(
-  //     "room:write"
-  //   )
-  //     ? "editor"
-  //     : "viewer";
-
-  //   setCurrentUserType(currentUserType);
-  // };
-
-  // useEffect(() => {
-  //   fetchData();
-  // }, [channelId, session]);
+  useEffect(() => {
+    if (editing && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [editing]);
 
   return (
-    <RoomProvider id={roomId}>
-      <ClientSideSuspense fallback={<LoadingProgressBar />}>
-        <div className="lg:flex lg:items-center lg:justify-between mt-12 padding-x padding-y max-width">
-          <Snackbar
-            anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            open={showResult}
-            autoHideDuration={12000}
-            onClose={handleCloseResult}
-          >
-            <Alert
-              onClose={handleCloseResult}
-              severity={error && error !== "" ? "error" : "success"}
-              variant="filled"
-              sx={{ width: "100%" }}
-            >
-              {error && error !== "" ? error : "Channel updated successfully"}
-            </Alert>
-          </Snackbar>
+    <div className="lg:flex lg:items-center lg:justify-between mt-12 padding-x padding-y max-width">
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={showResult}
+        autoHideDuration={12000}
+        onClose={handleCloseResult}
+      >
+        <Alert
+          onClose={handleCloseResult}
+          severity={error && error !== "" ? "error" : "success"}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {error && error !== "" ? error : "Channel updated successfully"}
+        </Alert>
+      </Snackbar>
 
-          <div className="min-w-0 flex-1">
-            {/* <div
-              ref={containerRef}
-              className="flex w-fit items-center justify-center gap-2"
-            >
-              {editing && !loading ? (
-                <Input
-                  type="text"
-                  value={channelTitle}
-                  ref={inputRef}
-                  placeholder="Enter title"
-                  onChange={(e) => setChannelTitle(e.target.value)}
-                  onKeyDown={updateChannelTitleHandler}
-                  disabled={!editing}
-                  className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:tracking-tight"
-                />
-              ) : (
-                <>
-                  <p className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:tracking-tight">
-                    {channelTitle}
-                  </p>
-                </>
-              )}
+      <div className="min-w-0 flex-1">
+        <div
+          ref={containerRef}
+          className="flex w-fit items-center justify-center gap-2"
+        >
+          {editing && !loading ? (
+            <Input
+              type="text"
+              value={channelTitle}
+              ref={inputRef}
+              placeholder="Enter channel name here"
+              onChange={(e) => setChannelTitle(e.target.value)}
+              onKeyDown={updateChannelTitleHandler}
+              disabled={!editing}
+              className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:tracking-tight"
+            />
+          ) : (
+            <>
+              <p className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:tracking-tight">
+                {channelTitle}
+              </p>
+            </>
+          )}
 
-              {currentUserType === "editor" && !editing && (
-                <Image
-                  src="/assets/icons/edit.svg"
-                  alt="edit"
-                  width={24}
-                  height={24}
-                  onClick={() => setEditing(true)}
-                  className="pointer"
-                />
-              )}
+          {currentUserType === "editor" && !editing && (
+            <Image
+              src="/assets/icons/edit.svg"
+              alt="edit"
+              width={24}
+              height={24}
+              onClick={() => setEditing(true)}
+              className="pointer"
+            />
+          )}
 
-              {currentUserType !== "editor" && (
-                <p className="view-only-tag">
-                  <ViewIcon width={12} height={12} /> View only
-                </p>
-              )}
-              {loading && <p className="text-sm text-gray-400">saving...</p>}
-            </div> */}
+          {currentUserType !== "editor" && (
+            <p className="view-only-tag">
+              <ViewIcon width={12} height={12} /> View only
+            </p>
+          )}
+          {loading && <p className="text-sm text-gray-400">saving...</p>}
+        </div>
 
-            <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-              <div className="mt-2 flex items-center text-sm text-gray-500">
-                <ChartPieIcon
-                  className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                  aria-hidden="true"
-                />
-                Generated {dataReceived} data
-              </div>
-              <div className="mt-2 flex items-center text-sm text-gray-500">
-                <CalendarIcon
-                  className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                  aria-hidden="true"
-                />
-                Created about {dateConverter(channel.createdAt.toString())}
-              </div>
-            </div>
-            <div className="mt-5">
-              {room && (
-                <div className="flex w-full flex-1 justify-end gap-2 sm:gap-3">
-                  <ActiveCollaborators />
-                  <InviteMember
-                    roomId={roomId}
-                    collaborators={usersData}
-                    creator={room.metadata.creator || ""}
-                    currentUserType={currentUserType}
-                  />
-                </div>
-              )}
-            </div>
+        <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+          <div className="mt-2 flex items-center text-sm text-gray-500">
+            <ChartPieIcon
+              className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+              aria-hidden="true"
+            />
+            Generated {dataPoint.length} data
+          </div>
+          <div className="mt-2 flex items-center text-sm text-gray-500">
+            <CalendarIcon
+              className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+              aria-hidden="true"
+            />
+            Created about {dateConverter(channel.createdAt.toString())}
           </div>
         </div>
-      </ClientSideSuspense>
-    </RoomProvider>
+        <div className="flex justify-between items-center my-5 ">
+          {roomMetadata && (
+            <InviteMember
+              roomId={roomId}
+              channelId={channelId}
+              collaborators={users}
+              creator={roomMetadata.creatorId}
+              currentUserType={currentUserType}
+            />
+          )}
+          <ActiveCollaborators />
+        </div>
+      </div>
+    </div>
   );
 };
 

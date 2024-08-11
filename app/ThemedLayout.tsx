@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline, StyledEngineProvider } from "@mui/material";
 import { Theme } from "@radix-ui/themes";
-import { ClientSideSuspense } from "@liveblocks/react/suspense";
 import themes from "@/app/themes";
 import { store } from "./ClientRootLayout";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -35,11 +34,7 @@ const ThemedLayout = ({ children }: { children: React.ReactNode }) => {
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={themes(customization)}>
         <CssBaseline />
-        <Theme>
-          <ClientSideSuspense fallback={<LoadingSpinner />}>
-            {children}
-          </ClientSideSuspense>
-        </Theme>
+        <Theme>{children}</Theme>
       </ThemeProvider>
     </StyledEngineProvider>
   );
