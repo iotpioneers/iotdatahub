@@ -8,15 +8,15 @@ const ActiveCollaborators = () => {
 
   return (
     <ul className="collaborators-list">
-      {collaborators.map(({ id, name }) => (
+      {collaborators.map(({ id, name, avatar, color }) => (
         <li key={id}>
           <Image
-            src="user.svg"
+            src={avatar || "user.svg"}
             alt={name}
             width={100}
             height={100}
             className="inline-block size-8 rounded-full ring-2 ring-slate-800"
-            style={{ border: `3px solid #f2994a` }}
+            style={{ border: `3px solid ${color}` }}
           />
         </li>
       ))}

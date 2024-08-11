@@ -12,6 +12,7 @@ const ChannelDetailsHeading = dynamic(
   () => import("@/components/Channels/ChannelDetailsHeading"),
   {
     ssr: false,
+    loading: () => <LoadingProgressBar />,
   }
 );
 
@@ -75,7 +76,7 @@ export default function ChannelDetails({ channelID }: { channelID: string }) {
     };
 
     fetchChannel();
-  }, []);
+  }, [channelData]);
 
   if (!channelData) {
     return;
@@ -88,8 +89,6 @@ export default function ChannelDetails({ channelID }: { channelID: string }) {
     apiKey,
     sampleCodes,
   } = channelData;
-
-  console.log("channelData", channelData);
 
   return (
     <main className="overflow-hidden">

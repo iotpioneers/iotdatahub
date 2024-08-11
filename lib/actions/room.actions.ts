@@ -43,7 +43,7 @@ export const createOrganizationRoom = async ({
   }
 };
 
-export const getChannelRoom = async ({
+export const getRoomAccess = async ({
   roomId,
   userId,
 }: {

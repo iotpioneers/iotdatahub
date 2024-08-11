@@ -19,10 +19,10 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import { ShareDocumentDialogProps, UserType } from "@/types";
-import Collaborator from "@/components/Collaborator";
 import { User } from "@/types/user";
 import { Share } from "@phosphor-icons/react";
 import { updateChannelAccess } from "@/lib/actions/room.actions";
+import Collaborator from "./Collaborator";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {

@@ -8,25 +8,27 @@ import {
   LiveblocksProvider,
 } from "@liveblocks/react/suspense";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { getUsersByEmails, getDocumentUsers } from "@/lib/actions/user.actions";
+import { getUsersById, getDocumentUsers } from "@/lib/actions/user.actions";
 
 const Provider = ({ children }: { children: ReactNode }) => {
   const { status, data: session } = useSession();
 
   if (status === "unauthenticated") redirect("/login");
 
+  const userId = session!.user!.id;
+
   return (
     <LiveblocksProvider
       authEndpoint="/api/liveblocks-auth"
       resolveUsers={async ({ userIds }) => {
-        const users = await getUsersByEmails({ userIds });
+        const users = await getUsersById({ userIds });
 
         return users;
       }}
       resolveMentionSuggestions={async ({ text, roomId }) => {
         const roomUsers = await getDocumentUsers({
           roomId,
-          currentUser: session!.user!.email!,
+          userId,
           text,
         });
 

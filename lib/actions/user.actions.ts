@@ -4,7 +4,7 @@ import { parseStringify } from "../utils";
 import { liveblocks } from "../liveblocks";
 import { User } from "@/types/user";
 
-export const getUsersByEmails = async ({ userIds }: { userIds: string[] }) => {
+export const getUsersById = async ({ userIds }: { userIds: string[] }) => {
   try {
     const response = await fetch(
       process.env.NEXT_PUBLIC_BASE_URL + "/api/users",
@@ -28,8 +28,8 @@ export const getUsersByEmails = async ({ userIds }: { userIds: string[] }) => {
       avatar: user.image,
     }));
 
-    const sortedUsers = userIds.map((email) =>
-      users.find((user: User) => user.email === email)
+    const sortedUsers = userIds.map((id) =>
+      users.find((user: User) => user.id === id)
     );
 
     return parseStringify(sortedUsers);
@@ -40,25 +40,23 @@ export const getUsersByEmails = async ({ userIds }: { userIds: string[] }) => {
 
 export const getDocumentUsers = async ({
   roomId,
-  currentUser,
+  userId,
   text,
 }: {
   roomId: string;
-  currentUser: string;
+  userId: string;
   text: string;
 }) => {
   try {
     const room = await liveblocks.getRoom(roomId);
 
-    const users = Object.keys(room.usersAccesses).filter(
-      (email) => email !== currentUser
-    );
+    const users = Object.keys(room.usersAccesses).filter((id) => id !== userId);
 
     if (text.length) {
       const lowerCaseText = text.toLowerCase();
 
-      const filteredUsers = users.filter((email: string) =>
-        email.toLowerCase().includes(lowerCaseText)
+      const filteredUsers = users.filter((id: string) =>
+        id.toLowerCase().includes(lowerCaseText)
       );
 
       return parseStringify(filteredUsers);

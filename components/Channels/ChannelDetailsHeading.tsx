@@ -10,16 +10,17 @@ import { ChartPieIcon } from "@heroicons/react/24/solid";
 import { ChannelProps } from "@/types";
 import { Input } from "@/components/Actions/input";
 
-import { updateChannelRoom, getChannelRoom } from "@/lib/actions/room.actions";
+import { updateChannelRoom, getRoomAccess } from "@/lib/actions/room.actions";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import { getUsersByEmails } from "@/lib/actions/user.actions";
+import { getUsersById } from "@/lib/actions/user.actions";
 import { User } from "@/types/user";
 import { ViewIcon } from "lucide-react";
-import Loader from "../Loader";
 import { dateConverter } from "@/lib/utils";
 
 import InviteMember from "./collaboration/InviteMember";
+import ActiveCollaborators from "./collaboration/ActiveCollaborators";
+import LoadingProgressBar from "../LoadingProgressBar";
 
 interface ChannelHeadingProps {
   channel: ChannelProps;
@@ -68,109 +69,105 @@ const ChannelDetailsHeading = ({
     return null;
   }
 
-  const updateChannelTitleHandler = async (
-    e: React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    if (e.key === "Enter") {
-      setLoading(true);
-      setError("");
+  // const updateChannelTitleHandler = async (
+  //   e: React.KeyboardEvent<HTMLInputElement>
+  // ) => {
+  //   if (e.key === "Enter") {
+  //     setLoading(true);
+  //     setError("");
 
-      try {
-        if (channelTitle !== channel?.name) {
-          const updatedChannel = await updateChannelRoom(
-            roomId,
-            channelId,
-            channelTitle
-          );
+  //     try {
+  //       if (channelTitle !== channel?.name) {
+  //         const updatedChannel = await updateChannelRoom(
+  //           roomId,
+  //           channelId,
+  //           channelTitle
+  //         );
 
-          if (!updatedChannel) {
-            setError("Failed to update channel");
-            setShowResult(true);
-            setEditing(false);
-            setLoading(false);
-            return;
-          }
+  //         if (!updatedChannel) {
+  //           setError("Failed to update channel");
+  //           setShowResult(true);
+  //           setEditing(false);
+  //           setLoading(false);
+  //           return;
+  //         }
 
-          setShowResult(true);
-          setEditing(false);
-        }
-      } catch (error) {
-        setError((error as Error).message);
-        setShowResult(true);
-      }
+  //         setShowResult(true);
+  //         setEditing(false);
+  //       }
+  //     } catch (error) {
+  //       setError((error as Error).message);
+  //       setShowResult(true);
+  //     }
 
-      setLoading(false);
-    }
-  };
+  //     setLoading(false);
+  //   }
+  // };
 
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
-        setEditing(false);
-        updateChannelRoom(roomId, channelId, channelTitle);
-      }
-    };
+  // useEffect(() => {
+  //   const handleClickOutside = (e: MouseEvent) => {
+  //     if (
+  //       containerRef.current &&
+  //       !containerRef.current.contains(e.target as Node)
+  //     ) {
+  //       setEditing(false);
+  //       updateChannelRoom(roomId, channelId, channelTitle);
+  //     }
+  //   };
 
-    document.addEventListener("mousedown", handleClickOutside);
+  //   document.addEventListener("mousedown", handleClickOutside);
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [channel!.id, channelTitle]);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, [channel!.id, channelTitle]);
 
-  useEffect(() => {
-    if (editing && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [editing]);
+  // useEffect(() => {
+  //   if (editing && inputRef.current) {
+  //     inputRef.current.focus();
+  //   }
+  // }, [editing]);
 
-  const fetchData = async () => {
-    if (!userId) {
-      throw new Error("User ");
-    }
+  // const fetchData = async () => {
+  //   const roomData = await getRoomAccess({
+  //     roomId,
+  //     userId,
+  //   });
 
-    const roomData = await getChannelRoom({
-      roomId,
-      userId,
-    });
+  //   if (!roomData) return;
 
-    if (!roomData) return;
+  //   setRoom(roomData);
 
-    setRoom(roomData);
+  //   const userIds = Object.keys(roomData.usersAccesses);
+  //   const users = await getUsersById({ userIds });
 
-    const userIds = Object.keys(roomData.usersAccesses);
-    const users = await getUsersByEmails({ userIds });
+  //   if (!users || users.length === 0) return;
 
-    if (!users || users.length === 0) return;
+  //   const usersData = users.map((user: User) => ({
+  //     ...user,
+  //     userType: roomData.usersAccesses[userId as string]?.includes("room:write")
+  //       ? "editor"
+  //       : "viewer",
+  //   }));
 
-    const usersData = users.map((user: User) => ({
-      ...user,
-      userType: roomData.usersAccesses[userId as string]?.includes("room:write")
-        ? "editor"
-        : "viewer",
-    }));
+  //   setUsersData(usersData);
 
-    setUsersData(usersData);
+  //   const currentUserType = roomData.usersAccesses[userId]?.includes(
+  //     "room:write"
+  //   )
+  //     ? "editor"
+  //     : "viewer";
 
-    const currentUserType = roomData.usersAccesses[userId]?.includes(
-      "room:write"
-    )
-      ? "editor"
-      : "viewer";
+  //   setCurrentUserType(currentUserType);
+  // };
 
-    setCurrentUserType(currentUserType);
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, [channelId, session]);
+  // useEffect(() => {
+  //   fetchData();
+  // }, [channelId, session]);
 
   return (
     <RoomProvider id={roomId}>
-      <ClientSideSuspense fallback={<Loader />}>
+      <ClientSideSuspense fallback={<LoadingProgressBar />}>
         <div className="lg:flex lg:items-center lg:justify-between mt-12 padding-x padding-y max-width">
           <Snackbar
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -189,7 +186,7 @@ const ChannelDetailsHeading = ({
           </Snackbar>
 
           <div className="min-w-0 flex-1">
-            <div
+            {/* <div
               ref={containerRef}
               className="flex w-fit items-center justify-center gap-2"
             >
@@ -229,7 +226,7 @@ const ChannelDetailsHeading = ({
                 </p>
               )}
               {loading && <p className="text-sm text-gray-400">saving...</p>}
-            </div>
+            </div> */}
 
             <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
               <div className="mt-2 flex items-center text-sm text-gray-500">
@@ -249,12 +246,15 @@ const ChannelDetailsHeading = ({
             </div>
             <div className="mt-5">
               {room && (
-                <InviteMember
-                  roomId={channelId}
-                  collaborators={usersData}
-                  creator={room.metadata.creator || ""}
-                  currentUserType={currentUserType}
-                />
+                <div className="flex w-full flex-1 justify-end gap-2 sm:gap-3">
+                  <ActiveCollaborators />
+                  <InviteMember
+                    roomId={roomId}
+                    collaborators={usersData}
+                    creator={room.metadata.creator || ""}
+                    currentUserType={currentUserType}
+                  />
+                </div>
               )}
             </div>
           </div>
