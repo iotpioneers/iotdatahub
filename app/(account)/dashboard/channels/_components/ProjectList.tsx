@@ -1,45 +1,9 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import Link from "next/link"; // Import Link from Next.js
 import { DeleteModal } from "@/components/DeleteModal";
+import { ChannelProps } from "@/types";
 
-interface Channel {
-  id: string;
-  name: string;
-  description: string;
-  createdAt: Date;
-}
-
-const ProjectList = () => {
-  const [channels, setChannels] = useState<Channel[] | null>(null);
-
-  useEffect(() => {
-    const fetchChannels = async () => {
-      try {
-        const res = await fetch(
-          process.env.NEXT_PUBLIC_BASE_URL + "/api/channels"
-        );
-        if (!res.ok) {
-          throw new Error("Failed to fetch channels");
-        }
-        const channelsData: Channel[] = await res.json();
-
-        // Assuming createdAt in channelsData is a string, parse it into Date
-        channelsData.forEach((channel) => {
-          channel.createdAt = new Date(channel.createdAt);
-        });
-
-        setChannels(channelsData);
-      } catch (error) {
-        return null;
-      }
-    };
-
-    fetchChannels();
-  }, []);
-
+const ProjectList = ({ channels }: { channels: ChannelProps[] | [] }) => {
   if (channels === null || channels.length === 0) {
     return null;
   }
@@ -65,7 +29,7 @@ const ProjectList = () => {
       headerName: "",
       width: 150,
       renderCell: (params: GridRenderCellParams) => (
-        <DeleteModal roomId={params.row.id} />
+        <DeleteModal channelId={params.row.id} />
       ),
     },
   ];

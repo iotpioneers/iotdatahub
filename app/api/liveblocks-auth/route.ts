@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (!userFound) {
-    throw new Error("User not found");
+    throw new Error("You need to be logged in");
   }
 
   const { id, name, email, image } = userFound;
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       id,
       name: name,
       email: email,
-      avatar: image!,
+      avatar: image || "user.svg",
       color: getUserColor(id),
     },
   };

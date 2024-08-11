@@ -5,14 +5,6 @@ import React from "react";
 // third party
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
-import { useSelector } from "react-redux";
-import { Theme } from "@radix-ui/themes";
-import { ThemeProvider } from "@mui/material/styles";
-import { CssBaseline, StyledEngineProvider } from "@mui/material";
-import {
-  ClientSideSuspense,
-  LiveblocksProvider,
-} from "@liveblocks/react/suspense";
 
 // project imports
 
@@ -39,10 +31,11 @@ import "@fontsource/poppins/600.css";
 import "@fontsource/poppins/700.css";
 
 // defaultTheme
-import themes from "@/app/themes";
 
 // style + assets
 import "@/app/styles/scss/style.scss";
+import { GlobalStateProvider } from "@/context";
+
 export const store = configureStore({ reducer });
 
 const ClientRootLayout = ({ children }: { children: React.ReactNode }) => {
@@ -51,7 +44,9 @@ const ClientRootLayout = ({ children }: { children: React.ReactNode }) => {
       <QueryClientProvider>
         <AuthProvider>
           <LocalizationProvider>
-            <ThemedLayout>{children}</ThemedLayout>
+            <ThemedLayout>
+              <GlobalStateProvider>{children}</GlobalStateProvider>
+            </ThemedLayout>
           </LocalizationProvider>
         </AuthProvider>
       </QueryClientProvider>

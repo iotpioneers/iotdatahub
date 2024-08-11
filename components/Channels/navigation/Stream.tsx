@@ -30,7 +30,7 @@ const status = [
   },
 ];
 
-const widget = [
+const widgets = [
   {
     value: "lineChart",
     label: "Line Chart - Displays time-series data",
@@ -80,6 +80,7 @@ interface Props {
 
 const Stream = ({ fields, dataPoint }: Props) => {
   const [value, setValue] = useState("today");
+  const [widget, setWidget] = useState("lineChart");
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -146,10 +147,10 @@ const Stream = ({ fields, dataPoint }: Props) => {
                 <TextField
                   id="standard-select-currency"
                   select
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
+                  value={widget}
+                  onChange={(e) => setWidget(e.target.value)}
                 >
-                  {widget.map((option) => (
+                  {widgets.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.label}
                     </MenuItem>

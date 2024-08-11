@@ -9,19 +9,27 @@ import { ClientSideSuspense } from "@liveblocks/react/suspense";
 import themes from "@/app/themes";
 import { store } from "./ClientRootLayout";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { createSelector } from "@reduxjs/toolkit";
 
-// Infer the type of store
-type AppStore = typeof store;
+type RootState = ReturnType<typeof store.getState>;
 
-// Infer the `RootState` and `AppDispatch` types from the store itself
-type RootState = ReturnType<AppStore["getState"]>;
+// Create memoized selectors
+const selectBorderRadius = (state: RootState) =>
+  state.customization.borderRadius;
+const selectFontFamily = (state: RootState) => state.customization.fontFamily;
+const selectNavType = (state: RootState) => state.customization.navType;
+
+const selectCustomization = createSelector(
+  [selectBorderRadius, selectFontFamily, selectNavType],
+  (borderRadius, fontFamily, navType) => ({
+    borderRadius,
+    fontFamily,
+    navType,
+  })
+);
 
 const ThemedLayout = ({ children }: { children: React.ReactNode }) => {
-  const customization = useSelector((state: RootState) => ({
-    borderRadius: state.customization.borderRadius,
-    fontFamily: state.customization.fontFamily,
-    navType: state.customization.navType,
-  }));
+  const customization = useSelector(selectCustomization);
 
   return (
     <StyledEngineProvider injectFirst>

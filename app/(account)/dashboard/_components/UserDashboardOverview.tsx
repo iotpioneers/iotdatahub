@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import DashboardOverview from "@/components/dashboard/DashboardOverview";
 import OrganizationOnboardingCreation from "@/components/dashboard/OrganizationOnboardingCreation";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
+import { useGlobalState } from "@/context";
 
 interface Organization {
   areaOfInterest: string;
@@ -33,6 +34,8 @@ const UserDashboardOverview = () => {
   const [members, setMembers] = useState<Member[] | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const { setState } = useGlobalState();
+
   useEffect(() => {
     const checkOrganizationStatus = async () => {
       try {
@@ -50,6 +53,7 @@ const UserDashboardOverview = () => {
         setHasOrganization(data.hasOrganization);
         setOrganization(data.organization);
         setMembers(data.members);
+        setState({ currentOrganization: data.organization });
       } catch (error) {
         return null;
       }

@@ -12,7 +12,6 @@ const ChannelDetailsHeading = dynamic(
   () => import("@/components/Channels/ChannelDetailsHeading"),
   {
     ssr: false,
-    loading: () => <LoadingProgressBar />,
   }
 );
 
@@ -50,30 +49,33 @@ export default function ChannelDetails({ channelID }: { channelID: string }) {
         );
 
         if (!res.ok) {
-          const errorData = await res.json();
-          setError("Failed to fetch channel");
+          setError("");
           setIsLoading(false);
+          setError("Failed to fetch channel data");
           return;
         }
 
         const channelData: ChannelData = await res.json();
 
         if (!channelData) {
-          setError("Failed to fetch channel");
+          setError("");
           setIsLoading(false);
+          setError("Failed to fetch channel");
           return;
         }
 
         setChannelData(channelData);
       } catch (error) {
         setError("An error occurred while fetching the channel");
+        setIsLoading(false);
       } finally {
+        setError("");
         setIsLoading(false);
       }
     };
 
     fetchChannel();
-  }, [channelData]);
+  }, []);
 
   if (!channelData) {
     return;
@@ -87,13 +89,15 @@ export default function ChannelDetails({ channelID }: { channelID: string }) {
     sampleCodes,
   } = channelData;
 
+  console.log("channelData", channelData);
+
   return (
     <main className="overflow-hidden">
       {isLoading && <LoadingProgressBar />}
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
-        autoHideDuration={6000}
+        autoHideDuration={12000}
         onClose={handleCloseResult}
       >
         <Alert

@@ -8,18 +8,11 @@ import { Button } from "@mui/material";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import Image from "next/image";
 import LoadingSpinner from "@/components/LoadingSpinner";
-
-interface Channel {
-  id: number;
-  name: string;
-  description: string;
-  lastSeen: Date | null;
-  lastSeenDateTime: Date;
-}
+import { ChannelProps } from "@/types";
 
 const ChannelList = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [channels, setChannels] = useState<Channel[] | null>(null);
+  const [channels, setChannels] = useState<ChannelProps[] | []>([]);
 
   useEffect(() => {
     const fetchChannels = async () => {
@@ -31,7 +24,7 @@ const ChannelList = () => {
         if (!res.ok) {
           throw new Error("Failed to fetch channels");
         }
-        const channelsData: Channel[] = await res.json();
+        const channelsData: ChannelProps[] = await res.json();
         setChannels(channelsData);
       } catch (error) {
         return null;
@@ -41,7 +34,7 @@ const ChannelList = () => {
     };
 
     fetchChannels();
-  }, [channels?.length]);
+  }, [channels.length]);
 
   return (
     <div className="w-full">
@@ -53,7 +46,7 @@ const ChannelList = () => {
         </Button>
       </Link>
 
-      {!isLoading && (!channels || channels.length === 0) && (
+      {channels && channels.length === 0 && !isLoading && (
         <div className="mb-8 w-full flex flex-row justify-between items-center text-center max-w-2xl mx-auto">
           <Text>
             Channels serve as a fundamental structure for organizing and storing
@@ -66,7 +59,7 @@ const ChannelList = () => {
       )}
 
       <Suspense fallback={<LoadingSpinner />}>
-        {channels && channels.length > 0 && <ProjectList />}
+        {channels && channels.length > 0 && <ProjectList channels={channels} />}
       </Suspense>
     </div>
   );

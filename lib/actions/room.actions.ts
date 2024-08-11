@@ -6,29 +6,27 @@ import { revalidatePath } from "next/cache";
 import { getAccessType, parseStringify } from "../utils";
 import {
   AccessType,
-  CreateChannelRoomParams,
+  CreateOrganisationRoomParams,
   RoomAccesses,
   ShareDocumentParams,
 } from "@/types";
 import axios from "axios";
 
-export const createChannelRoom = async ({
+export const createOrganizationRoom = async ({
   roomId,
-  creator,
+  userId,
   email,
   title,
-  description,
-}: CreateChannelRoomParams) => {
+}: CreateOrganisationRoomParams) => {
   try {
     const metadata = {
-      creator,
+      creatorId: userId,
       email,
       title,
-      description,
     };
 
     const usersAccesses: RoomAccesses = {
-      [email]: ["room:write"],
+      [userId]: ["room:write"],
     };
 
     const room = await liveblocks.createRoom(roomId, {
@@ -37,7 +35,7 @@ export const createChannelRoom = async ({
       defaultAccesses: [],
     });
 
-    revalidatePath("/dashboard/channels");
+    revalidatePath("/dashboard/organization");
 
     return parseStringify(room);
   } catch (error) {
@@ -67,7 +65,11 @@ export const getChannelRoom = async ({
   }
 };
 
-export const updateChannelRoom = async (roomId: string, title: string) => {
+export const updateChannelRoom = async (
+  roomId: string,
+  channelId: string,
+  title: string
+) => {
   try {
     const updatedRoom = await liveblocks.updateRoom(roomId, {
       metadata: {
@@ -77,7 +79,7 @@ export const updateChannelRoom = async (roomId: string, title: string) => {
 
     if (updatedRoom) {
       const response = await fetch(
-        process.env.NEXT_PUBLIC_BASE_URL + `/api/channels/${roomId}`,
+        process.env.NEXT_PUBLIC_BASE_URL + `/api/channels/${channelId}`,
         {
           method: "PUT",
           headers: {
@@ -92,7 +94,7 @@ export const updateChannelRoom = async (roomId: string, title: string) => {
         return null;
       }
 
-      revalidatePath(`/dashboard/channels/${roomId}`);
+      revalidatePath(`/dashboard/channels/${channelId}`);
 
       return parseStringify(updatedRoom);
     }
@@ -179,26 +181,17 @@ export const removeCollaborator = async ({
   }
 };
 
-export const deleteChannel = async (channelId: string) => {
+export const deleteChannel = async (roomId: string, channelId: string) => {
   try {
-    const response = await axios.delete(
-      process.env.NEXT_PUBLIC_BASE_URL + `/api/channels/${channelId}`
-    );
+    const response = await axios.delete(`/api/channels/${channelId}`);
 
     if (response.status !== 200) {
       return null;
     }
 
-    try {
-      await liveblocks.deleteRoom(channelId);
-
-      revalidatePath(`/dashboard/channels`);
-    } catch (error) {
-      return null;
-    }
-
-    revalidatePath("/");
+    revalidatePath("/dashboard/channels");
   } catch (error) {
+    console.error("Error deleting channel:", error);
     revalidatePath("/dashboard/channels");
   }
 };

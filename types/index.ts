@@ -6,9 +6,10 @@ export interface ChannelProps {
   name: string;
   description: string;
   deviceId?: string | null;
+  organizationId: string;
   access: "PUBLIC" | "PRIVATE";
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   userId: string;
 }
 export interface DataPointProps {
@@ -47,10 +48,6 @@ export interface AddMemberProps {
 }
 
 /* eslint-disable no-unused-vars */
-export type SearchParamProps = {
-  params: { [key: string]: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
 
 export type AccessType = ["room:write"] | ["room:read", "room:presence:write"];
 
@@ -64,12 +61,11 @@ export type RoomMetadata = {
   title: string;
 };
 
-export type CreateChannelRoomParams = {
+export type CreateOrganisationRoomParams = {
   roomId: string;
   email: string;
-  creator: string;
+  userId: string;
   title: string;
-  description: string;
 };
 
 export type User = {
@@ -126,6 +122,6 @@ export type AddDocumentBtnProps = {
   email: string;
 };
 
-export type DeleteModalProps = { roomId: string };
+export type DeleteModalProps = { channelId: string };
 
 export type ThreadWrapperProps = { thread: ThreadData<BaseMetadata> };

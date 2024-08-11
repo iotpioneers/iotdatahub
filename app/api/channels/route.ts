@@ -6,6 +6,7 @@ import { channelSchema } from "@/validations/schema.validation";
 
 interface Field {
   name: string;
+  organization: { connect: { id: string } };
 }
 
 export async function POST(request: NextRequest) {
@@ -36,6 +37,7 @@ export async function POST(request: NextRequest) {
   }
 
   const { name, description, fields } = validation.data;
+  const { organizationId } = body;
 
   // Generate a new valid ObjectID for apiKey
   const apiKey = new ObjectId().toHexString();
@@ -45,6 +47,7 @@ export async function POST(request: NextRequest) {
     const formattedFields: Field[] | undefined = fields?.map(
       (fieldName: string) => ({
         name: fieldName,
+        organization: { connect: { id: organizationId } },
       })
     );
 
@@ -117,6 +120,7 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         description,
+        organizationId,
         userId: user.id,
         fields: {
           create: formattedFields || [],
@@ -126,6 +130,7 @@ export async function POST(request: NextRequest) {
             apiKey,
             userId: user.id,
             fields: formattedFields?.map((field) => field.name) || [],
+            organizationId,
           },
         },
       },
@@ -145,6 +150,7 @@ export async function POST(request: NextRequest) {
         codes: sampleCodes,
         apiKeyId: apiKey,
         channelId: newChannel.id,
+        organizationId,
       },
     });
 

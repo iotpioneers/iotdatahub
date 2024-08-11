@@ -16,7 +16,7 @@ import { redirect } from "next/navigation";
 import { getUsersByEmails } from "@/lib/actions/user.actions";
 import { User } from "@/types/user";
 import { ViewIcon } from "lucide-react";
-import LoadingSpinner from "../LoadingSpinner";
+import Loader from "../Loader";
 import { dateConverter } from "@/lib/utils";
 
 import InviteMember from "./collaboration/InviteMember";
@@ -35,6 +35,9 @@ const ChannelDetailsHeading = ({
   if (status === "unauthenticated") {
     redirect("/login");
   }
+  const { id: userId } = session!.user;
+
+  const { id: channelId, organizationId: roomId } = channel;
 
   const [channelTitle, setChannelTitle] = useState(channel?.name);
   const [editing, setEditing] = useState(false);
@@ -75,7 +78,8 @@ const ChannelDetailsHeading = ({
       try {
         if (channelTitle !== channel?.name) {
           const updatedChannel = await updateChannelRoom(
-            channel.id,
+            roomId,
+            channelId,
             channelTitle
           );
 
@@ -106,7 +110,7 @@ const ChannelDetailsHeading = ({
         !containerRef.current.contains(e.target as Node)
       ) {
         setEditing(false);
-        updateChannelRoom(channel.id, channelTitle);
+        updateChannelRoom(roomId, channelId, channelTitle);
       }
     };
 
@@ -115,7 +119,7 @@ const ChannelDetailsHeading = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [channel.id, channelTitle]);
+  }, [channel!.id, channelTitle]);
 
   useEffect(() => {
     if (editing && inputRef.current) {
@@ -124,15 +128,13 @@ const ChannelDetailsHeading = ({
   }, [editing]);
 
   const fetchData = async () => {
-    const currentUserEmail = session?.user?.email;
-
-    if (!currentUserEmail) {
-      throw new Error("User email is not defined");
+    if (!userId) {
+      throw new Error("User ");
     }
 
     const roomData = await getChannelRoom({
-      roomId: channel.id,
-      userId: currentUserEmail,
+      roomId,
+      userId,
     });
 
     if (!roomData) return;
@@ -146,16 +148,14 @@ const ChannelDetailsHeading = ({
 
     const usersData = users.map((user: User) => ({
       ...user,
-      userType: roomData.usersAccesses[user!.email as string]?.includes(
-        "room:write"
-      )
+      userType: roomData.usersAccesses[userId as string]?.includes("room:write")
         ? "editor"
         : "viewer",
     }));
 
     setUsersData(usersData);
 
-    const currentUserType = roomData.usersAccesses[currentUserEmail]?.includes(
+    const currentUserType = roomData.usersAccesses[userId]?.includes(
       "room:write"
     )
       ? "editor"
@@ -166,16 +166,16 @@ const ChannelDetailsHeading = ({
 
   useEffect(() => {
     fetchData();
-  }, [channel.id, session]);
+  }, [channelId, session]);
 
   return (
-    <RoomProvider id={channel.id}>
-      <ClientSideSuspense fallback={<LoadingSpinner />}>
+    <RoomProvider id={roomId}>
+      <ClientSideSuspense fallback={<Loader />}>
         <div className="lg:flex lg:items-center lg:justify-between mt-12 padding-x padding-y max-width">
           <Snackbar
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
             open={showResult}
-            autoHideDuration={6000}
+            autoHideDuration={12000}
             onClose={handleCloseResult}
           >
             <Alert
@@ -244,13 +244,13 @@ const ChannelDetailsHeading = ({
                   className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                   aria-hidden="true"
                 />
-                Created about {dateConverter(channel.createdAt)}
+                Created about {dateConverter(channel.createdAt.toString())}
               </div>
             </div>
             <div className="mt-5">
               {room && (
                 <InviteMember
-                  roomId={channel.id}
+                  roomId={channelId}
                   collaborators={usersData}
                   creator={room.metadata.creator || ""}
                   currentUserType={currentUserType}

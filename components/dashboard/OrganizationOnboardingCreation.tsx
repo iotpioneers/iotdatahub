@@ -1,12 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { Button, Callout, Heading, Text } from "@radix-ui/themes";
 import { nanoid } from "nanoid";
 import { useRouter } from "next/navigation";
 import { organizationSchema } from "@/validations/schema.validation";
+import { useGlobalState } from "@/context";
+import axios from "axios";
+import { useSession } from "next-auth/react";
+import { createOrganizationRoom } from "@/lib/actions/room.actions";
 
 // Define the enum AreaOfInterest
 enum AreaOfInterest {
@@ -27,6 +31,15 @@ enum AreaOfInterest {
 }
 
 const OrganizationOnboardingCreation: React.FC = () => {
+  const { status, data: session } = useSession();
+  const router = useRouter();
+  const { setState } = useGlobalState();
+
+  if (status !== "loading" && status === "unauthenticated")
+    router.push("/login");
+
+  const { id: userId, email } = session!.user;
+
   const [error, setError] = useState<string>("");
   const [step, setStep] = useState<number>(1);
   const [organizationType, setOrganizationType] = useState<
@@ -52,8 +65,6 @@ const OrganizationOnboardingCreation: React.FC = () => {
 
     setOpen(false);
   };
-
-  const router = useRouter();
 
   // Generate organization name
   const organizationName = "MY-ORG-" + nanoid(6);
@@ -122,23 +133,29 @@ const OrganizationOnboardingCreation: React.FC = () => {
     }
 
     try {
-      const response = await fetch("/api/organizations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(organizationData),
-      });
+      const response = await axios.post("/api/organizations", organizationData);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.error || "Error creating organization");
+      if (response.status !== 201) {
+        setError(response.statusText || "Error creating organization");
         setLoading(false);
         return;
       }
 
-      const newOrganization = await response.json();
+      const { newOrganization } = response.data;
 
+      const { id: roomId, name: title } = newOrganization;
+
+      await createOrganizationRoom({
+        roomId,
+        userId,
+        email,
+        title,
+      });
+
+      setState((prev) => ({
+        ...prev,
+        organization: newOrganization,
+      }));
       setOpen(true);
       setLoading(false);
       setTimeout(() => {
@@ -153,11 +170,11 @@ const OrganizationOnboardingCreation: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-5 -mt-12">
+    <div className="flex items-center justify-center min-h-screen px-5 -mt-2 ">
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
-        autoHideDuration={6000}
+        autoHideDuration={12000}
         onClose={handleCloseResult}
       >
         <Alert

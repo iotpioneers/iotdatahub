@@ -1,13 +1,13 @@
 "use client";
 
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import {
   ArchiveBoxXMarkIcon,
   CloudArrowUpIcon,
 } from "@heroicons/react/24/outline";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,20 +17,23 @@ import "easymde/dist/easymde.min.css";
 import { channelSchema } from "@/validations/schema.validation";
 import ErrorMessage from "@/components/ErrorMessage";
 import { useSession } from "next-auth/react";
-import { createChannelRoom } from "@/lib/actions/room.actions";
+import { useGlobalState } from "@/context";
+import axios from "axios";
 
 type ChannelForm = z.infer<typeof channelSchema>;
 
 export default function ChannelForm() {
-  const { status, data: session } = useSession();
-
-  if (status === "unauthenticated") redirect("/login");
-
+  const { status } = useSession();
+  const { state, fetchCurrentOrganization } = useGlobalState();
   const router = useRouter();
+
   const [fields, setFields] = useState<string[]>([""]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [open, setOpen] = React.useState(false);
+
+  if (status === "unauthenticated") router.push("/login");
+  const currentOrganization = state.currentOrganization;
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
@@ -70,41 +73,28 @@ export default function ChannelForm() {
     }
   };
 
+  useEffect(() => {
+    fetchCurrentOrganization();
+  }, [currentOrganization]);
+
   const onSubmit = handleSubmit(async (data) => {
     try {
       setIsSubmitting(true);
-      const response = await fetch("/api/channels", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+      const response = await axios.post("/api/channels", {
+        ...data,
+        organizationId: currentOrganization!.id,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (response.status !== 201) {
         setError("Failed to create channel");
         throw new Error("Failed to create channel");
       }
 
-      const result = await response.json();
+      const result = await response.data;
 
-      const { id, name: channelName, description } = result.newChannel;
+      const { id } = result.newChannel;
 
       if (result) {
-        const room = await createChannelRoom({
-          roomId: id,
-          creator: session!.user!.name!,
-          email: session!.user!.email!,
-          title: channelName,
-          description,
-        });
-
-        if (!room) {
-          setError("Failed to create room");
-          throw new Error("Failed to create room");
-        }
-
         setOpen(true);
 
         setIsSubmitting(false);
@@ -122,7 +112,7 @@ export default function ChannelForm() {
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
-        autoHideDuration={6000}
+        autoHideDuration={12000}
         onClose={handleCloseResult}
       >
         <Alert

@@ -114,7 +114,7 @@ export default function DeviceForm() {
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
-        autoHideDuration={6000}
+        autoHideDuration={12000}
         onClose={handleCloseResult}
       >
         <Alert

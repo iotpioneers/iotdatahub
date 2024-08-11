@@ -104,20 +104,19 @@ const AuthLogin = ({ ...others }) => {
     const response = await signIn("credentials", {
       email: data.email,
       password: data.password,
-      redirect: false,
+      redirect: true,
       callbackUrl: "/dashboard",
     });
+
     setLoading(false);
     if (response?.error) {
       setError(response.error);
       setOpen(true);
-    } else {
-      setError(null);
-      setOpen(true);
-      router.push(process.env.NEXT_PUBLIC_BASE_URL + "/dashboard");
     }
-
+    setError(null);
+    setOpen(true);
     setLoading(false);
+    router.push(process.env.NEXT_PUBLIC_BASE_URL + "/dashboard");
   };
 
   return (
@@ -125,7 +124,7 @@ const AuthLogin = ({ ...others }) => {
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
-        autoHideDuration={6000}
+        autoHideDuration={12000}
         onClose={handleCloseResult}
       >
         <Alert

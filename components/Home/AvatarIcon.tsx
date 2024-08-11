@@ -16,7 +16,7 @@ const AvatarIcon = () => {
           <Popover.Trigger>
             <Avatar className="h-10 w-10 bg-gray-100 border-n-1 border-1 rounded-full flex items-center justify-center">
               <img
-                src={session!.user!.image || "/user.svg"}
+                src={session?.user?.image || "user.svg"}
                 alt="Profile"
                 className="rounded-full"
               />
@@ -26,7 +26,7 @@ const AvatarIcon = () => {
             <Flex gap="4">
               <Box className="m-0 p-2">
                 <Heading size="2" as="h3" className="mt-2 mb-3 text-n-8">
-                  {session!.user!.email}
+                  {session?.user?.email}
                 </Heading>
                 <div className="grid">
                   <Link

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { deleteChannel } from "@/lib/actions/room.actions";
 
@@ -19,17 +19,25 @@ import {
 import { Button } from "@mui/material";
 import { DeleteModalProps } from "@/types";
 import LoadingProgressBar from "./LoadingProgressBar";
+import { useGlobalState } from "@/context";
 
-export const DeleteModal = ({ roomId }: DeleteModalProps) => {
+export const DeleteModal = ({ channelId }: DeleteModalProps) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
+
+  const { state, fetchCurrentOrganization } = useGlobalState();
+  const currentOrganization = state.currentOrganization;
+
+  useEffect(() => {
+    fetchCurrentOrganization();
+  }, [currentOrganization]);
 
   const deleteChannelHandler = async () => {
     setLoading(true);
 
     try {
-      await deleteChannel(roomId);
+      await deleteChannel(currentOrganization!.id, channelId);
 
       setOpen(false);
       setLoading(false);

@@ -77,7 +77,14 @@ const schema = Yup.object().shape({
     .typeError("Must be a valid phone number")
     .required("Phone is required"),
 
-  password: Yup.string().min(8).max(255).required("Password is required"),
+  password: Yup.string()
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
+    )
+    .min(8)
+    .max(255)
+    .required("Password is required"),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Passwords must match")
     .required("Confirm Password is required"),
@@ -207,7 +214,7 @@ const AuthRegister = ({ ...others }) => {
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
-        autoHideDuration={6000}
+        autoHideDuration={12000}
         onClose={handleCloseResult}
       >
         <Alert
