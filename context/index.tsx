@@ -2,12 +2,14 @@
 
 import { ChannelProps } from "@/types";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 import React, {
   createContext,
   useContext,
   useState,
   ReactNode,
   useCallback,
+  useEffect,
 } from "react";
 
 // Define the shape of your Organization state based on the Prisma schema
@@ -25,10 +27,23 @@ enum OrganizationType {
   ENTREPRISE = "ENTREPRISE",
 }
 
+interface currentUser {
+  id: string;
+  name: string;
+  email: string;
+  image: string | "";
+  country: string;
+  phonenumber: string;
+  role: string;
+  subscriptionId: string | null;
+  organizationId: string | null;
+}
+
 // Define the global state interface
 interface GlobalState {
   currentOrganization: Organization | null;
-  userChannels: ChannelProps[] | []; // Corrected spelling here
+  userChannels: ChannelProps[] | [];
+  currentUser: currentUser | null;
 }
 
 // Define the context type
@@ -37,6 +52,7 @@ interface GlobalStateContextType {
   setState: React.Dispatch<React.SetStateAction<GlobalState>>;
   fetchCurrentOrganization: () => Promise<void>;
   fetchUserChannels: () => Promise<void>;
+  updateUserData: (newData: currentUser) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -48,10 +64,32 @@ const GlobalStateContext = createContext<GlobalStateContextType | undefined>(
 export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<GlobalState>({
     currentOrganization: null,
-    userChannels: [], // Corrected spelling here
+    userChannels: [],
+    currentUser: null,
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const { status, data: sessionData } = useSession();
+
+  // Effect to update global state when session changes
+  useEffect(() => {
+    if (status === "authenticated") {
+      setState((prevState) => ({
+        ...prevState,
+        currentUser: {
+          id: sessionData.user.id,
+          name: sessionData.user.name,
+          email: sessionData.user.email,
+          image: sessionData.user.image || "",
+          country: sessionData.user.country,
+          phonenumber: sessionData.user.phonenumber,
+          role: sessionData.user.role,
+          subscriptionId: sessionData.user.subscriptionId,
+          organizationId: sessionData.user.organizationId,
+        },
+      }));
+    }
+  }, [status, sessionData]);
 
   const fetchCurrentOrganization = async () => {
     try {
@@ -84,7 +122,7 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
       const channelsData: ChannelProps[] = res.data;
       setState((prevState) => ({
         ...prevState,
-        userChannels: channelsData, // Corrected spelling here
+        userChannels: channelsData,
       }));
     } catch (error) {
       console.error("Error fetching user channels:", error);
@@ -93,6 +131,31 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  const updateUserData = async (newData: currentUser) => {
+    try {
+      setIsLoading(true);
+      // Update the user data on the server
+      const res = await axios.put(`/api/users/${newData.id}`, newData);
+
+      if (res.status !== 200) {
+        throw new Error("Failed to update user data");
+      }
+
+      console.log("User data updated successfully", res.data);
+
+      // Update the local state
+      setState((prevState) => ({
+        ...prevState,
+        currentUser: newData,
+      }));
+    } catch (error) {
+      console.error("Error updating user data:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <GlobalStateContext.Provider
       value={{
@@ -100,6 +163,7 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
         setState,
         fetchCurrentOrganization,
         fetchUserChannels,
+        updateUserData,
         isLoading,
       }}
     >

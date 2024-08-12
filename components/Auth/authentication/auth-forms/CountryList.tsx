@@ -14,7 +14,7 @@ interface CountryListProps {
   selectedCountry: CountryType | null;
   setSelectedCountry: (country: CountryType | null) => void;
 }
-// Full list of countries with phone codes
+// List of countries with phone codes
 const countries: CountryType[] = [
   { code: "AD", label: "Andorra", phone: "376" },
   {
@@ -475,7 +475,7 @@ const CountryList: React.FC<CountryListProps> = ({
       renderInput={(params) => (
         <TextField
           {...params}
-          label="Choose a country"
+          label="Country"
           inputProps={{
             ...params.inputProps,
           }}

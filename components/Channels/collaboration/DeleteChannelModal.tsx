@@ -18,10 +18,10 @@ import {
 
 import { Button } from "@mui/material";
 import { DeleteModalProps } from "@/types";
-import LoadingProgressBar from "./LoadingProgressBar";
+import LoadingProgressBar from "../../LoadingProgressBar";
 import { useGlobalState } from "@/context";
 
-export const DeleteModal = ({ channelId }: DeleteModalProps) => {
+export const DeleteChannelModal = ({ channelId }: DeleteModalProps) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");

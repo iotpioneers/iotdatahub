@@ -22,7 +22,7 @@ import Typography from "@mui/material/Typography";
 import { Callout } from "@radix-ui/themes";
 import { Member, AddMemberProps } from "@/types";
 import ErrorMessage from "@/components/ErrorMessage";
-import UploadImage from "@/components/UploadImage";
+import UploadImage from "@/components/dashboard/account/UploadImage";
 
 type MemberFormData = z.infer<typeof memberSchema>;
 

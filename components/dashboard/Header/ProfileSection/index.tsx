@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
 import { useSelector } from "react-redux";
 
 // material-ui
@@ -22,9 +21,9 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import Paper from "@mui/material/Paper";
 import Popper from "@mui/material/Popper";
 import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
-import Typography from "@mui/material/Typography";
 
 // third-party
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -45,6 +44,8 @@ import {
 } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useGlobalState } from "@/context";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 // ==============================|| PROFILE MENU ||============================== //
 
@@ -57,11 +58,9 @@ export type AppStore = typeof store;
 export type RootState = ReturnType<AppStore["getState"]>;
 
 const ProfileSection = () => {
+  const { state } = useGlobalState();
   const { status, data: session } = useSession();
   const router = useRouter();
-
-  if (status === "unauthenticated") router.push("/login");
-
   const theme = useTheme();
   const customization = useSelector((state: RootState) => state.customization);
 
@@ -70,6 +69,16 @@ const ProfileSection = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
+  const prevOpen = useRef(open);
+
+  const { currentUser } = state;
+
+  useEffect(() => {
+    if (prevOpen.current === true && open === false) {
+      anchorRef.current?.focus();
+    }
+    prevOpen.current = open;
+  }, [open]);
 
   const handleLogout = async () => {
     router.push("/logout");
@@ -88,20 +97,22 @@ const ProfileSection = () => {
     route = ""
   ) => {
     setSelectedIndex(index);
-    handleClose(event as unknown as MouseEvent | TouchEvent); // Type assertion here
+    handleClose(event as unknown as MouseEvent | TouchEvent);
   };
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
   };
 
-  const prevOpen = useRef(open);
   useEffect(() => {
-    if (prevOpen.current === true && open === false) {
-      anchorRef.current?.focus();
+    if (status !== "loading" && status === "unauthenticated") {
+      router.push("/login");
     }
-    prevOpen.current = open;
-  }, [open]);
+  }, [status, router, state]);
+
+  const userName = currentUser?.name || session?.user?.name;
+  const userEmail = currentUser?.email || session?.user?.email;
+  const userImage = currentUser?.image || session?.user?.image;
 
   return (
     <>
@@ -127,7 +138,7 @@ const ProfileSection = () => {
         }}
         icon={
           <Avatar
-            src="user.svg"
+            src={userImage || "/user.svg"}
             sx={{
               ...theme.typography.mediumAvatar,
               margin: "8px 0 8px 8px !important",
@@ -185,13 +196,9 @@ const ProfileSection = () => {
                   <Box sx={{ p: 2, pb: 0 }}>
                     <Stack>
                       <Stack direction="row" spacing={0.5} alignItems="center">
-                        <Typography variant="h4">
-                          {session!.user!.name}
-                        </Typography>
+                        <Typography variant="h4">{userName}</Typography>
                       </Stack>
-                      <Typography variant="subtitle2">
-                        {session!.user!.email}
-                      </Typography>
+                      <Typography variant="subtitle2">{userEmail}</Typography>
                     </Stack>
                     <OutlinedInput
                       sx={{ width: "100%", pr: 1, pl: 2, my: 2 }}

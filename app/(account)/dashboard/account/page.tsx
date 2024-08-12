@@ -6,7 +6,6 @@ import Grid from "@mui/material/Unstable_Grid2";
 import { AccountDetailsForm } from "@/components/dashboard/account/AccountDetailsForm";
 import { AccountInfo } from "@/components/dashboard/account/AccountInfo";
 
-
 export default function AccountPage(): React.JSX.Element {
   return (
     <Stack spacing={3}>
@@ -28,6 +27,6 @@ export default function AccountPage(): React.JSX.Element {
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Account - IoTDataHub - Dashboard",
+  title: "IoTDataHub | User-Account",
   description: "Manage your account details",
 };

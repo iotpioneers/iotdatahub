@@ -1,85 +1,336 @@
 "use client";
 
-import * as React from "react";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import CardHeader from "@mui/material/CardHeader";
-import Divider from "@mui/material/Divider";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import Select from "@mui/material/Select";
-import Grid from "@mui/material/Unstable_Grid2";
-import { useSession } from "next-auth/react";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
+import React, { useEffect, useState } from "react";
+import { configureStore } from "@reduxjs/toolkit";
 
-export function AccountDetailsForm(): React.JSX.Element {
-  const { status, data: session } = useSession();
+import { useSession } from "next-auth/react";
+import { useGlobalState } from "@/context";
+import { redirect } from "next/navigation";
+
+// material-ui
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import FormControl from "@mui/material/FormControl";
+import FormHelperText from "@mui/material/FormHelperText";
+import Grid from "@mui/material/Grid";
+import InputLabel from "@mui/material/InputLabel";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+
+// third party
+import * as Yup from "yup";
+import { Formik } from "formik";
+
+// project imports
+import AnimateButton from "@/components/Auth/AnimateButton";
+import reducer from "@/app/store/reducer";
+import LoadingProgressBar from "@/components/LoadingProgressBar";
+import CountryList from "@/components/Auth/authentication/auth-forms/CountryList";
+
+const store = configureStore({ reducer });
+
+export type AppStore = typeof store;
+export type RootState = ReturnType<AppStore["getState"]>;
+
+interface CountryType {
+  code: string;
+  label: string;
+  phone: string;
+  suggested?: boolean;
+}
+
+const schema = Yup.object().shape({
+  firstname: Yup.string().max(255).required("Firstname is required"),
+  lastname: Yup.string().max(255).required("Lastname is required"),
+  country: Yup.string().optional(),
+  phonecode: Yup.string().optional(),
+  phonenumber: Yup.string()
+    .test(
+      "is-number",
+      "Must be a valid phone number",
+      (value) => value === "" || (!isNaN(Number(value)) && Number(value) > 0)
+    )
+    .required("Phone is required"),
+});
+
+type FormData = Yup.InferType<typeof schema>;
+
+export function AccountDetailsForm({ ...others }): React.JSX.Element {
+  const theme = useTheme();
+  const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
+
+  const { state, updateUserData, isLoading } = useGlobalState();
+  const { status } = useSession();
+  const [selectedCountry, setSelectedCountry] = useState<CountryType | null>(
+    null
+  );
+
+  const { currentUser } = state;
+
+  console.log("currentUser", currentUser);
+
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
+
+  if (
+    (status !== "loading" && status === "unauthenticated") ||
+    currentUser === null
+  ) {
+    redirect("/login");
+  }
+
+  useEffect(() => {
+    if (currentUser) {
+      const countryData = {
+        code: currentUser.phonenumber.split(" ")[0] || "",
+        label: currentUser.country || "",
+        phone: currentUser.phonenumber.split(" ")[1] || "",
+      };
+      setSelectedCountry(countryData);
+    }
+  }, [currentUser]);
+
+  const handleUpdateUserData = async (data: FormData) => {
+    if (currentUser) {
+      try {
+        const updatedUserData = {
+          ...currentUser,
+          ...data,
+          phonenumber: `${data.phonecode} ${data.phonenumber}`,
+        };
+        await updateUserData(updatedUserData);
+        setSnackbarMessage("User data updated successfully");
+        setSnackbarSeverity("success");
+        setOpenSnackbar(true);
+      } catch (error) {
+        console.error("Error updating user data:", error);
+        setSnackbarMessage("Failed to update user data");
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
+      }
+    }
+  };
+
+  const handleCloseSnackbar = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpenSnackbar(false);
+  };
 
   return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault();
-      }}
-    >
-      <Card>
-        {status === "loading" && <LoadingProgressBar />}
-        <CardHeader subheader="The information can be edited" title="Profile" />
-        <Divider />
-        <CardContent>
-          <Grid container spacing={3}>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>First name</InputLabel>
-                <OutlinedInput
-                  defaultValue={session!.user!.name?.split(" ")[0]}
-                  label="First name"
-                  name="firstName"
-                />
-              </FormControl>
+    <>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+
+      <Formik
+        initialValues={{
+          firstname: currentUser?.name?.split(" ")[0] || "",
+          lastname: currentUser?.name?.split(" ")[1] || "",
+          country: currentUser?.country || "",
+          phonecode: currentUser?.phonenumber?.split(" ")[0] || "",
+          phonenumber: currentUser?.phonenumber?.split(" ")[1] || "",
+          submit: null,
+        }}
+        validationSchema={schema}
+        onSubmit={(values, actions) => {
+          handleUpdateUserData(values);
+          actions.setSubmitting(false);
+        }}
+      >
+        {({
+          errors,
+          handleBlur,
+          handleChange,
+          handleSubmit,
+          isSubmitting,
+          touched,
+          values,
+        }) => (
+          <form noValidate onSubmit={handleSubmit} {...others}>
+            <Grid container spacing={matchDownSM ? 0 : 2}>
+              <Grid item xs={12} sm={6}>
+                <FormControl
+                  fullWidth
+                  error={Boolean(touched.firstname && errors.firstname)}
+                  sx={{ ...theme.typography.customInput }}
+                >
+                  <InputLabel htmlFor="outlined-adornment-firstname-register">
+                    First Name
+                  </InputLabel>
+                  <OutlinedInput
+                    id="outlined-adornment-firstname-register"
+                    type="text"
+                    value={values.firstname}
+                    name="firstname"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    inputProps={{}}
+                  />
+                  {touched.firstname && errors.firstname && (
+                    <FormHelperText
+                      error
+                      id="standard-weight-helper-text--register"
+                    >
+                      {errors.firstname}
+                    </FormHelperText>
+                  )}
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl
+                  fullWidth
+                  error={Boolean(touched.lastname && errors.lastname)}
+                  sx={{ ...theme.typography.customInput }}
+                >
+                  <InputLabel htmlFor="outlined-adornment-lastname-register">
+                    Last Name
+                  </InputLabel>
+                  <OutlinedInput
+                    id="outlined-adornment-lastname-register"
+                    type="text"
+                    value={values.lastname}
+                    name="lastname"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    inputProps={{}}
+                  />
+                  {touched.lastname && errors.lastname && (
+                    <FormHelperText
+                      error
+                      id="standard-weight-helper-text--register"
+                    >
+                      {errors.lastname}
+                    </FormHelperText>
+                  )}
+                </FormControl>
+              </Grid>
             </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>Last name</InputLabel>
-                <OutlinedInput
-                  defaultValue={session!.user!.name?.split(" ")[1]}
-                  label="Last name"
-                  name="lastName"
-                />
-              </FormControl>
+            <FormControl
+              fullWidth
+              error={Boolean(touched.country && errors.country)}
+              sx={{ ...theme.typography.customInput }}
+            >
+              <CountryList
+                selectedCountry={selectedCountry}
+                setSelectedCountry={(country) => {
+                  setSelectedCountry(country);
+                  handleChange({
+                    target: {
+                      name: "country",
+                      value: country?.label || "",
+                    },
+                  });
+                  handleChange({
+                    target: {
+                      name: "phonecode",
+                      value: country?.phone || "",
+                    },
+                  });
+                }}
+              />
+              {touched.country && errors.country && (
+                <FormHelperText
+                  error
+                  id="standard-weight-helper-text--register"
+                >
+                  {errors.country}
+                </FormHelperText>
+              )}
+            </FormControl>
+            <Grid container spacing={matchDownSM ? 0 : 2}>
+              <Grid item xs={12} sm={3}>
+                <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
+                  <InputLabel htmlFor="outlined-adornment-phonecode-register">
+                    Code
+                  </InputLabel>
+                  <OutlinedInput
+                    id="outlined-adornment-phonecode"
+                    type="text"
+                    value={`+${values.phonecode}`}
+                    name="phonecode"
+                    readOnly
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={9}>
+                <FormControl
+                  fullWidth
+                  error={Boolean(touched.phonenumber && errors.phonenumber)}
+                  sx={{ ...theme.typography.customInput }}
+                >
+                  <InputLabel htmlFor="outlined-adornment-phonenumber-register">
+                    Phone Number
+                  </InputLabel>
+                  <OutlinedInput
+                    id="outlined-adornment-phonenumber-register"
+                    type="tel"
+                    value={values.phonenumber}
+                    name="phonenumber"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    inputProps={{}}
+                  />
+                  {touched.phonenumber && errors.phonenumber && (
+                    <FormHelperText
+                      error
+                      id="standard-weight-helper-text--register"
+                    >
+                      {errors.phonenumber}
+                    </FormHelperText>
+                  )}
+                </FormControl>
+              </Grid>
             </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>Email address</InputLabel>
-                <OutlinedInput
-                  defaultValue={session!.user!.email}
-                  label="Email address"
-                  name="email"
-                />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Country</InputLabel>
-                <OutlinedInput label="Country" name="country" type="text" />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Phone number</InputLabel>
-                <OutlinedInput label="Phone number" name="phone" type="tel" />
-              </FormControl>
-            </Grid>
-          </Grid>
-        </CardContent>
-        <Divider />
-        <CardActions sx={{ justifyContent: "flex-end" }}>
-          <Button variant="contained">Save details</Button>
-        </CardActions>
-      </Card>
-    </form>
+
+            {errors.submit && (
+              <Box sx={{ mt: 3 }}>
+                <FormHelperText error>{errors.submit}</FormHelperText>
+              </Box>
+            )}
+
+            <Box sx={{ mt: 2 }}>
+              <AnimateButton>
+                <Button
+                  disableElevation
+                  disabled={isSubmitting || isLoading}
+                  fullWidth
+                  size="large"
+                  type="submit"
+                  variant="contained"
+                  color="secondary"
+                >
+                  {isSubmitting || isLoading
+                    ? "Please wait while saving changes..."
+                    : "Save Changes"}
+                </Button>
+                {isSubmitting || (isLoading && <LoadingProgressBar />)}
+              </AnimateButton>
+            </Box>
+          </form>
+        )}
+      </Formik>
+    </>
   );
 }

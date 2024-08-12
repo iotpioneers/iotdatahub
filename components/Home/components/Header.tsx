@@ -8,7 +8,6 @@ import Button from "./Button";
 import MenuSvg from "./design/svg/MenuSvg";
 import { HamburgerMenu } from "./design/Header";
 import NavigationMenuLinks from "../NavigationMenuLinks/NavigationMenuLinks";
-import AvatarIcon from "../AvatarIcon";
 
 const Header = () => {
   const { status, data: session } = useSession();
@@ -55,7 +54,7 @@ const Header = () => {
                 openNavigation ? "flex" : "hidden"
               } fixed top-[5rem] left-0 right-0 bottom-0 bg-n-8 lg:static lg:flex lg:mx-auto lg:bg-transparent`}
             >
-              <div className="relative z-2 flex flex-col items-center justify-center m-auto lg:flex-row">
+              <div className="relative z-2 flex flex-col items-center justify-center lg:flex-row">
                 <NavigationMenuLinks />
                 {navigation.map((item) => (
                   <a
@@ -82,10 +81,6 @@ const Header = () => {
                 {status === "authenticated" ? "DASHBOARD" : "SIGN IN"}
               </Button>
             )}
-
-            <div className="hidden xs:block">
-              {status === "authenticated" && <AvatarIcon />}
-            </div>
 
             <Button
               className="ml-1 lg:hidden"

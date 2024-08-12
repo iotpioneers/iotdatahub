@@ -1,6 +1,6 @@
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import Link from "next/link"; // Import Link from Next.js
-import { DeleteModal } from "@/components/DeleteModal";
+import { DeleteChannelModal } from "@/components/Channels/collaboration/DeleteChannelModal";
 import { ChannelProps } from "@/types";
 
 const ProjectList = ({ channels }: { channels: ChannelProps[] | [] }) => {
@@ -29,7 +29,7 @@ const ProjectList = ({ channels }: { channels: ChannelProps[] | [] }) => {
       headerName: "",
       width: 150,
       renderCell: (params: GridRenderCellParams) => (
-        <DeleteModal channelId={params.row.id} />
+        <DeleteChannelModal channelId={params.row.id} />
       ),
     },
   ];

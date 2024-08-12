@@ -21,13 +21,9 @@ const login = async (credentials: Credentials) => {
     where: { email: credentials.email },
   });
 
-  console.log("user", user);
-
   if (!user) {
     throw new Error("User not found");
   }
-
-  console.log("user.emailVerified", user.emailVerified);
 
   if (user.emailVerified == null) {
     throw new Error("Email not verified");
@@ -73,7 +69,6 @@ const authOptions: AuthOptions = {
           }
           return user;
         } catch (error) {
-          // Handle the error or throw it again
           throw error;
         }
       },
@@ -89,9 +84,9 @@ const authOptions: AuthOptions = {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
-        token.role = user.role;
         token.country = user.country;
         token.phonenumber = user.phonenumber;
+        token.role = user.role;
         token.subscriptionId = user.subscriptionId;
         token.organizationId = user.organizationId;
       }

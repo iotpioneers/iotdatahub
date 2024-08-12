@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { CldImage, CldUploadWidget } from "next-cloudinary";
+import { CldUploadWidget } from "next-cloudinary";
 
 interface CloudinaryResult {
   public_id: string;

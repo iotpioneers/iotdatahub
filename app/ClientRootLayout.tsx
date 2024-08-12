@@ -8,7 +8,7 @@ import { Provider } from "react-redux";
 
 // project imports
 
-import AuthProvider from "@/app/auth/Provider";
+import AuthProvider from "@/app/auth/AuthProvider";
 import reducer from "@/app/store/reducer";
 import QueryClientProvider from "@/app/QueryClientProvider";
 import { LocalizationProvider } from "@/components/core/localization-provider";

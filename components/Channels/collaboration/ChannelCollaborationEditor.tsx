@@ -21,7 +21,7 @@ import {
 
 import FloatingToolbarPlugin from "./plugins/FloatingToolbarPlugin";
 import { useThreads } from "@liveblocks/react/suspense";
-import Comments from "../../Comments";
+import ChannelComments from "./ChannelComments";
 import { UserType } from "@/types";
 import LoadingSpinner from "../../LoadingSpinner";
 
@@ -77,7 +77,7 @@ export function ChannelCollaborationEditor({
           <LiveblocksPlugin>
             <FloatingComposer className="w-[350px]" />
             <FloatingThreads threads={threads} />
-            <Comments />
+            <ChannelComments />
           </LiveblocksPlugin>
         </div>
       </div>

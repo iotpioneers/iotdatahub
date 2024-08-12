@@ -21,7 +21,7 @@ const ThreadWrapper = ({ thread }: ThreadWrapperProps) => {
   );
 };
 
-const Comments = () => {
+const ChannelComments = () => {
   const { threads } = useThreads();
 
   return (
@@ -35,4 +35,4 @@ const Comments = () => {
   );
 };
 
-export default Comments;
+export default ChannelComments;

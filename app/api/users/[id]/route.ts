@@ -24,10 +24,16 @@ export async function PUT(
 ) {
   const body = await request.json();
 
-  const validation = userSchema.safeParse(body);
-
-  if (!validation.success)
-    return NextResponse.json(validation.error.errors, { status: 400 });
+  const {
+    name,
+    email,
+    country,
+    phonenumber,
+    image,
+    role,
+    subscriptionId,
+    organizationId,
+  } = body;
 
   const user = await prisma.user.findUnique({
     where: { id: params.id },
@@ -38,7 +44,16 @@ export async function PUT(
 
   const updatedUser = await prisma.user.update({
     where: { id: user.id },
-    data: body,
+    data: {
+      name,
+      email,
+      country,
+      phonenumber,
+      image,
+      role,
+      subscriptionId,
+      organizationId,
+    },
   });
 
   return NextResponse.json(updatedUser);
