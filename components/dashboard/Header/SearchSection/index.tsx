@@ -11,6 +11,7 @@ import Grid from "@mui/material/Grid";
 import InputAdornment from "@mui/material/InputAdornment";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Popper from "@mui/material/Popper";
+import Tooltip from "@mui/material/Tooltip";
 import { useTheme } from "@mui/material/styles";
 
 // third-party
@@ -136,9 +137,11 @@ const SearchSection = () => {
           {(popupState) => (
             <>
               <Box sx={{ ml: 2 }}>
-                <HeaderAvatar {...bindToggle(popupState)}>
-                  <IconSearch stroke={1.5} size="19.2px" />
-                </HeaderAvatar>
+                <Tooltip title="Search">
+                  <HeaderAvatar {...bindToggle(popupState)}>
+                    <IconSearch stroke={1.5} size="19.2px" />
+                  </HeaderAvatar>
+                </Tooltip>
               </Box>
               <Popper
                 {...bindPopper(popupState)}

@@ -76,6 +76,7 @@ const NotificationSection = () => {
           [theme.breakpoints.down("md")]: {
             mr: 2,
           },
+          zIndex: theme.zIndex.drawer + 100,
         }}
       >
         <ButtonBase sx={{ borderRadius: "24px" }}>

@@ -17,19 +17,31 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import Drawer from "@mui/material/Drawer";
+import LoadingProgressBar from "../LoadingProgressBar";
+import UpgradePlanCard from "./UpgradePlanCard";
 
 interface SidebarContentProps {
+  isLoading: boolean;
   activeLink: string;
   handleSetActiveLink: (link: string) => void;
 }
 
-function SideNavbar() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+function SideNavbar({
+  isSidebarOpen,
+  setIsSidebarOpen,
+}: {
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: (open: boolean) => void;
+}) {
+  const [isLoading, setIsLoading] = useState(false);
   const [activeLink, setActiveLink] = useState("");
 
   const handleSetActiveLink = (link: string) => {
     setActiveLink(link);
-    setIsSidebarOpen(false);
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 5000);
   };
 
   const toggleSidebar = () => {
@@ -37,15 +49,7 @@ function SideNavbar() {
   };
 
   return (
-    <div className="py-3">
-      <IconButton
-        aria-label="toggle drawer"
-        edge="start"
-        onClick={toggleSidebar}
-        sx={{ marginLeft: 1, display: { lg: "none" } }}
-      >
-        {isSidebarOpen ? <MenuOpenIcon /> : <MenuIcon />}
-      </IconButton>
+    <>
       <Drawer
         anchor="left"
         open={isSidebarOpen}
@@ -55,7 +59,12 @@ function SideNavbar() {
           "& .MuiDrawer-paper": { boxSizing: "border-box", width: 240 },
         }}
       >
-        <div className="flex justify-between items-center px-4 py-2">
+        <div className="flex justify-between items-center px-4 py-8">
+          <h1 className="flex lg:hidden text-lg text-center justify-center cursor-pointer font-bold text-blue-900">
+            <Link href="/" className="flex justify-center items-center gap-1">
+              <span className="hover:text-zinc-950">IoTDataHub</span>
+            </Link>
+          </h1>
           <IconButton
             aria-label="toggle drawer"
             edge="start"
@@ -64,40 +73,36 @@ function SideNavbar() {
             {isSidebarOpen ? <MenuOpenIcon /> : <MenuIcon />}
           </IconButton>
         </div>
-        <SidebarContent
-          activeLink={activeLink}
-          handleSetActiveLink={handleSetActiveLink}
-        />
+        <div className="px-2">
+          <SidebarContent
+            isLoading={isLoading}
+            activeLink={activeLink}
+            handleSetActiveLink={handleSetActiveLink}
+          />
+        </div>
       </Drawer>
-      <div
-        className={`relative ${
-          isSidebarOpen ? "flex" : "hidden"
-        } lg:flex bg-white`}
-      >
+      <div className={`relative hidden lg:flex bg-white`}>
         <Disclosure as="nav">
-          <div className="p-6 w-1/2 h-screen bg-white z-20 fixed top-0 lg:left-0 lg:w-60 border-r border-gray-10 border-5">
+          <div className="p-6 w-1/2 h-screen bg-white z-20 fixed top-0 lg:left-0 lg:w-60 border-r border-gray-10 border-5 overflow-y-auto">
             <SidebarContent
+              isLoading={isLoading}
               activeLink={activeLink}
               handleSetActiveLink={handleSetActiveLink}
             />
           </div>
         </Disclosure>
       </div>
-    </div>
+    </>
   );
 }
 
 const SidebarContent: React.FC<SidebarContentProps> = ({
+  isLoading,
   activeLink,
   handleSetActiveLink,
 }) => {
   return (
-    <div className="flex flex-col justify-start item-center">
-      <h1 className="text-base text-center justify-center cursor-pointer font-bold text-blue-900 border-b border-gray-100 pb-6 w-full">
-        <Link href="/" className="flex justify-center items-center gap-1">
-          <span className="hover:text-zinc-950">IoTDataHub</span>
-        </Link>
-      </h1>
+    <div className="flex flex-col justify-start item-center mt-0 lg:mt-14">
       <div className="border-b border-gray-100 pb-4">
         <Link href="/dashboard">
           <div
@@ -111,6 +116,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             <HiViewGrid className="text-2xl text-gray-600" />
             <h3 className="text-base font-semibold">Overview</h3>
           </div>
+          {activeLink === "/dashboard" && isLoading && <LoadingProgressBar />}
         </Link>
         <Link href="/dashboard/devices">
           <div
@@ -124,6 +130,9 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             <MdOutlineDevices className="text-2xl text-gray-600" />
             <h3 className="text-base font-semibold">Devices</h3>
           </div>
+          {activeLink === "/dashboard/devices" && isLoading && (
+            <LoadingProgressBar />
+          )}
         </Link>
         <Link href="/dashboard/channels">
           <div
@@ -137,6 +146,9 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             <BiNetworkChart className="text-2xl text-gray-600" />
             <h3 className="text-base font-semibold">Channels</h3>
           </div>
+          {activeLink === "/dashboard/channels" && isLoading && (
+            <LoadingProgressBar />
+          )}
         </Link>
       </div>
       {/* setting  */}
@@ -153,6 +165,9 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             <GiUpgrade className="text-2xl text-gray-600" />
             <h3 className="text-base font-semibold">Upgrade Plan</h3>
           </div>
+          {activeLink === "/dashboard/subscription" && isLoading && (
+            <LoadingProgressBar />
+          )}
         </Link>
         <Link href="#">
           <div
@@ -166,6 +181,9 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             <MdOutlineAnalytics className="text-2xl text-gray-600" />
             <h3 className="text-base font-semibold">Analytics</h3>
           </div>
+          {activeLink === "/dashboard/analytics" && isLoading && (
+            <LoadingProgressBar />
+          )}
         </Link>
         <Link href="/dashboard/organization">
           <div
@@ -179,8 +197,17 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             <GiOrganigram className="text-2xl text-gray-600" />
             <h3 className="text-base font-semibold">Organization</h3>
           </div>
+          {activeLink === "/dashboard/organization" && isLoading && (
+            <LoadingProgressBar />
+          )}
         </Link>
       </div>
+
+      {/* Upgrade Plan */}
+      <div className="my-2">
+        <UpgradePlanCard />
+      </div>
+
       {/* logout */}
       <div className="my-2">
         <Link href="/dashboard/settings">
@@ -195,6 +222,9 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             <MdOutlineSettings className="text-2xl text-gray-600" />
             <h3 className="text-base font-semibold">Settings</h3>
           </div>
+          {activeLink === "/dashboard/settings" && isLoading && (
+            <LoadingProgressBar />
+          )}
         </Link>
         <Link href="/dashboard/account">
           <div
@@ -208,6 +238,9 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             <MdManageAccounts className="text-2xl text-gray-600" />
             <h3 className="text-base font-semibold">Account</h3>
           </div>
+          {activeLink === "/dashboard/account" && isLoading && (
+            <LoadingProgressBar />
+          )}
         </Link>
         <Link href="/api/auth/signout">
           <div
@@ -221,6 +254,9 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             <MdOutlineLogout className="text-2xl text-gray-600" />
             <h3 className="text-base font-semibold">Logout</h3>
           </div>
+          {activeLink === "/api/auth/signout" && isLoading && (
+            <LoadingProgressBar />
+          )}
         </Link>
       </div>
     </div>

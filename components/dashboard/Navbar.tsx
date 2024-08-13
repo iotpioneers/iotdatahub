@@ -1,8 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
 import SearchSection from "./Header/SearchSection";
 import NotificationSection from "./Header/NotificationSection";
 import ProfileSection from "./Header/ProfileSection";
@@ -11,50 +9,94 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-const Navbar = () => {
+// material-ui
+import { useTheme } from "@mui/material/styles";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import ButtonBase from "@mui/material/ButtonBase";
+import Tooltip from "@mui/material/Tooltip";
+
+// assets
+import { IconMenu2 } from "@tabler/icons-react";
+
+// ==============================|| MAIN NAVBAR / HEADER ||============================== //
+
+const Navbar = ({
+  isSidebarOpen,
+  setIsSidebarOpen,
+}: {
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: (open: boolean) => void;
+}) => {
   const { status } = useSession();
+  const theme = useTheme();
 
   const router = useRouter();
 
   if (status === "unauthenticated") router.push("/login");
 
   return (
-    <React.Fragment>
+    <>
+      {/* logo & toggler button */}
       <Box
-        component="header"
         sx={{
-          borderBottom: "1px solid var(--mui-palette-divider)",
-          backgroundColor: "var(--mui-palette-background-paper)",
-          position: "sticky",
-          top: 0,
-          zIndex: "var(--mui-zIndex-appBar)",
+          width: 228,
+
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 1,
+          [theme.breakpoints.down("md")]: {
+            width: "auto",
+          },
         }}
       >
-        <Stack
-          direction="row"
-          spacing={2}
+        <Box component="span" sx={{ display: "block", mr: 2, flexGrow: 1 }}>
+          <h1 className="text-2xl text-start cursor-pointer font-bold text-blue-900">
+            <Link href="/">
+              <span className="hover:text-zinc-950">IoTDataHub</span>
+            </Link>
+          </h1>
+        </Box>
+        <ButtonBase
           sx={{
-            alignItems: "center",
-            justifyContent: "space-between",
-            minHeight: "64px",
-            px: 2,
+            borderRadius: "8px",
+            display: { xs: "flex", lg: "none" },
+            overflow: "hidden",
           }}
         >
-          <Stack sx={{ alignItems: "center" }} direction="row" spacing={2}>
-            <Link href="/" className="flex justify-center items-center gap-1">
-              <h1 className="flex lg:hidden text-2xl text-center justify-center cursor-pointer font-bold text-blue-900 border-gray-100 w-full">
-                <span className="hover:text-zinc-950">IoTDataHub</span>
-              </h1>
-            </Link>
-            <SearchSection />
-          </Stack>
-          <Stack sx={{ alignItems: "center" }} direction="row" spacing={2}>
-            <NotificationSection />
-            {status === "authenticated" && <ProfileSection />}
-          </Stack>
-        </Stack>
+          <Tooltip title="Toggle Menu">
+            <Avatar
+              variant="rounded"
+              sx={{
+                ...theme.typography.commonAvatar,
+                ...theme.typography.mediumAvatar,
+                transition: "all .2s ease-in-out",
+                background: theme.palette.secondary.light,
+                color: theme.palette.secondary.dark,
+                "&:hover": {
+                  background: theme.palette.secondary.dark,
+                  color: theme.palette.secondary.light,
+                },
+              }}
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              color="inherit"
+            >
+              <IconMenu2 stroke={1.5} size="1.3rem" />
+            </Avatar>
+          </Tooltip>
+        </ButtonBase>
       </Box>
-    </React.Fragment>
+
+      {/* header search */}
+      <SearchSection />
+      <Box sx={{ flexGrow: 1 }} />
+      <Box sx={{ flexGrow: 1 }} />
+
+      {/* notification & profile */}
+      <NotificationSection />
+      <ProfileSection />
+    </>
   );
 };
 

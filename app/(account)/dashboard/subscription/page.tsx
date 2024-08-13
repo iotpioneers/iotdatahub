@@ -68,7 +68,7 @@ export default function PricingList() {
             {item.description}
           </p>
 
-          <div className="flex items-center h-[5.5rem] mb-6">
+          <div className="flex items-center text-teal-50 h-[5.5rem] mb-6">
             {item.price && (
               <>
                 <div className="h3">$</div>
@@ -80,10 +80,14 @@ export default function PricingList() {
           </div>
 
           <Link
-            href="https://buy.stripe.com/test_28o3fF8wIbpn4LuaEE"
+            href={
+              item.buttonDisabled
+                ? "#"
+                : "https://buy.stripe.com/test_28o3fF8wIbpn4LuaEE"
+            }
             className={`w-full mb-6 inline-flex items-center justify-center h-11 transition-colors mt-4 rounded-md ${
               item.buttonDisabled
-                ? "bg-gray-200 text-gray-500"
+                ? "bg-none text-gray-500"
                 : "bg-blue-500 text-white"
             } `}
           >

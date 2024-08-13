@@ -70,8 +70,6 @@ export function AccountDetailsForm({ ...others }): React.JSX.Element {
 
   const { currentUser } = state;
 
-  console.log("currentUser", currentUser);
-
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
@@ -94,7 +92,7 @@ export function AccountDetailsForm({ ...others }): React.JSX.Element {
       };
       setSelectedCountry(countryData);
     }
-  }, [currentUser]);
+  }, [currentUser, status]);
 
   const handleUpdateUserData = async (data: FormData) => {
     if (currentUser) {

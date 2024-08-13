@@ -54,6 +54,7 @@ interface GlobalStateContextType {
   fetchUserChannels: () => Promise<void>;
   updateUserData: (newData: currentUser) => Promise<void>;
   isLoading: boolean;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Create the context
@@ -165,6 +166,7 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
         fetchUserChannels,
         updateUserData,
         isLoading,
+        setIsLoading,
       }}
     >
       {children}
