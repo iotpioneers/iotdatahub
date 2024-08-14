@@ -108,8 +108,8 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           <div
             className={`flex mb-0 xs:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
               activeLink === "/dashboard"
-                ? "bg-gray-900 text-white"
-                : "hover:bg-gray-900 text-gray-600"
+                ? "bg-gray-300 text-white"
+                : "hover:bg-gray-200 text-gray-600"
             }`}
             onClick={() => handleSetActiveLink("/dashboard")}
           >
@@ -122,8 +122,8 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           <div
             className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
               activeLink === "/dashboard/devices"
-                ? "bg-gray-900 text-white"
-                : "hover:bg-gray-900 text-gray-600"
+                ? "bg-gray-300 text-white"
+                : "hover:bg-gray-200 text-gray-600"
             }`}
             onClick={() => handleSetActiveLink("/dashboard/devices")}
           >
@@ -138,8 +138,8 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           <div
             className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
               activeLink === "/dashboard/channels"
-                ? "bg-gray-900 text-white"
-                : "hover:bg-gray-900 text-gray-600"
+                ? "bg-gray-300 text-white"
+                : "hover:bg-gray-200 text-gray-600"
             }`}
             onClick={() => handleSetActiveLink("/dashboard/channels")}
           >
@@ -157,8 +157,8 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           <div
             className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
               activeLink === "/dashboard/subscription"
-                ? "bg-gray-900 text-white"
-                : "hover:bg-gray-900 text-gray-600"
+                ? "bg-gray-300 text-white"
+                : "hover:bg-gray-200 text-gray-600"
             }`}
             onClick={() => handleSetActiveLink("/dashboard/subscription")}
           >
@@ -173,8 +173,8 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           <div
             className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
               activeLink === "/dashboard/analytics"
-                ? "bg-gray-900 text-white"
-                : "hover:bg-gray-900 text-gray-600"
+                ? "bg-gray-300 text-white"
+                : "hover:bg-gray-200 text-gray-600"
             }`}
             onClick={() => handleSetActiveLink("/dashboard/analytics")}
           >
@@ -189,8 +189,8 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           <div
             className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
               activeLink === "/dashboard/organization"
-                ? "bg-gray-900 text-white"
-                : "hover:bg-gray-900 text-gray-600"
+                ? "bg-gray-300 text-white"
+                : "hover:bg-gray-200 text-gray-600"
             }`}
             onClick={() => handleSetActiveLink("/dashboard/organization")}
           >
@@ -203,19 +203,14 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
         </Link>
       </div>
 
-      {/* Upgrade Plan */}
-      <div className="my-2">
-        <UpgradePlanCard />
-      </div>
-
-      {/* logout */}
+      {/* account and logout */}
       <div className="my-2">
         <Link href="/dashboard/settings">
           <div
             className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
               activeLink === "/dashboard/settings"
-                ? "bg-gray-900 text-white"
-                : "hover:bg-gray-900 text-gray-600"
+                ? "bg-gray-300 text-white"
+                : "hover:bg-gray-200 text-gray-600"
             }`}
             onClick={() => handleSetActiveLink("/dashboard/settings")}
           >
@@ -230,8 +225,8 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           <div
             className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
               activeLink === "/dashboard/account"
-                ? "bg-gray-900 text-white"
-                : "hover:bg-gray-900 text-gray-600"
+                ? "bg-gray-300 text-white"
+                : "hover:bg-gray-200 text-gray-600"
             }`}
             onClick={() => handleSetActiveLink("/dashboard/account")}
           >
@@ -246,8 +241,8 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           <div
             className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 border border-gray-200 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
               activeLink === "/api/auth/signout"
-                ? "bg-gray-900 text-white"
-                : "hover:bg-gray-900 text-gray-600"
+                ? "bg-gray-300 text-white"
+                : "hover:bg-gray-200 text-gray-600"
             }`}
             onClick={() => handleSetActiveLink("/api/auth/signout")}
           >
@@ -258,6 +253,11 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             <LoadingProgressBar />
           )}
         </Link>
+      </div>
+
+      {/* Upgrade Plan */}
+      <div className="my-2">
+        <UpgradePlanCard />
       </div>
     </div>
   );

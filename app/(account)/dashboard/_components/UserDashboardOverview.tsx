@@ -53,7 +53,6 @@ const UserDashboardOverview = () => {
         setHasOrganization(data.hasOrganization);
         setOrganization(data.organization);
         setMembers(data.members);
-        setState({ currentOrganization: data.organization });
       } catch (error) {
         return null;
       }

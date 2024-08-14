@@ -24,7 +24,7 @@ export default function RootLayout({
         <ClientRootLayout>
           <CollaborationProvider>
             <DashboardNavigation />
-            <div className="flex flex-col flex-grow lg:ml-64 xs:mx-2">
+            <div className="flex flex-col flex-grow lg:ml-64 xs:mx-2 mt-24">
               <Container>{children}</Container>
             </div>
           </CollaborationProvider>

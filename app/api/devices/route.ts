@@ -49,6 +49,7 @@ export async function POST(request: NextRequest) {
         description,
         userId: user.id,
         channelId: channel.id,
+        organizationId: channel.organizationId,
       },
       include: { user: true, channel: true },
     });

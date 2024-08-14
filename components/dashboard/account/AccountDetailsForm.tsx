@@ -45,7 +45,7 @@ interface CountryType {
 const schema = Yup.object().shape({
   firstname: Yup.string().max(255).required("Firstname is required"),
   lastname: Yup.string().max(255).required("Lastname is required"),
-  country: Yup.string().optional(),
+  country: Yup.string().required("Country is required"),
   phonecode: Yup.string().optional(),
   phonenumber: Yup.string()
     .test(
@@ -63,18 +63,17 @@ export function AccountDetailsForm({ ...others }): React.JSX.Element {
   const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
 
   const { state, updateUserData, isLoading } = useGlobalState();
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
   const { status } = useSession();
   const [selectedCountry, setSelectedCountry] = useState<CountryType | null>(
     null
   );
 
   const { currentUser } = state;
-
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
-    "success"
-  );
 
   if (
     (status !== "loading" && status === "unauthenticated") ||
@@ -100,6 +99,7 @@ export function AccountDetailsForm({ ...others }): React.JSX.Element {
         const updatedUserData = {
           ...currentUser,
           ...data,
+          name: `${data.firstname} ${data.lastname}`,
           phonenumber: `${data.phonecode} ${data.phonenumber}`,
         };
         await updateUserData(updatedUserData);
@@ -260,8 +260,19 @@ export function AccountDetailsForm({ ...others }): React.JSX.Element {
             <Grid container spacing={matchDownSM ? 0 : 2}>
               <Grid item xs={12} sm={3}>
                 <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-                  <InputLabel htmlFor="outlined-adornment-phonecode-register">
+                  <InputLabel
+                    htmlFor="outlined-adornment-phonecode-register"
+                    className="flex justify-between items-center gap-2"
+                  >
                     Code
+                    <img
+                      loading="lazy"
+                      width="20"
+                      srcSet={`https://flagcdn.com/w40/${selectedCountry?.code.toLowerCase()}.png 2x`}
+                      src={`https://flagcdn.com/w20/${selectedCountry?.code.toLowerCase()}.png`}
+                      alt=""
+                      style={{ marginRight: "8px" }}
+                    />
                   </InputLabel>
                   <OutlinedInput
                     id="outlined-adornment-phonecode"

@@ -34,7 +34,11 @@ export function AccountInfo(): React.JSX.Element {
 
   const handleImageUpload = async (imageUrl: string) => {
     if (currentUser) {
-      await updateUserData({ ...currentUser, image: imageUrl });
+      const updatedUserData = {
+        ...currentUser,
+        image: imageUrl,
+      };
+      await updateUserData(updatedUserData);
     }
   };
 

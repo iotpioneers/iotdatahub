@@ -14,6 +14,7 @@ interface CountryListProps {
   selectedCountry: CountryType | null;
   setSelectedCountry: (country: CountryType | null) => void;
 }
+
 // List of countries with phone codes
 const countries: CountryType[] = [
   { code: "AD", label: "Andorra", phone: "376" },
@@ -440,6 +441,13 @@ const countries: CountryType[] = [
   { code: "ZW", label: "Zimbabwe", phone: "263" },
 ];
 
+// Function to convert country code to emoji flag
+const getFlagEmoji = (countryCode: string) => {
+  return countryCode
+    .toUpperCase()
+    .replace(/./g, (char) => String.fromCodePoint(127397 + char.charCodeAt(0)));
+};
+
 const CountryList: React.FC<CountryListProps> = ({
   selectedCountry,
   setSelectedCountry,
@@ -472,12 +480,16 @@ const CountryList: React.FC<CountryListProps> = ({
         );
       }}
       onChange={(event, newValue) => setSelectedCountry(newValue)}
+      isOptionEqualToValue={(option, value) =>
+        option.code === value.code && option.label === value.label
+      }
       renderInput={(params) => (
         <TextField
           {...params}
           label="Country"
           inputProps={{
             ...params.inputProps,
+            autoComplete: "new-password",
           }}
         />
       )}

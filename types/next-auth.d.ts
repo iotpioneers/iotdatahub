@@ -5,10 +5,10 @@ declare module "next-auth" {
     id: string;
     name: string;
     email: string;
+    image: string | null;
     country: string;
     phonenumber: string;
     emailVerified: Date | null;
-    image: string | null;
     role: string;
     subscriptionId: string | null;
     organizationId: string | null;
@@ -19,6 +19,7 @@ declare module "next-auth" {
       id: string;
       name: string;
       email: string;
+      image: string | null;
       country: string;
       phonenumber: string;
       role: string;

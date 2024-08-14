@@ -19,12 +19,6 @@ export const navigation = [
     title: "Pricing",
     url: "/pricing",
   },
-  {
-    id: "4",
-    title: "New account",
-    url: "/register",
-    onlyMobile: true,
-  },
 ];
 
 export const heroIcons = ["star.svg", "star.svg", "star.svg", "star.svg"];

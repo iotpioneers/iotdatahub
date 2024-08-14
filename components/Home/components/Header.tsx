@@ -61,9 +61,7 @@ const Header = () => {
                     key={item.id}
                     href={item.url}
                     onClick={handleClick}
-                    className={`lg:hidden block relative font-code text-2xl uppercase text-n-1 transition-colors hover:text-color-1 ${
-                      item.onlyMobile ? "lg:hidden" : ""
-                    } px-6 py-6 md:py-8 lg:-mr-0.25 lg:text-xs lg:font-semibold lg:text-n-1/50 lg:leading-5 lg:hover:text-n-1 xl:px-12`}
+                    className={`lg:hidden block relative font-code text-2xl uppercase text-n-1 transition-colors hover:text-color-1px-6 py-6 md:py-8 lg:-mr-0.25 lg:text-xs lg:font-semibold lg:text-n-1/50 lg:leading-5 lg:hover:text-n-1 xl:px-12`}
                   >
                     {item.title}
                   </a>

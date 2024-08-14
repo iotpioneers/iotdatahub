@@ -3,6 +3,7 @@
 import { ChannelProps } from "@/types";
 import axios from "axios";
 import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 import React, {
   createContext,
   useContext,
@@ -31,7 +32,7 @@ interface currentUser {
   id: string;
   name: string;
   email: string;
-  image: string | "";
+  image: string | null;
   country: string;
   phonenumber: string;
   role: string;
@@ -70,7 +71,11 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const { status, data: sessionData } = useSession();
+  const { status, data: session, update } = useSession();
+
+  if (status !== "loading" && status === "unauthenticated") {
+    redirect("/login");
+  }
 
   // Effect to update global state when session changes
   useEffect(() => {
@@ -78,19 +83,19 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
       setState((prevState) => ({
         ...prevState,
         currentUser: {
-          id: sessionData.user.id,
-          name: sessionData.user.name,
-          email: sessionData.user.email,
-          image: sessionData.user.image || "",
-          country: sessionData.user.country,
-          phonenumber: sessionData.user.phonenumber,
-          role: sessionData.user.role,
-          subscriptionId: sessionData.user.subscriptionId,
-          organizationId: sessionData.user.organizationId,
+          id: session.user.id,
+          name: session.user.name,
+          email: session.user.email,
+          image: session.user.image || null,
+          country: session.user.country,
+          phonenumber: session.user.phonenumber,
+          role: session.user.role,
+          subscriptionId: session.user.subscriptionId,
+          organizationId: session.user.organizationId,
         },
       }));
     }
-  }, [status, sessionData]);
+  }, [status, session, update]);
 
   const fetchCurrentOrganization = async () => {
     try {
@@ -135,6 +140,9 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
   const updateUserData = async (newData: currentUser) => {
     try {
       setIsLoading(true);
+
+      console.log("newData", newData.image);
+
       // Update the user data on the server
       const res = await axios.put(`/api/users/${newData.id}`, newData);
 
@@ -142,7 +150,23 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
         throw new Error("Failed to update user data");
       }
 
-      console.log("User data updated successfully", res.data);
+      const updatedImage = newData.image
+        ? `${newData.image}?t=${Date.now()}`
+        : null;
+
+      // Update the user data on the client
+      await update({
+        ...session,
+        user: {
+          ...session?.user,
+          name: newData.name,
+          image: updatedImage,
+          phonenumber: newData.phonenumber,
+          country: newData.country,
+        },
+      });
+
+      console.log("User data updated on the client", session?.user);
 
       // Update the local state
       setState((prevState) => ({

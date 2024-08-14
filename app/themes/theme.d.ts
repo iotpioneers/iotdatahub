@@ -19,12 +19,14 @@ declare module "@mui/material/styles" {
     customInput: React.CSSProperties;
     commonAvatar: React.CSSProperties;
     mediumAvatar: React.CSSProperties;
+    largeAvatar: React.CSSProperties;
   }
 
   interface TypographyVariantsOptions {
     customInput?: React.CSSProperties;
     commonAvatar?: React.CSSProperties;
     mediumAvatar?: React.CSSProperties;
+    largeAvatar?: React.CSSProperties;
   }
 }
 

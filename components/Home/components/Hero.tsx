@@ -8,6 +8,7 @@ import Button from "./Button";
 import Section from "./Section";
 import Notification from "./Notification";
 import hover3d from "@/app/utils/hover";
+import SwipeableTextMobileStepper from "./design/HorizontalStepper/SwipeableTextMobileStepper";
 
 const Hero = () => {
   const hero = useRef<HTMLDivElement>(null);
@@ -70,20 +71,8 @@ const Hero = () => {
                   transform: hoverHero.transform,
                 }}
               >
-                <div className="relative max-w-[40rem] mx-auto md:max-w-5xl xl:mb-20 xs:-mt-10 lg:-mt-24">
-                  <div className="relative z-1 p-0.5 rounded-2xl bg-conic-gradient">
-                    <div className="aspect-[33/40] rounded-[0.9rem] overflow-hidden md:aspect-[688/490] lg:aspect-[1024/490]">
-                      <Image
-                        src="/hero/home.jpg"
-                        width={600}
-                        height={600}
-                        alt="hero"
-                        style={{
-                          transform: imageHover.transform,
-                        }}
-                      />
-                    </div>
-                  </div>
+                <div className="relative xl:mb-20 xs:-mt-10 lg:-mt-24 rounded-2xl bg-conic-gradient p-1">
+                  <SwipeableTextMobileStepper />
                 </div>
               </div>
             </div>

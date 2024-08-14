@@ -1,84 +1,154 @@
+import PropTypes from "prop-types";
+import { memo } from "react";
+
 // material-ui
+import { useTheme } from "@mui/material/styles";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import Grid from "@mui/material/Grid";
+import LinearProgress, {
+  linearProgressClasses,
+} from "@mui/material/LinearProgress";
 import AnimateButton from "@/components/Auth/AnimateButton";
 import { Link } from "@mui/material";
 import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 
-// ==============================|| PROFILE MENU - UPGRADE PLAN CARD ||============================== //
+// assets
+import TableChartOutlinedIcon from "@mui/icons-material/TableChartOutlined";
+
+// ==============================|| PROGRESS BAR WITH LABEL ||============================== //
+
+interface LinearProgressWithLabelProps {
+  value: number;
+}
+
+function LinearProgressWithLabel({
+  value,
+  ...others
+}: LinearProgressWithLabelProps) {
+  return (
+    <Grid container direction="column" spacing={1} sx={{ mt: 1.5 }}>
+      <Grid item>
+        <Grid container justifyContent="space-between">
+          <Grid item>
+            <Typography variant="h6" sx={{ color: "primary.800" }}>
+              Usage
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Typography variant="h6" color="inherit">{`${Math.round(
+              value
+            )}%`}</Typography>
+          </Grid>
+        </Grid>
+      </Grid>
+      <Grid item>
+        <LinearProgress
+          aria-label="progress of theme"
+          variant="determinate"
+          value={value}
+          {...others}
+          sx={{
+            height: 10,
+            borderRadius: 30,
+            [`&.${linearProgressClasses.colorPrimary}`]: {
+              bgcolor: "background.paper",
+            },
+            [`& .${linearProgressClasses.bar}`]: {
+              borderRadius: 5,
+              bgcolor: "primary.dark",
+            },
+          }}
+        />
+      </Grid>
+    </Grid>
+  );
+}
+
+// ==============================|| SIDEBAR - MENU CARD ||============================== //
 
 const UpgradePlanCard = () => {
-  const cardSX = {
-    content: '""',
-    position: "absolute",
-    width: 200,
-    height: 200,
-    borderColor: "warning.main",
-  };
+  const theme = useTheme();
 
   return (
     <Card
       sx={{
-        bgcolor: "warning.light",
-        my: 2,
+        bgcolor: "primary.light",
+        mb: 2.75,
         overflow: "hidden",
         position: "relative",
         "&:after": {
-          border: "19px solid ",
+          content: '""',
+          position: "absolute",
+          width: 157,
+          height: 157,
+          bgcolor: "primary.200",
           borderRadius: "50%",
-          top: "65px",
-          right: "-150px",
-          ...cardSX,
-        },
-        "&:before": {
-          border: "3px solid ",
-          borderRadius: "50%",
-          top: "145px",
-          right: "-70px",
-          ...cardSX,
+          top: -105,
+          right: -96,
         },
       }}
     >
-      <CardContent>
-        <Grid container direction="column" spacing={2}>
-          <Grid item>
-            <Typography variant="h4">Upgrade your plan</Typography>
-          </Grid>
-          <Grid item>
-            <Typography
-              variant="subtitle2"
-              color={"grey.900"}
-              sx={{ opacity: 0.6 }}
-            >
-              70% discount for 1 years <br />
-              subscriptions.
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Stack direction="row">
-              <Link
-                sx={{ textDecoration: "none" }}
-                href="/dashboard/subscription"
+      <Box sx={{ p: 2 }}>
+        <List disablePadding sx={{ m: 0 }}>
+          <ListItem alignItems="flex-start" disableGutters disablePadding>
+            <ListItemAvatar sx={{ mt: 0 }}>
+              <Avatar
+                variant="rounded"
+                sx={{
+                  ...theme.typography.commonAvatar,
+                  ...theme.typography.largeAvatar,
+                  color: "primary.main",
+                  border: "none",
+                  borderColor: "primary.main",
+                  bgcolor: "background.paper",
+                }}
               >
-                <AnimateButton>
-                  <Button
-                    variant="contained"
-                    color="warning"
-                    sx={{ boxShadow: "none" }}
-                  >
-                    Go Premium
-                  </Button>
-                </AnimateButton>
-              </Link>
-            </Stack>
-          </Grid>
+                <TableChartOutlinedIcon fontSize="inherit" />
+              </Avatar>
+            </ListItemAvatar>
+            <ListItemText
+              sx={{ mt: 0 }}
+              primary={
+                <Typography variant="subtitle1" sx={{ color: "primary.800" }}>
+                  Free
+                </Typography>
+              }
+              secondary={
+                <Typography variant="caption">Your current plan</Typography>
+              }
+            />
+          </ListItem>
+        </List>
+        <LinearProgressWithLabel value={80} />
+        <Grid item sx={{ marginTop: 2 }}>
+          <Stack direction="row">
+            <Link
+              sx={{ textDecoration: "none" }}
+              href="/dashboard/subscription"
+            >
+              <AnimateButton>
+                <Button
+                  variant="contained"
+                  color="warning"
+                  sx={{ boxShadow: "none" }}
+                >
+                  Go Premium
+                </Button>
+              </AnimateButton>
+            </Link>
+          </Stack>
         </Grid>
-      </CardContent>
+      </Box>
     </Card>
   );
 };
 
-export default UpgradePlanCard;
+export default memo(UpgradePlanCard);

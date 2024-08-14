@@ -63,6 +63,7 @@ export async function POST(request: NextRequest) {
           value: numericValue,
           fieldId: fieldExist.id,
           channelId: apiKey.channelId,
+          organizationId: apiKey.organizationId,
         },
       });
 

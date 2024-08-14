@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "@mui/material/styles";
-import Avatar from "@mui/material/Avatar";
 import Badge from "@mui/material/Badge";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
@@ -80,34 +79,30 @@ const NotificationSection = () => {
         }}
       >
         <ButtonBase sx={{ borderRadius: "24px" }}>
-          <Avatar
-            component="button"
-            variant="rounded"
-            sx={{
-              ...theme.typography.commonAvatar,
-              ...theme.typography.mediumAvatar,
-              transition: "all .2s ease-in-out",
-              background: theme.palette.secondary.light,
-              color: theme.palette.secondary.dark,
-              '&[aria-controls="menu-list-grow"],&:hover': {
-                background: theme.palette.secondary.dark,
-                color: theme.palette.secondary.light,
-              },
-            }}
-            ref={anchorRef}
-            aria-controls={open ? "menu-list-grow" : undefined}
-            aria-haspopup="true"
-            onClick={handleToggle}
-            color="inherit"
-          >
-            <Tooltip title="Notifications">
-              <Badge badgeContent={count} color="info" variant="standard">
-                <IconButton>
-                  <IconBell stroke={1.5} size="1.3rem" />
-                </IconButton>
-              </Badge>
-            </Tooltip>
-          </Avatar>
+          <Tooltip title="Notifications">
+            <Badge badgeContent={count} color="error" variant="standard">
+              <IconButton
+                sx={{
+                  ...theme.typography.commonAvatar,
+                  ...theme.typography.mediumAvatar,
+                  transition: "all .2s ease-in-out",
+                  background: theme.palette.secondary.light,
+                  color: theme.palette.secondary.dark,
+                  '&[aria-controls="menu-list-grow"],&:hover': {
+                    background: theme.palette.secondary.dark,
+                    color: theme.palette.secondary.light,
+                  },
+                }}
+                ref={anchorRef}
+                aria-controls={open ? "menu-list-grow" : undefined}
+                aria-haspopup="true"
+                onClick={handleToggle}
+                color="inherit"
+              >
+                <IconBell stroke={1.5} size="1.3rem" />
+              </IconButton>
+            </Badge>
+          </Tooltip>
         </ButtonBase>
       </Box>
       <Popper

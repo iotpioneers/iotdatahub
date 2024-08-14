@@ -79,24 +79,31 @@ const authOptions: AuthOptions = {
     maxAge: 30 * 24 * 60 * 60,
   },
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, trigger, session }) {
+      if (trigger === "update") {
+        return { ...token, ...session.user };
+      }
+
       if (user) {
         token.id = user.id;
-        token.email = user.email;
         token.name = user.name;
+        token.email = user.email;
+        token.image = user.image ?? null;
         token.country = user.country;
         token.phonenumber = user.phonenumber;
         token.role = user.role;
         token.subscriptionId = user.subscriptionId;
         token.organizationId = user.organizationId;
       }
+
       return token;
     },
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id;
-        session.user.email = token.email;
         session.user.name = token.name;
+        session.user.email = token.email;
+        session.user.image = token.image as string | null;
         session.user.role = token.role;
         session.user.country = token.country;
         session.user.phonenumber = token.phonenumber;
