@@ -1,15 +1,15 @@
 import * as React from "react";
-import Image from "next/image";
+
 import { alpha } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
-import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import styled from "styled-components";
 import hover3d from "@/app/utils/hover";
 import Section from "../components/Section";
+import SwipeableTextMobileStepper from "../components/design/HorizontalStepper/SwipeableTextMobileStepper";
 
 const Hero = () => {
   const hero = React.useRef<HTMLDivElement>(null);
@@ -19,13 +19,6 @@ const Hero = () => {
     x: 30,
     y: -40,
     z: 30,
-  });
-
-  const imageHover = hover3d(hero, {
-    ref: hero,
-    x: 20,
-    y: -5,
-    z: 11,
   });
 
   return (
@@ -41,6 +34,7 @@ const Hero = () => {
                 : `linear-gradient(#02294F, ${alpha("#090E10", 0.0)})`,
             backgroundSize: "100% 20%",
             backgroundRepeat: "no-repeat",
+            mt: { sm: "-4rem", md: "-5rem" },
           })}
         >
           <Container
@@ -48,8 +42,8 @@ const Hero = () => {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              pt: { xs: 14, sm: 20 },
-              pb: { xs: 8, sm: 12 },
+              pt: { xs: 10, sm: 14 },
+              pb: { xs: 1, sm: 2 },
             }}
           >
             <Stack
@@ -80,7 +74,7 @@ const Hero = () => {
                           : "primary.light",
                     }}
                   >
-                    IoT Data Hub
+                    IoTDataHub
                     <img
                       src="hero/curve.png"
                       className="absolute top-full left-0 w-full xl:-mt-2"
@@ -118,33 +112,16 @@ const Hero = () => {
                   Get Started
                 </Button>
               </Stack>
-              <Typography
-                variant="caption"
-                textAlign="center"
-                sx={{ opacity: 0.8 }}
-              >
-                By clicking &quot;Get Started&quot; you agree to our&nbsp;
-                <Link href="#" color="primary">
-                  Terms & Conditions
-                </Link>
-                .
-              </Typography>
             </Stack>
             <div
-              className="image-content image"
+              className="image-content image mt-5 2xl:mt-0"
               style={{
                 transform: hoverHero.transform,
               }}
             >
-              <Image
-                src="/hero/home.jpg"
-                width={600}
-                height={600}
-                alt="hero"
-                style={{
-                  transform: imageHover.transform,
-                }}
-              />
+              <div className="rounded-2xl bg-conic-gradient p-1">
+                <SwipeableTextMobileStepper />
+              </div>
             </div>
           </Container>
         </Box>

@@ -1,9 +1,16 @@
+"use client";
+
 import * as React from "react";
+import styled from "styled-components";
+import { motion, useScroll, useTransform } from "framer-motion";
+
+// Material UI
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
+import { useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import AutoFixHighRoundedIcon from "@mui/icons-material/AutoFixHighRounded";
 import ConstructionRoundedIcon from "@mui/icons-material/ConstructionRounded";
@@ -51,11 +58,36 @@ const items = [
   },
 ];
 
+const HighlightWrapper = ({ children }: { children: React.ReactNode }) => {
+  const div = React.useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: div,
+    offset: ["start end", "end start"],
+  });
+
+  const x = useTransform(scrollYProgress, [1, 0.4, 0], [0, 0, -1000]);
+
+  return (
+    <div ref={div}>
+      <motion.div style={{ x }}>{children}</motion.div>
+    </div>
+  );
+};
+
 const Highlights = () => {
+  const theme = useTheme();
+
   return (
     <Box
       id="highlights"
       sx={{
+        backgroundImage:
+          theme.palette.mode === "light"
+            ? "linear-gradient(180deg, #CEE5FD, #FFF)"
+            : `linear-gradient(180deg, #011010, #000)",
+                  0.0
+                )})`,
         pt: { xs: 4, sm: 12 },
         pb: { xs: 8, sm: 16 },
         color: "white",
@@ -86,39 +118,48 @@ const Highlights = () => {
             and unmatched support.
           </Typography>
         </Box>
-        <Grid container spacing={2.5}>
-          {items.map((item, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              <Stack
-                direction="column"
-                color="inherit"
-                component={Card}
-                spacing={1}
-                useFlexGap
-                sx={{
-                  p: 3,
-                  height: "100%",
-                  border: "1px solid",
-                  borderColor: "grey.800",
-                  background: "transparent",
-                  backgroundColor: "grey.900",
-                }}
-              >
-                <Box sx={{ opacity: "50%" }}>{item.icon}</Box>
-                <div className="grid">
-                  <Typography fontWeight="medium" gutterBottom>
-                    {item.title}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: "grey.400" }}>
-                    {item.description}
-                  </Typography>
-                </div>
-              </Stack>
-            </Grid>
-          ))}
-        </Grid>
+        <HighlightSectionStyled>
+          <Grid container spacing={2.5}>
+            {items.map((item, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}>
+                <HighlightWrapper>
+                  <Stack
+                    direction="column"
+                    color="inherit"
+                    component={Card}
+                    spacing={1}
+                    useFlexGap
+                    sx={{
+                      p: 3,
+                      height: "100%",
+                      border: "1px solid",
+                      borderColor: "grey.800",
+                      background: "transparent",
+                      backgroundColor: "grey.900",
+                    }}
+                  >
+                    <Box sx={{ opacity: "50%" }}>{item.icon}</Box>
+                    <div className="grid">
+                      <Typography fontWeight="medium" gutterBottom>
+                        {item.title}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: "grey.400" }}>
+                        {item.description}
+                      </Typography>
+                    </div>
+                  </Stack>
+                </HighlightWrapper>
+              </Grid>
+            ))}
+          </Grid>
+        </HighlightSectionStyled>
       </Container>
     </Box>
   );
 };
+
+const HighlightSectionStyled = styled.section`
+  width: 100%;
+`;
+
 export default Highlights;

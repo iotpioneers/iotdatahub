@@ -1,5 +1,9 @@
+"use client";
+
 import * as React from "react";
 import { useSession } from "next-auth/react";
+
+// Material UI
 import { Link, PaletteMode } from "@mui/material";
 import Box from "@mui/material/Box";
 import AppBar from "@mui/material/AppBar";
@@ -9,11 +13,13 @@ import Container from "@mui/material/Container";
 import Divider from "@mui/material/Divider";
 import MenuItem from "@mui/material/MenuItem";
 import Drawer from "@mui/material/Drawer";
-import MenuIcon from "@mui/icons-material/Menu";
-import ToggleColorMode from "./ToggleColorMode";
-import NavigationMenuLinks from "../NavigationMenuLinks/NavigationMenuLinks";
-import ToggleButton from "../Button";
+
+// Project imports
+import ToggleColorMode from "./LandingPage/ToggleColorMode";
+import NavigationMenuLinks from "./NavigationMenuLinks/NavigationMenuLinks";
 import { navigation } from "@/constants";
+import AngledButton from "./components/design/AngledButton";
+import MenuSvg from "./components/design/svg/MenuSvg";
 
 const logoStyle = {
   width: "140px",
@@ -26,26 +32,16 @@ interface AppAppBarProps {
   toggleColorMode: () => void;
 }
 
-function HomeHeader({ mode, toggleColorMode }: AppAppBarProps) {
-  const [open, setOpen] = React.useState(false);
+const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
+  const [openNavigation, setOpenNavigation] = React.useState(false);
 
   const { status, data: session } = useSession();
 
-  const toggleDrawer = (newOpen: boolean) => () => {
-    setOpen(newOpen);
-  };
-
-  const scrollToSection = (sectionId: string) => {
-    const sectionElement = document.getElementById(sectionId);
-    const offset = 128;
-    if (sectionElement) {
-      const targetScroll = sectionElement.offsetTop - offset;
-      sectionElement.scrollIntoView({ behavior: "smooth" });
-      window.scrollTo({
-        top: targetScroll,
-        behavior: "smooth",
-      });
-      setOpen(false);
+  const toggleNavigation = () => {
+    if (openNavigation) {
+      setOpenNavigation(false);
+    } else {
+      setOpenNavigation(true);
     }
   };
 
@@ -134,16 +130,14 @@ function HomeHeader({ mode, toggleColorMode }: AppAppBarProps) {
               )}
             </Box>
             <Box sx={{ display: { sm: "", md: "none" } }}>
-              <Button
-                variant="text"
-                color="primary"
-                aria-label="menu"
-                onClick={toggleDrawer(true)}
-                sx={{ minWidth: "30px", p: "4px" }}
+              <AngledButton
+                className="ml-1 lg:hidden"
+                px="px-3"
+                onClick={toggleNavigation}
               >
-                <MenuIcon />
-              </Button>
-              <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
+                <MenuSvg openNavigation={openNavigation} />
+              </AngledButton>
+              <Drawer anchor="right" open={openNavigation} sx={{ mt: 12 }}>
                 <Box
                   sx={{
                     minWidth: "60dvw",
@@ -155,11 +149,18 @@ function HomeHeader({ mode, toggleColorMode }: AppAppBarProps) {
                   <Box
                     sx={{
                       display: "flex",
-                      flexDirection: "column",
-                      alignItems: "end",
-                      flexGrow: 1,
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
                     }}
                   >
+                    <AngledButton
+                      className="ml-1 lg:hidden"
+                      px="px-3"
+                      onClick={toggleNavigation}
+                    >
+                      <MenuSvg openNavigation={openNavigation} />
+                    </AngledButton>
                     <ToggleColorMode
                       mode={mode}
                       toggleColorMode={toggleColorMode}
@@ -169,27 +170,25 @@ function HomeHeader({ mode, toggleColorMode }: AppAppBarProps) {
                     <Link
                       key={item.id}
                       href={item.url}
-                      onClick={toggleDrawer(false)}
+                      onClick={() => setOpenNavigation(false)}
                       className={`lg:hidden block relative font-code text-2xl uppercase text-n-1 transition-colors hover:text-color-1 px-6 py-2`}
                     >
-                      <MenuItem onClick={() => toggleDrawer(false)}>
+                      <MenuItem onClick={() => setOpenNavigation(false)}>
                         {item.title}
                       </MenuItem>
                     </Link>
                   ))}
                   <Divider />
-                  <MenuItem>
-                    {status !== "loading" && (
-                      <Button
-                        className="flex  xs:mr-1 "
-                        href={
-                          status === "authenticated" ? "/dashboard" : "/login"
-                        }
-                      >
-                        {status === "authenticated" ? "DASHBOARD" : "SIGN IN"}
-                      </Button>
-                    )}
-                  </MenuItem>
+                  {status !== "loading" && (
+                    <AngledButton
+                      className="flex text-pink-500 mt-2"
+                      href={
+                        status === "authenticated" ? "/dashboard" : "/login"
+                      }
+                    >
+                      {status === "authenticated" ? "DASHBOARD" : "SIGN IN"}
+                    </AngledButton>
+                  )}
                   <MenuItem>
                     {status !== "loading" && status === "unauthenticated" && (
                       <Button
@@ -212,6 +211,6 @@ function HomeHeader({ mode, toggleColorMode }: AppAppBarProps) {
       </AppBar>
     </div>
   );
-}
+};
 
 export default HomeHeader;

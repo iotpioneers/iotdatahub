@@ -10,7 +10,7 @@ interface ButtonProps {
   white?: boolean;
 }
 
-const Button = ({
+const AngledButton = ({
   className,
   href,
   onClick,
@@ -40,4 +40,4 @@ const Button = ({
   return href ? renderLink() : renderButton();
 };
 
-export default Button;
+export default AngledButton;

@@ -13,35 +13,26 @@ import DevicesRoundedIcon from "@mui/icons-material/DevicesRounded";
 import EdgesensorHighRoundedIcon from "@mui/icons-material/EdgesensorHighRounded";
 import ViewQuiltRoundedIcon from "@mui/icons-material/ViewQuiltRounded";
 
+import IoTProducts from "@/public/IoT-products.jpg";
+
 const items = [
   {
     icon: <ViewQuiltRoundedIcon />,
     title: "Centralized Dashboard",
     description:
       "Monitor all your IoT devices and data streams in one intuitive dashboard. Customize views to focus on what's most important to you.",
-    imageLight:
-      'url("/static/images/templates/templates-images/dash-light.png")',
-    imageDark: 'url("/static/images/templates/templates-images/dash-dark.png")',
   },
   {
     icon: <EdgesensorHighRoundedIcon />,
     title: "Real-time Analytics",
     description:
       "Get insights into your data with real-time analytics. Track performance, detect anomalies, and make informed decisions on the fly.",
-    imageLight:
-      'url("/static/images/templates/templates-images/analytics-light.png")',
-    imageDark:
-      'url("/static/images/templates/templates-images/analytics-dark.png")',
   },
   {
     icon: <DevicesRoundedIcon />,
     title: "Cross-Platform Access",
     description:
       "Access your IoT data and controls from any device. Our platform supports web, mobile, and desktop applications.",
-    imageLight:
-      'url("/static/images/templates/templates-images/devices-light.png")',
-    imageDark:
-      'url("/static/images/templates/templates-images/devices-dark.png")',
   },
 ];
 
@@ -115,16 +106,15 @@ const Features = () => {
           >
             <Box
               sx={{
-                backgroundImage: (theme) =>
-                  theme.palette.mode === "light"
-                    ? items[selectedItemIndex].imageLight
-                    : items[selectedItemIndex].imageDark,
+                backgroundImage: `url(${IoTProducts.src})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 minHeight: 280,
               }}
             />
-            <Box sx={{ px: 2, pb: 2 }}>
+            <Box
+              sx={{ px: 2, pb: 2, display: "flex", flexDirection: "column" }}
+            >
               <Typography
                 color="text.primary"
                 variant="body2"
@@ -276,13 +266,12 @@ const Features = () => {
             <Box
               sx={{
                 m: "auto",
-                width: 420,
+                width: "100%",
                 height: 500,
                 backgroundSize: "contain",
-                backgroundImage: (theme) =>
-                  theme.palette.mode === "light"
-                    ? items[selectedItemIndex].imageLight
-                    : items[selectedItemIndex].imageDark,
+                backgroundImage: `url(${IoTProducts.src})`,
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
               }}
             />
           </Card>

@@ -8,9 +8,9 @@ import CollaborationProvider from "../Provider";
 import DashboardNavigation from "@/components/dashboard/DashboardNavigation";
 
 export const metadata: Metadata = {
-  title: "IoTDataHub",
+  title: "IoTDataHub - Dashboard",
   description:
-    "Your one-stop destination for seamless and efficient IoT Plug and Play services. Our cutting-edge solutions empower businesses to effortlessly connect, manage, and optimize their IoT devices, enabling a smarter and more connected world.",
+    "Manage your IoT devices with ease. Our IoT Plug and Play solutions empower businesses to seamlessly connect, manage, and optimize their IoT devices, enabling a smarter and more connected world.",
 };
 
 export default function RootLayout({

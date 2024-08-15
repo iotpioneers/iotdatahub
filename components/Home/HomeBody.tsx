@@ -1,36 +1,50 @@
 "use client";
+import * as React from "react";
 
-import { useRef } from "react";
+// MUI imports
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
+
+// Project imports
+import Hero from "./LandingPage/Hero";
+import Highlights from "./LandingPage/Highlights";
+import Features from "./LandingPage/Features";
+import Testimonials from "./LandingPage/Testimonials";
+import FAQ from "./LandingPage/FAQ";
+import Benefits from "./LandingPage/Benefits";
+import Collaboration from "./LandingPage/Collaboration";
 import PopUpButton from "@/components/Home/components/design/PopUpButton/PopUpButton";
-import Benefits from "./components/Benefits";
-import Collaboration from "./components/Collaboration";
-import Footer from "./components/Footer";
-import Hero from "./components/Hero";
-import Services from "./components/Services";
 import ButtonGradient from "@/components/Home/components/design/svg/ButtonGradient";
 
 const HomeBody = () => {
-  const sectionTop = useRef<HTMLElement>(null);
+  const sectionTop = React.useRef<HTMLElement>(null);
 
   const handleScroll = () => {
     sectionTop.current?.scrollIntoView({ behavior: "smooth" });
   };
+
   return (
     <>
+      <Hero />
+
       <div>
         <PopUpButton handleScroll={handleScroll}></PopUpButton>
       </div>
-      <div className="pt-[4.75rem] lg:pt-[5.25rem] overflow-hidden">
-        <Hero />
+      <Box sx={{ bgcolor: "background.default" }}>
         <Benefits />
+        <Divider />
+        <Features />
+        <Divider />
+        <Testimonials />
+        <Divider />
         <Collaboration />
-        <Services />
-        <Footer />
-      </div>
-
+        <Divider />
+        <Highlights />
+        <Divider />
+        <FAQ />
+      </Box>
       <ButtonGradient />
     </>
   );
 };
-
 export default HomeBody;

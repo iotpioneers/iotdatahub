@@ -1,7 +1,7 @@
 import Section from "./Section";
-import Heading from "./Heading";
 import PricingList from "./PricingList";
 import { LeftLine, RightLine } from "./design/Pricing";
+import { Heading } from "@radix-ui/themes";
 
 const Pricing = () => {
   return (
@@ -19,10 +19,7 @@ const Pricing = () => {
           </div>
         </div>
         <div className="flex mt-16 lg:-mt-20">
-          <Heading
-            tag="Get started with IoTDataHub"
-            title="Find the right pricing package"
-          />
+          <Heading title="Find the right pricing package" />
         </div>
 
         <div className="relative">
