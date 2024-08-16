@@ -7,9 +7,9 @@ import Alert from "@mui/material/Alert";
 import { CalendarIcon } from "@heroicons/react/20/solid";
 import { ChartPieIcon } from "@heroicons/react/24/solid";
 import { ChannelHeadingProps } from "@/types";
-import { Input } from "@/components/Actions/input";
+import { Input } from "@/components/Actions/TextEditingInput";
 
-import { updateChannelData } from "@/lib/actions/room.actions";
+import { updateChannelRoomData } from "@/lib/actions/room.actions";
 import { ViewIcon } from "lucide-react";
 import { dateConverter } from "@/lib/utils";
 
@@ -60,7 +60,7 @@ const ChannelDetailsHeading = ({
 
       try {
         if (channelTitle !== channel?.name) {
-          const updatedChannel = await updateChannelData(
+          const updatedChannel = await updateChannelRoomData(
             channelId,
             channelTitle
           );
@@ -75,13 +75,16 @@ const ChannelDetailsHeading = ({
 
           setShowResult(true);
           setEditing(false);
+          setLoading(false);
         }
       } catch (error) {
+        console.log("Error updating channel", error);
         setError((error as Error).message);
         setShowResult(true);
+      } finally {
+        setLoading(false);
+        setEditing(false);
       }
-
-      setLoading(false);
     }
   };
 
@@ -92,7 +95,7 @@ const ChannelDetailsHeading = ({
         !containerRef.current.contains(e.target as Node)
       ) {
         setEditing(false);
-        updateChannelData(channelId, channelTitle);
+        updateChannelRoomData(channelId, channelTitle);
       }
     };
 
@@ -153,7 +156,7 @@ const ChannelDetailsHeading = ({
 
           {currentUserType === "editor" && !editing && (
             <Image
-              src="/assets/icons/edit.svg"
+              src="/icons/edit.svg"
               alt="edit"
               width={24}
               height={24}

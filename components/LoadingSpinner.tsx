@@ -4,7 +4,7 @@ const LoadingSpinner = () => {
   return (
     <div className="loader">
       <Image
-        src="/assets/icons/loader.svg"
+        src="/icons/loader.svg"
         alt="loader"
         width={44}
         height={44}

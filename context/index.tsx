@@ -73,10 +73,6 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { status, data: session, update } = useSession();
 
-  if (status !== "loading" && status === "unauthenticated") {
-    redirect("/login");
-  }
-
   // Effect to update global state when session changes
   useEffect(() => {
     if (status === "authenticated") {

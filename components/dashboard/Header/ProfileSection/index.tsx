@@ -146,7 +146,7 @@ const ProfileSection = () => {
           }}
           icon={
             <Avatar
-              src={userImage || "/user.svg"}
+              src={userImage || ""}
               sx={{
                 ...theme.typography.mediumAvatar,
                 margin: "8px 0 8px 8px !important",

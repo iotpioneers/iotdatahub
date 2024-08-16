@@ -49,7 +49,7 @@ export function AccountInfo(): React.JSX.Element {
         <Stack spacing={2} sx={{ alignItems: "center" }}>
           <div>
             <Avatar
-              src={userImage || "/user.svg"}
+              src={userImage || ""}
               sx={{
                 height: "100px",
                 width: "100px",

@@ -25,11 +25,15 @@ import ChannelComments from "./ChannelComments";
 import { UserType } from "@/types";
 import LoadingSpinner from "../../LoadingSpinner";
 
-export function ChannelCollaborationEditor({
+const ChannelCollaborationEditor = ({
+  roomId,
   currentUserType,
+  channelDescription,
 }: {
+  roomId: string;
   currentUserType: UserType;
-}) {
+  channelDescription: string;
+}) => {
   const status = useEditorStatus();
   const { threads } = useThreads();
 
@@ -43,9 +47,11 @@ export function ChannelCollaborationEditor({
     editable: currentUserType === "editor",
   });
 
-  function Placeholder() {
+  function Placeholder({ channelDescription }: { channelDescription: string }) {
     return (
-      <div className="editor-placeholder">{"Enter some rich text..."}</div>
+      <div className="editor-placeholder">
+        {channelDescription || "Enter some rich text..."}
+      </div>
     );
   }
 
@@ -65,7 +71,9 @@ export function ChannelCollaborationEditor({
                 contentEditable={
                   <ContentEditable className="editor-input h-full" />
                 }
-                placeholder={<Placeholder />}
+                placeholder={
+                  <Placeholder channelDescription={channelDescription} />
+                }
                 ErrorBoundary={LexicalErrorBoundary}
               />
               {currentUserType === "editor" && <FloatingToolbarPlugin />}
@@ -83,4 +91,5 @@ export function ChannelCollaborationEditor({
       </div>
     </LexicalComposer>
   );
-}
+};
+export default ChannelCollaborationEditor;

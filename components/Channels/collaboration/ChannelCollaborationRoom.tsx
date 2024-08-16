@@ -7,7 +7,7 @@ import { ChannelCollaborativeRoomProps } from "@/types";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import ChannelDetailsHeading from "../ChannelDetailsHeading";
 import ChannelNavigation from "../ChannelNavigation";
-import { ChannelCollaborationEditor } from "@/components/Channels/collaboration/ChannelCollaborationEditor";
+import ChannelCollaborationEditor from "@/components/Channels/collaboration/ChannelCollaborationEditor";
 
 const ChannelCollaborationRoom = ({
   roomId,
@@ -39,7 +39,11 @@ const ChannelCollaborationRoom = ({
             sampleCodes={sampleCodes}
             apiKey={apiKey}
           />
-          <ChannelCollaborationEditor currentUserType={currentUserType} />
+          <ChannelCollaborationEditor
+            roomId={roomId}
+            currentUserType={currentUserType}
+            channelDescription={channel.description}
+          />
         </div>
       </ClientSideSuspense>
     </RoomProvider>

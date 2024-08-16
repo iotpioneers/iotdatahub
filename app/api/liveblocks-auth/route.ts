@@ -28,9 +28,9 @@ export async function POST(request: NextRequest) {
     id,
     info: {
       id,
-      name: name,
-      email: email,
-      avatar: image || "user.svg",
+      name,
+      email,
+      avatar: image || "",
       color: getUserColor(id),
     },
   };

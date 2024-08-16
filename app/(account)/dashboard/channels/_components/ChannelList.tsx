@@ -9,6 +9,7 @@ import LoadingProgressBar from "@/components/LoadingProgressBar";
 import Image from "next/image";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { ChannelProps } from "@/types";
+import axios from "axios";
 
 const ChannelList = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -18,13 +19,13 @@ const ChannelList = () => {
     const fetchChannels = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch(
+        const res = await axios.get(
           process.env.NEXT_PUBLIC_BASE_URL + "/api/channels"
         );
-        if (!res.ok) {
+        if (res.status !== 200) {
           throw new Error("Failed to fetch channels");
         }
-        const channelsData: ChannelProps[] = await res.json();
+        const channelsData: ChannelProps[] = await res.data;
         setChannels(channelsData);
       } catch (error) {
         return null;
@@ -34,14 +35,14 @@ const ChannelList = () => {
     };
 
     fetchChannels();
-  }, [channels.length]);
+  }, [channels.length, channels]);
 
   return (
     <div className="w-full">
       {isLoading && <LoadingProgressBar />}
       <Link href="/dashboard/channels/new" onClick={() => setIsLoading(true)}>
         <Button className="button bg-gray-600 p-3 rounded-md gap-1 mb-2">
-          <Image src="/assets/icons/add.svg" alt="add" width={24} height={24} />
+          <Image src="/icons/add.svg" alt="add" width={24} height={24} />
           <p className="block">Add New Channel</p>
         </Button>
       </Link>

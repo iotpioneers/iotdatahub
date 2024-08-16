@@ -508,6 +508,7 @@ const AuthRegister = ({ ...others }) => {
                 value={values.password}
                 name="password"
                 label="Password"
+                autoComplete="off"
                 onBlur={handleBlur}
                 onChange={(e) => {
                   handleChange(e);
@@ -571,6 +572,7 @@ const AuthRegister = ({ ...others }) => {
                 <OutlinedInput
                   id="outlined-adornment-confirmPassword-register"
                   type="password"
+                  autoComplete="off"
                   value={values.confirmPassword}
                   name="confirmPassword"
                   label="Confirm Password"

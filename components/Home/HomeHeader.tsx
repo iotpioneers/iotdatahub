@@ -35,7 +35,7 @@ interface AppAppBarProps {
 const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
   const [openNavigation, setOpenNavigation] = React.useState(false);
 
-  const { status, data: session } = useSession();
+  const { status } = useSession();
 
   const toggleNavigation = () => {
     if (openNavigation) {
@@ -107,7 +107,7 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                 alignItems: "center",
               }}
             >
-              <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} />
+              {/* <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} /> */}
               {status !== "loading" && (
                 <Button
                   className="flex  xs:mr-1 "
@@ -161,10 +161,10 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                     >
                       <MenuSvg openNavigation={openNavigation} />
                     </AngledButton>
-                    <ToggleColorMode
+                    {/* <ToggleColorMode
                       mode={mode}
                       toggleColorMode={toggleColorMode}
-                    />
+                    /> */}
                   </Box>
                   {navigation.map((item) => (
                     <Link

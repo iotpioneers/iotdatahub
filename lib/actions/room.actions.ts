@@ -6,18 +6,18 @@ import { revalidatePath } from "next/cache";
 import { getAccessType, parseStringify } from "../utils";
 import {
   AccessType,
-  CreateOrganisationRoomParams,
+  CreateChannelRoomParams,
   RoomAccesses,
   ShareDocumentParams,
 } from "@/types";
 import axios from "axios";
 
-export const createOrganizationRoom = async ({
+export const createChannelRoom = async ({
   roomId,
   userId,
   email,
   title,
-}: CreateOrganisationRoomParams) => {
+}: CreateChannelRoomParams) => {
   try {
     const metadata = {
       creatorId: userId,
@@ -26,16 +26,16 @@ export const createOrganizationRoom = async ({
     };
 
     const usersAccesses: RoomAccesses = {
-      [userId]: ["room:write"],
+      [email]: ["room:write"],
     };
 
     const room = await liveblocks.createRoom(roomId, {
       metadata,
       usersAccesses,
-      defaultAccesses: ["room:read", "room:presence:write"],
+      defaultAccesses: ["room:write"],
     });
 
-    revalidatePath("/dashboard/organization");
+    revalidatePath("/dashboard/channels");
 
     return parseStringify(room);
   } catch (error) {
@@ -46,18 +46,14 @@ export const createOrganizationRoom = async ({
 export const getRoomAccess = async ({
   roomId,
   userId,
-  userEmail,
 }: {
   roomId: string;
   userId: string;
-  userEmail: string;
 }) => {
   try {
     const room = await liveblocks.getRoom(roomId);
 
-    const hasAccess = Object.keys(room.usersAccesses).includes(
-      userId || userEmail
-    );
+    const hasAccess = Object.keys(room.usersAccesses).includes(userId);
 
     if (!hasAccess) {
       throw new Error("You do not have access to this channel");
@@ -65,35 +61,37 @@ export const getRoomAccess = async ({
 
     return parseStringify(room);
   } catch (error) {
+    console.error("Error getting room access", error);
     throw new Error(error as string);
   }
 };
 
-export const updateChannelData = async (channelId: string, title: string) => {
+export const updateChannelRoomData = async (
+  channelId: string,
+  title: string
+) => {
   try {
     const response = await axios.patch(`/api/channels/${channelId}`, {
       name: title,
     });
 
+    console.log("response", response);
+
     if (response.status !== 200) {
       return null;
     }
 
-    const updatedChannelData = response.data;
+    const updateChannelRoom = await liveblocks.updateRoom(channelId, {
+      metadata: {
+        title,
+      },
+    });
+
+    console.log("updateChannelRoom", updateChannelRoom);
 
     revalidatePath(`/dashboard/channels/${channelId}`);
 
-    return parseStringify(updatedChannelData);
-  } catch (error) {
-    return null;
-  }
-};
-
-export const getDocuments = async (email: string) => {
-  try {
-    const rooms = await liveblocks.getRooms({ userId: email });
-
-    return parseStringify(rooms);
+    return parseStringify(updateChannelRoom);
   } catch (error) {
     return null;
   }
@@ -160,22 +158,27 @@ export const removeCollaborator = async ({
       },
     });
 
-    revalidatePath(`/documents/${roomId}`);
+    revalidatePath(`/dashboard/channels/${roomId}`);
     return parseStringify(updatedRoom);
   } catch (error) {
     return null;
   }
 };
 
-export const deleteChannel = async (roomId: string, channelId: string) => {
+export const deleteChannel = async (channelId: string) => {
   try {
-    const response = await axios.delete(`/api/channels/${channelId}`);
+    const response = await axios.delete(
+      process.env.NEXT_PUBLIC_BASE_URL + `/api/channels/${channelId}`
+    );
 
     if (response.status !== 200) {
       return null;
     }
 
+    await liveblocks.deleteRoom(channelId);
+
     revalidatePath("/dashboard/channels");
+    return parseStringify(response.data);
   } catch (error) {
     console.error("Error deleting channel:", error);
     revalidatePath("/dashboard/channels");

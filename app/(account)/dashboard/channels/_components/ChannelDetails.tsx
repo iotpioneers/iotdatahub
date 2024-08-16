@@ -1,26 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ChannelNavigation from "@/components/Channels/ChannelNavigation";
+
+// Project imports
 import { ChannelProps, DataPointProps, FieldProps } from "@/types";
-import dynamic from "next/dynamic";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { getUsersById } from "@/lib/actions/user.actions";
+import { getUsers } from "@/lib/actions/user.actions";
 import { User } from "@/types/user";
 import { getRoomAccess } from "@/lib/actions/room.actions";
 import ChannelCollaborationRoom from "@/components/Channels/collaboration/ChannelCollaborationRoom";
-
-const ChannelDetailsHeading = dynamic(
-  () => import("@/components/Channels/ChannelDetailsHeading"),
-  {
-    ssr: false,
-    loading: () => <LoadingProgressBar />,
-  }
-);
 
 interface ChannelData {
   channel: ChannelProps;
@@ -30,7 +22,7 @@ interface ChannelData {
   sampleCodes: string;
 }
 
-export default function ChannelDetails({ channelID }: { channelID: string }) {
+const ChannelDetails = ({ channelID }: { channelID: string }) => {
   const { status, data: session } = useSession();
   const router = useRouter();
 
@@ -45,7 +37,7 @@ export default function ChannelDetails({ channelID }: { channelID: string }) {
   const [room, setRoom] = useState<any>(null);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (status !== "loading" && status === "unauthenticated") {
       router.push("/login");
     }
   }, [status, router]);
@@ -79,35 +71,38 @@ export default function ChannelDetails({ channelID }: { channelID: string }) {
     const fetchData = async () => {
       if (!channelData || !session?.user) return;
 
-      const { organizationId: roomId } = channelData.channel;
       const userId = session.user.id;
       const userEmail = session.user.email;
 
       try {
-        const roomData = await getRoomAccess({ roomId, userId, userEmail });
+        const roomData = await getRoomAccess({
+          roomId: channelID,
+          userId,
+        });
         if (!roomData) return;
 
         setRoom(roomData);
 
         const userIds = Object.keys(roomData.usersAccesses);
-        const users = await getUsersById({ userIds });
 
-        if (!users || users.length === 0) return;
+        const users = await getUsers({ userIds });
 
         const usersData = users.map((user: User) => ({
           ...user,
-          userType: roomData.usersAccesses[userId]?.includes("room:write")
+          userType: roomData.usersAccesses[userEmail]?.includes("room:write")
             ? "editor"
             : "viewer",
         }));
 
         setUsersData(usersData);
 
-        const currentUserType = roomData.usersAccesses[userId]?.includes(
+        const currentUserType = roomData.usersAccesses[userEmail]?.includes(
           "room:write"
         )
           ? "editor"
           : "viewer";
+
+        console.log("currentUserType", currentUserType);
 
         setCurrentUserType(currentUserType);
       } catch (error) {
@@ -162,7 +157,7 @@ export default function ChannelDetails({ channelID }: { channelID: string }) {
         </Alert>
       </Snackbar>
       <ChannelCollaborationRoom
-        roomId={channel.organizationId}
+        roomId={channelID}
         roomMetadata={room?.metadata}
         users={usersData}
         currentUserType={currentUserType}
@@ -174,4 +169,6 @@ export default function ChannelDetails({ channelID }: { channelID: string }) {
       />
     </main>
   );
-}
+};
+
+export default ChannelDetails;

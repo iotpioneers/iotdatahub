@@ -4,7 +4,7 @@ import ClientRootLayout from "@/app/ClientRootLayout";
 import "../globals.css";
 import { Container } from "@radix-ui/themes";
 
-import CollaborationProvider from "../Provider";
+import CollaborationProvider from "../CollaborationProvider";
 import DashboardNavigation from "@/components/dashboard/DashboardNavigation";
 
 export const metadata: Metadata = {

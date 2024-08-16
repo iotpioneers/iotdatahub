@@ -35,7 +35,7 @@ const Collaboration = () => {
   const xTransform = useTransform(
     scrollYProgress,
     [1, 0.5, 0.1, 0],
-    [windowWidth / 10, 0, 0, 0]
+    [windowWidth / 3, 0, 0, 0]
   );
 
   return (

@@ -15,6 +15,7 @@ import Benefits from "./LandingPage/Benefits";
 import Collaboration from "./LandingPage/Collaboration";
 import PopUpButton from "@/components/Home/components/design/PopUpButton/PopUpButton";
 import ButtonGradient from "@/components/Home/components/design/svg/ButtonGradient";
+import Footer from "./components/Footer";
 
 const HomeBody = () => {
   const sectionTop = React.useRef<HTMLElement>(null);
@@ -42,6 +43,7 @@ const HomeBody = () => {
         <Highlights />
         <Divider />
         <FAQ />
+        <Footer />
       </Box>
       <ButtonGradient />
     </>

@@ -77,7 +77,7 @@ const Collaborator = ({
         </div>
       </div>
 
-      {creator === collaborator.id ? (
+      {creator === collaborator.email ? (
         <p className="text-sm text-slate-800">Owner</p>
       ) : (
         <div className="flex items-center">

@@ -10,7 +10,6 @@ import { organizationSchema } from "@/validations/schema.validation";
 import { useGlobalState } from "@/context";
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import { createOrganizationRoom } from "@/lib/actions/room.actions";
 
 // Define the enum AreaOfInterest
 enum AreaOfInterest {
@@ -142,15 +141,6 @@ const OrganizationOnboardingCreation: React.FC = () => {
       }
 
       const { newOrganization } = response.data;
-
-      const { id: roomId, name: title } = newOrganization;
-
-      await createOrganizationRoom({
-        roomId,
-        userId,
-        email,
-        title,
-      });
 
       setState((prev) => ({
         ...prev,

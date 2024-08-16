@@ -1,29 +1,37 @@
 "use client";
 
 import React, { ChangeEvent, useEffect, useState } from "react";
-import Snackbar from "@mui/material/Snackbar";
+import { Button } from "@radix-ui/themes";
+import axios from "axios";
+import "easymde/dist/easymde.min.css";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { Controller, useForm } from "react-hook-form";
+import SimpleMDE from "react-simplemde-editor";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+// material-ui
 import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
+
+// Project Imports
+import ErrorMessage from "@/components/ErrorMessage";
+import { useGlobalState } from "@/context";
+import { createChannelRoom } from "@/lib/actions/room.actions";
+import { channelSchema } from "@/validations/schema.validation";
+
+// Icons
 import {
   ArchiveBoxXMarkIcon,
   CloudArrowUpIcon,
 } from "@heroicons/react/24/outline";
-import { useRouter } from "next/navigation";
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@radix-ui/themes";
-import SimpleMDE from "react-simplemde-editor";
-import "easymde/dist/easymde.min.css";
-import { channelSchema } from "@/validations/schema.validation";
-import ErrorMessage from "@/components/ErrorMessage";
-import { useSession } from "next-auth/react";
-import { useGlobalState } from "@/context";
-import axios from "axios";
 
+// Types
 type ChannelForm = z.infer<typeof channelSchema>;
 
 export default function ChannelForm() {
-  const { status } = useSession();
+  const { status, data: session } = useSession();
   const { state, fetchCurrentOrganization } = useGlobalState();
   const router = useRouter();
 
@@ -32,8 +40,11 @@ export default function ChannelForm() {
   const [error, setError] = useState<string>("");
   const [open, setOpen] = React.useState(false);
 
-  if (status === "unauthenticated") router.push("/login");
+  if (status !== "loading" && status === "unauthenticated")
+    router.push("/login");
+
   const currentOrganization = state.currentOrganization;
+  const { id: userId, email } = session!.user;
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
@@ -45,6 +56,7 @@ export default function ChannelForm() {
 
     setOpen(false);
   };
+
   const {
     register,
     control,
@@ -92,18 +104,31 @@ export default function ChannelForm() {
 
       const result = await response.data;
 
-      const { id } = result.newChannel;
+      const { id: roomId, name: title } = result.newChannel;
 
-      if (result) {
+      const room = await createChannelRoom({
+        roomId,
+        userId,
+        email,
+        title,
+      });
+
+      if (!room) {
+        setError("Failed to create channel");
         setOpen(true);
-
         setIsSubmitting(false);
-        setError("");
-        router.push(`/dashboard/channels/${id}`);
+        throw new Error("Failed to create channel");
       }
+      setOpen(true);
+
+      setIsSubmitting(false);
+      setError("");
+      router.push(`/dashboard/channels/${room.id}`);
     } catch (error) {
       setIsSubmitting(false);
       setError("An unexpected error occurred.");
+    } finally {
+      setIsSubmitting(false);
     }
   });
 

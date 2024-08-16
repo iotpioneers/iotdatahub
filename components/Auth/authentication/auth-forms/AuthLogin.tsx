@@ -279,6 +279,7 @@ const AuthLogin = ({ ...others }) => {
               <OutlinedInput
                 id="outlined-adornment-password-login"
                 type={showPassword ? "text" : "password"}
+                autoComplete="off"
                 value={values.password}
                 name="password"
                 onBlur={handleBlur}

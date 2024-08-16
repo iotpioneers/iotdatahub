@@ -61,7 +61,7 @@ export type RoomMetadata = {
   title: string;
 };
 
-export type CreateOrganisationRoomParams = {
+export type CreateChannelRoomParams = {
   roomId: string;
   email: string;
   userId: string;

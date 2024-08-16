@@ -8,7 +8,7 @@ import {
   LiveblocksProvider,
 } from "@liveblocks/react/suspense";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { getUsersById, getDocumentUsers } from "@/lib/actions/user.actions";
+import { getUsers, getDocumentUsers } from "@/lib/actions/user.actions";
 
 const CollaborationProvider = ({ children }: { children: ReactNode }) => {
   const { status, data: session } = useSession();
@@ -27,7 +27,7 @@ const CollaborationProvider = ({ children }: { children: ReactNode }) => {
     <LiveblocksProvider
       authEndpoint="/api/liveblocks-auth"
       resolveUsers={async ({ userIds }) => {
-        const users = await getUsersById({ userIds });
+        const users = await getUsers({ userIds });
 
         return users;
       }}

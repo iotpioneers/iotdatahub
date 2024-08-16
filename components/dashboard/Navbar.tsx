@@ -33,7 +33,8 @@ const Navbar = ({
 
   const router = useRouter();
 
-  if (status === "unauthenticated") router.push("/login");
+  if (status !== "loading" && status === "unauthenticated")
+    router.push("/login");
 
   return (
     <>

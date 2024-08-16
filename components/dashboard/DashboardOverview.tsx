@@ -73,9 +73,16 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 }) => {
   const { status, data: session } = useSession();
 
-  if (status === "unauthenticated") {
+  if (status !== "loading" && status === "unauthenticated") {
     return redirect("/login");
   }
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return "Good Morning";
+    if (hour >= 12 && hour < 18) return "Good Afternoon";
+    return "Good Evening";
+  };
 
   return (
     <div className="min-h-screen font-sans text-gray-800">
@@ -85,7 +92,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           <div className="bg-orange-200 p-5 rounded-lg shadow-md mx-5 xs:mx-0">
             <div>
               <Heading as="h1" className="text-2xl font-bold mb-5">
-                Hello, {session!.user!.name}
+                {getGreeting()}, {session!.user!.name}
               </Heading>
               <Text className="text-gray-600">
                 Welcome to your personalized IoT dashboard. Here, you can manage

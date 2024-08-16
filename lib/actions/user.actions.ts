@@ -2,34 +2,34 @@
 
 import { parseStringify } from "../utils";
 import { liveblocks } from "../liveblocks";
-import { User } from "@/types/user";
+import { UserData } from "@/types/user";
+import axios from "axios";
 
-export const getUsersById = async ({ userIds }: { userIds: string[] }) => {
+export const getUsers = async ({ userIds }: { userIds: string[] }) => {
   try {
-    const response = await fetch(
-      process.env.NEXT_PUBLIC_BASE_URL + "/api/users",
+    const response = await axios.post(
+      process.env.NEXT_PUBLIC_BASE_URL + "/api/users/emails",
       {
-        method: "GET",
+        userIds,
       }
     );
-
-    if (!response.ok) {
+    if (response.status !== 200) {
       return;
     }
 
-    const data = await response.json();
+    const data = await response.data;
 
     if (!data) return;
 
-    const users = data.map((user: User) => ({
+    const users = data.map((user: UserData) => ({
       id: user.id,
       name: user.name,
       email: user.email,
       avatar: user.image,
     }));
 
-    const sortedUsers = userIds.map((id) =>
-      users.find((user: User) => user.id === id)
+    const sortedUsers = userIds.map((email) =>
+      users.find((user: UserData) => user.email === email)
     );
 
     return parseStringify(sortedUsers);

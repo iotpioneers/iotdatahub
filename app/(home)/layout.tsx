@@ -13,7 +13,6 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import ClientRootLayout from "@/app/ClientRootLayout";
 import HomeHeader from "@/components/Home/HomeHeader";
 import getLPTheme from "@/app/themes/getLPTheme";
-import Footer from "@/components/Home/components/Footer";
 
 export default function RootLayout({
   children,
@@ -35,7 +34,6 @@ export default function RootLayout({
             <CssBaseline />
             <HomeHeader mode={mode} toggleColorMode={toggleColorMode} />
             <main>{children}</main>
-            <Footer />
           </ThemeProvider>
         </ClientRootLayout>
       </body>
