@@ -22,7 +22,7 @@ import {
 import FloatingToolbarPlugin from "./plugins/FloatingToolbarPlugin";
 import { useThreads } from "@liveblocks/react/suspense";
 import ChannelComments from "./ChannelComments";
-import { UserType } from "@/types";
+import { UserAccessType } from "@/types";
 import LoadingSpinner from "../../LoadingSpinner";
 
 const ChannelCollaborationEditor = ({
@@ -31,7 +31,7 @@ const ChannelCollaborationEditor = ({
   channelDescription,
 }: {
   roomId: string;
-  currentUserType: UserType;
+  currentUserType: UserAccessType;
   channelDescription: string;
 }) => {
   const status = useEditorStatus();

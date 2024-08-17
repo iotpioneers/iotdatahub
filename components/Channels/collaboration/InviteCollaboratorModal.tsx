@@ -18,8 +18,8 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
-import { ShareChannelRoomAccessDialogProps, UserType } from "@/types";
-import { User } from "@/types/user";
+import { ShareChannelRoomAccessDialogProps, UserAccessType } from "@/types";
+import { CollaborationUser } from "@/types/user";
 import { Share } from "@phosphor-icons/react";
 import { updateChannelAccess } from "@/lib/actions/room.actions";
 import Collaborator from "./Collaborator";
@@ -41,25 +41,25 @@ const InviteCollaboratorModal = ({
 }: ShareChannelRoomAccessDialogProps) => {
   const user = useSelf();
 
-  const [open, setOpen] = React.useState(false);
+  const [openInviteModal, setOpenInviteModal] = React.useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [email, setEmail] = useState("");
-  const [userType, setUserType] = useState<UserType>("viewer");
+  const [userType, setUserType] = useState<UserAccessType>("viewer");
   const [showResult, setShowResult] = useState<boolean>(false);
 
   const accessChangeHandler = (
     event: SelectChangeEvent<"creator" | "editor" | "viewer">
   ) => {
-    setUserType(event.target.value as UserType);
+    setUserType(event.target.value as UserAccessType);
   };
 
   const handleClickOpen = () => {
-    setOpen(true);
+    setOpenInviteModal(true);
   };
   const handleClose = () => {
-    setOpen(false);
+    setOpenInviteModal(false);
   };
 
   const handleCloseResult = (
@@ -72,7 +72,7 @@ const InviteCollaboratorModal = ({
     setShowResult(false);
   };
 
-  const shareChannelHandler = async () => {
+  const shareChannelAccessHandler = async () => {
     setLoading(true);
 
     if (!email || !roomId || !userType || !user) {
@@ -86,7 +86,7 @@ const InviteCollaboratorModal = ({
       await updateChannelAccess({
         roomId,
         receiverEmail: email,
-        userType: userType as UserType,
+        userType: userType as UserAccessType,
         updatedBy: user.info,
       });
 
@@ -97,15 +97,12 @@ const InviteCollaboratorModal = ({
     } catch (error) {
       setError("Failed to invite user");
       setShowResult(true);
-      setOpen(false);
+      setOpenInviteModal(false);
     } finally {
       setLoading(false);
-      setOpen(false);
+      setOpenInviteModal(false);
       setEmail("");
       setUserType("viewer");
-      setError("");
-      setSuccess("");
-      setShowResult(false);
     }
   };
 
@@ -135,7 +132,7 @@ const InviteCollaboratorModal = ({
       <BootstrapDialog
         onClose={handleClose}
         aria-labelledby="customized-dialog-title"
-        open={open}
+        open={openInviteModal}
       >
         <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
           Manage who can view this project
@@ -186,7 +183,7 @@ const InviteCollaboratorModal = ({
             </FormControl>
             <Button
               type="submit"
-              onClick={shareChannelHandler}
+              onClick={shareChannelAccessHandler}
               className=" text-white gradient-blue flex h-full gap-1 px-5"
               disabled={loading}
             >
@@ -202,17 +199,12 @@ const InviteCollaboratorModal = ({
                   creator={creator}
                   receiverEmail={collaborator.email}
                   collaborator={collaborator}
-                  user={user.info as User}
+                  user={user.info as CollaborationUser}
                 />
               ))}
             </ul>
           </div>
         </DialogContent>
-        <DialogActions>
-          <Button autoFocus onClick={handleClose}>
-            Save changes
-          </Button>
-        </DialogActions>
       </BootstrapDialog>
     </React.Fragment>
   );

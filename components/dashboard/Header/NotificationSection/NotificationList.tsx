@@ -52,6 +52,10 @@ const NotificationList = () => {
     (notification) => !notification.readAt
   );
 
+  console.log("inboxNotifications", inboxNotifications);
+
+  console.log("unreadNotifications", unreadNotifications);
+
   return (
     <List
       sx={{
@@ -110,7 +114,7 @@ const NotificationList = () => {
                         showRoomName={false}
                       />
                     ),
-                    $channelRommAccess: (props) => (
+                    $channelRoomAccess: (props) => (
                       <InboxNotification.Custom
                         {...props}
                         title={props.inboxNotification.activities[0].data.title}

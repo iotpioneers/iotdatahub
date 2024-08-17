@@ -6,14 +6,13 @@ import {
   removeCollaborator,
   updateChannelAccess,
 } from "@/lib/actions/room.actions";
-import { CollaboratorProps, UserType } from "@/types";
+import { CollaboratorProps, UserAccessType } from "@/types";
 
 import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import { Badge } from "@radix-ui/themes";
 
 const Collaborator = ({
   roomId,
@@ -25,8 +24,7 @@ const Collaborator = ({
   const [userType, setUserType] = useState(collaborator.userType || "viewer");
   const [loading, setLoading] = useState(false);
 
-  console.log("creator ---", creator);
-  console.log("collaborator ---", collaborator);
+  console.log("collaborator", collaborator);
 
   const shareChannelUpdateHandler = async (type: string) => {
     setLoading(true);
@@ -34,17 +32,17 @@ const Collaborator = ({
     await updateChannelAccess({
       roomId,
       receiverEmail,
-      userType: type as UserType,
+      userType: type as UserAccessType,
       updatedBy: user,
     });
 
     setLoading(false);
   };
 
-  const accessChangeHandler = (
-    event: SelectChangeEvent<"creator" | "editor" | "viewer">
+  const channelAccessChangeHandler = (
+    event: SelectChangeEvent<"editor" | "viewer">
   ) => {
-    setUserType(event.target.value as UserType);
+    setUserType(event.target.value as UserAccessType);
     shareChannelUpdateHandler(event.target.value);
   };
 
@@ -69,7 +67,7 @@ const Collaborator = ({
         <div>
           <p className="line-clamp-1 text-sm text-slate-950 font-semibold leading-4">
             {collaborator.name}
-            <span className="text-10-regular pl-2 text-blue-100">
+            <span className="text-10-regular pl-2 text-red-600">
               {loading && "updating..."}
             </span>
           </p>
@@ -80,7 +78,7 @@ const Collaborator = ({
       </div>
 
       {creator === collaborator.id ? (
-        <p className="bg-green-400 px-2 py-1 rounded text-sm text-slate-800">
+        <p className="bg-slate-500 px-2 py-1 rounded text-sm text-slate-100">
           Owner
         </p>
       ) : (
@@ -91,12 +89,11 @@ const Collaborator = ({
               labelId="demo-select-small-label"
               id="demo-select-small"
               value={userType}
-              label="Access"
-              onChange={accessChangeHandler}
+              label="Change Access"
+              onChange={channelAccessChangeHandler}
             >
-              <MenuItem value="viewer">viewer</MenuItem>
-              <MenuItem value="editor">editor</MenuItem>
-              <MenuItem value="creator">creator</MenuItem>
+              <MenuItem value="viewer">view</MenuItem>
+              <MenuItem value="editor">edit</MenuItem>
             </Select>
           </FormControl>
           <Button

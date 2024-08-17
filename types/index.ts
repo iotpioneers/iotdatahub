@@ -49,11 +49,13 @@ export interface AddMemberProps {
 
 /* eslint-disable no-unused-vars */
 
-export type AccessType = ["room:write"] | ["room:read", "room:presence:write"];
+export type ChannelAccessType =
+  | ["room:write"]
+  | ["room:read", "room:presence:write"];
 
-export type RoomAccesses = Record<string, AccessType>;
+export type RoomAccesses = Record<string, ChannelAccessType>;
 
-export type UserType = "creator" | "editor" | "viewer";
+export type UserAccessType = "viewer" | "editor";
 
 export type RoomMetadata = {
   creatorId: string;
@@ -74,19 +76,19 @@ export type User = {
   email: string;
   avatar?: string;
   color: string;
-  userType?: UserType;
+  userType?: UserAccessType;
 };
 
 export type ShareChannelParams = {
   roomId: string;
   receiverEmail: string;
-  userType: UserType;
+  userType: UserAccessType;
   updatedBy: User;
 };
 
 export type UserTypeSelectorParams = {
   userType: string;
-  setUserType: React.Dispatch<React.SetStateAction<UserType>>;
+  setUserType: React.Dispatch<React.SetStateAction<UserAccessType>>;
   onClickHandler?: (value: string) => void;
 };
 
@@ -94,7 +96,7 @@ export type ShareChannelRoomAccessDialogProps = {
   roomId: string;
   collaborators: User[];
   creator: string;
-  currentUserType: UserType;
+  currentUserType: UserAccessType;
 };
 
 export type HeaderProps = {
@@ -114,7 +116,7 @@ export type ChannelHeadingProps = {
   roomId: string;
   roomMetadata: RoomMetadata;
   users: User[];
-  currentUserType: UserType;
+  currentUserType: UserAccessType;
   channel: ChannelProps;
   dataPoint: DataPointProps[];
 };
@@ -131,7 +133,7 @@ export type ChannelCollaborativeRoomProps = {
   roomId: string;
   roomMetadata: RoomMetadata;
   users: User[];
-  currentUserType: UserType;
+  currentUserType: UserAccessType;
   channel: ChannelProps;
   dataPoint: DataPointProps[];
   fields: FieldProps[];

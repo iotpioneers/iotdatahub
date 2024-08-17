@@ -10,7 +10,7 @@ import Alert from "@mui/material/Alert";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { getUsers } from "@/lib/actions/user.actions";
-import { User } from "@/types/user";
+import { CollaborationUser } from "@/types/user";
 import { getRoomAccess } from "@/lib/actions/room.actions";
 import ChannelCollaborationRoom from "@/components/Channels/collaboration/ChannelCollaborationRoom";
 
@@ -79,7 +79,11 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
           userEmail,
         });
 
-        if (!roomData) return;
+        if (!roomData) {
+          setIsLoading(false);
+          setError("You do not have access to this channel");
+          setOpen(true);
+        }
 
         setRoom(roomData);
 
@@ -92,7 +96,7 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
           return;
         }
 
-        const usersData = users.map((user: User) => ({
+        const usersData = users.map((user: CollaborationUser) => ({
           ...user,
           userType: roomData.usersAccesses[userEmail]?.includes("room:write")
             ? "editor"

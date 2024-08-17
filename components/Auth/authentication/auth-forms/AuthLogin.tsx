@@ -326,7 +326,7 @@ const AuthLogin = ({ ...others }) => {
                 }
                 label="Remember me"
               />
-              <Link href="#">
+              <Link href="/forgot-password">
                 <Typography
                   variant="subtitle1"
                   color="secondary"

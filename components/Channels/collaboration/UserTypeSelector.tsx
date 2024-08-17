@@ -5,14 +5,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/Actions/SelectorActions";
-import { UserType, UserTypeSelectorParams } from "@/types";
+import { UserAccessType, UserTypeSelectorParams } from "@/types";
 
 const UserTypeSelector = ({
   userType,
   setUserType,
   onClickHandler,
 }: UserTypeSelectorParams) => {
-  const accessChangeHandler = (type: UserType) => {
+  const accessChangeHandler = (type: UserAccessType) => {
     setUserType(type);
     onClickHandler && onClickHandler(type);
   };
@@ -20,7 +20,7 @@ const UserTypeSelector = ({
   return (
     <Select
       value={userType}
-      onValueChange={(type: UserType) => accessChangeHandler(type)}
+      onValueChange={(type: UserAccessType) => accessChangeHandler(type)}
     >
       <SelectTrigger className="shad-select">
         <SelectValue />

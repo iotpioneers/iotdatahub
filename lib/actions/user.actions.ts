@@ -51,13 +51,9 @@ export const getChannelRoomUsers = async ({
   try {
     const room = await liveblocks.getRoom(roomId);
 
-    console.log("room", room);
-
     const users = Object.keys(room.usersAccesses).filter(
       (email) => email !== userEmail
     );
-
-    console.log("users", users);
 
     if (text.length) {
       const lowerCaseText = text.toLowerCase();
@@ -65,8 +61,6 @@ export const getChannelRoomUsers = async ({
       const filteredUsers = users.filter((email: string) =>
         email.toLowerCase().includes(lowerCaseText)
       );
-
-      console.log("filteredUsers", filteredUsers);
 
       return parseStringify(filteredUsers);
     }

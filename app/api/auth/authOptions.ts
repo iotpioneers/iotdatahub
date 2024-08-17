@@ -45,7 +45,7 @@ const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   secret: process.env.JWT_SECRET,
   pages: {
-    signIn: "/auth/login",
+    signIn: "/login",
   },
   providers: [
     GoogleProvider({

@@ -80,7 +80,11 @@ const NotificationSection = () => {
       >
         <ButtonBase sx={{ borderRadius: "24px" }}>
           <Tooltip title="Notifications">
-            <Badge badgeContent={count} color="error" variant="standard">
+            <Badge
+              badgeContent={count > 9 ? "9+" : count}
+              color="error"
+              variant="standard"
+            >
               <IconButton
                 sx={{
                   ...theme.typography.commonAvatar,
@@ -148,13 +152,13 @@ const NotificationSection = () => {
                         sx={{ pt: 2, px: 2 }}
                       >
                         <Grid item>
-                          <Stack direction="row" spacing={2}>
+                          <Stack direction="row" spacing={1}>
                             <Typography variant="subtitle1">
                               All Notification
                             </Typography>
                             <Chip
                               size="small"
-                              label={count}
+                              label={count > 9 ? "9+" : count}
                               sx={{
                                 color: theme.palette.background.default,
                                 bgcolor: theme.palette.warning.dark,

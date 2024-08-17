@@ -5,7 +5,7 @@ import { liveblocks } from "../liveblocks";
 import { revalidatePath } from "next/cache";
 import { getAccessType, parseStringify } from "../utils";
 import {
-  AccessType,
+  ChannelAccessType,
   CreateChannelRoomParams,
   RoomAccesses,
   ShareChannelParams,
@@ -32,7 +32,7 @@ export const createChannelRoom = async ({
     const room = await liveblocks.createRoom(roomId, {
       metadata,
       usersAccesses,
-      defaultAccesses: ["room:write"],
+      defaultAccesses: [],
     });
 
     revalidatePath("/dashboard/channels");
@@ -105,30 +105,31 @@ export const updateChannelAccess = async ({
 }: ShareChannelParams) => {
   try {
     const usersAccesses: RoomAccesses = {
-      [receiverEmail]: getAccessType(userType) as AccessType,
+      [receiverEmail]: getAccessType(userType) as ChannelAccessType,
     };
 
     const room = await liveblocks.updateRoom(roomId, {
       usersAccesses,
     });
 
-    if (room) {
-      const notificationId = nanoid();
-
-      await liveblocks.triggerInboxNotification({
-        userId: receiverEmail,
-        kind: "$channelRommAccess",
-        subjectId: notificationId,
-        activityData: {
-          userType,
-          title: `You have been granted ${userType} access to the channel by ${updatedBy.name}`,
-          updatedBy: updatedBy.name,
-          image: updatedBy.avatar,
-          email: updatedBy.email,
-        },
-        roomId,
-      });
+    if (!room) {
+      throw new Error("Error updating room access");
     }
+    const notificationId = nanoid();
+
+    await liveblocks.triggerInboxNotification({
+      userId: receiverEmail,
+      kind: "$channelRoomAccess",
+      subjectId: notificationId,
+      activityData: {
+        userType,
+        title: `You have been granted ${userType} access to the channel by ${updatedBy.name}`,
+        updatedBy: updatedBy.name,
+        image: updatedBy.avatar,
+        email: updatedBy.email,
+      },
+      roomId,
+    });
 
     revalidatePath(`/dashboard/channels/${roomId}`);
     return parseStringify(room);
@@ -155,6 +156,18 @@ export const removeCollaborator = async ({
       usersAccesses: {
         [email]: null,
       },
+    });
+
+    const notificationId = nanoid();
+
+    await liveblocks.triggerInboxNotification({
+      userId: email,
+      kind: "$channelRoomAccess",
+      subjectId: notificationId,
+      activityData: {
+        title: "You have been removed to collabote to the channel",
+      },
+      roomId,
     });
 
     revalidatePath(`/dashboard/channels/${roomId}`);
