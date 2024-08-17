@@ -13,6 +13,7 @@ export const getUsers = async ({ userIds }: { userIds: string[] }) => {
         userIds,
       }
     );
+
     if (response.status !== 200) {
       return;
     }
@@ -38,26 +39,34 @@ export const getUsers = async ({ userIds }: { userIds: string[] }) => {
   }
 };
 
-export const getDocumentUsers = async ({
+export const getChannelRoomUsers = async ({
   roomId,
-  userId,
+  userEmail,
   text,
 }: {
   roomId: string;
-  userId: string;
+  userEmail: string;
   text: string;
 }) => {
   try {
     const room = await liveblocks.getRoom(roomId);
 
-    const users = Object.keys(room.usersAccesses).filter((id) => id !== userId);
+    console.log("room", room);
+
+    const users = Object.keys(room.usersAccesses).filter(
+      (email) => email !== userEmail
+    );
+
+    console.log("users", users);
 
     if (text.length) {
       const lowerCaseText = text.toLowerCase();
 
-      const filteredUsers = users.filter((id: string) =>
-        id.toLowerCase().includes(lowerCaseText)
+      const filteredUsers = users.filter((email: string) =>
+        email.toLowerCase().includes(lowerCaseText)
       );
+
+      console.log("filteredUsers", filteredUsers);
 
       return parseStringify(filteredUsers);
     }

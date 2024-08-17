@@ -71,14 +71,14 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
     const fetchData = async () => {
       if (!channelData || !session?.user) return;
 
-      const userId = session.user.id;
       const userEmail = session.user.email;
 
       try {
         const roomData = await getRoomAccess({
           roomId: channelID,
-          userId,
+          userEmail,
         });
+
         if (!roomData) return;
 
         setRoom(roomData);
@@ -86,6 +86,11 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
         const userIds = Object.keys(roomData.usersAccesses);
 
         const users = await getUsers({ userIds });
+
+        if (!users) {
+          setError("No users found or an error occurred");
+          return;
+        }
 
         const usersData = users.map((user: User) => ({
           ...user,
@@ -101,8 +106,6 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
         )
           ? "editor"
           : "viewer";
-
-        console.log("currentUserType", currentUserType);
 
         setCurrentUserType(currentUserType);
       } catch (error) {

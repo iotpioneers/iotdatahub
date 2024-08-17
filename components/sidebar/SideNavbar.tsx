@@ -153,22 +153,6 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
       </div>
       {/* setting  */}
       <div className=" border-b border-gray-100 pb-4">
-        <Link href="/dashboard/subscription">
-          <div
-            className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
-              activeLink === "/dashboard/subscription"
-                ? "bg-gray-300 text-white"
-                : "hover:bg-gray-200 text-gray-600"
-            }`}
-            onClick={() => handleSetActiveLink("/dashboard/subscription")}
-          >
-            <GiUpgrade className="text-2xl text-gray-600" />
-            <h3 className="text-base font-semibold">Upgrade Plan</h3>
-          </div>
-          {activeLink === "/dashboard/subscription" && isLoading && (
-            <LoadingProgressBar />
-          )}
-        </Link>
         <Link href="#">
           <div
             className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
@@ -203,59 +187,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
         </Link>
       </div>
 
-      {/* account and logout */}
-      <div className="my-2">
-        <Link href="/dashboard/settings">
-          <div
-            className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
-              activeLink === "/dashboard/settings"
-                ? "bg-gray-300 text-white"
-                : "hover:bg-gray-200 text-gray-600"
-            }`}
-            onClick={() => handleSetActiveLink("/dashboard/settings")}
-          >
-            <MdOutlineSettings className="text-2xl text-gray-600" />
-            <h3 className="text-base font-semibold">Settings</h3>
-          </div>
-          {activeLink === "/dashboard/settings" && isLoading && (
-            <LoadingProgressBar />
-          )}
-        </Link>
-        <Link href="/dashboard/account">
-          <div
-            className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
-              activeLink === "/dashboard/account"
-                ? "bg-gray-300 text-white"
-                : "hover:bg-gray-200 text-gray-600"
-            }`}
-            onClick={() => handleSetActiveLink("/dashboard/account")}
-          >
-            <MdManageAccounts className="text-2xl text-gray-600" />
-            <h3 className="text-base font-semibold">Account</h3>
-          </div>
-          {activeLink === "/dashboard/account" && isLoading && (
-            <LoadingProgressBar />
-          )}
-        </Link>
-        <Link href="/api/auth/signout">
-          <div
-            className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 border border-gray-200 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
-              activeLink === "/api/auth/signout"
-                ? "bg-gray-300 text-white"
-                : "hover:bg-gray-200 text-gray-600"
-            }`}
-            onClick={() => handleSetActiveLink("/api/auth/signout")}
-          >
-            <MdOutlineLogout className="text-2xl text-gray-600" />
-            <h3 className="text-base font-semibold">Logout</h3>
-          </div>
-          {activeLink === "/api/auth/signout" && isLoading && (
-            <LoadingProgressBar />
-          )}
-        </Link>
-      </div>
-
-      {/* Upgrade Plan */}
+      {/* Upgrade Plan Card */}
       <div className="my-2">
         <UpgradePlanCard />
       </div>

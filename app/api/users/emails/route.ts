@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/client";
-import { getToken } from "next-auth/jwt";
 
 interface UserIds {
   userIds: string[];
@@ -9,34 +8,17 @@ interface UserIds {
 export async function POST(request: NextRequest) {
   try {
     const { userIds }: UserIds = await request.json();
-    const token = await getToken({ req: request });
 
-    if (!token) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    const userEmail = token.email as string;
-
-    const user = await prisma.user.findUnique({
-      where: { email: userEmail },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    if (!userIds || !Array.isArray(userIds)) {
-      return NextResponse.json(
-        { error: "User emails must be provided" },
-        { status: 400 }
-      );
-    }
-
-    const users = await prisma.user.findMany({
+    const usersFound = await prisma.user.findMany({
       where: { email: { in: userIds } },
     });
 
-    return NextResponse.json(users);
+    if (usersFound.length === 0) {
+      console.log("No users found for the provided emails");
+      return NextResponse.json({ error: "No users found" }, { status: 404 });
+    }
+
+    return NextResponse.json(usersFound);
   } catch (error) {
     return NextResponse.json(
       { error: "Error fetching users" },

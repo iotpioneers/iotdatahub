@@ -18,7 +18,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
-import { ShareDocumentDialogProps, UserType } from "@/types";
+import { ShareChannelRoomAccessDialogProps, UserType } from "@/types";
 import { User } from "@/types/user";
 import { Share } from "@phosphor-icons/react";
 import { updateChannelAccess } from "@/lib/actions/room.actions";
@@ -33,13 +33,12 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const InviteMember = ({
+const InviteCollaboratorModal = ({
   roomId,
-  channelId,
   collaborators,
   creator,
   currentUserType,
-}: ShareDocumentDialogProps) => {
+}: ShareChannelRoomAccessDialogProps) => {
   const user = useSelf();
 
   const [open, setOpen] = React.useState(false);
@@ -75,8 +74,6 @@ const InviteMember = ({
 
   const shareChannelHandler = async () => {
     setLoading(true);
-    setError("");
-    setSuccess("");
 
     if (!email || !roomId || !userType || !user) {
       setError("Please enter all fields");
@@ -88,13 +85,14 @@ const InviteMember = ({
     try {
       await updateChannelAccess({
         roomId,
-        channelId,
-        email,
+        receiverEmail: email,
         userType: userType as UserType,
         updatedBy: user.info,
       });
 
-      setSuccess("User has been invited successfully");
+      setSuccess(
+        "User has been invited to collaborate on the channel successfully"
+      );
       setShowResult(true);
     } catch (error) {
       setError("Failed to invite user");
@@ -105,6 +103,9 @@ const InviteMember = ({
       setOpen(false);
       setEmail("");
       setUserType("viewer");
+      setError("");
+      setSuccess("");
+      setShowResult(false);
     }
   };
 
@@ -198,9 +199,8 @@ const InviteMember = ({
                 <Collaborator
                   key={collaborator.id}
                   roomId={roomId}
-                  channelId={channelId}
                   creator={creator}
-                  email={collaborator.email}
+                  receiverEmail={collaborator.email}
                   collaborator={collaborator}
                   user={user.info as User}
                 />
@@ -218,4 +218,4 @@ const InviteMember = ({
   );
 };
 
-export default InviteMember;
+export default InviteCollaboratorModal;

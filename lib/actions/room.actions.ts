@@ -8,7 +8,7 @@ import {
   AccessType,
   CreateChannelRoomParams,
   RoomAccesses,
-  ShareDocumentParams,
+  ShareChannelParams,
 } from "@/types";
 import axios from "axios";
 
@@ -45,15 +45,15 @@ export const createChannelRoom = async ({
 
 export const getRoomAccess = async ({
   roomId,
-  userId,
+  userEmail,
 }: {
   roomId: string;
-  userId: string;
+  userEmail: string;
 }) => {
   try {
     const room = await liveblocks.getRoom(roomId);
 
-    const hasAccess = Object.keys(room.usersAccesses).includes(userId);
+    const hasAccess = Object.keys(room.usersAccesses).includes(userEmail);
 
     if (!hasAccess) {
       throw new Error("You do not have access to this channel");
@@ -99,14 +99,13 @@ export const updateChannelRoomData = async (
 
 export const updateChannelAccess = async ({
   roomId,
-  channelId,
-  email,
+  receiverEmail,
   userType,
   updatedBy,
-}: ShareDocumentParams) => {
+}: ShareChannelParams) => {
   try {
     const usersAccesses: RoomAccesses = {
-      [email]: getAccessType(userType) as AccessType,
+      [receiverEmail]: getAccessType(userType) as AccessType,
     };
 
     const room = await liveblocks.updateRoom(roomId, {
@@ -117,8 +116,8 @@ export const updateChannelAccess = async ({
       const notificationId = nanoid();
 
       await liveblocks.triggerInboxNotification({
-        userId: email,
-        kind: "$documentAccess",
+        userId: receiverEmail,
+        kind: "$channelRommAccess",
         subjectId: notificationId,
         activityData: {
           userType,
@@ -127,11 +126,11 @@ export const updateChannelAccess = async ({
           image: updatedBy.avatar,
           email: updatedBy.email,
         },
-        roomId: channelId,
+        roomId,
       });
     }
 
-    revalidatePath(`/dashboard/channels/${channelId}`);
+    revalidatePath(`/dashboard/channels/${roomId}`);
     return parseStringify(room);
   } catch (error) {
     return null;

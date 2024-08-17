@@ -118,7 +118,7 @@ const UpgradePlanCard = () => {
               sx={{ mt: 0 }}
               primary={
                 <Typography variant="subtitle1" sx={{ color: "primary.800" }}>
-                  Free
+                  Professional
                 </Typography>
               }
               secondary={
@@ -140,7 +140,7 @@ const UpgradePlanCard = () => {
                   color="warning"
                   sx={{ boxShadow: "none" }}
                 >
-                  Go Premium
+                  Try entreprise
                 </Button>
               </AnimateButton>
             </Link>

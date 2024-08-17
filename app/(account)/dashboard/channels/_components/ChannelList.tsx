@@ -35,7 +35,7 @@ const ChannelList = () => {
     };
 
     fetchChannels();
-  }, [channels.length, channels]);
+  }, [channels.length]);
 
   return (
     <div className="w-full">

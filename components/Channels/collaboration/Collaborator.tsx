@@ -13,25 +13,27 @@ import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
+import { Badge } from "@radix-ui/themes";
 
 const Collaborator = ({
   roomId,
-  channelId,
   creator,
+  receiverEmail,
   collaborator,
-  email,
   user,
 }: CollaboratorProps) => {
   const [userType, setUserType] = useState(collaborator.userType || "viewer");
   const [loading, setLoading] = useState(false);
+
+  console.log("creator ---", creator);
+  console.log("collaborator ---", collaborator);
 
   const shareChannelUpdateHandler = async (type: string) => {
     setLoading(true);
 
     await updateChannelAccess({
       roomId,
-      channelId,
-      email,
+      receiverEmail,
       userType: type as UserType,
       updatedBy: user,
     });
@@ -58,7 +60,7 @@ const Collaborator = ({
     <li className="flex items-center justify-between gap-2 py-3">
       <div className="flex gap-2">
         <Image
-          src="user.svg"
+          src={collaborator.avatar || ""}
           alt={collaborator.name}
           width={36}
           height={36}
@@ -77,8 +79,10 @@ const Collaborator = ({
         </div>
       </div>
 
-      {creator === collaborator.email ? (
-        <p className="text-sm text-slate-800">Owner</p>
+      {creator === collaborator.id ? (
+        <p className="bg-green-400 px-2 py-1 rounded text-sm text-slate-800">
+          Owner
+        </p>
       ) : (
         <div className="flex items-center">
           <FormControl sx={{ m: 1, minWidth: 120 }} size="small">

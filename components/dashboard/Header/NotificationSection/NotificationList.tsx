@@ -110,7 +110,7 @@ const NotificationList = () => {
                         showRoomName={false}
                       />
                     ),
-                    $documentAccess: (props) => (
+                    $channelRommAccess: (props) => (
                       <InboxNotification.Custom
                         {...props}
                         title={props.inboxNotification.activities[0].data.title}

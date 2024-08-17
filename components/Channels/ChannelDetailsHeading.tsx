@@ -13,7 +13,7 @@ import { updateChannelRoomData } from "@/lib/actions/room.actions";
 import { ViewIcon } from "lucide-react";
 import { dateConverter } from "@/lib/utils";
 
-import InviteMember from "./collaboration/InviteMember";
+import InviteCollaboratorModal from "./collaboration/InviteCollaboratorModal";
 import ActiveCollaborators from "./collaboration/ActiveCollaborators";
 
 const ChannelDetailsHeading = ({
@@ -191,9 +191,8 @@ const ChannelDetailsHeading = ({
         </div>
         <div className="flex justify-between items-center my-5 ">
           {roomMetadata && (
-            <InviteMember
+            <InviteCollaboratorModal
               roomId={roomId}
-              channelId={channelId}
               collaborators={users}
               creator={roomMetadata.creatorId}
               currentUserType={currentUserType}

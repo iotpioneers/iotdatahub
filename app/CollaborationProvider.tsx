@@ -8,7 +8,7 @@ import {
   LiveblocksProvider,
 } from "@liveblocks/react/suspense";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { getUsers, getDocumentUsers } from "@/lib/actions/user.actions";
+import { getUsers, getChannelRoomUsers } from "@/lib/actions/user.actions";
 
 const CollaborationProvider = ({ children }: { children: ReactNode }) => {
   const { status, data: session } = useSession();
@@ -21,7 +21,7 @@ const CollaborationProvider = ({ children }: { children: ReactNode }) => {
     return null;
   }
 
-  const userId = session.user.id;
+  const userEmail = session.user.email;
 
   return (
     <LiveblocksProvider
@@ -32,13 +32,13 @@ const CollaborationProvider = ({ children }: { children: ReactNode }) => {
         return users;
       }}
       resolveMentionSuggestions={async ({ text, roomId }) => {
-        const roomUsers = await getDocumentUsers({
+        const channelRoomUsers = await getChannelRoomUsers({
           roomId,
-          userId,
+          userEmail,
           text,
         });
 
-        return roomUsers;
+        return channelRoomUsers;
       }}
     >
       <ClientSideSuspense fallback={<LoadingSpinner />}>

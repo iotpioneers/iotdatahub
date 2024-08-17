@@ -124,7 +124,7 @@ const AuthLogin = ({ ...others }) => {
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
-        autoHideDuration={12000}
+        autoHideDuration={20000}
         onClose={handleCloseResult}
       >
         <Alert
@@ -133,7 +133,7 @@ const AuthLogin = ({ ...others }) => {
           variant="filled"
           sx={{ width: "100%" }}
         >
-          {error ? error : "User logged successfully"}
+          {error ? error : "Login Successful ! Redirecting please wait ..."}
         </Alert>
       </Snackbar>
 

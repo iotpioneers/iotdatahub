@@ -77,10 +77,9 @@ export type User = {
   userType?: UserType;
 };
 
-export type ShareDocumentParams = {
+export type ShareChannelParams = {
   roomId: string;
-  channelId: string;
-  email: string;
+  receiverEmail: string;
   userType: UserType;
   updatedBy: User;
 };
@@ -91,9 +90,8 @@ export type UserTypeSelectorParams = {
   onClickHandler?: (value: string) => void;
 };
 
-export type ShareDocumentDialogProps = {
+export type ShareChannelRoomAccessDialogProps = {
   roomId: string;
-  channelId: string;
   collaborators: User[];
   creator: string;
   currentUserType: UserType;
@@ -106,8 +104,7 @@ export type HeaderProps = {
 
 export type CollaboratorProps = {
   roomId: string;
-  channelId: string;
-  email: string;
+  receiverEmail: string;
   creator: string;
   collaborator: User;
   user: User;
