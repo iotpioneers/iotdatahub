@@ -10,8 +10,6 @@ export const parseStringify = (value: any) => JSON.parse(JSON.stringify(value));
 
 export const getAccessType = (userType: UserAccessType) => {
   switch (userType) {
-    case "creator":
-      return ["room:write"];
     case "editor":
       return ["room:write"];
     case "viewer":

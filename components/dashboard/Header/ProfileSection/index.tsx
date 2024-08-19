@@ -31,8 +31,8 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 
 // project imports
 import reducer from "@/app/store/reducer";
-import MainCard from "../cards/MainCard";
-import Transitions from "../extended/Transitions";
+import MainCard from "../../cards/MainCard";
+import Transitions from "../../extended/Transitions";
 
 // assets
 import { configureStore } from "@reduxjs/toolkit";

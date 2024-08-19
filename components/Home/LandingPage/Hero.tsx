@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography";
 import styled from "styled-components";
 import hover3d from "@/app/utils/hover";
 import Section from "../components/Section";
-import SwipeableTextMobileStepper from "../components/design/HorizontalStepper/SwipeableTextMobileStepper";
+import SwipeableTextMobileStepper from "../components/design/SwipeableTextMobileStepper";
 
 const Hero = () => {
   const hero = React.useRef<HTMLDivElement>(null);
@@ -59,6 +59,7 @@ const Hero = () => {
                   alignSelf: "center",
                   textAlign: "center",
                   fontSize: "clamp(3.5rem, 10vw, 4rem)",
+                  mb: { sm: 2, md: 0 },
                 }}
               >
                 Cutt edge with&nbsp;

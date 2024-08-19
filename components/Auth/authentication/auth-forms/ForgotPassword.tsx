@@ -21,7 +21,7 @@ import axios from "axios";
 import { Formik, FormikProps } from "formik";
 
 // project imports
-import MainCard from "@/components/dashboard/Header/cards/MainCard";
+import MainCard from "@/components/dashboard/cards/MainCard";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import AnimateButton from "@/components/Auth/AnimateButton";
 

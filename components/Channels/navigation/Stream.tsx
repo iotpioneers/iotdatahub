@@ -10,7 +10,7 @@ import { gridSpacing } from "./constant";
 import LineChartComponent from "../charts/LineChartComponent";
 import AddChartComponent from "../charts/AddChartComponent";
 import { DataPointProps, FieldProps } from "@/types";
-import MainCard from "@/components/dashboard/Header/cards/MainCard";
+import MainCard from "@/components/dashboard/cards/MainCard";
 
 // types
 import PropTypes from "prop-types";

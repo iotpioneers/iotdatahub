@@ -18,7 +18,7 @@ import { useTheme } from "@mui/material/styles";
 import PopupState, { bindPopper, bindToggle } from "material-ui-popup-state";
 
 // project imports
-import Transitions from "../extended/Transitions";
+import Transitions from "../../extended/Transitions";
 
 // assets
 import {

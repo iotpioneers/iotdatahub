@@ -7,10 +7,10 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
-import SwipeableViews from "react-swipeable-views";
-import { autoPlay } from "react-swipeable-views-utils";
+// import SwipeableViews from "react-swipeable-views";
+// import { autoPlay } from "react-swipeable-views-utils";
 
-const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
+// const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
 
 const images = [
   {
@@ -68,7 +68,7 @@ const SwipeableTextMobileStepper = () => {
       >
         <Typography>{images[activeStep].label}</Typography>
       </Paper>
-      <AutoPlaySwipeableViews
+      {/* <AutoPlaySwipeableViews
         axis={theme.direction === "rtl" ? "x-reverse" : "x"}
         index={activeStep}
         onChangeIndex={handleStepChange}
@@ -92,7 +92,7 @@ const SwipeableTextMobileStepper = () => {
             ) : null}
           </div>
         ))}
-      </AutoPlaySwipeableViews>
+      </AutoPlaySwipeableViews> */}
       <MobileStepper
         steps={maxSteps}
         position="static"

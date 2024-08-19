@@ -19,11 +19,11 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ButtonBase from "@mui/material/ButtonBase";
-import Transitions from "../extended/Transitions";
+import Transitions from "../../extended/Transitions";
 import NotificationList from "./NotificationList";
 import { IconBell } from "@tabler/icons-react";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import MainCard from "../cards/MainCard";
+import MainCard from "../../cards/MainCard";
 import { useUnreadInboxNotificationsCount } from "@liveblocks/react/suspense";
 import Link from "next/link";
 
