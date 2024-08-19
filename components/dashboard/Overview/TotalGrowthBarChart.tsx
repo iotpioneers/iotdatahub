@@ -22,6 +22,7 @@ import {
 import SkeletonTotalGrowthBarChart from "../cards/Skeleton/SkeletonTotalGrowthBarChart";
 import MainCard from "../cards/MainCard";
 import { gridSpacing } from "@/app/store/constant";
+import { Channel, Field, DataPoint } from "@/types";
 
 // ==============================|| DASHBOARD DEFAULT - TOTAL GROWTH BAR CHART ||============================== //
 
@@ -35,7 +36,19 @@ const dataLine = [
   { name: "Jul", value: 100 },
 ];
 
-const TotalGrowthBarChart = ({ isLoading }: { isLoading: boolean }) => {
+interface TotalGrowthBarChartProps {
+  isLoading: boolean;
+  channels: Channel[] | null;
+  fields: Field[] | null;
+  dataPoints: DataPoint[] | null;
+}
+
+const TotalGrowthBarChart = ({
+  isLoading,
+  channels,
+  fields,
+  dataPoints,
+}: TotalGrowthBarChartProps) => {
   return (
     <>
       {isLoading ? (
@@ -53,7 +66,9 @@ const TotalGrowthBarChart = ({ isLoading }: { isLoading: boolean }) => {
                 <Grid item>
                   <Grid container direction="column" spacing={1}>
                     <Grid item>
-                      <Typography variant="h2">Total Growth</Typography>
+                      <Typography variant="h2">
+                        Data Condition Overview
+                      </Typography>
                     </Grid>
                   </Grid>
                 </Grid>

@@ -1,7 +1,19 @@
 import { BaseMetadata } from "@liveblocks/client";
 import { ThreadData } from "@liveblocks/node";
 
-export interface ChannelProps {
+export interface Device {
+  id: string;
+  name: string;
+  description: string;
+  channelId: string | null;
+  organizationId: string;
+  status: "ONLINE" | "OFFLINE" | "DISCONNECTED";
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+}
+
+export interface Channel {
   id: string;
   name: string;
   description: string;
@@ -12,22 +24,35 @@ export interface ChannelProps {
   updatedAt: Date;
   userId: string;
 }
-export interface DataPointProps {
+
+export interface DataPoint {
   id: string;
   timestamp: string;
   value: number;
   fieldId: string;
   channelId: string;
+  organizationId: string;
   createdAt: string;
   updatedAt: string;
 }
-export interface FieldProps {
+export interface Field {
   id: string;
   name: string;
   description: string;
   channelId: string;
+  organizationId: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Organization {
+  areaOfInterest: string;
+  createdAt: Date;
+  id: string;
+  name: string;
+  type: string;
+  updatedAt: Date;
+  userId: string;
 }
 
 export interface Member {
@@ -117,14 +142,14 @@ export type ChannelHeadingProps = {
   roomMetadata: RoomMetadata;
   users: User[];
   currentUserType: UserAccessType;
-  channel: ChannelProps;
-  dataPoint: DataPointProps[];
+  channel: Channel;
+  dataPoint: DataPoint[];
 };
 
 export type ChannelNavigationProps = {
   channelId: string;
-  dataPoint: DataPointProps[];
-  fields: FieldProps[];
+  dataPoint: DataPoint[];
+  fields: Field[];
   sampleCodes: string;
   apiKey: string;
 };
@@ -134,9 +159,9 @@ export type ChannelCollaborativeRoomProps = {
   roomMetadata: RoomMetadata;
   users: User[];
   currentUserType: UserAccessType;
-  channel: ChannelProps;
-  dataPoint: DataPointProps[];
-  fields: FieldProps[];
+  channel: Channel;
+  dataPoint: DataPoint[];
+  fields: Field[];
   apiKey: string;
   sampleCodes: string;
 };

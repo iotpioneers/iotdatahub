@@ -16,6 +16,7 @@ import SkeletonTotalDatGeneratedLightCard from "../cards/Skeleton/SkeletonTotalD
 
 // assets
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
+import { Member, Organization } from "@/types";
 
 // styles
 const CardWrapper = styled(MainCard)(({ theme }) => ({
@@ -46,28 +47,6 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 }));
 
 // ==============================|| DASHBOARD - TOTAL INCOME DARK CARD ||============================== //
-
-interface Organization {
-  areaOfInterest: string;
-  createdAt: Date;
-  id: string;
-  name: string;
-  type: string;
-  updatedAt: Date;
-  userId: string;
-}
-
-interface Member {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  country: string;
-  avatar: string;
-  access: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 interface OrganizarionOverviewProps {
   isLoading: boolean;

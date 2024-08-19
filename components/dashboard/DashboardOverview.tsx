@@ -10,60 +10,45 @@ import Grid from "@mui/material/Grid";
 // project imports
 import UserActivityOverviewCard from "@/components/dashboard/Overview/UserActivityOverviewCard";
 import OrganizarionOverviewCard from "@/components/dashboard/Overview/OrganizarionOverviewCard";
-import TotalDatGeneratedLightCard from "@/components/dashboard/Overview/TotalDatGeneratedLightCard";
+import TotalDataGeneratedCard from "@/components/dashboard/Overview/TotalDataGeneratedCard";
 import TotalGrowthBarChart from "@/components/dashboard/Overview/TotalGrowthBarChart";
+import TotalChannelCard from "@/components/dashboard/Overview/TotalChannelCard";
+import TotalDevicesCard from "@/components/dashboard/Overview/TotalDevicesCard";
 
 import { gridSpacing } from "@/app/store/constant";
 
 // assets
 import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
+import {
+  Channel,
+  DataPoint,
+  Field,
+  Device,
+  Member,
+  Organization,
+} from "@/types";
+import WelcomeContentCard from "./Overview/WelcomeContentCard";
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
-
-interface Organization {
-  areaOfInterest: string;
-  createdAt: Date;
-  id: string;
-  name: string;
-  type: string;
-  updatedAt: Date;
-  userId: string;
-}
-
-interface Member {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  country: string;
-  avatar: string;
-  access: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 interface DashboardOverviewProps {
   organization: Organization | null;
   members: Member[] | null;
+  devices: Device[] | null;
+  channels: Channel[] | null;
+  fields: Field[] | null;
+  datapoints: DataPoint[] | null;
 }
 
 const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   organization,
   members,
+  devices,
+  channels,
+  fields,
+  datapoints,
 }) => {
-  const { status, data: session } = useSession();
   const [isLoading, setLoading] = useState(true);
-
-  if (status !== "loading" && status === "unauthenticated") {
-    return redirect("/login");
-  }
-
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return "Good Morning";
-    if (hour >= 12 && hour < 18) return "Good Afternoon";
-    return "Good Evening";
-  };
 
   useEffect(() => {
     setLoading(false);
@@ -74,17 +59,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item lg={8} md={12} sm={12} xs={12}>
-            <div className="bg-orange-200 p-5 rounded-lg shadow-md mx-5 xs:mx-0">
-              <div>
-                <Heading as="h1" className="text-2xl font-bold mb-5">
-                  {getGreeting()}, {session!.user!.name}
-                </Heading>
-                <Text className="text-gray-600">
-                  Welcome to your personalized IoT Data Hub dashboard. Here, you
-                  can manage your devices, monitor data, and stay connected.
-                </Text>
-              </div>
-            </div>
+            <WelcomeContentCard />
           </Grid>
           <Grid item lg={4} md={12} sm={12} xs={12}>
             <Grid container spacing={gridSpacing}>
@@ -96,11 +71,11 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 />
               </Grid>
               <Grid item sm={6} xs={12} md={6} lg={12}>
-                <TotalDatGeneratedLightCard
+                <TotalDataGeneratedCard
                   {...{
                     isLoading: isLoading,
-                    total: 12,
-                    label: "3 Channels",
+                    total: datapoints ? datapoints.length : 0,
+                    label: "Total Datapoint Uploads",
                     icon: <InsightsOutlinedIcon fontSize="inherit" />,
                   }}
                 />
@@ -111,11 +86,37 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       </Grid>
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
+          <Grid item lg={6} md={6} sm={6} xs={12}>
+            <TotalChannelCard isLoading={isLoading} channels={channels} />
+          </Grid>
+          <Grid item lg={6} md={6} sm={6} xs={12}>
+            <TotalDevicesCard
+              isLoading={isLoading}
+              devices={devices}
+              channels={channels}
+              fields={fields}
+            />
+          </Grid>
+        </Grid>
+      </Grid>
+      <Grid item xs={12}>
+        <Grid container spacing={gridSpacing}>
           <Grid item xs={12} md={8}>
-            <TotalGrowthBarChart isLoading={isLoading} />
+            <TotalGrowthBarChart
+              isLoading={isLoading}
+              channels={channels}
+              fields={fields}
+              dataPoints={datapoints}
+            />
           </Grid>
           <Grid item xs={12} md={4}>
-            <UserActivityOverviewCard isLoading={isLoading} />
+            <UserActivityOverviewCard
+              isLoading={isLoading}
+              devices={devices}
+              channels={channels}
+              fields={fields}
+              dataPoints={datapoints}
+            />
           </Grid>
         </Grid>
       </Grid>

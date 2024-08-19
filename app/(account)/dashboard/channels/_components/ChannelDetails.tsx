@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 // Project imports
-import { ChannelProps, DataPointProps, FieldProps } from "@/types";
+import { Channel, DataPoint, Field } from "@/types";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
@@ -15,9 +15,9 @@ import { getRoomAccess } from "@/lib/actions/room.actions";
 import ChannelCollaborationRoom from "@/components/Channels/collaboration/ChannelCollaborationRoom";
 
 interface ChannelData {
-  channel: ChannelProps;
-  dataPoint: DataPointProps[];
-  fields: FieldProps[];
+  channel: Channel;
+  dataPoint: DataPoint[];
+  fields: Field[];
   apiKey: string;
   sampleCodes: string;
 }

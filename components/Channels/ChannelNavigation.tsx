@@ -8,7 +8,7 @@ import Stream from "./navigation/Stream";
 import CodeSnippet from "./navigation/CodeSnippet";
 import ExportChannelData from "./ExportChannelData";
 import { ApiKeys } from "./navigation";
-import { ChannelNavigationProps, DataPointProps, FieldProps } from "@/types";
+import { ChannelNavigationProps, DataPoint, Field } from "@/types";
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");

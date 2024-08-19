@@ -1,6 +1,6 @@
 "use client";
 
-import { ChannelProps } from "@/types";
+import { Channel } from "@/types";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
@@ -43,7 +43,7 @@ interface currentUser {
 // Define the global state interface
 interface GlobalState {
   currentOrganization: Organization | null;
-  userChannels: ChannelProps[] | [];
+  userChannels: Channel[] | [];
   currentUser: currentUser | null;
 }
 
@@ -121,7 +121,7 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
       if (res.status !== 200) {
         throw new Error("Failed to fetch channels");
       }
-      const channelsData: ChannelProps[] = res.data;
+      const channelsData: Channel[] = res.data;
       setState((prevState) => ({
         ...prevState,
         userChannels: channelsData,

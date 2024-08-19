@@ -49,7 +49,19 @@ interface TotalDatGeneratedLightCardProps {
   isLoading: boolean;
 }
 
-const TotalDatGeneratedLightCard = ({
+const formatTotal = (total: number): string => {
+  if (total === 0) {
+    return "No data generated yet";
+  } else if (total >= 1_000_000) {
+    return (total / 1_000_000).toFixed(1) + "M generated";
+  } else if (total >= 1_000) {
+    return (total / 1_000).toFixed(1) + "k generated";
+  } else {
+    return total.toString();
+  }
+};
+
+const TotalDataGeneratedCard = ({
   isLoading,
   total,
   icon,
@@ -85,9 +97,7 @@ const TotalDatGeneratedLightCard = ({
                 <ListItemText
                   sx={{ py: 0, mt: 0.45, mb: 0.45 }}
                   primary={
-                    <Typography variant="h4">
-                      {total}k data generated
-                    </Typography>
+                    <Typography variant="h4">{formatTotal(total)}</Typography>
                   }
                   secondary={
                     <Typography
@@ -107,4 +117,4 @@ const TotalDatGeneratedLightCard = ({
   );
 };
 
-export default TotalDatGeneratedLightCard;
+export default TotalDataGeneratedCard;

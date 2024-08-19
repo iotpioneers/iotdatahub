@@ -10,7 +10,6 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { date } from "zod";
 
 interface DataPointProps {
   id: string;
@@ -20,10 +19,9 @@ interface DataPointProps {
 
 interface LineChartProps {
   chartData?: DataPointProps[];
-  field?: string;
 }
 
-const LineChartComponent = ({ chartData = [], field = "" }: LineChartProps) => {
+const LineChartComponent = ({ chartData = [] }: LineChartProps) => {
   let data = [];
 
   data = chartData.map((dataPoint) => {

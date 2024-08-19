@@ -8,12 +8,12 @@ import { Button } from "@mui/material";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import Image from "next/image";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { ChannelProps } from "@/types";
+import { Channel } from "@/types";
 import axios from "axios";
 
 const ChannelList = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [channels, setChannels] = useState<ChannelProps[] | []>([]);
+  const [channels, setChannels] = useState<Channel[] | []>([]);
 
   useEffect(() => {
     const fetchChannels = async () => {
@@ -25,7 +25,7 @@ const ChannelList = () => {
         if (res.status !== 200) {
           throw new Error("Failed to fetch channels");
         }
-        const channelsData: ChannelProps[] = await res.data;
+        const channelsData: Channel[] = await res.data;
         setChannels(channelsData);
       } catch (error) {
         return null;

@@ -4,33 +4,23 @@ import { useEffect, useState } from "react";
 import DashboardOverview from "@/components/dashboard/DashboardOverview";
 import OrganizationOnboardingCreation from "@/components/dashboard/OrganizationOnboardingCreation";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
-
-interface Organization {
-  areaOfInterest: string;
-  createdAt: Date;
-  id: string;
-  name: string;
-  type: string;
-  updatedAt: Date;
-  userId: string;
-}
-
-interface Member {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  country: string;
-  avatar: string;
-  access: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import {
+  Channel,
+  DataPoint,
+  Device,
+  Field,
+  Member,
+  Organization,
+} from "@/types";
 
 const UserDashboardOverview = () => {
   const [hasOrganization, setHasOrganization] = useState<boolean | null>(null);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [members, setMembers] = useState<Member[] | null>(null);
+  const [devices, setDevices] = useState<Device[] | null>(null);
+  const [channels, setChannels] = useState<Channel[] | null>(null);
+  const [fields, setFields] = useState<Field[] | null>(null);
+  const [dataPoints, setDataPoints] = useState<DataPoint[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,13 +40,23 @@ const UserDashboardOverview = () => {
         setHasOrganization(data.hasOrganization);
         setOrganization(data.organization);
         setMembers(data.members);
+        setDevices(data.devices);
+        setChannels(data.channels);
+        setFields(data.fields);
+        setDataPoints(data.datapoints);
       } catch (error) {
         return null;
       }
     };
 
     checkOrganizationStatus();
-  }, []);
+  }, [
+    channels?.length,
+    devices?.length,
+    fields?.length,
+    dataPoints?.length,
+    members?.length,
+  ]);
 
   if (hasOrganization === null) {
     return;
@@ -66,7 +66,14 @@ const UserDashboardOverview = () => {
     <>
       {loading && <LoadingProgressBar />}
       {!hasOrganization && <OrganizationOnboardingCreation />}
-      <DashboardOverview organization={organization} members={members} />
+      <DashboardOverview
+        organization={organization}
+        members={members}
+        devices={devices}
+        channels={channels}
+        fields={fields}
+        datapoints={dataPoints}
+      />
     </>
   );
 };

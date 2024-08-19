@@ -1,9 +1,9 @@
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import Link from "next/link"; // Import Link from Next.js
 import { DeleteChannelModal } from "@/components/Channels/collaboration/DeleteChannelModal";
-import { ChannelProps } from "@/types";
+import { Channel } from "@/types";
 
-const ProjectList = ({ channels }: { channels: ChannelProps[] | [] }) => {
+const ProjectList = ({ channels }: { channels: Channel[] | [] }) => {
   if (channels === null || channels.length === 0) {
     return null;
   }
