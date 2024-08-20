@@ -11,6 +11,7 @@ import LineChartComponent from "../charts/LineChartComponent";
 import GaugeChart from "../charts/GaugeChart";
 import MainCard from "@/components/dashboard/cards/MainCard";
 import { DataPoint, Field } from "@/types";
+import BarChartWidget from "../charts/BarChartWidget";
 
 const status = [
   {
@@ -67,8 +68,8 @@ const Stream = ({ fields, dataPoint }: Props) => {
     switch (widget) {
       case "lineChart":
         return <LineChartComponent chartData={chartData} />;
-      // case "barChart":
-      //   return <BarChartComponent chartData={chartData} />;
+      case "barChart":
+        return <BarChartWidget chartData={chartData} />;
       case "gauge":
         return <GaugeChart chartData={chartData} />;
       case "numericDisplay":

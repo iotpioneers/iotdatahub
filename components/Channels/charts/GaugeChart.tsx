@@ -66,12 +66,14 @@ const GaugeChart = ({ chartData = [] }: GaugeChartProps) => {
     ];
   }
 
-  // Use the latest data point for the gauge value
   const latestValue = data[data.length - 1].value;
 
-  // Define your data range
+  // Find the highest value in the dataset
+  const maxDataValue = Math.max(...data.map((d) => d.value));
+
+  // Set the minValue and maxValue based on data
   const minValue = 0;
-  const maxValue = 1000; // Adjust this based on your data range
+  const maxValue = maxDataValue > 1000 ? maxDataValue + 1000 : 1000; // Default to 1000 if maxDataValue is 0
 
   // Calculate the percentage for the gauge
   const gaugeValue = ((latestValue - minValue) / (maxValue - minValue)) * 100;
@@ -82,7 +84,6 @@ const GaugeChart = ({ chartData = [] }: GaugeChartProps) => {
         <GaugeReferenceArc />
         <GaugeValueArc />
         <GaugePointer />
-        {/* Display the value at the center of the gauge */}
         <text
           x="50%"
           y="75%"
