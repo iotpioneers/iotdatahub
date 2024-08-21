@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import React from "react";
 
 // material-ui
@@ -131,10 +130,6 @@ const TotalChannelCard = ({ isLoading, channels }: TotalChannelCardProps) => {
       )}
     </>
   );
-};
-
-TotalChannelCard.propTypes = {
-  isLoading: PropTypes.bool,
 };
 
 export default TotalChannelCard;

@@ -65,15 +65,18 @@ const UserDashboardOverview = () => {
   return (
     <>
       {loading && <LoadingProgressBar />}
-      {!hasOrganization && <OrganizationOnboardingCreation />}
-      <DashboardOverview
-        organization={organization}
-        members={members}
-        devices={devices}
-        channels={channels}
-        fields={fields}
-        datapoints={dataPoints}
-      />
+      {!hasOrganization ? (
+        <OrganizationOnboardingCreation />
+      ) : (
+        <DashboardOverview
+          organization={organization}
+          members={members}
+          devices={devices}
+          channels={channels}
+          fields={fields}
+          datapoints={dataPoints}
+        />
+      )}
     </>
   );
 };

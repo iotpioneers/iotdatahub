@@ -12,6 +12,7 @@ import GaugeChart from "../charts/GaugeChart";
 import MainCard from "@/components/dashboard/cards/MainCard";
 import { DataPoint, Field } from "@/types";
 import BarChartWidget from "../charts/BarChartWidget";
+import { AddChartComponent } from "../charts";
 
 const status = [
   {
@@ -31,27 +32,23 @@ const status = [
 const widgets = [
   {
     value: "lineChart",
-    label: "Line Chart - Displays time-series data",
+    label: "Line Chart",
   },
   {
     value: "barChart",
-    label: "Bar Chart - Compares different data points",
+    label: "Bar Chart",
   },
   {
     value: "gauge",
-    label: "Gauge - Shows real-time values",
+    label: "Gauge",
   },
   {
     value: "numericDisplay",
-    label: "Numeric Display - Shows current value readings",
+    label: "Numeric Display",
   },
   {
     value: "map",
-    label: "Map - Visualizes geographical data",
-  },
-  {
-    value: "histogram",
-    label: "Histogram - Analyzes data distribution",
+    label: "Map",
   },
 ];
 
@@ -76,8 +73,6 @@ const Stream = ({ fields, dataPoint }: Props) => {
       //   return <NumericDisplay chartData={chartData} />;
       // case "map":
       //   return <MapComponent chartData={chartData} />;
-      // case "histogram":
-      //   return <HistogramComponent chartData={chartData} />;
       default:
         return null;
     }
@@ -156,6 +151,9 @@ const Stream = ({ fields, dataPoint }: Props) => {
                 </TextField>
               </Grid>
             </Grid>
+          </Grid>
+          <Grid item xs={12} className="flex justify-center items-center">
+            <AddChartComponent />
           </Grid>
         </Grid>
       </MainCard>

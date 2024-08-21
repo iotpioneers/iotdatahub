@@ -69,9 +69,9 @@ model User {
   id             String          @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   email          String          @unique
-  country        String
-  phonenumber    String
-  emailVerified  DateTime?
+  country        String?
+  phonenumber    String?
+  emailVerified  Boolean         @default(false)
   image          String?
   password       String?
   role           Role            @default(USER)

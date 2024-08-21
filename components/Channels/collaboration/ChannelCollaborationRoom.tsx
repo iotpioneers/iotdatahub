@@ -33,7 +33,7 @@ const ChannelCollaborationRoom = ({
             dataPoint={dataPoint}
           />
           <ChannelNavigation
-            channelId={channel.id}
+            channel={channel}
             fields={fields}
             dataPoint={dataPoint}
             sampleCodes={sampleCodes}

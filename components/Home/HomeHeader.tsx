@@ -122,7 +122,7 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                   variant="contained"
                   size="small"
                   component="a"
-                  href="/material-ui/getting-started/templates/sign-up/"
+                  href="/register"
                   target="_blank"
                 >
                   Sign up
@@ -189,20 +189,14 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                       {status === "authenticated" ? "DASHBOARD" : "SIGN IN"}
                     </AngledButton>
                   )}
-                  <MenuItem>
-                    {status !== "loading" && status === "unauthenticated" && (
-                      <Button
-                        color="primary"
-                        variant="contained"
-                        size="small"
-                        component="a"
-                        href="/material-ui/getting-started/templates/sign-up/"
-                        target="_blank"
-                      >
-                        Sign up
-                      </Button>
-                    )}
-                  </MenuItem>
+                  {status !== "loading" && status === "unauthenticated" && (
+                    <AngledButton
+                      className="flex text-pink-500 mt-2"
+                      href="/register"
+                    >
+                      Sign up
+                    </AngledButton>
+                  )}
                 </Box>
               </Drawer>
             </Box>

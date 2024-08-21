@@ -9,13 +9,14 @@ import CodeSnippet from "./navigation/CodeSnippet";
 import ExportChannelData from "./ExportChannelData";
 import { ApiKeys } from "./navigation";
 import { ChannelNavigationProps, DataPoint, Field } from "@/types";
+import ChannelSettings from "./navigation/ChannelSettings";
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
 }
 
 const ChannelNavigation = ({
-  channelId,
+  channel,
   fields,
   dataPoint,
   sampleCodes,
@@ -104,7 +105,7 @@ const ChannelNavigation = ({
                   )
                 }
               >
-                <ExportChannelData channelId={channelId} />
+                <ExportChannelData channelId={channel.id} />
               </Tab>
             </Tab.List>
           </div>
@@ -114,6 +115,9 @@ const ChannelNavigation = ({
             </Tab.Panel>
             <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
               <CodeSnippet sampleCodes={sampleCodes} />
+            </Tab.Panel>
+            <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
+              <ChannelSettings fields={fields} channel={channel} />
             </Tab.Panel>
             <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
               <ApiKeys apiKey={apiKey} />

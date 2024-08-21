@@ -25,7 +25,7 @@ const login = async (credentials: Credentials) => {
     throw new Error("User not found");
   }
 
-  if (user.emailVerified == null) {
+  if (!user.emailVerified) {
     throw new Error("Email not verified");
   }
 
@@ -51,6 +51,9 @@ const authOptions: AuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      httpOptions: {
+        timeout: 10000,
+      },
     }),
     CredentialsProvider({
       name: "credentials",
@@ -74,6 +77,7 @@ const authOptions: AuthOptions = {
       },
     }),
   ],
+  debug: true,
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,

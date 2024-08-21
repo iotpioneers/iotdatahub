@@ -99,24 +99,26 @@ const AuthLogin = ({ ...others }) => {
   };
 
   const loginUser = async (data: FormData) => {
-    setError(null);
     setLoading(true);
-    const response = await signIn("credentials", {
-      email: data.email,
-      password: data.password,
-      redirect: true,
-      callbackUrl: "/dashboard",
-    });
+    try {
+      const response = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: true,
+        callbackUrl: "/dashboard",
+      });
 
-    setLoading(false);
-    if (response?.error) {
-      setError(response.error);
+      if (response?.error) {
+        setError(response.error);
+        setOpen(true);
+        return;
+      }
+    } catch (error) {
+      setError("Failed to login");
       setOpen(true);
+    } finally {
+      setLoading(false);
     }
-    setError(null);
-    setOpen(true);
-    setLoading(false);
-    router.push(process.env.NEXT_PUBLIC_BASE_URL + "/dashboard");
   };
 
   return (

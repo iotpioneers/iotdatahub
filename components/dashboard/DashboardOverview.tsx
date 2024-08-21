@@ -28,6 +28,7 @@ import {
   Organization,
 } from "@/types";
 import WelcomeContentCard from "./Overview/WelcomeContentCard";
+import Link from "next/link";
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
@@ -64,12 +65,15 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           <Grid item lg={4} md={12} sm={12} xs={12}>
             <Grid container spacing={gridSpacing}>
               <Grid item sm={6} xs={12} md={6} lg={12}>
-                <OrganizarionOverviewCard
-                  isLoading={isLoading}
-                  organization={organization}
-                  members={members}
-                />
+                <Link href="/dashboard/organizations">
+                  <OrganizarionOverviewCard
+                    isLoading={isLoading}
+                    organization={organization}
+                    members={members}
+                  />
+                </Link>
               </Grid>
+
               <Grid item sm={6} xs={12} md={6} lg={12}>
                 <TotalDataGeneratedCard
                   {...{
@@ -87,15 +91,19 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item lg={6} md={6} sm={6} xs={12}>
-            <TotalChannelCard isLoading={isLoading} channels={channels} />
+            <Link href="/dashboard/channels">
+              <TotalChannelCard isLoading={isLoading} channels={channels} />
+            </Link>
           </Grid>
           <Grid item lg={6} md={6} sm={6} xs={12}>
-            <TotalDevicesCard
-              isLoading={isLoading}
-              devices={devices}
-              channels={channels}
-              fields={fields}
-            />
+            <Link href="/dashboard/devices">
+              <TotalDevicesCard
+                isLoading={isLoading}
+                devices={devices}
+                channels={channels}
+                fields={fields}
+              />
+            </Link>
           </Grid>
         </Grid>
       </Grid>

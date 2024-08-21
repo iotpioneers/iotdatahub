@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import Head from "next/head";
+
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface Props {
   params: { token: string };
@@ -11,8 +14,21 @@ interface Props {
 
 const VerifyEmail = ({ params }: Props) => {
   const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const handleCloseResult = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  };
 
   useEffect(() => {
     setError("");
@@ -22,12 +38,23 @@ const VerifyEmail = ({ params }: Props) => {
     }
 
     const verifyEmail = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(`/api/email/verify/${params.token}`);
+
+        if (response.status !== 200) {
+          setError(response.statusText);
+          setOpen(true);
+        }
+
         setMessage(response.data.message);
+        setOpen(true);
         router.push("/dashboard");
       } catch (err) {
         setError("An error occurred while verifying your email.");
+        setOpen(true);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -36,21 +63,22 @@ const VerifyEmail = ({ params }: Props) => {
 
   return (
     <>
-      <Head>
-        <title>Email Verification - IoT Data Hub</title>
-        <meta
-          name="description"
-          content="Verify your email address for IoT Data Hub to complete your registration."
-        />
-        <meta name="robots" content="noindex, nofollow" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta charSet="UTF-8" />
-      </Head>
-      <div>
-        <h1>Email Verification</h1>
-        {message && <p>{message}</p>}
-        {error && <p>{error}</p>}
-      </div>
+      {loading && <LoadingSpinner />}
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={open}
+        autoHideDuration={12000}
+        onClose={handleCloseResult}
+      >
+        <Alert
+          onClose={handleCloseResult}
+          severity={error ? "error" : "success"}
+          variant="standard"
+          sx={{ width: "100%" }}
+        >
+          {error && error}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

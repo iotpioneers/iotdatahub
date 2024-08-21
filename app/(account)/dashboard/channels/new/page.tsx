@@ -1,9 +1,9 @@
 import React from "react";
 import { Metadata } from "next";
-import ChannelForm from "@/components/Forms/ChannelForm";
+import ChannelSettingsForm from "@/components/Forms/ChannelSettingsForm";
 
 export default function NewChannelPage() {
-  return <ChannelForm />;
+  return <ChannelSettingsForm />;
 }
 
 export const dynamic = "force-dynamic";

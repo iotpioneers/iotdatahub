@@ -87,7 +87,7 @@ const OrganizarionOverviewCard: React.FC<OrganizarionOverviewProps> = ({
                   sx={{ py: 0, my: 0.45 }}
                   primary={
                     <Typography variant="h4" sx={{ color: "#fff" }}>
-                      {members!.length > 1
+                      {members && members!.length > 1
                         ? `${members?.length} Members`
                         : "1 Member"}
                     </Typography>
