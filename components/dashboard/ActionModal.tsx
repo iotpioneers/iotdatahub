@@ -1,15 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
-
-// material-ui
+import { useState } from "react";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
-
-// Project Imports
-import { deleteChannel } from "@/lib/actions/room.actions";
-
 import {
   Dialog,
   DialogClose,
@@ -20,17 +14,32 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/Actions/DialogActions";
-
 import { Button } from "@mui/material";
-import { DeleteModalProps } from "@/types";
-import LoadingProgressBar from "../../LoadingProgressBar";
+import LoadingProgressBar from "../LoadingProgressBar";
 
-export const DeleteChannelModal = ({ channelId }: DeleteModalProps) => {
+interface CustomModalProps {
+  triggerComponent: React.ReactNode;
+  title: string;
+  description: string;
+  warning?: string;
+  confirmButtonText: string;
+  onConfirm: () => Promise<void>;
+  iconSrc: string;
+}
+
+export const ActionModal: React.FC<CustomModalProps> = ({
+  triggerComponent,
+  title,
+  warning,
+  description,
+  confirmButtonText,
+  onConfirm,
+  iconSrc,
+}) => {
   const [open, setOpen] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
-  const [info, setInfo] = useState<string>("");
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
@@ -39,29 +48,17 @@ export const DeleteChannelModal = ({ channelId }: DeleteModalProps) => {
     if (reason === "clickaway") {
       return;
     }
-
     setOpen(false);
   };
 
-  const deleteChannelHandler = async () => {
+  const handleConfirm = async () => {
     setLoading(true);
-
+    setShowMessage(false);
     try {
-      const response = await deleteChannel(channelId);
-
-      if (!response) {
-        setError("Failed to delete channel");
-        setShowMessage(true);
-        setLoading(false);
-      }
-
-      setInfo("Channel deleted successfully");
-      setShowMessage(true);
-      setLoading(false);
+      await onConfirm();
     } catch (error) {
-      setError("Failed to delete channel");
+      setError("Operation failed");
       setShowMessage(true);
-      setLoading(false);
     } finally {
       setLoading(false);
       setOpen(false);
@@ -71,17 +68,7 @@ export const DeleteChannelModal = ({ channelId }: DeleteModalProps) => {
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button className="min-w-9 justify-center items-center gap-1 rounded-xl  p-2 transition-all my-2">
-            <Image
-              src="/icons/delete.svg"
-              alt="delete"
-              width={20}
-              height={20}
-              className="mt-1"
-            />
-          </Button>
-        </DialogTrigger>
+        <DialogTrigger asChild>{triggerComponent}</DialogTrigger>
         <DialogContent className="shad-dialog">
           <Snackbar
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -91,25 +78,25 @@ export const DeleteChannelModal = ({ channelId }: DeleteModalProps) => {
           >
             <Alert
               onClose={handleCloseResult}
-              severity={error ? "error" : "success"}
+              severity={"error"}
               variant="filled"
               sx={{ width: "100%" }}
             >
-              {error ? error : info}
+              {error}
             </Alert>
           </Snackbar>
           <DialogHeader>
             <Image
-              src="/icons/delete-modal.svg"
-              alt="delete"
+              src={iconSrc}
+              alt="icon"
               width={48}
               height={48}
               className="mb-4"
             />
-            <DialogTitle>Delete channel</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this channel? This action cannot
-              be undone.
+            <DialogTitle>{title}</DialogTitle>
+            <DialogDescription>{description}</DialogDescription>
+            <DialogDescription className="text-red-400">
+              {warning}
             </DialogDescription>
           </DialogHeader>
 
@@ -121,10 +108,10 @@ export const DeleteChannelModal = ({ channelId }: DeleteModalProps) => {
             <Button
               type="button"
               variant="contained"
-              onClick={deleteChannelHandler}
+              onClick={handleConfirm}
               className="gradient-red w-full"
             >
-              {loading ? "Deleting..." : "Delete"}
+              {loading ? "Processing..." : confirmButtonText}
             </Button>
           </DialogFooter>
           {loading && <LoadingProgressBar />}

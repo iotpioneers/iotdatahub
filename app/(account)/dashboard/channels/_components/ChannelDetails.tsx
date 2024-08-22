@@ -135,7 +135,7 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
   }
 
   if (!channelData) {
-    return <div>No channel data available</div>;
+    return <LoadingProgressBar />;
   }
 
   const {

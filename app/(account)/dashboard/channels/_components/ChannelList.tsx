@@ -60,7 +60,9 @@ const ChannelList = () => {
       )}
 
       <Suspense fallback={<LoadingSpinner />}>
-        {channels && channels.length > 0 && <ProjectList channels={channels} />}
+        {channels && channels.length > 0 && (
+          <ProjectList initialChannels={channels} />
+        )}
       </Suspense>
     </div>
   );

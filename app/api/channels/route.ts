@@ -195,17 +195,31 @@ export async function GET(request: NextRequest) {
     throw new Error("User not found");
   }
 
-  const channels = await prisma.channel.findMany({
+  const allChannels = await prisma.channel.findMany({
     where: { userId: user.id },
     orderBy: { createdAt: "desc" },
   });
 
-  if (!channels || channels.length === 0) {
+  if (!allChannels || allChannels.length === 0) {
     return NextResponse.json(
       { error: "No channels found for this user" },
       { status: 404 }
     );
   }
+
+  const channels = await Promise.all(
+    allChannels.map(async (channel) => {
+      const channelOwner = await prisma.user.findUnique({
+        where: { id: channel.userId },
+      });
+
+      return {
+        ...channel,
+        ownerEmail: channelOwner?.email,
+        ownerImage: channelOwner?.image,
+      };
+    })
+  );
 
   return NextResponse.json(channels);
 }

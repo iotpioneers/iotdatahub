@@ -20,6 +20,8 @@ export interface Channel {
   deviceId?: string | null;
   organizationId: string;
   access: "PUBLIC" | "PRIVATE";
+  ownerEmail: string;
+  ownerImage: string;
   createdAt: Date;
   updatedAt: Date;
   userId: string;

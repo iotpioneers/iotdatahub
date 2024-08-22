@@ -68,6 +68,7 @@ export async function PUT(
     data: {
       name: body.name || channel.name,
       description: body.description || channel.description,
+      access: body.access || channel.access,
     },
   });
 
