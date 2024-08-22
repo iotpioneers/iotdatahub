@@ -40,8 +40,7 @@ export default function ChannelForm() {
   const [error, setError] = useState<string>("");
   const [open, setOpen] = React.useState(false);
 
-  if (status !== "loading" && status === "unauthenticated")
-    router.push("/login");
+  if (status !== "loading" && status === "unauthenticated") return null;
 
   const currentOrganization = state.currentOrganization;
   const { id: userId, email } = session!.user;

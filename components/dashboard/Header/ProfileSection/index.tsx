@@ -113,7 +113,7 @@ const ProfileSection = () => {
 
   useEffect(() => {
     if (status !== "loading" && status === "unauthenticated") {
-      router.push("/login");
+      return;
     }
   }, [status, router, state]);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import ProjectList from "./ProjectList";
+import ChannelListTable from "./ChannelListTable";
 import { Text } from "@radix-ui/themes";
 import Link from "next/link";
 import { Button } from "@mui/material";
@@ -61,7 +61,7 @@ const ChannelList = () => {
 
       <Suspense fallback={<LoadingSpinner />}>
         {channels && channels.length > 0 && (
-          <ProjectList initialChannels={channels} />
+          <ChannelListTable initialChannels={channels} />
         )}
       </Suspense>
     </div>

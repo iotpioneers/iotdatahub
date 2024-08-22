@@ -1,6 +1,21 @@
 import { BaseMetadata } from "@liveblocks/client";
 import { ThreadData } from "@liveblocks/node";
 
+export interface ApiKey {
+  id: string;
+  apiKey: string;
+  userId: string;
+  channelId: string;
+  organizationId: string;
+}
+
+export interface SampleCodes {
+  id: string;
+  codes: string;
+  apiKeyId: string;
+  organizationId: string;
+}
+
 export interface Device {
   id: string;
   name: string;
@@ -164,8 +179,8 @@ export type ChannelCollaborativeRoomProps = {
   channel: Channel;
   dataPoint: DataPoint[];
   fields: Field[];
-  apiKey: string;
-  sampleCodes: string;
+  apiKey: apiKey;
+  sampleCodes: samples;
 };
 
 export type AddDocumentBtnProps = {

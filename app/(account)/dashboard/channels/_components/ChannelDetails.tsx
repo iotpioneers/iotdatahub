@@ -38,7 +38,7 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
 
   useEffect(() => {
     if (status !== "loading" && status === "unauthenticated") {
-      router.push("/login");
+      return;
     }
   }, [status, router]);
 

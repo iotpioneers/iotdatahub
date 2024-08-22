@@ -113,7 +113,7 @@ const ChannelSettings = ({ fields, channel }: ChannelSettingsProps) => {
               }
               title="Delete Channel"
               description={`Are you sure you want to delete the channel "${channel?.name}"? `}
-              warning="This action cannot be undone."
+              warning="This action cannot be reversed."
               confirmButtonText="Delete"
               onConfirm={deleteChannelHandler}
               iconSrc="/icons/delete-modal.svg"

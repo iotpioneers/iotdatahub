@@ -19,7 +19,7 @@ const formatDate = (date: Date) =>
     year: "numeric",
   }).format(new Date(date));
 
-const ProjectList = ({
+const ChannelListTable = ({
   initialChannels,
 }: {
   initialChannels: Channel[] | [];
@@ -222,4 +222,4 @@ const ProjectList = ({
   );
 };
 
-export default ProjectList;
+export default ChannelListTable;

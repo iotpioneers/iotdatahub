@@ -45,8 +45,8 @@ export async function GET(
     channel,
     dataPoint,
     fields,
-    apiKey: apiKey.apiKey,
-    sampleCodes: sampleCodes.codes,
+    apiKey,
+    sampleCodes,
   });
 }
 

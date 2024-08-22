@@ -37,8 +37,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
   const router = useRouter();
   const { setState } = useGlobalState();
 
-  if (status !== "loading" && status === "unauthenticated")
-    router.push("/login");
+  if (status !== "loading" && status === "unauthenticated") return null;
 
   const [error, setError] = useState<string>("");
   const [step, setStep] = useState<number>(0);

@@ -24,10 +24,7 @@ import { Channel, Field } from "@/types";
 import { ActionModal } from "../dashboard/ActionModal";
 
 // Icons
-import {
-  ArchiveBoxXMarkIcon,
-  CloudArrowUpIcon,
-} from "@heroicons/react/24/outline";
+import { ArchiveBoxXMarkIcon } from "@heroicons/react/24/outline";
 import { Save as SaveIcon, Add as AddIcon } from "@mui/icons-material";
 import LoadingProgressBar from "../LoadingProgressBar";
 
@@ -72,7 +69,7 @@ const ChannelSettingsForm = ({ fields, channel }: ChannelSettingsFormProps) => {
   const {
     register,
     control,
-    handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<ChannelForm>({
     resolver: zodResolver(channelSchema),
@@ -123,34 +120,30 @@ const ChannelSettingsForm = ({ fields, channel }: ChannelSettingsFormProps) => {
     setOpen(true);
   };
 
-  const onSubmit = handleSubmit(async (data) => {
-    console.log("Form data:", data);
+  const updateChannelDescription = async () => {
     try {
       setIsSubmitting(true);
+      const description = getValues("description") || channel?.description;
+
       const response = await axios.put(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/${channel?.id}`,
-        {
-          ...data,
-          description: data.description || channel?.description,
-        }
+        { description }
       );
-      console.log("Response:", response); // Debugging line
 
-      if (response.status !== 201) {
+      if (response.status !== 200) {
         setError("Failed to update channel.");
         setOpen(true);
       } else {
         setSuccessMessage("Channel description updated successfully.");
-        router.push(`/dashboard/channels/${channel?.id}`);
+        setOpen(true);
       }
     } catch (error) {
-      console.error("Error:", error); // Debugging line
       setError("An unexpected error occurred.");
       setOpen(true);
     } finally {
       setIsSubmitting(false);
     }
-  });
+  };
 
   return (
     <main className="overflow-hidden">
@@ -190,7 +183,7 @@ const ChannelSettingsForm = ({ fields, channel }: ChannelSettingsFormProps) => {
         </CardContent>
       </Card>
       <MainCard>
-        <form className="mt-6" onSubmit={onSubmit}>
+        <form className="mt-6">
           {fieldsState.map((field, index) => (
             <div className="mb-4 flex items-center" key={field.id}>
               <div className="flex-1">
@@ -232,11 +225,10 @@ const ChannelSettingsForm = ({ fields, channel }: ChannelSettingsFormProps) => {
                 warning="This action cannot be undone."
                 confirmButtonText="Delete"
                 onConfirm={() => deleteField(index)}
-                iconSrc="/icons/delete-modal.svg"
+                iconSrc="/icons/delete.svg"
               />
             </div>
           ))}
-
           {/* Add New Field Button */}
           <Button
             variant="outlined"
@@ -248,7 +240,6 @@ const ChannelSettingsForm = ({ fields, channel }: ChannelSettingsFormProps) => {
           >
             New Field
           </Button>
-
           <div className="my-4">
             <Controller
               name="description"
@@ -266,21 +257,30 @@ const ChannelSettingsForm = ({ fields, channel }: ChannelSettingsFormProps) => {
             />
             <ErrorMessage>{errors.description?.message}</ErrorMessage>
           </div>
-
-          {/* Action Buttons */}
+          ;{/* Action Buttons */}
+          {isSubmitting && <LoadingProgressBar />}
           <Box mt={1} display="flex" justifyContent="flex-end" gap={2}>
-            <Button
-              variant="contained"
-              color="primary"
-              className="inline-flex justify-center rounded-md border border-transparent py-2 px-4 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              startIcon={<SaveIcon />}
-              type="submit"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Saving Settings..." : "Save Settings"}
-            </Button>
-            {isSubmitting && <LoadingProgressBar />}
+            <ActionModal
+              triggerComponent={
+                <Button
+                  variant="contained"
+                  color="primary"
+                  className="inline-flex justify-center rounded-md border border-transparent py-2 px-4 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  startIcon={<SaveIcon />}
+                  disabled={isSubmitting}
+                >
+                  Update Description
+                </Button>
+              }
+              title="Update Channel Description"
+              description="Are you sure you want to update the channel description?"
+              warning="This action will modify the channel's description."
+              confirmButtonText="Update"
+              onConfirm={updateChannelDescription}
+              iconSrc="/icons/edit.svg"
+            />
           </Box>
+          ;
         </form>
       </MainCard>
     </main>
