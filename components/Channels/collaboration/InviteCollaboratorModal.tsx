@@ -20,9 +20,17 @@ import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import { ShareChannelRoomAccessDialogProps, UserAccessType } from "@/types";
 import { CollaborationUser } from "@/types/user";
-import { Share } from "@phosphor-icons/react";
+import { Share, Link } from "@phosphor-icons/react";
 import { updateChannelAccess } from "@/lib/actions/room.actions";
 import Collaborator from "./Collaborator";
+import Avatar from "@mui/material/Avatar";
+import List from "@mui/material/List";
+import NativeSelect from "@mui/material/NativeSelect";
+import ListItem from "@mui/material/ListItem";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import ListItemText from "@mui/material/ListItemText";
+import LockIcon from "@mui/icons-material/Lock";
+import PublicIcon from "@mui/icons-material/Public";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -38,7 +46,10 @@ const InviteCollaboratorModal = ({
   collaborators,
   creator,
   currentUserType,
-}: ShareChannelRoomAccessDialogProps) => {
+  initialGeneralAccess = "viewer",
+}: ShareChannelRoomAccessDialogProps & {
+  initialGeneralAccess?: UserAccessType;
+}) => {
   const user = useSelf();
 
   const [openInviteModal, setOpenInviteModal] = React.useState(false);
@@ -48,6 +59,11 @@ const InviteCollaboratorModal = ({
   const [email, setEmail] = useState("");
   const [userType, setUserType] = useState<UserAccessType>("viewer");
   const [showResult, setShowResult] = useState<boolean>(false);
+  const [generalAccess, setGeneralAccess] =
+    useState<UserAccessType>(initialGeneralAccess);
+  const [linkAccessType, setLinkAccessType] = useState<"restricted" | "anyone">(
+    "restricted"
+  );
 
   const accessChangeHandler = (
     event: SelectChangeEvent<"creator" | "editor" | "viewer">
@@ -55,10 +71,24 @@ const InviteCollaboratorModal = ({
     setUserType(event.target.value as UserAccessType);
   };
 
+  const handleGeneralAccessChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const value = event.target.value;
+    if (value === "anyone") {
+      setLinkAccessType("anyone");
+      setGeneralAccess("viewer");
+    } else {
+      setLinkAccessType("restricted");
+      setGeneralAccess(value as UserAccessType);
+    }
+  };
+
   const handleClickOpen = () => {
     setOpenInviteModal(true);
   };
-  const handleClose = () => {
+
+  const handleCloseInviteModal = () => {
     setOpenInviteModal(false);
   };
 
@@ -130,16 +160,20 @@ const InviteCollaboratorModal = ({
         </Button>
       )}
       <BootstrapDialog
-        onClose={handleClose}
+        onClose={handleCloseInviteModal}
         aria-labelledby="customized-dialog-title"
         open={openInviteModal}
       >
-        <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-          Manage who can view this project
+        <DialogTitle
+          variant="h3"
+          sx={{ m: 0, p: 2 }}
+          id="customized-dialog-title"
+        >
+          Invite Collaborator
         </DialogTitle>
         <IconButton
           aria-label="close"
-          onClick={handleClose}
+          onClick={handleCloseInviteModal}
           sx={{
             position: "absolute",
             right: 8,
@@ -150,10 +184,7 @@ const InviteCollaboratorModal = ({
           <CloseIcon />
         </IconButton>
         <DialogContent dividers>
-          <Typography gutterBottom>
-            Select which users can view and edit this document
-          </Typography>
-          <div className="flex justify-between items-center mt-5">
+          <div className="flex justify-between items-center mt-2">
             <TextField
               autoFocus
               required
@@ -191,6 +222,9 @@ const InviteCollaboratorModal = ({
             </Button>
           </div>
           <div className="my-2 space-y-2">
+            <Typography gutterBottom variant="h4" mt={2}>
+              People with access
+            </Typography>
             <ul className="flex flex-col">
               {collaborators.map((collaborator) => (
                 <Collaborator
@@ -204,6 +238,74 @@ const InviteCollaboratorModal = ({
               ))}
             </ul>
           </div>
+          <div className="my-2 space-y-2">
+            <Typography variant="h4" gutterBottom sx={{ mt: 2 }}>
+              General access
+            </Typography>
+            <List>
+              <ListItem>
+                <ListItemAvatar>
+                  <Avatar>
+                    {linkAccessType === "restricted" ? (
+                      <LockIcon />
+                    ) : (
+                      <PublicIcon />
+                    )}
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={
+                    <NativeSelect
+                      defaultValue="restricted"
+                      inputProps={{
+                        name: "generalAccess",
+                        id: "uncontrolled-native",
+                      }}
+                      onChange={handleGeneralAccessChange}
+                    >
+                      <option value="restricted">Restricted</option>
+                      <option value="anyone">Anyone with the link</option>
+                    </NativeSelect>
+                  }
+                  secondary={
+                    linkAccessType === "restricted"
+                      ? "Only people with access can open with the link"
+                      : `Anyone on the internet with the link can ${
+                          generalAccess === "viewer" ? "view" : "edit"
+                        } `
+                  }
+                />
+                {linkAccessType === "anyone" && (
+                  <NativeSelect
+                    defaultValue="viewer"
+                    inputProps={{
+                      name: "linkAccessType",
+                      id: "uncontrolled-native",
+                    }}
+                    onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
+                      setGeneralAccess(event.target.value as UserAccessType)
+                    }
+                    sx={{ ml: 3, mt: 2 }}
+                  >
+                    <option value="viewer">Viewer</option>
+                    <option value="editor">Editor</option>
+                  </NativeSelect>
+                )}
+              </ListItem>
+            </List>
+          </div>
+          <DialogActions sx={{ justifyContent: "space-between" }}>
+            <Button startIcon={<Link />} variant="outlined">
+              Copy link
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleCloseInviteModal}
+            >
+              Done
+            </Button>
+          </DialogActions>
         </DialogContent>
       </BootstrapDialog>
     </React.Fragment>

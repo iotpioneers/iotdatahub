@@ -13,6 +13,7 @@ import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
+import { CollaborationActionModal } from "./CollaborationActionModal";
 
 const Collaborator = ({
   roomId,
@@ -78,7 +79,7 @@ const Collaborator = ({
       </div>
 
       {creator === collaborator.id ? (
-        <p className="bg-slate-500 px-2 py-1 rounded text-sm text-slate-100">
+        <p className="bg-slate-100 px-2 py-1 rounded text-sm text-slate-800">
           Owner
         </p>
       ) : (
@@ -96,12 +97,16 @@ const Collaborator = ({
               <MenuItem value="editor">edit</MenuItem>
             </Select>
           </FormControl>
-          <Button
-            type="button"
-            onClick={() => removeCollaboratorHandler(collaborator.email)}
-          >
-            Remove
-          </Button>
+
+          <CollaborationActionModal
+            triggerComponent={<Button>Remove</Button>}
+            title="Remove Collaborator"
+            description={`Are you sure you want to remove ${collaborator.name} from this room?`}
+            warning="This action cannot be undone."
+            confirmButtonText="Remove"
+            onConfirm={() => removeCollaboratorHandler(collaborator.email)}
+            iconSrc="/icons/delete.svg"
+          />
         </div>
       )}
     </li>

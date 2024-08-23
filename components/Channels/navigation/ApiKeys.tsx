@@ -17,9 +17,14 @@ import {
 } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import { ApiKey } from "@/types";
 
-const ApiKeys = ({ apiKey: initialApiKey }: { apiKey: string }) => {
-  const [apiKey, setApiKey] = useState(initialApiKey);
+interface ApiKeysProps {
+  apiKey: ApiKey;
+}
+
+const ApiKeys = ({ apiKey: initialApiKey }: ApiKeysProps) => {
+  const [apiKey, setApiKey] = useState(initialApiKey.apiKey);
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 

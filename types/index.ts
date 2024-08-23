@@ -167,8 +167,8 @@ export type ChannelNavigationProps = {
   channel: Channel;
   dataPoint: DataPoint[];
   fields: Field[];
-  sampleCodes: string;
-  apiKey: string;
+  sampleCodes: SampleCodes;
+  apiKey: ApiKey;
 };
 
 export type ChannelCollaborativeRoomProps = {
@@ -179,8 +179,8 @@ export type ChannelCollaborativeRoomProps = {
   channel: Channel;
   dataPoint: DataPoint[];
   fields: Field[];
-  apiKey: apiKey;
-  sampleCodes: samples;
+  apiKey: ApiKey;
+  sampleCodes: SampleCodes;
 };
 
 export type AddDocumentBtnProps = {

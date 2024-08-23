@@ -71,11 +71,11 @@ body {
     @apply bg-gradient-to-t from-red-500 to-red-400;
   }
 
-  .shad-dialog {
+  .action-dialog {
     @apply w-full max-w-[400px] rounded-xl border-none  px-5 py-7 shadow-xl sm:min-w-[500px] !important;
   }
 
-  .shad-dialog button {
+  .action-dialog button {
     @apply focus:ring-0 focus:ring-offset-0 focus-visible:border-none focus-visible:outline-none focus-visible:ring-transparent focus-visible:ring-offset-0 !important;
   }
 

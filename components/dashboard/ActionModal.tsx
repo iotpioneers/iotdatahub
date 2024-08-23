@@ -69,7 +69,7 @@ export const ActionModal: React.FC<CustomModalProps> = ({
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>{triggerComponent}</DialogTrigger>
-        <DialogContent className="shad-dialog">
+        <DialogContent className="action-dialog">
           <Snackbar
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
             open={showMessage}
