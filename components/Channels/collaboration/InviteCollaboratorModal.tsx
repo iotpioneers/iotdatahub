@@ -186,7 +186,6 @@ const InviteCollaboratorModal = ({
         <DialogContent dividers>
           <div className="flex justify-between items-center mt-2">
             <TextField
-              autoFocus
               required
               margin="dense"
               id="name"

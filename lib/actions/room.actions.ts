@@ -35,6 +35,19 @@ export const createChannelRoom = async ({
       defaultAccesses: [],
     });
 
+    // Notification for creating a new channel
+    const notificationId = nanoid();
+    await liveblocks.triggerInboxNotification({
+      userId: email,
+      kind: "$channelCreated",
+      subjectId: notificationId,
+      activityData: {
+        title: `You have successfully created the channel "${title}"`,
+        channelId: roomId,
+      },
+      roomId,
+    });
+
     revalidatePath("/dashboard/channels");
 
     return parseStringify(room);
@@ -61,7 +74,6 @@ export const getRoomAccess = async ({
 
     return parseStringify(room);
   } catch (error) {
-    console.error("Error getting room access", error);
     throw new Error(error as string);
   }
 };
@@ -75,8 +87,6 @@ export const updateChannelRoomData = async (
       name: title,
     });
 
-    console.log("response", response);
-
     if (response.status !== 200) {
       return null;
     }
@@ -87,7 +97,22 @@ export const updateChannelRoomData = async (
       },
     });
 
-    console.log("updateChannelRoom", updateChannelRoom);
+    const creatorId = Array.isArray(updateChannelRoom.metadata.creatorId)
+      ? updateChannelRoom.metadata.creatorId[0]
+      : updateChannelRoom.metadata.creatorId;
+
+    // Notification for updating channel information
+    const notificationId = nanoid();
+    await liveblocks.triggerInboxNotification({
+      userId: creatorId,
+      kind: "$channelUpdated",
+      subjectId: notificationId,
+      activityData: {
+        title: `The channel "${title}" has been updated`,
+        channelId: channelId,
+      },
+      roomId: channelId,
+    });
 
     revalidatePath(`/dashboard/channels/${channelId}`);
 
@@ -108,6 +133,8 @@ export const updateChannelAccess = async ({
       [receiverEmail]: getAccessType(userType) as ChannelAccessType,
     };
 
+    console.log("userType", userType);
+
     const room = await liveblocks.updateRoom(roomId, {
       usersAccesses,
     });
@@ -115,18 +142,20 @@ export const updateChannelAccess = async ({
     if (!room) {
       throw new Error("Error updating room access");
     }
-    const notificationId = nanoid();
 
+    // Notification for updating channel access
+    const notificationId = nanoid();
     await liveblocks.triggerInboxNotification({
       userId: receiverEmail,
       kind: "$channelRoomAccess",
       subjectId: notificationId,
       activityData: {
         userType,
-        title: `You have been granted ${userType} access to the channel by ${updatedBy.name}`,
+        title: `You have been granted ${userType} access to the channel "${room.metadata.title}"`,
         updatedBy: updatedBy.name,
         image: updatedBy.avatar,
         email: updatedBy.email,
+        channelId: roomId,
       },
       roomId,
     });
@@ -158,14 +187,15 @@ export const removeCollaborator = async ({
       },
     });
 
+    // Notification for removing a collaborator
     const notificationId = nanoid();
-
     await liveblocks.triggerInboxNotification({
       userId: email,
       kind: "$channelRoomAccess",
       subjectId: notificationId,
       activityData: {
-        title: "You have been removed to collabote to the channel",
+        title: `You have been removed from the channel "${room.metadata.title}"`,
+        channelId: roomId,
       },
       roomId,
     });
@@ -179,6 +209,8 @@ export const removeCollaborator = async ({
 
 export const deleteChannel = async (channelId: string) => {
   try {
+    const room = await liveblocks.getRoom(channelId);
+
     const response = await axios.delete(
       process.env.NEXT_PUBLIC_BASE_URL + `/api/channels/${channelId}`
     );
@@ -187,12 +219,27 @@ export const deleteChannel = async (channelId: string) => {
       return null;
     }
 
+    const creatorId = Array.isArray(room.metadata.creatorId)
+      ? room.metadata.creatorId[0]
+      : room.metadata.creatorId;
+
+    // Notification for deleting a channel
+    const notificationId = nanoid();
+    await liveblocks.triggerInboxNotification({
+      userId: creatorId,
+      kind: "$channelDeleted",
+      subjectId: notificationId,
+      activityData: {
+        title: `The channel "${room.metadata.title}" has been deleted`,
+        channelId: channelId,
+      },
+    });
+
     await liveblocks.deleteRoom(channelId);
 
     revalidatePath("/dashboard/channels");
     return parseStringify(response.data);
   } catch (error) {
-    console.error("Error deleting channel:", error);
     revalidatePath("/dashboard/channels");
   }
 };

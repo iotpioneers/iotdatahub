@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 // Project imports
-import { Channel, DataPoint, Field } from "@/types";
+import { ApiKey, Channel, DataPoint, Field, SampleCodes } from "@/types";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
@@ -18,8 +18,8 @@ interface ChannelData {
   channel: Channel;
   dataPoint: DataPoint[];
   fields: Field[];
-  apiKey: string;
-  sampleCodes: string;
+  apiKey: ApiKey;
+  sampleCodes: SampleCodes;
 }
 
 const ChannelDetails = ({ channelID }: { channelID: string }) => {
@@ -31,7 +31,7 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [currentUserType, setCurrentUserType] = useState<"editor" | "viewer">(
-    "editor"
+    "viewer"
   );
   const [usersData, setUsersData] = useState<any[]>([]);
   const [room, setRoom] = useState<any>(null);
@@ -98,7 +98,7 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
 
         const usersData = users.map((user: CollaborationUser) => ({
           ...user,
-          userType: roomData.usersAccesses[userEmail]?.includes("room:write")
+          userType: roomData.usersAccesses[user.email]?.includes("room:write")
             ? "editor"
             : "viewer",
         }));

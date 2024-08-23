@@ -26,9 +26,6 @@ import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 
-// third-party
-import PerfectScrollbar from "react-perfect-scrollbar";
-
 // project imports
 import reducer from "@/app/store/reducer";
 import MainCard from "../../cards/MainCard";
@@ -231,150 +228,140 @@ const ProfileSection = () => {
                     />
                     <Divider />
                   </Box>
-                  <PerfectScrollbar
-                    style={{
+
+                  <Box
+                    sx={{
                       height: "100%",
-                      maxHeight: "calc(100vh - 250px)",
-                      overflowX: "hidden",
                       overflowY: "auto",
+                      padding: "16px",
+                      p: 2,
+                      pt: 0,
                     }}
                   >
-                    <Box
+                    <Card
                       sx={{
-                        height: "100%",
-                        overflowY: "auto",
-                        padding: "16px",
-                        p: 2,
-                        pt: 0,
+                        bgcolor: theme.palette.primary.light,
+                        my: 2,
                       }}
                     >
-                      <Card
-                        sx={{
-                          bgcolor: theme.palette.primary.light,
-                          my: 2,
-                        }}
-                      >
-                        <CardContent>
-                          <Grid container spacing={3} direction="column">
-                            <Grid item>
-                              <Grid
-                                item
-                                container
-                                alignItems="center"
-                                justifyContent="space-between"
-                              >
-                                <Grid item>
-                                  <Typography variant="subtitle1">
-                                    Allow Notifications
-                                  </Typography>
-                                </Grid>
-                                <Grid item>
-                                  <Switch
-                                    checked={notification}
-                                    onChange={(e) =>
-                                      setNotification(e.target.checked)
-                                    }
-                                    name="sdm"
-                                    size="small"
-                                  />
-                                </Grid>
+                      <CardContent>
+                        <Grid container spacing={3} direction="column">
+                          <Grid item>
+                            <Grid
+                              item
+                              container
+                              alignItems="center"
+                              justifyContent="space-between"
+                            >
+                              <Grid item>
+                                <Typography variant="subtitle1">
+                                  Allow Notifications
+                                </Typography>
+                              </Grid>
+                              <Grid item>
+                                <Switch
+                                  checked={notification}
+                                  onChange={(e) =>
+                                    setNotification(e.target.checked)
+                                  }
+                                  name="sdm"
+                                  size="small"
+                                />
                               </Grid>
                             </Grid>
                           </Grid>
-                        </CardContent>
-                      </Card>
-                      <Divider />
-                      <List
-                        component="nav"
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                    <Divider />
+                    <List
+                      component="nav"
+                      sx={{
+                        width: "100%",
+                        maxWidth: 350,
+                        minWidth: 300,
+                        backgroundColor: theme.palette.background.paper,
+                        borderRadius: "10px",
+                        [theme.breakpoints.down("md")]: {
+                          minWidth: "100%",
+                        },
+                        "& .MuiListItemButton-root": {
+                          mt: 0.5,
+                        },
+                      }}
+                    >
+                      <ListItemButton
                         sx={{
-                          width: "100%",
-                          maxWidth: 350,
-                          minWidth: 300,
-                          backgroundColor: theme.palette.background.paper,
-                          borderRadius: "10px",
-                          [theme.breakpoints.down("md")]: {
-                            minWidth: "100%",
-                          },
-                          "& .MuiListItemButton-root": {
-                            mt: 0.5,
-                          },
+                          borderRadius: `${customization.borderRadius}px`,
                         }}
+                        selected={selectedIndex === 0}
+                        onClick={(event) =>
+                          handleListItemClick(event, 0, "/dashboard/settings")
+                        }
                       >
-                        <ListItemButton
-                          sx={{
-                            borderRadius: `${customization.borderRadius}px`,
-                          }}
-                          selected={selectedIndex === 0}
-                          onClick={(event) =>
-                            handleListItemClick(event, 0, "/dashboard/settings")
+                        <ListItemIcon>
+                          <IconSettings stroke={1.5} size="1.3rem" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <Typography variant="body2">Settings</Typography>
                           }
-                        >
-                          <ListItemIcon>
-                            <IconSettings stroke={1.5} size="1.3rem" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <Typography variant="body2">Settings</Typography>
-                            }
-                          />
-                        </ListItemButton>
-                        <ListItemButton
-                          sx={{
-                            borderRadius: `${customization.borderRadius}px`,
-                          }}
-                          selected={selectedIndex === 1}
-                          onClick={(event) =>
-                            handleListItemClick(event, 1, "/dashboard/account")
-                          }
-                        >
-                          <ListItemIcon>
-                            <IconUser stroke={1.5} size="1.3rem" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <Grid
-                                container
-                                spacing={1}
-                                justifyContent="space-between"
-                              >
-                                <Grid item>
-                                  <Typography variant="body2">
-                                    Account
-                                  </Typography>
-                                </Grid>
-                                <Grid item>
-                                  <Chip
-                                    label="02"
-                                    size="small"
-                                    sx={{
-                                      bgcolor: theme.palette.warning.dark,
-                                      color: theme.palette.background.default,
-                                    }}
-                                  />
-                                </Grid>
+                        />
+                      </ListItemButton>
+                      <ListItemButton
+                        sx={{
+                          borderRadius: `${customization.borderRadius}px`,
+                        }}
+                        selected={selectedIndex === 1}
+                        onClick={(event) =>
+                          handleListItemClick(event, 1, "/dashboard/account")
+                        }
+                      >
+                        <ListItemIcon>
+                          <IconUser stroke={1.5} size="1.3rem" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <Grid
+                              container
+                              spacing={1}
+                              justifyContent="space-between"
+                            >
+                              <Grid item>
+                                <Typography variant="body2">Account</Typography>
                               </Grid>
-                            }
-                          />
-                        </ListItemButton>
-                        <ListItemButton
-                          sx={{
-                            borderRadius: `${customization.borderRadius}px`,
-                          }}
-                          selected={selectedIndex === 4}
-                          onClick={handleLogout}
-                        >
-                          <ListItemIcon>
-                            <IconLogout stroke={1.5} size="1.3rem" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <Typography variant="body2">Logout</Typography>
-                            }
-                          />
-                        </ListItemButton>
-                      </List>
-                    </Box>
-                  </PerfectScrollbar>
+                              <Grid item>
+                                <Chip
+                                  label="02"
+                                  size="small"
+                                  sx={{
+                                    bgcolor: theme.palette.warning.dark,
+                                    color: theme.palette.background.default,
+                                  }}
+                                />
+                              </Grid>
+                            </Grid>
+                          }
+                        />
+                      </ListItemButton>
+                      <ListItemButton
+                        sx={{
+                          borderRadius: `${customization.borderRadius}px`,
+                        }}
+                        selected={selectedIndex === 4}
+                        onClick={handleLogout}
+                      >
+                        <ListItemIcon>
+                          <IconLogout stroke={1.5} size="1.3rem" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <Typography variant="body2">Logout</Typography>
+                          }
+                        />
+                      </ListItemButton>
+                    </List>
+                  </Box>
                 </MainCard>
               </ClickAwayListener>
             </Paper>

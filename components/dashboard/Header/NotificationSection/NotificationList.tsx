@@ -2,7 +2,6 @@
 
 import PropTypes from "prop-types";
 
-// material-ui
 import {
   InboxNotification,
   InboxNotificationList,
@@ -41,8 +40,6 @@ ListItemWrapper.propTypes = {
   children: PropTypes.node,
 };
 
-// ==============================|| NOTIFICATION LIST ITEM ||============================== //
-
 const NotificationList = () => {
   const theme = useTheme();
 
@@ -52,25 +49,21 @@ const NotificationList = () => {
     (notification) => !notification.readAt
   );
 
-  console.log("inboxNotifications", inboxNotifications);
-
-  console.log("unreadNotifications", unreadNotifications);
-
   return (
     <List
       sx={{
         width: "100%",
-        maxWidth: 330,
+        maxWidth: 400,
         py: 0,
         borderRadius: "10px",
         [theme.breakpoints.down("md")]: {
-          maxWidth: 300,
+          maxWidth: 350,
         },
         "& .MuiListItemSecondaryAction-root": {
-          top: 22,
+          top: 18,
         },
         "& .MuiDivider-root": {
-          my: 0,
+          mb: 6,
         },
         "& .list-container": {
           pl: 7,
@@ -97,7 +90,7 @@ const NotificationList = () => {
                 <InboxNotification
                   key={notification.id}
                   inboxNotification={notification}
-                  className="bg-dark-200 text-white"
+                  className="flex items-center text-white gap-4 rounded-[10px] mb-2 hover:bg-gray-200 dark:hover:bg-gray-600"
                   href={`/dashboard/channels/${notification.roomId}`}
                   showActions={false}
                   kinds={{

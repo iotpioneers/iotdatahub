@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
@@ -6,8 +8,11 @@ import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
-import { useTheme } from "@mui/system";
+import Slider from "react-slick";
+
+// Import CSS files for react-slick
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const userTestimonials = [
   {
@@ -52,36 +57,37 @@ const userTestimonials = [
     name: "Emmanuel Engineer",
     occupation: "CDO, AgriTech Corp",
     testimonial:
-      "The quality of IoT Data Hub exceeded our expectations. It’s a well-designed, robust solution that supports our digital farming initiatives perfectly. It's definitely a valuable investment for any modern farm.",
+      "The quality of IoT Data Hub exceeded our expectations. It's a well-designed, robust solution that supports our digital farming initiatives perfectly. It's definitely a valuable investment for any modern farm.",
   },
 ];
 
-const whiteLogos = [
-  "https://assets-global.website-files.com/61ed56ae9da9fd7e0ef0a967/6560628e8573c43893fe0ace_Sydney-white.svg",
-  "https://assets-global.website-files.com/61ed56ae9da9fd7e0ef0a967/655f4d520d0517ae8e8ddf13_Bern-white.svg",
-  "https://assets-global.website-files.com/61ed56ae9da9fd7e0ef0a967/655f46794c159024c1af6d44_Montreal-white.svg",
-  "https://assets-global.website-files.com/61ed56ae9da9fd7e0ef0a967/61f12e891fa22f89efd7477a_TerraLight.svg",
-  "https://assets-global.website-files.com/61ed56ae9da9fd7e0ef0a967/6560a09d1f6337b1dfed14ab_colorado-white.svg",
-  "https://assets-global.website-files.com/61ed56ae9da9fd7e0ef0a967/655f5caa77bf7d69fb78792e_Ankara-white.svg",
-];
-
-const darkLogos = [
-  "https://assets-global.website-files.com/61ed56ae9da9fd7e0ef0a967/6560628889c3bdf1129952dc_Sydney-black.svg",
-  "https://assets-global.website-files.com/61ed56ae9da9fd7e0ef0a967/655f4d4d8b829a89976a419c_Bern-black.svg",
-  "https://assets-global.website-files.com/61ed56ae9da9fd7e0ef0a967/655f467502f091ccb929529d_Montreal-black.svg",
-  "https://assets-global.website-files.com/61ed56ae9da9fd7e0ef0a967/61f12e911fa22f2203d7514c_TerraDark.svg",
-  "https://assets-global.website-files.com/61ed56ae9da9fd7e0ef0a967/6560a0990f3717787fd49245_colorado-black.svg",
-  "https://assets-global.website-files.com/61ed56ae9da9fd7e0ef0a967/655f5ca4e548b0deb1041c33_Ankara-black.svg",
-];
-
-const logoStyle = {
-  width: "64px",
-  opacity: 0.3,
-};
-
 const Testimonials = () => {
-  const theme = useTheme();
-  const logos = theme.palette.mode === "light" ? darkLogos : whiteLogos;
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    pauseOnHover: true,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  };
 
   return (
     <Container
@@ -111,47 +117,44 @@ const Testimonials = () => {
           innovation, and reliable support.
         </Typography>
       </Box>
-      <Grid container spacing={2}>
-        {userTestimonials.map((testimonial, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index} sx={{ display: "flex" }}>
-            <Card
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                flexGrow: 1,
-                p: 1,
-              }}
-            >
-              <CardContent>
-                <Typography variant="body2" color="text.secondary">
-                  {testimonial.testimonial}
-                </Typography>
-              </CardContent>
-              <Box
+      <Box sx={{ width: "100%" }}>
+        <Slider {...settings}>
+          {userTestimonials.map((testimonial, index) => (
+            <Box key={index} sx={{ p: 1 }}>
+              <Card
                 sx={{
                   display: "flex",
-                  flexDirection: "row",
+                  flexDirection: "column",
                   justifyContent: "space-between",
-                  pr: 2,
+                  height: "100%",
                 }}
               >
-                <CardHeader
-                  avatar={testimonial.avatar}
-                  title={testimonial.name}
-                  subheader={testimonial.occupation}
-                />
-                <img
-                  src={logos[index]}
-                  alt={`Logo ${index + 1}`}
-                  style={logoStyle}
-                />
-              </Box>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    pr: 2,
+                  }}
+                >
+                  <CardHeader
+                    avatar={testimonial.avatar}
+                    title={testimonial.name}
+                    subheader={testimonial.occupation}
+                  />
+                </Box>
+                <CardContent>
+                  <Typography variant="body2" color="text.secondary">
+                    {testimonial.testimonial}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Box>
+          ))}
+        </Slider>
+      </Box>
     </Container>
   );
 };
+
 export default Testimonials;

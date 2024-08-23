@@ -12,7 +12,6 @@ import Features from "./LandingPage/Features";
 import Testimonials from "./LandingPage/Testimonials";
 import FAQ from "./LandingPage/FAQ";
 import Benefits from "./LandingPage/Benefits";
-import Collaboration from "./LandingPage/Collaboration";
 import PopUpButton from "@/components/Home/components/design/PopUpButton/PopUpButton";
 import ButtonGradient from "@/components/Home/components/design/svg/ButtonGradient";
 import Footer from "./components/Footer";
@@ -37,8 +36,6 @@ const HomeBody = () => {
         <Features />
         <Divider />
         <Testimonials />
-        <Divider />
-        <Collaboration />
         <Divider />
         <Highlights />
         <Divider />

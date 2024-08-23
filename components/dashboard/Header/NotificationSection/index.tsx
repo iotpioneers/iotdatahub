@@ -22,12 +22,10 @@ import ButtonBase from "@mui/material/ButtonBase";
 import Transitions from "../../extended/Transitions";
 import NotificationList from "./NotificationList";
 import { IconBell } from "@tabler/icons-react";
-import PerfectScrollbar from "react-perfect-scrollbar";
 import MainCard from "../../cards/MainCard";
 import { useUnreadInboxNotificationsCount } from "@liveblocks/react/suspense";
 import Link from "next/link";
 
-// notification status options
 const status = [
   { value: "all", label: "All Notification" },
   { value: "new", label: "New" },
@@ -151,7 +149,7 @@ const NotificationSection = () => {
                         justifyContent="space-between"
                         sx={{ pt: 2, px: 2 }}
                       >
-                        <Grid item>
+                        <Grid item sx={{ mr: 1 }}>
                           <Stack direction="row" spacing={1}>
                             <Typography variant="subtitle1">
                               All Notification
@@ -176,52 +174,34 @@ const NotificationSection = () => {
                       </Grid>
                     </Grid>
                     <Grid item xs={12}>
-                      <PerfectScrollbar
-                        style={{
-                          height: "100%",
-                          maxHeight: "calc(100vh - 20px)",
-                          overflowX: "hidden",
-                        }}
-                      >
-                        <Grid container direction="column" spacing={2}>
-                          <Grid item xs={12}>
-                            <Box sx={{ px: 2, pt: 0.25 }}>
-                              <TextField
-                                id="outlined-select-currency-native"
-                                select
-                                fullWidth
-                                value={value}
-                                onChange={handleChange}
-                                SelectProps={{
-                                  native: true,
-                                }}
-                              >
-                                {status.map((option) => (
-                                  <option
-                                    key={option.value}
-                                    value={option.value}
-                                  >
-                                    {option.label}
-                                  </option>
-                                ))}
-                              </TextField>
-                            </Box>
-                          </Grid>
-                          <Grid item xs={12} p={0}>
-                            <Divider sx={{ my: 0 }} />
-                          </Grid>
-                        </Grid>
-
+                      <Box sx={{ px: 2, pt: 0.25 }}>
+                        <TextField
+                          id="outlined-select-currency-native"
+                          select
+                          fullWidth
+                          value={value}
+                          onChange={handleChange}
+                          SelectProps={{
+                            native: true,
+                          }}
+                        >
+                          {status.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </TextField>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} p={0}>
+                      <Divider sx={{ my: 0 }} />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Box sx={{ height: "400px", overflowY: "auto" }}>
                         <NotificationList />
-                      </PerfectScrollbar>
+                      </Box>
                     </Grid>
                   </Grid>
-                  <Divider />
-                  <CardActions sx={{ p: 1.25, justifyContent: "center" }}>
-                    <Button size="small" disableElevation>
-                      View All
-                    </Button>
-                  </CardActions>
                 </MainCard>
               </ClickAwayListener>
             </Paper>
