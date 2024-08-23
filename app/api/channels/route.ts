@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { getToken } from "next-auth/jwt";
 import { channelSchema } from "@/validations/schema.validation";
+import { ApiKey } from "@/types";
 
 interface Field {
   name: string;
@@ -40,7 +41,15 @@ export async function POST(request: NextRequest) {
   const { organizationId } = body;
 
   // Generate a new valid ObjectID for apiKey
-  const apiKey = new ObjectId().toHexString();
+  let apiKey: string;
+  let existingApiKey: ApiKey | null;
+
+  do {
+    apiKey = new ObjectId().toHexString();
+    existingApiKey = await prisma.apiKey.findUnique({
+      where: { apiKey },
+    });
+  } while (existingApiKey);
 
   try {
     // Format the fields data as Prisma expects

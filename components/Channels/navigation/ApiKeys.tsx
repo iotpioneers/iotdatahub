@@ -18,6 +18,7 @@ import {
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { ApiKey } from "@/types";
+import axios from "axios";
 
 interface ApiKeysProps {
   apiKey: ApiKey;
@@ -26,6 +27,7 @@ interface ApiKeysProps {
 const ApiKeys = ({ apiKey: initialApiKey }: ApiKeysProps) => {
   const [apiKey, setApiKey] = useState(initialApiKey.apiKey);
   const [showSnackbar, setShowSnackbar] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const handleCopyApiKey = () => {
@@ -35,12 +37,27 @@ const ApiKeys = ({ apiKey: initialApiKey }: ApiKeysProps) => {
   };
 
   const handleGenerateNewApiKey = async () => {
-    const newApiKey =
-      Math.random().toString(36).substring(2, 15) +
-      Math.random().toString(36).substring(2, 15);
-    setApiKey(newApiKey);
-    setSnackbarMessage("New API key generated");
-    setShowSnackbar(true);
+    setIsLoading(true);
+    try {
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/apikey/${initialApiKey.id}`
+      );
+
+      console.log("response", response);
+
+      if (response.status === 200) {
+        const newApiKey: ApiKey = response.data;
+        setApiKey(newApiKey.apiKey);
+        setSnackbarMessage("New API key generated");
+      } else {
+        setSnackbarMessage("Failed to generate new API key");
+      }
+    } catch (error) {
+      setSnackbarMessage("Failed to generate new API key");
+    } finally {
+      setIsLoading(false);
+      setShowSnackbar(true);
+    }
   };
 
   return (
@@ -77,7 +94,9 @@ const ApiKeys = ({ apiKey: initialApiKey }: ApiKeysProps) => {
         </Box>
         <Button
           variant="contained"
-          startIcon={<RefreshIcon />}
+          startIcon={
+            <RefreshIcon className={isLoading ? "animate-spin" : ""} />
+          }
           onClick={handleGenerateNewApiKey}
         >
           Generate New API Key

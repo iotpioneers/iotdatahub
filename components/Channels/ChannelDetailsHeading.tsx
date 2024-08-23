@@ -6,15 +6,17 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { CalendarIcon } from "@heroicons/react/20/solid";
 import { ChartPieIcon } from "@heroicons/react/24/solid";
-import { ChannelHeadingProps } from "@/types";
-import { Input } from "@/components/Actions/TextEditingInput";
+import { ViewIcon } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 import { updateChannelRoomData } from "@/lib/actions/room.actions";
-import { ViewIcon } from "lucide-react";
+import { Input } from "@/components/Actions/TextEditingInput";
 import { dateConverter } from "@/lib/utils";
+import { ChannelHeadingProps } from "@/types";
 
 import InviteCollaboratorModal from "./collaboration/InviteCollaboratorModal";
 import ActiveCollaborators from "./collaboration/ActiveCollaborators";
+import { Card } from "@mui/material";
 
 const ChannelDetailsHeading = ({
   roomId,
@@ -174,6 +176,11 @@ const ChannelDetailsHeading = ({
         </div>
 
         <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+          <div className="mt-2 max-w-xl">
+            <Card sx={{ p: 2, border: "1px solid", borderColor: "divider" }}>
+              <ReactMarkdown>{channel.description}</ReactMarkdown>
+            </Card>
+          </div>
           <div className="mt-2 flex items-center text-sm text-gray-500">
             <ChartPieIcon
               className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
