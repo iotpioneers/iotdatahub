@@ -121,12 +121,16 @@ export type User = {
   userType?: UserAccessType;
 };
 
-export type ShareChannelParams = {
+export interface ShareChannelParams {
   roomId: string;
-  receiverEmail: string;
-  userType: UserAccessType;
+  collaborators: Array<{
+    email: string;
+    userType: UserAccessType;
+  }>;
+  notifyPeople: boolean;
+  message?: string;
   updatedBy: User;
-};
+}
 
 export type UserTypeSelectorParams = {
   userType: string;

@@ -75,7 +75,6 @@ export const CollaborationActionModal: React.FC<CustomModalProps> = ({
         maxWidth="sm"
         fullWidth
       >
-        {loading && <LoadingProgressBar />}
         <DialogTitle>
           <div style={{ display: "flex", alignItems: "center" }}>
             <Image src={iconSrc} alt="icon" width={32} height={32} />
@@ -92,6 +91,7 @@ export const CollaborationActionModal: React.FC<CustomModalProps> = ({
               <CloseIcon />
             </IconButton>
           </div>
+          {loading && <LoadingProgressBar />}
         </DialogTitle>
         <DialogContent>
           <div style={{ marginBottom: 16 }}>

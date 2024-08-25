@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
     });
 
     if (usersFound.length === 0) {
-      console.log("No users found for the provided emails");
       return NextResponse.json({ error: "No users found" }, { status: 404 });
     }
 

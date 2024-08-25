@@ -4,6 +4,7 @@ import { nanoid } from "nanoid";
 import { liveblocks } from "../liveblocks";
 import { revalidatePath } from "next/cache";
 import { getAccessType, parseStringify } from "../utils";
+import { RoomPermission } from "@liveblocks/node";
 import {
   ChannelAccessType,
   CreateChannelRoomParams,
@@ -35,7 +36,6 @@ export const createChannelRoom = async ({
       defaultAccesses: [],
     });
 
-    // Notification for creating a new channel
     const notificationId = nanoid();
     await liveblocks.triggerInboxNotification({
       userId: email,
@@ -83,9 +83,12 @@ export const updateChannelRoomData = async (
   title: string
 ) => {
   try {
-    const response = await axios.patch(`/api/channels/${channelId}`, {
-      name: title,
-    });
+    const response = await axios.patch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/${channelId}`,
+      {
+        name: title,
+      }
+    );
 
     if (response.status !== 200) {
       return null;
@@ -101,7 +104,6 @@ export const updateChannelRoomData = async (
       ? updateChannelRoom.metadata.creatorId[0]
       : updateChannelRoom.metadata.creatorId;
 
-    // Notification for updating channel information
     const notificationId = nanoid();
     await liveblocks.triggerInboxNotification({
       userId: creatorId,
@@ -114,7 +116,9 @@ export const updateChannelRoomData = async (
       roomId: channelId,
     });
 
-    revalidatePath(`/dashboard/channels/${channelId}`);
+    revalidatePath(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/channels/${channelId}`
+    );
 
     return parseStringify(updateChannelRoom);
   } catch (error) {
@@ -124,16 +128,18 @@ export const updateChannelRoomData = async (
 
 export const updateChannelAccess = async ({
   roomId,
-  receiverEmail,
-  userType,
+  collaborators,
+  notifyPeople,
+  message,
   updatedBy,
 }: ShareChannelParams) => {
   try {
-    const usersAccesses: RoomAccesses = {
-      [receiverEmail]: getAccessType(userType) as ChannelAccessType,
-    };
-
-    console.log("userType", userType);
+    const usersAccesses: RoomAccesses = {};
+    collaborators.forEach((collaborator) => {
+      usersAccesses[collaborator.email] = getAccessType(
+        collaborator.userType
+      ) as ChannelAccessType;
+    });
 
     const room = await liveblocks.updateRoom(roomId, {
       usersAccesses,
@@ -143,26 +149,36 @@ export const updateChannelAccess = async ({
       throw new Error("Error updating room access");
     }
 
-    // Notification for updating channel access
-    const notificationId = nanoid();
-    await liveblocks.triggerInboxNotification({
-      userId: receiverEmail,
-      kind: "$channelRoomAccess",
-      subjectId: notificationId,
-      activityData: {
-        userType,
-        title: `You have been granted ${userType} access to the channel "${room.metadata.title}"`,
-        updatedBy: updatedBy.name,
-        image: updatedBy.avatar,
-        email: updatedBy.email,
-        channelId: roomId,
-      },
-      roomId,
-    });
+    if (notifyPeople) {
+      for (const collaborator of collaborators) {
+        const notificationId = nanoid();
+        await liveblocks.triggerInboxNotification({
+          userId: collaborator.email,
+          kind: "$channelRoomAccess",
+          subjectId: notificationId,
+          activityData: {
+            userType: collaborator.userType,
+            title: `You have been granted ${
+              collaborator.userType
+            } access to the channel "${room.metadata.title}" by ${
+              updatedBy.name
+            } ${message && `The message from sender is: ${message}`}`,
+            updatedBy: updatedBy.name,
+            image: updatedBy.avatar,
+            email: updatedBy.email,
+            channelId: roomId,
+          },
+          roomId,
+        });
+      }
+    }
 
-    revalidatePath(`/dashboard/channels/${roomId}`);
+    revalidatePath(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/channels/${roomId}`
+    );
     return parseStringify(room);
   } catch (error) {
+    console.error("Error updating channel access:", error);
     return null;
   }
 };
@@ -181,13 +197,15 @@ export const removeCollaborator = async ({
       throw new Error("You cannot remove yourself from the document");
     }
 
+    const updatedUsersAccesses = {
+      ...room.usersAccesses,
+      [email]: null,
+    };
+
     const updatedRoom = await liveblocks.updateRoom(roomId, {
-      usersAccesses: {
-        [email]: null,
-      },
+      usersAccesses: updatedUsersAccesses,
     });
 
-    // Notification for removing a collaborator
     const notificationId = nanoid();
     await liveblocks.triggerInboxNotification({
       userId: email,
@@ -195,14 +213,17 @@ export const removeCollaborator = async ({
       subjectId: notificationId,
       activityData: {
         title: `You have been removed from the channel "${room.metadata.title}"`,
-        channelId: roomId,
+        roomId,
       },
       roomId,
     });
 
-    revalidatePath(`/dashboard/channels/${roomId}`);
+    revalidatePath(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/channels/${roomId}`
+    );
     return parseStringify(updatedRoom);
   } catch (error) {
+    console.error("Error removing collaborator:", error);
     return null;
   }
 };
@@ -223,7 +244,6 @@ export const deleteChannel = async (channelId: string) => {
       ? room.metadata.creatorId[0]
       : room.metadata.creatorId;
 
-    // Notification for deleting a channel
     const notificationId = nanoid();
     await liveblocks.triggerInboxNotification({
       userId: creatorId,
@@ -237,9 +257,47 @@ export const deleteChannel = async (channelId: string) => {
 
     await liveblocks.deleteRoom(channelId);
 
-    revalidatePath("/dashboard/channels");
+    revalidatePath(process.env.NEXT_PUBLIC_BASE_URL + "/dashboard/channels");
     return parseStringify(response.data);
   } catch (error) {
-    revalidatePath("/dashboard/channels");
+    revalidatePath(process.env.NEXT_PUBLIC_BASE_URL + "/dashboard/channels");
+  }
+};
+
+export const updateRoomDefaultAccess = async (
+  roomId: string,
+  defaultAccesses: RoomPermission
+) => {
+  try {
+    const room = await liveblocks.getRoom(roomId);
+
+    const updatedRoom = await liveblocks.updateRoom(roomId, {
+      defaultAccesses,
+    });
+
+    if (!updatedRoom) {
+      throw new Error("Error updating room default access");
+    }
+
+    const creatorId = Array.isArray(room.metadata.creatorId)
+      ? room.metadata.creatorId[0]
+      : room.metadata.creatorId;
+
+    const notificationId = nanoid();
+    await liveblocks.triggerInboxNotification({
+      userId: creatorId,
+      kind: "$channelDefaultAccessUpdated",
+      subjectId: notificationId,
+      activityData: {
+        title: `The general access for channel "${room.metadata.title}" has been updated`,
+        channelId: roomId,
+      },
+      roomId,
+    });
+
+    revalidatePath(`/dashboard/channels/${roomId}`);
+    return parseStringify(updatedRoom);
+  } catch (error) {
+    return null;
   }
 };

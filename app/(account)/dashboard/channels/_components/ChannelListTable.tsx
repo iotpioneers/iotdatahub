@@ -167,7 +167,6 @@ const ChannelListTable = ({
       width: 120,
       renderCell: renderAccessBadge,
     },
-    { field: "description", headerName: "Description", width: 300 },
     {
       field: "createdAt",
       headerName: "Created",

@@ -43,8 +43,6 @@ const ApiKeys = ({ apiKey: initialApiKey }: ApiKeysProps) => {
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/apikey/${initialApiKey.id}`
       );
 
-      console.log("response", response);
-
       if (response.status === 200) {
         const newApiKey: ApiKey = response.data;
         setApiKey(newApiKey.apiKey);
@@ -74,9 +72,6 @@ const ApiKeys = ({ apiKey: initialApiKey }: ApiKeysProps) => {
         </Typography>
         <Divider sx={{ my: 2 }} />
         <Box sx={{ mb: 3 }}>
-          <Typography variant="subtitle1" gutterBottom>
-            Your current API key:
-          </Typography>
           <TextField
             fullWidth
             value={apiKey}
@@ -99,7 +94,7 @@ const ApiKeys = ({ apiKey: initialApiKey }: ApiKeysProps) => {
           }
           onClick={handleGenerateNewApiKey}
         >
-          Generate New API Key
+          {isLoading ? "Generating a new API Key..." : "Generate New API Key"}
         </Button>
       </Paper>
 

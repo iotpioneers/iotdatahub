@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   removeCollaborator,
   updateChannelAccess,
@@ -14,43 +14,59 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import { CollaborationActionModal } from "./CollaborationActionModal";
+import { DeleteOutline } from "@mui/icons-material";
 
-const Collaborator = ({
+const PeopleWithAccess = ({
   roomId,
   creator,
   receiverEmail,
   collaborator,
   user,
-}: CollaboratorProps) => {
+  onCollaboratorRemoved,
+}: CollaboratorProps & {
+  onCollaboratorRemoved: (email: string) => void;
+}) => {
   const [userType, setUserType] = useState(collaborator.userType || "viewer");
   const [loading, setLoading] = useState(false);
-
-  console.log("collaborator", collaborator);
-
-  const shareChannelUpdateHandler = async (type: string) => {
-    setLoading(true);
-
-    await updateChannelAccess({
-      roomId,
-      receiverEmail,
-      userType: type as UserAccessType,
-      updatedBy: user,
-    });
-
-    setLoading(false);
-  };
+  const [pendingAccessChange, setPendingAccessChange] =
+    useState<UserAccessType | null>(null);
+  const invisibleTriggerRef = useRef<HTMLButtonElement>(null);
 
   const channelAccessChangeHandler = (
     event: SelectChangeEvent<"editor" | "viewer">
   ) => {
-    setUserType(event.target.value as UserAccessType);
-    shareChannelUpdateHandler(event.target.value);
+    const newAccessType = event.target.value as UserAccessType;
+    setPendingAccessChange(newAccessType);
+    setTimeout(() => invisibleTriggerRef.current?.click(), 0);
+  };
+
+  const HandleAccessChange = async () => {
+    if (pendingAccessChange) {
+      setLoading(true);
+      await updateChannelAccess({
+        roomId,
+        collaborators: [
+          { email: receiverEmail, userType: pendingAccessChange },
+        ],
+        notifyPeople: true,
+        updatedBy: user,
+      });
+      setUserType(pendingAccessChange);
+      setPendingAccessChange(null);
+      setLoading(false);
+    }
   };
 
   const removeCollaboratorHandler = async (email: string) => {
     setLoading(true);
 
-    await removeCollaborator({ roomId, email });
+    const result = await removeCollaborator({ roomId, email });
+
+    if (result) {
+      onCollaboratorRemoved(email);
+    } else {
+      console.log("Failed to remove collaborator. Please try again.");
+    }
 
     setLoading(false);
   };
@@ -98,8 +114,25 @@ const Collaborator = ({
             </Select>
           </FormControl>
 
+          {pendingAccessChange && (
+            <CollaborationActionModal
+              triggerComponent={
+                <button ref={invisibleTriggerRef} style={{ display: "none" }} />
+              }
+              title="Change Collaborator Access"
+              description={`Are you sure you want to change ${collaborator.name}'s access to ${pendingAccessChange}?`}
+              warning="This action will update the collaborator's permissions."
+              confirmButtonText="Confirm"
+              onConfirm={HandleAccessChange}
+              iconSrc="/icons/edit.svg"
+            />
+          )}
           <CollaborationActionModal
-            triggerComponent={<Button>Remove</Button>}
+            triggerComponent={
+              <Button>
+                <DeleteOutline />
+              </Button>
+            }
             title="Remove Collaborator"
             description={`Are you sure you want to remove ${collaborator.name} from this room?`}
             warning="This action cannot be undone."
@@ -113,4 +146,4 @@ const Collaborator = ({
   );
 };
 
-export default Collaborator;
+export default PeopleWithAccess;

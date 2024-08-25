@@ -80,7 +80,6 @@ const ChannelDetailsHeading = ({
           setLoading(false);
         }
       } catch (error) {
-        console.log("Error updating channel", error);
         setError((error as Error).message);
         setShowResult(true);
       } finally {
@@ -156,7 +155,7 @@ const ChannelDetailsHeading = ({
             </>
           )}
 
-          {currentUserType === "editor" && !editing && (
+          {!loading && currentUserType === "editor" && !editing && (
             <Image
               src="/icons/edit.svg"
               alt="edit"
@@ -167,7 +166,7 @@ const ChannelDetailsHeading = ({
             />
           )}
 
-          {currentUserType !== "editor" && (
+          {!loading && currentUserType !== "editor" && (
             <p className="view-only-tag">
               <ViewIcon width={12} height={12} /> View only
             </p>

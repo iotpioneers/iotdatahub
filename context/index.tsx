@@ -137,8 +137,6 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     try {
       setIsLoading(true);
 
-      console.log("newData", newData.image);
-
       // Update the user data on the server
       const res = await axios.put(`/api/users/${newData.id}`, newData);
 
@@ -161,8 +159,6 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
           country: newData.country,
         },
       });
-
-      console.log("User data updated on the client", session?.user);
 
       // Update the local state
       setState((prevState) => ({
