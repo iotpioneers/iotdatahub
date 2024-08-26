@@ -38,10 +38,12 @@ interface Collaborator {
 
 interface AddCollaboratorSelectorProps {
   roomId: string;
+  onCollaboratorsAdded: () => void;
 }
 
 const AddCollaboratorSelector: React.FC<AddCollaboratorSelectorProps> = ({
   roomId,
+  onCollaboratorsAdded,
 }) => {
   const user = useSelf();
 
@@ -134,6 +136,8 @@ const AddCollaboratorSelector: React.FC<AddCollaboratorSelectorProps> = ({
 
   const handleInviteCollaborators = async () => {
     setLoading(true);
+    setError("");
+    setSuccess("");
 
     if (selectedCollaborators.length === 0 || !roomId || !user) {
       setError("Please select at least one collaborator");
@@ -148,7 +152,7 @@ const AddCollaboratorSelector: React.FC<AddCollaboratorSelectorProps> = ({
         userType: collaborator.accessType.toLowerCase() as UserAccessType,
       }));
 
-      await updateChannelAccess({
+      const response = await updateChannelAccess({
         roomId,
         collaborators,
         notifyPeople,
@@ -156,18 +160,24 @@ const AddCollaboratorSelector: React.FC<AddCollaboratorSelectorProps> = ({
         updatedBy: user.info,
       });
 
-      setSuccess("Collaborators have been invited to the channel successfully");
-      setShowResult(true);
-      setSelectedCollaborators([]);
-      setMessage("");
+      if (response) {
+        setSuccess(
+          "Collaborators have been invited to the channel successfully"
+        );
+        setSelectedCollaborators([]);
+        setMessage("");
+        onCollaboratorsAdded(); // Call this to refresh the collaborator list
+      } else {
+        setError("Failed to invite collaborators");
+      }
     } catch (error) {
+      console.error("Error inviting collaborators:", error);
       setError("Failed to invite collaborators");
-      setShowResult(true);
     } finally {
       setLoading(false);
+      setShowResult(true);
     }
   };
-
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
     reason?: string

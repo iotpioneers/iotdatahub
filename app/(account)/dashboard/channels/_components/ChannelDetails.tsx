@@ -166,7 +166,6 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
       <ChannelCollaborationRoom
         roomId={channelID}
         roomMetadata={room?.metadata}
-        users={usersData}
         currentUserType={currentUserType}
         channel={channel}
         dataPoint={dataPoint}

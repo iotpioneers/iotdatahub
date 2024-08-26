@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { redirect } from "next/navigation";
-import { Heading, Text } from "@radix-ui/themes";
-import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
 // material-ui
 import Grid from "@mui/material/Grid";
+import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
 
 // project imports
 import UserActivityOverviewCard from "@/components/dashboard/Overview/UserActivityOverviewCard";
@@ -14,11 +14,9 @@ import TotalDataGeneratedCard from "@/components/dashboard/Overview/TotalDataGen
 import TotalGrowthBarChart from "@/components/dashboard/Overview/TotalGrowthBarChart";
 import TotalChannelCard from "@/components/dashboard/Overview/TotalChannelCard";
 import TotalDevicesCard from "@/components/dashboard/Overview/TotalDevicesCard";
-
 import { gridSpacing } from "@/app/store/constant";
 
 // assets
-import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
 import {
   Channel,
   DataPoint,
@@ -28,7 +26,6 @@ import {
   Organization,
 } from "@/types";
 import WelcomeContentCard from "./Overview/WelcomeContentCard";
-import Link from "next/link";
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
@@ -49,11 +46,20 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   fields,
   datapoints,
 }) => {
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [isLoading, setLoading] = useState(true);
+
+  const router = useRouter();
 
   useEffect(() => {
     setLoading(false);
   }, []);
+
+  const handleRedirect = (href: string) => {
+    setIsRedirecting(true);
+    setLoading(true);
+    router.push(href);
+  };
 
   return (
     <Grid container spacing={gridSpacing}>
@@ -65,13 +71,13 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           <Grid item lg={4} md={12} sm={12} xs={12}>
             <Grid container spacing={gridSpacing}>
               <Grid item sm={6} xs={12} md={6} lg={12}>
-                <Link href="/dashboard/organizations">
+                <div onClick={() => handleRedirect("/dashboard/organizations")}>
                   <OrganizarionOverviewCard
-                    isLoading={isLoading}
+                    isLoading={isLoading || isRedirecting}
                     organization={organization}
                     members={members}
                   />
-                </Link>
+                </div>
               </Grid>
 
               <Grid item sm={6} xs={12} md={6} lg={12}>
@@ -91,19 +97,19 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item lg={6} md={6} sm={6} xs={12}>
-            <Link href="/dashboard/channels">
+            <div onClick={() => handleRedirect("/dashboard/channels")}>
               <TotalChannelCard isLoading={isLoading} channels={channels} />
-            </Link>
+            </div>
           </Grid>
           <Grid item lg={6} md={6} sm={6} xs={12}>
-            <Link href="/dashboard/devices">
+            <div onClick={() => handleRedirect("/dashboard/devices")}>
               <TotalDevicesCard
                 isLoading={isLoading}
                 devices={devices}
                 channels={channels}
                 fields={fields}
               />
-            </Link>
+            </div>
           </Grid>
         </Grid>
       </Grid>

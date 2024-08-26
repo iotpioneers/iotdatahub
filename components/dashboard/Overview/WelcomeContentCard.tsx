@@ -3,14 +3,13 @@
 import React from "react";
 import { redirect } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { TypeAnimation } from "react-type-animation";
 
 // material-ui
 import { useTheme } from "@mui/material/styles";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 
 // project imports
@@ -29,6 +28,14 @@ const getGreeting = () => {
   return "Good Evening";
 };
 
+// Array of welcome messages
+const welcomeMessages = [
+  "Welcome to your personalized IoT Data Hub dashboard. Here, you can manage your devices, monitor data, and stay connected.",
+  "Explore your IoT ecosystem with ease. Monitor, manage, and optimize your connected devices all in one place.",
+  "Your gateway to the world of IoT. Dive into real-time data, device management, and intelligent insights.",
+  "Unleash the power of your IoT network. Streamline operations, enhance efficiency, and make data-driven decisions.",
+];
+
 const WelcomeContentCard = () => {
   const theme = useTheme();
 
@@ -37,15 +44,9 @@ const WelcomeContentCard = () => {
   if (status !== "loading" && status === "unauthenticated") {
     return redirect("/login");
   }
-  const [anchorEl, setAnchorEl] = React.useState<null | SVGSVGElement>(null);
 
-  const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  // Create the sequence for TypeAnimation
+  const welcomeSequence = welcomeMessages.flatMap((message) => [message, 3000]);
 
   return (
     <>
@@ -111,10 +112,17 @@ const WelcomeContentCard = () => {
                       mb: 0.75,
                     }}
                   >
-                    {getGreeting()}
-                    <span className="text-slate-500 uppercase ml-2">
-                      {session!.user!.name.split(" ")[0]}
-                    </span>
+                    <TypeAnimation
+                      sequence={[
+                        `${getGreeting()} ${
+                          session?.user?.name?.split(" ")[0] || ""
+                        }`,
+                        1000,
+                      ]}
+                      wrapper="span"
+                      speed={50}
+                      repeat={1}
+                    />
                   </Typography>
                 </Grid>
               </Grid>
@@ -127,8 +135,12 @@ const WelcomeContentCard = () => {
                   color: "grey.700",
                 }}
               >
-                Welcome to your personalized IoT Data Hub dashboard. Here, you
-                can manage your devices, monitor data, and stay connected.{" "}
+                <TypeAnimation
+                  sequence={welcomeSequence}
+                  wrapper="span"
+                  speed={50}
+                  repeat={Infinity}
+                />
               </Typography>
             </Grid>
           </Grid>

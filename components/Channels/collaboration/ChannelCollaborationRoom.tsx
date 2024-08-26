@@ -12,7 +12,6 @@ import ChannelCollaborationEditor from "@/components/Channels/collaboration/Chan
 const ChannelCollaborationRoom = ({
   roomId,
   roomMetadata,
-  users,
   currentUserType,
   channel,
   dataPoint,
@@ -26,7 +25,6 @@ const ChannelCollaborationRoom = ({
         <div className="flex flex-col">
           <ChannelDetailsHeading
             roomId={roomId}
-            users={users}
             roomMetadata={roomMetadata}
             currentUserType={currentUserType}
             channel={channel}

@@ -140,7 +140,6 @@ export type UserTypeSelectorParams = {
 
 export type ShareChannelRoomAccessDialogProps = {
   roomId: string;
-  collaborators: User[];
   creator: string;
   currentUserType: UserAccessType;
 };
@@ -161,7 +160,6 @@ export type CollaboratorProps = {
 export type ChannelHeadingProps = {
   roomId: string;
   roomMetadata: RoomMetadata;
-  users: User[];
   currentUserType: UserAccessType;
   channel: Channel;
   dataPoint: DataPoint[];
@@ -178,7 +176,6 @@ export type ChannelNavigationProps = {
 export type ChannelCollaborativeRoomProps = {
   roomId: string;
   roomMetadata: RoomMetadata;
-  users: User[];
   currentUserType: UserAccessType;
   channel: Channel;
   dataPoint: DataPoint[];

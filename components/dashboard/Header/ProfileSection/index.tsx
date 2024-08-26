@@ -330,16 +330,6 @@ const ProfileSection = () => {
                               <Grid item>
                                 <Typography variant="body2">Account</Typography>
                               </Grid>
-                              <Grid item>
-                                <Chip
-                                  label="02"
-                                  size="small"
-                                  sx={{
-                                    bgcolor: theme.palette.warning.dark,
-                                    color: theme.palette.background.default,
-                                  }}
-                                />
-                              </Grid>
                             </Grid>
                           }
                         />

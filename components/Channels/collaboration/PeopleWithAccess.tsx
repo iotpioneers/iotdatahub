@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import React, { useRef, useState } from "react";
 import {
   removeCollaborator,
@@ -15,6 +14,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import { CollaborationActionModal } from "./CollaborationActionModal";
 import { DeleteOutline } from "@mui/icons-material";
+import { Avatar } from "@mui/material";
 
 const PeopleWithAccess = ({
   roomId,
@@ -74,13 +74,9 @@ const PeopleWithAccess = ({
   return (
     <li className="flex items-center justify-between gap-2 py-3">
       <div className="flex gap-2">
-        <Image
-          src={collaborator.avatar || ""}
-          alt={collaborator.name}
-          width={36}
-          height={36}
-          className="size-9 rounded-full"
-        />
+        <Avatar src={collaborator.avatar || undefined}>
+          {collaborator.name?.[0] || collaborator.email[0]}
+        </Avatar>
         <div>
           <p className="line-clamp-1 text-sm text-slate-950 font-semibold leading-4">
             {collaborator.name}

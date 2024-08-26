@@ -4,7 +4,7 @@ import * as React from "react";
 import { useSession } from "next-auth/react";
 
 // Material UI
-import { Link, PaletteMode } from "@mui/material";
+import { Link, PaletteMode, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -20,6 +20,7 @@ import NavigationMenuLinks from "./NavigationMenuLinks/NavigationMenuLinks";
 import { navigation } from "@/constants";
 import AngledButton from "./components/design/AngledButton";
 import MenuSvg from "./components/design/svg/MenuSvg";
+import LoadingProgressBar from "../LoadingProgressBar";
 
 const logoStyle = {
   width: "140px",
@@ -96,7 +97,11 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                   <span className="hover:text-zinc-950">IoTDataHub</span>
                 </h1>
               </Link>
-              <Box sx={{ display: { xs: "none", md: "flex" } }}>
+              <Box
+                sx={{
+                  display: { xs: "none", md: "flex", marginLeft: "10rem" },
+                }}
+              >
                 <NavigationMenuLinks />
               </Box>
             </Box>
@@ -117,16 +122,15 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                 </Button>
               )}
               {status !== "loading" && status === "unauthenticated" && (
-                <Button
-                  color="primary"
-                  variant="contained"
-                  size="small"
-                  component="a"
+                <Link
+                  type="button"
                   href="/register"
-                  target="_blank"
+                  className="underline hover:text-emerald-600 hover:bg-slate-700 hover:p-2 hover:rounded-2xl "
                 >
-                  Sign up
-                </Button>
+                  <Typography variant="body1" sx={{ textDecoration: "none" }}>
+                    SIGN UP
+                  </Typography>
+                </Link>
               )}
             </Box>
             <Box sx={{ display: { sm: "", md: "none" } }}>
@@ -179,6 +183,7 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                     </Link>
                   ))}
                   <Divider />
+                  {status === "loading" && <LoadingProgressBar />}
                   {status !== "loading" && (
                     <AngledButton
                       className="flex text-pink-500 mt-2"

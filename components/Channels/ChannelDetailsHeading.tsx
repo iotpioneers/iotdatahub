@@ -21,7 +21,6 @@ import { Card } from "@mui/material";
 const ChannelDetailsHeading = ({
   roomId,
   roomMetadata,
-  users,
   currentUserType,
   channel,
   dataPoint,
@@ -180,26 +179,27 @@ const ChannelDetailsHeading = ({
               <ReactMarkdown>{channel.description}</ReactMarkdown>
             </Card>
           </div>
-          <div className="mt-2 flex items-center text-sm text-gray-500">
-            <ChartPieIcon
-              className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-              aria-hidden="true"
-            />
-            Generated {dataPoint.length} data
-          </div>
-          <div className="mt-2 flex items-center text-sm text-gray-500">
-            <CalendarIcon
-              className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-              aria-hidden="true"
-            />
-            Created about {dateConverter(channel.createdAt.toString())}
+          <div className="flex flex-col">
+            <div className="mt-2 flex items-center text-sm text-gray-500">
+              <ChartPieIcon
+                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                aria-hidden="true"
+              />
+              Generated {dataPoint.length} data
+            </div>
+            <div className="mt-2 flex items-center text-sm text-gray-500">
+              <CalendarIcon
+                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                aria-hidden="true"
+              />
+              Created about {dateConverter(channel.createdAt.toString())}
+            </div>
           </div>
         </div>
         <div className="flex justify-between items-center my-5 ">
           {roomMetadata && (
             <InviteCollaboratorModal
               roomId={roomId}
-              collaborators={users}
               creator={roomMetadata.creatorId}
               currentUserType={currentUserType}
             />
