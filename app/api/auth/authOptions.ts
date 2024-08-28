@@ -52,7 +52,7 @@ const authOptions: AuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       httpOptions: {
-        timeout: 10000,
+        timeout: Number(process.env.GOOGLE_TIMEOUT!),
       },
     }),
     CredentialsProvider({
@@ -79,7 +79,7 @@ const authOptions: AuthOptions = {
   ],
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: Number(process.env.NEXT_AUTH_TIMEOUT!),
   },
   callbacks: {
     async jwt({ token, user, trigger, session }) {

@@ -148,8 +148,7 @@ export default function ChannelForm() {
           {error ? error : "Channel created successfully"}
         </Alert>
       </Snackbar>
-      <h1>Add a new channel</h1>
-      <div className="mt-10 border-t border-gray-200"></div>
+      <div className="border-t border-gray-200"></div>
       <form className="mt-6" onSubmit={onSubmit}>
         <div className="mb-4">
           <label

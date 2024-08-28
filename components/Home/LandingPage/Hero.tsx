@@ -7,10 +7,12 @@ import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Section from "../components/Section";
+import HeroSection from "./LandingPage";
 
 const Hero = () => {
   return (
     <Section>
+      <HeroSection />
       <Box
         id="hero"
         sx={(theme) => ({
