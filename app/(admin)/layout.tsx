@@ -1,9 +1,17 @@
 import React from "react";
-
-// Project imports
 import { Metadata } from "next";
+import ClientRootLayout from "@/app/ClientRootLayout";
+import { Container } from "@radix-ui/themes";
 
-export default function AdminRootLayout({
+import AdminRootLayout from "@/components/Admin/components/AdminRootLayout";
+
+export const metadata: Metadata = {
+  title: "IoTDataHub - Dashboard",
+  description:
+    "Manage your IoT devices with ease. Our IoT Plug and Play solutions empower businesses to seamlessly connect, manage, and optimize their IoT devices, enabling a smarter and more connected world.",
+};
+
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -11,15 +19,10 @@ export default function AdminRootLayout({
   return (
     <html lang="en">
       <body>
-        <main>{children}</main>
+        <ClientRootLayout>
+          <AdminRootLayout>{children}</AdminRootLayout>
+        </ClientRootLayout>
       </body>
     </html>
   );
 }
-
-export const dynamic = "force-dynamic";
-
-export const metadata: Metadata = {
-  title: "IoTDataHub - Admin - Dashboard",
-  description: "Welcome to the IoTDataHub admin dashboard",
-};

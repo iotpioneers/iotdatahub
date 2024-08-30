@@ -7,18 +7,19 @@ import Stack from "@mui/material/Stack";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { useTheme } from "@mui/material/styles";
 
-export default function PageViewsBarChart() {
+export default function IoTDataBarChart() {
   const theme = useTheme();
   const colorPalette = [
     theme.palette.primary.dark,
     theme.palette.primary.main,
     theme.palette.primary.light,
   ];
+
   return (
     <Card variant="outlined" sx={{ width: "100%" }}>
       <CardContent>
         <Typography component="h2" variant="subtitle2" gutterBottom>
-          Views and downloads
+          Device Activity Overview
         </Typography>
         <Stack sx={{ justifyContent: "space-between" }}>
           <Stack
@@ -30,12 +31,12 @@ export default function PageViewsBarChart() {
             }}
           >
             <Typography variant="h4" component="p">
-              1.3M
+              15.7K
             </Typography>
-            <Chip size="small" color="error" label="-8%" />
+            <Chip size="small" color="success" label="+12%" />
           </Stack>
           <Typography variant="caption" sx={{ color: "text.secondary" }}>
-            Page views and downloads for the last 6 months
+            Total device interactions in the last 6 months
           </Typography>
         </Stack>
         <BarChart
@@ -52,21 +53,21 @@ export default function PageViewsBarChart() {
           }
           series={[
             {
-              id: "page-views",
-              label: "views",
-              data: [2234, 3872, 2998, 4125, 3357, 2789, 2998],
+              id: "data-received",
+              label: "Data Received",
+              data: [4300, 4700, 5200, 4600, 5100, 4900, 5300],
               stack: "A",
             },
             {
-              id: "downloads",
-              label: "Downloads",
-              data: [3098, 4215, 2384, 2101, 4752, 3593, 2384],
+              id: "commands-sent",
+              label: "Commands Sent",
+              data: [1200, 1500, 1300, 1600, 1400, 1500, 1700],
               stack: "A",
             },
             {
-              id: "conversions",
-              label: "Conversions",
-              data: [4051, 2275, 3129, 4693, 3904, 2038, 2275],
+              id: "alerts-triggered",
+              label: "Alerts Triggered",
+              data: [350, 400, 380, 420, 390, 410, 450],
               stack: "A",
             },
           ]}

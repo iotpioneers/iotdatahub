@@ -23,7 +23,6 @@ const Hero = () => {
               : `linear-gradient(#02294F, ${alpha("#090E10", 0.0)})`,
           backgroundSize: "100% 20%",
           backgroundRepeat: "no-repeat",
-          mt: { sm: "-4rem", md: "-5rem" },
         })}
       >
         <Container
@@ -31,7 +30,7 @@ const Hero = () => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            pt: { xs: 10, sm: 14 },
+            pt: { xs: 0, sm: 14 },
             pb: { xs: 1, sm: 2 },
           }}
         >
@@ -41,7 +40,7 @@ const Hero = () => {
             sx={{ width: { xs: "100%", sm: "70%" } }}
           >
             <Typography
-              variant="h1"
+              variant="h6"
               sx={{
                 display: "flex",
                 flexDirection: { xs: "column", md: "row" },
@@ -51,7 +50,7 @@ const Hero = () => {
                 mb: { sm: 2, md: 0 },
               }}
             >
-              Cutt edge with&nbsp;
+              Cut edge with&nbsp;
               <span className="inline-block relative mx-1">
                 <Typography
                   component="span"

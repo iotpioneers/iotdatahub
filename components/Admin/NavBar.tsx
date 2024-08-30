@@ -13,6 +13,7 @@ import Container from "@mui/material/Container";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import ToggleColorMode from "./components/ToggleColorMode";
 import getDashboardTheme from "./theme/getDashboardTheme";
+import { HomeIcon } from "lucide-react";
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   position: "fixed",
@@ -60,7 +61,7 @@ export default function NavBar({
               variant="text"
               size="small"
               aria-label="IoT Data Hub"
-              startIcon={<ArrowBackRoundedIcon />}
+              startIcon={<HomeIcon />}
               component="a"
               href="/"
               sx={{ display: { xs: "none", sm: "flex" } }}

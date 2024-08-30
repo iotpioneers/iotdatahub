@@ -34,43 +34,42 @@ type ExtendedTreeItemProps = {
 const ITEMS: TreeViewBaseItem<ExtendedTreeItemProps>[] = [
   {
     id: "1",
-    label: "Website",
+    label: "IoT Dashboard",
     children: [
-      { id: "1.1", label: "Home", color: "green" },
-      { id: "1.2", label: "Pricing", color: "green" },
-      { id: "1.3", label: "About us", color: "green" },
+      { id: "1.1", label: "Overview", color: "green" },
+      { id: "1.2", label: "Device Management", color: "green" },
+      { id: "1.3", label: "Data Analysis", color: "green" },
       {
         id: "1.4",
-        label: "Blog",
+        label: "Reports",
         children: [
-          { id: "1.1.1", label: "Announcements", color: "blue" },
-          { id: "1.1.2", label: "April lookahead", color: "blue" },
-          { id: "1.1.3", label: "What's new", color: "blue" },
-          { id: "1.1.4", label: "Meet the team", color: "blue" },
+          { id: "1.4.1", label: "Daily Reports", color: "blue" },
+          { id: "1.4.2", label: "Weekly Reports", color: "blue" },
+          { id: "1.4.3", label: "Monthly Reports", color: "blue" },
+          { id: "1.4.4", label: "Custom Reports", color: "blue" },
         ],
       },
     ],
   },
   {
     id: "2",
-    label: "Store",
+    label: "User Management",
     children: [
-      { id: "2.1", label: "All products", color: "green" },
+      { id: "2.1", label: "All Users", color: "green" },
       {
         id: "2.2",
-        label: "Categories",
+        label: "Roles & Permissions",
         children: [
-          { id: "2.2.1", label: "Gadgets", color: "blue" },
-          { id: "2.2.2", label: "Phones", color: "blue" },
-          { id: "2.2.3", label: "Wearables", color: "blue" },
+          { id: "2.2.1", label: "Admin", color: "blue" },
+          { id: "2.2.2", label: "User", color: "blue" },
+          { id: "2.2.3", label: "Guest", color: "blue" },
         ],
       },
-      { id: "2.3", label: "Bestsellers", color: "green" },
-      { id: "2.4", label: "Sales", color: "green" },
+      { id: "2.3", label: "User Groups", color: "green" },
     ],
   },
-  { id: "4", label: "Contact", color: "blue" },
-  { id: "5", label: "Help", color: "blue" },
+  { id: "3", label: "Settings", color: "blue" },
+  { id: "4", label: "Help & Support", color: "blue" },
 ];
 
 function DotIcon({ color }: { color: string }) {
@@ -190,14 +189,14 @@ export default function CustomizedTreeView() {
     >
       <CardContent>
         <Typography component="h2" variant="subtitle2">
-          Product tree
+          IoT Platform Navigation
         </Typography>
         <RichTreeView
           items={ITEMS}
-          aria-label="pages"
+          aria-label="platform-navigation"
           multiSelect
           defaultExpandedItems={["1", "1.1"]}
-          defaultSelectedItems={["1.1", "1.1.1"]}
+          defaultSelectedItems={["1.1", "1.4.1"]}
           sx={{
             m: "0 -8px",
             pb: "8px",

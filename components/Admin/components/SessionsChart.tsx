@@ -33,7 +33,7 @@ function getDaysInMonth(month: number, year: number) {
   return days;
 }
 
-export default function SessionsChart() {
+export default function IoTActivityChart() {
   const theme = useTheme();
   const data = getDaysInMonth(4, 2024);
 
@@ -47,7 +47,7 @@ export default function SessionsChart() {
     <Card variant="outlined" sx={{ width: "100%" }}>
       <CardContent>
         <Typography component="h2" variant="subtitle2" gutterBottom>
-          Sessions
+          Activities
         </Typography>
         <Stack sx={{ justifyContent: "space-between" }}>
           <Stack
@@ -59,12 +59,12 @@ export default function SessionsChart() {
             }}
           >
             <Typography variant="h4" component="p">
-              13,277
+              25,732
             </Typography>
-            <Chip size="small" color="success" label="+35%" />
+            <Chip size="small" color="success" label="+42%" />
           </Stack>
           <Typography variant="caption" sx={{ color: "text.secondary" }}>
-            Sessions per day for the last 30 days
+            Total activity in the last 30 days
           </Typography>
         </Stack>
         <LineChart
@@ -78,44 +78,44 @@ export default function SessionsChart() {
           ]}
           series={[
             {
-              id: "direct",
-              label: "Direct",
+              id: "devicesConnected",
+              label: "Devices Connected",
               showMark: false,
               curve: "linear",
               stack: "total",
               area: true,
               stackOrder: "ascending",
               data: [
-                300, 900, 600, 1200, 1500, 1800, 2400, 2100, 2700, 3000, 1800,
-                3300, 3600, 3900, 4200, 4500, 3900, 4800, 5100, 5400, 4800,
-                5700, 6000, 6300, 6600, 6900, 7200, 7500, 7800, 8100,
+                500, 1000, 800, 1600, 2000, 2400, 3000, 2700, 3300, 3600, 2200,
+                4000, 4400, 4700, 5100, 5500, 4900, 6000, 6400, 6800, 6200,
+                7200, 7600, 8000, 8400, 8800, 9200, 9600, 10000, 10400,
               ],
             },
             {
-              id: "referral",
-              label: "Referral",
+              id: "messagesSent",
+              label: "Messages Sent",
               showMark: false,
               curve: "linear",
               stack: "total",
               area: true,
               stackOrder: "ascending",
               data: [
-                500, 900, 700, 1400, 1100, 1700, 2300, 2000, 2600, 2900, 2300,
-                3200, 3500, 3800, 4100, 4400, 2900, 4700, 5000, 5300, 5600,
-                5900, 6200, 6500, 5600, 6800, 7100, 7400, 7700, 8000,
+                700, 1200, 1000, 1800, 1400, 2100, 2800, 2400, 3100, 3400, 2800,
+                3900, 4300, 4600, 5000, 5400, 3500, 5800, 6200, 6600, 7000,
+                7400, 7800, 8200, 7000, 8600, 9000, 9400, 9800, 10200,
               ],
             },
             {
-              id: "organic",
-              label: "Organic",
+              id: "sensorReadings",
+              label: "Sensor Readings",
               showMark: false,
               curve: "linear",
               stack: "total",
               stackOrder: "ascending",
               data: [
-                1000, 1500, 1200, 1700, 1300, 2000, 2400, 2200, 2600, 2800,
-                2500, 3000, 3400, 3700, 3200, 3900, 4100, 3500, 4300, 4500,
-                4000, 4700, 5000, 5200, 4800, 5400, 5600, 5900, 6100, 6300,
+                1500, 2000, 1700, 2200, 1800, 2500, 3000, 2700, 3200, 3400,
+                3000, 3600, 4000, 4400, 3900, 4500, 4700, 4100, 4900, 5100,
+                4600, 5300, 5700, 5900, 5500, 6100, 6500, 6900, 7300, 7700,
               ],
               area: true,
             },
@@ -124,14 +124,14 @@ export default function SessionsChart() {
           margin={{ left: 50, right: 20, top: 20, bottom: 20 }}
           grid={{ horizontal: true }}
           sx={{
-            "& .MuiAreaElement-series-organic": {
-              fill: "url('#organic')",
+            "& .MuiAreaElement-series-sensorReadings": {
+              fill: "url('#sensorReadings')",
             },
-            "& .MuiAreaElement-series-referral": {
-              fill: "url('#referral')",
+            "& .MuiAreaElement-series-messagesSent": {
+              fill: "url('#messagesSent')",
             },
-            "& .MuiAreaElement-series-direct": {
-              fill: "url('#direct')",
+            "& .MuiAreaElement-series-devicesConnected": {
+              fill: "url('#devicesConnected')",
             },
           }}
           slotProps={{
@@ -140,9 +140,15 @@ export default function SessionsChart() {
             },
           }}
         >
-          <AreaGradient color={theme.palette.primary.dark} id="organic" />
-          <AreaGradient color={theme.palette.primary.main} id="referral" />
-          <AreaGradient color={theme.palette.primary.light} id="direct" />
+          <AreaGradient
+            color={theme.palette.primary.dark}
+            id="sensorReadings"
+          />
+          <AreaGradient color={theme.palette.primary.main} id="messagesSent" />
+          <AreaGradient
+            color={theme.palette.primary.light}
+            id="devicesConnected"
+          />
         </LineChart>
       </CardContent>
     </Card>

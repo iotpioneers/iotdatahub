@@ -11,44 +11,69 @@ import LinearProgress, {
   linearProgressClasses,
 } from "@mui/material/LinearProgress";
 
+// You'll need to create these flag components
 import {
-  IndiaFlag,
-  UsaFlag,
-  BrazilFlag,
-  GlobeFlag,
+  BurundiFlag,
+  KenyaFlag,
+  RwandaFlag,
+  SouthSudanFlag,
+  TanzaniaFlag,
+  UgandaFlag,
+  DRCFlag,
 } from "../internals/components/CustomIcons";
 
 const data = [
-  { label: "India", value: 50000 },
-  { label: "USA", value: 35000 },
-  { label: "Brazil", value: 10000 },
-  { label: "Other", value: 5000 },
+  { label: "Kenya", value: 30000 },
+  { label: "Tanzania", value: 25000 },
+  { label: "Uganda", value: 20000 },
+  { label: "DRC", value: 15000 },
+  { label: "Rwanda", value: 5000 },
+  { label: "South Sudan", value: 3000 },
+  { label: "Burundi", value: 2000 },
 ];
 
 const countries = [
   {
-    name: "India",
-    value: 50,
-    flag: <IndiaFlag />,
+    name: "Kenya",
+    value: 30,
+    flag: <KenyaFlag />,
     color: "hsl(220, 25%, 65%)",
   },
   {
-    name: "USA",
-    value: 35,
-    flag: <UsaFlag />,
+    name: "Tanzania",
+    value: 25,
+    flag: <TanzaniaFlag />,
+    color: "hsl(220, 25%, 55%)",
+  },
+  {
+    name: "Uganda",
+    value: 20,
+    flag: <UgandaFlag />,
     color: "hsl(220, 25%, 45%)",
   },
   {
-    name: "Brazil",
-    value: 10,
-    flag: <BrazilFlag />,
-    color: "hsl(220, 25%, 30%)",
+    name: "DRC",
+    value: 15,
+    flag: <DRCFlag />,
+    color: "hsl(220, 25%, 35%)",
   },
   {
-    name: "Other",
+    name: "Rwanda",
     value: 5,
-    flag: <GlobeFlag />,
-    color: "hsl(220, 25%, 20%)",
+    flag: <RwandaFlag />,
+    color: "hsl(220, 25%, 25%)",
+  },
+  {
+    name: "South Sudan",
+    value: 3,
+    flag: <SouthSudanFlag />,
+    color: "hsl(220, 25%, 15%)",
+  },
+  {
+    name: "Burundi",
+    value: 2,
+    flag: <BurundiFlag />,
+    color: "hsl(220, 25%, 5%)",
   },
 ];
 
@@ -118,12 +143,17 @@ function PieCenterLabel({ primaryText, secondaryText }: PieCenterLabelProps) {
 
 const colors = [
   "hsl(220, 20%, 65%)",
-  "hsl(220, 20%, 42%)",
+  "hsl(220, 20%, 55%)",
+  "hsl(220, 20%, 45%)",
   "hsl(220, 20%, 35%)",
   "hsl(220, 20%, 25%)",
+  "hsl(220, 20%, 15%)",
+  "hsl(220, 20%, 5%)",
 ];
 
 export default function ChartUserByCountry() {
+  const totalUsers = data.reduce((sum, country) => sum + country.value, 0);
+
   return (
     <Card
       variant="outlined"
@@ -157,7 +187,10 @@ export default function ChartUserByCountry() {
               legend: { hidden: true },
             }}
           >
-            <PieCenterLabel primaryText="98.5K" secondaryText="Total" />
+            <PieCenterLabel
+              primaryText={`${(totalUsers / 1000).toFixed(1)}K`}
+              secondaryText="Total"
+            />
           </PieChart>
         </Box>
         {countries.map((country, index) => (

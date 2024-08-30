@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -12,27 +14,48 @@ import AssignmentRoundedIcon from "@mui/icons-material/AssignmentRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 import HelpRoundedIcon from "@mui/icons-material/HelpRounded";
+import { useRouter } from "next/navigation";
 
 const mainListItems = [
-  { text: "Home", icon: <HomeRoundedIcon /> },
-  { text: "Analytics", icon: <AnalyticsRoundedIcon /> },
-  { text: "Clients", icon: <PeopleRoundedIcon /> },
-  { text: "Tasks", icon: <AssignmentRoundedIcon /> },
+  { text: "Overview", icon: <HomeRoundedIcon />, path: "/admin" },
+  {
+    text: "Analytics",
+    icon: <AnalyticsRoundedIcon />,
+    path: "#",
+  },
+  { text: "Users", icon: <PeopleRoundedIcon />, path: "/admin/users" },
+  { text: "Tasks", icon: <AssignmentRoundedIcon />, path: "#" },
 ];
 
 const secondaryListItems = [
-  { text: "Settings", icon: <SettingsRoundedIcon /> },
-  { text: "About", icon: <InfoRoundedIcon /> },
-  { text: "Feedback", icon: <HelpRoundedIcon /> },
+  { text: "Settings", icon: <SettingsRoundedIcon />, path: "#" },
+  { text: "About", icon: <InfoRoundedIcon />, path: "#" },
+  { text: "Feedback", icon: <HelpRoundedIcon />, path: "#" },
 ];
 
-export default function MenuContent() {
+interface MenuContentProps {
+  onNavigate: (path: string) => void;
+}
+
+export default function MenuContent({ onNavigate }: MenuContentProps) {
+  const router = useRouter();
+
+  const handleNavigate = React.useCallback(
+    (path: string) => {
+      router.push(path);
+    },
+    [onNavigate]
+  );
+
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: "space-between" }}>
       <List dense>
         {mainListItems.map((item, index) => (
           <ListItem key={index} disablePadding sx={{ display: "block" }}>
-            <ListItemButton selected={index === 0}>
+            <ListItemButton
+              onClick={() => handleNavigate(item.path)}
+              selected={index === 0}
+            >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>
@@ -43,7 +66,7 @@ export default function MenuContent() {
       <List dense>
         {secondaryListItems.map((item, index) => (
           <ListItem key={index} disablePadding sx={{ display: "block" }}>
-            <ListItemButton>
+            <ListItemButton onClick={() => handleNavigate(item.path)}>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>

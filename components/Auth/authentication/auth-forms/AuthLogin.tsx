@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { configureStore } from "@reduxjs/toolkit";
 import { useSelector } from "react-redux";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 
 // material-ui
 import { useTheme } from "@mui/material/styles";
@@ -61,6 +61,7 @@ type FormData = Yup.InferType<typeof schema>;
 
 const AuthLogin = ({ ...others }) => {
   const theme = useTheme();
+  const { data: session } = useSession();
   const router = useRouter();
   const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
   const customization = useSelector((state: RootState) => state.customization);
@@ -104,8 +105,7 @@ const AuthLogin = ({ ...others }) => {
       const response = await signIn("credentials", {
         email: data.email,
         password: data.password,
-        redirect: true,
-        callbackUrl: "/dashboard",
+        redirect: false,
       });
 
       if (response?.error) {
@@ -113,7 +113,16 @@ const AuthLogin = ({ ...others }) => {
         setOpen(true);
         return;
       }
+
+      if (response?.ok && response?.url) {
+        if (session!.user!.role === "ADMIN") {
+          router.push("/admin");
+        } else {
+          router.push("/dashboard");
+        }
+      }
     } catch (error) {
+      console.log("error", error);
       setError("Failed to login");
       setOpen(true);
     } finally {

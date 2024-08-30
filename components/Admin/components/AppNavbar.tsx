@@ -10,6 +10,7 @@ import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
 import SideMenuMobile from "./SideMenuMobile";
 import MenuButton from "./MenuButton";
+import { Link } from "@mui/material";
 
 const Toolbar = styled(MuiToolbar)({
   width: "100%",
@@ -59,13 +60,15 @@ export default function AppNavbar() {
         >
           <Stack direction="row" spacing={1} sx={{ justifyContent: "center" }}>
             <CustomIcon />
-            <Typography
-              variant="h4"
-              component="h1"
-              sx={{ color: "text.primary" }}
-            >
-              Dashboard
-            </Typography>
+            <Link href="/dashboard">
+              <Typography
+                variant="h4"
+                component="h1"
+                sx={{ color: "text.primary" }}
+              >
+                Dashboard
+              </Typography>
+            </Link>
           </Stack>
           <MenuButton aria-label="menu" onClick={toggleDrawer(true)}>
             <MenuRoundedIcon />
