@@ -222,7 +222,10 @@ export async function GET(request: NextRequest) {
 
   // Check if token is null before proceeding
   if (!token) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "You must be logged in" },
+      { status: 404 }
+    );
   }
 
   const userEmail = token.email as string;
@@ -232,7 +235,7 @@ export async function GET(request: NextRequest) {
   });
 
   if (!user) {
-    throw new Error("User not found");
+    throw new Error("You must be logged in");
   }
 
   const allChannels = await prisma.channel.findMany({

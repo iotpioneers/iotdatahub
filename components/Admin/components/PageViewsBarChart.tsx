@@ -59,14 +59,14 @@ export default function IoTDataBarChart() {
               stack: "A",
             },
             {
-              id: "commands-sent",
-              label: "Commands Sent",
+              id: "field-created",
+              label: "Field Created",
               data: [1200, 1500, 1300, 1600, 1400, 1500, 1700],
               stack: "A",
             },
             {
-              id: "alerts-triggered",
-              label: "Alerts Triggered",
+              id: "channel-created",
+              label: "Channel Created",
               data: [350, 400, 380, 420, 390, 410, 450],
               stack: "A",
             },

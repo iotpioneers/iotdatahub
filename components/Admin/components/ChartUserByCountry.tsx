@@ -1,4 +1,6 @@
-import * as React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { useDrawingArea } from "@mui/x-charts/hooks";
 import { styled } from "@mui/material/styles";
@@ -10,72 +12,16 @@ import Stack from "@mui/material/Stack";
 import LinearProgress, {
   linearProgressClasses,
 } from "@mui/material/LinearProgress";
+import axios from "axios";
+import { CircularProgress, List, ListItem, ListItemText } from "@mui/material";
+import { UserData } from "@/types/user";
+import { allCountries } from "@/components/Auth/authentication/auth-forms/CountryList";
 
-// You'll need to create these flag components
-import {
-  BurundiFlag,
-  KenyaFlag,
-  RwandaFlag,
-  SouthSudanFlag,
-  TanzaniaFlag,
-  UgandaFlag,
-  DRCFlag,
-} from "../internals/components/CustomIcons";
-
-const data = [
-  { label: "Kenya", value: 30000 },
-  { label: "Tanzania", value: 25000 },
-  { label: "Uganda", value: 20000 },
-  { label: "DRC", value: 15000 },
-  { label: "Rwanda", value: 5000 },
-  { label: "South Sudan", value: 3000 },
-  { label: "Burundi", value: 2000 },
-];
-
-const countries = [
-  {
-    name: "Kenya",
-    value: 30,
-    flag: <KenyaFlag />,
-    color: "hsl(220, 25%, 65%)",
-  },
-  {
-    name: "Tanzania",
-    value: 25,
-    flag: <TanzaniaFlag />,
-    color: "hsl(220, 25%, 55%)",
-  },
-  {
-    name: "Uganda",
-    value: 20,
-    flag: <UgandaFlag />,
-    color: "hsl(220, 25%, 45%)",
-  },
-  {
-    name: "DRC",
-    value: 15,
-    flag: <DRCFlag />,
-    color: "hsl(220, 25%, 35%)",
-  },
-  {
-    name: "Rwanda",
-    value: 5,
-    flag: <RwandaFlag />,
-    color: "hsl(220, 25%, 25%)",
-  },
-  {
-    name: "South Sudan",
-    value: 3,
-    flag: <SouthSudanFlag />,
-    color: "hsl(220, 25%, 15%)",
-  },
-  {
-    name: "Burundi",
-    value: 2,
-    flag: <BurundiFlag />,
-    color: "hsl(220, 25%, 5%)",
-  },
-];
+// Function to generate a color based on index
+function generateColor(index: number, totalCountries: number) {
+  const hue = (index / totalCountries) * 360;
+  return `hsl(${hue}, 70%, 60%)`;
+}
 
 interface StyledTextProps {
   variant: "primary" | "secondary";
@@ -89,30 +35,16 @@ const StyledText = styled("text", {
   fill: theme.palette.text.secondary,
   variants: [
     {
-      props: {
-        variant: "primary",
-      },
+      props: { variant: "primary" },
       style: {
         fontSize: theme.typography.h5.fontSize,
-      },
-    },
-    {
-      props: ({ variant }) => variant !== "primary",
-      style: {
-        fontSize: theme.typography.body2.fontSize,
-      },
-    },
-    {
-      props: {
-        variant: "primary",
-      },
-      style: {
         fontWeight: theme.typography.h5.fontWeight,
       },
     },
     {
-      props: ({ variant }) => variant !== "primary",
+      props: { variant: "secondary" },
       style: {
+        fontSize: theme.typography.body2.fontSize,
         fontWeight: theme.typography.body2.fontWeight,
       },
     },
@@ -141,18 +73,62 @@ function PieCenterLabel({ primaryText, secondaryText }: PieCenterLabelProps) {
   );
 }
 
-const colors = [
-  "hsl(220, 20%, 65%)",
-  "hsl(220, 20%, 55%)",
-  "hsl(220, 20%, 45%)",
-  "hsl(220, 20%, 35%)",
-  "hsl(220, 20%, 25%)",
-  "hsl(220, 20%, 15%)",
-  "hsl(220, 20%, 5%)",
-];
-
 export default function ChartUserByCountry() {
-  const totalUsers = data.reduce((sum, country) => sum + country.value, 0);
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users`
+        );
+        setUsers(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to fetch users");
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  if (loading) {
+    return <CircularProgress />;
+  }
+
+  if (error) {
+    return <Typography color="error">{error}</Typography>;
+  }
+
+  const totalUsers = users.length;
+
+  // Count users by country
+  const userCounts: { [key: string]: number } = allCountries.reduce(
+    (acc, country) => {
+      const count = users.filter(
+        (user) => user.country === country.label
+      ).length;
+      if (count > 0) {
+        acc[country.label] = count;
+      }
+      return acc;
+    },
+    {} as { [key: string]: number } // Add this type cast
+  );
+
+  // Sort countries by user count and get top 10
+  const topCountries = Object.entries(userCounts)
+    .sort(([, a], [, b]) => (b as number) - (a as number))
+    .slice(0, 10);
+
+  const data = topCountries.map(([label, value], index) => ({
+    label,
+    value,
+    color: generateColor(index, topCountries.length),
+  }));
 
   return (
     <Card
@@ -161,17 +137,10 @@ export default function ChartUserByCountry() {
     >
       <CardContent>
         <Typography component="h2" variant="subtitle2">
-          Users by country
+          Top Countries
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <PieChart
-            colors={colors}
-            margin={{
-              left: 80,
-              right: 80,
-              top: 80,
-              bottom: 80,
-            }}
             series={[
               {
                 data,
@@ -188,47 +157,55 @@ export default function ChartUserByCountry() {
             }}
           >
             <PieCenterLabel
-              primaryText={`${(totalUsers / 1000).toFixed(1)}K`}
+              primaryText={`${totalUsers}`}
               secondaryText="Total"
             />
           </PieChart>
         </Box>
-        {countries.map((country, index) => (
-          <Stack
-            key={index}
-            direction="row"
-            sx={{ alignItems: "center", gap: 2, pb: 2 }}
-          >
-            {country.flag}
-            <Stack sx={{ gap: 1, flexGrow: 1 }}>
-              <Stack
-                direction="row"
-                sx={{
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: 2,
-                }}
-              >
-                <Typography variant="body2" sx={{ fontWeight: "500" }}>
-                  {country.name}
-                </Typography>
-                <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                  {country.value}%
-                </Typography>
+        {data.map((country, index) => {
+          const percentage = (country.value / totalUsers) * 100;
+          return (
+            <Stack
+              key={index}
+              direction="row"
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 2,
+                pb: 2,
+              }}
+            >
+              <Stack sx={{ gap: 1, flexGrow: 1 }}>
+                <Stack
+                  direction="row"
+                  sx={{
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 2,
+                  }}
+                >
+                  <Typography variant="body2" sx={{ fontWeight: "500" }}>
+                    {country.label}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                    {percentage.toFixed(1)}%
+                  </Typography>
+                </Stack>
+                <LinearProgress
+                  variant="determinate"
+                  aria-label={`Number of users in ${country.label}`}
+                  value={percentage}
+                  sx={{
+                    [`& .${linearProgressClasses.bar}`]: {
+                      backgroundColor: country.color,
+                    },
+                  }}
+                />
               </Stack>
-              <LinearProgress
-                variant="determinate"
-                aria-label="Number of users by country"
-                value={country.value}
-                sx={{
-                  [`& .${linearProgressClasses.bar}`]: {
-                    backgroundColor: country.color,
-                  },
-                }}
-              />
             </Stack>
-          </Stack>
-        ))}
+          );
+        })}
       </CardContent>
     </Card>
   );

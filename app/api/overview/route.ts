@@ -26,10 +26,18 @@ export async function GET(request: NextRequest) {
   }
 
   const users = await prisma.user.findMany();
+  const organizations = await prisma.organization.findMany();
+  const devices = await prisma.device.findMany();
+  const channels = await prisma.channel.findMany();
+  const fields = await prisma.field.findMany();
+  const dataPoints = await prisma.dataPoint.findMany();
 
-  if (!users) {
-    return NextResponse.json({ error: "There are no users" }, { status: 404 });
-  }
-
-  return NextResponse.json(users);
+  return NextResponse.json({
+    users,
+    organizations,
+    devices,
+    channels,
+    fields,
+    dataPoints,
+  });
 }

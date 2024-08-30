@@ -16,7 +16,7 @@ interface CountryListProps {
 }
 
 // List of countries with phone codes
-const countries: CountryType[] = [
+export const allCountries: CountryType[] = [
   { code: "AD", label: "Andorra", phone: "376" },
   {
     code: "AE",
@@ -456,7 +456,7 @@ const CountryList: React.FC<CountryListProps> = ({
     <Autocomplete
       id="country-select"
       value={selectedCountry}
-      options={countries}
+      options={allCountries}
       autoHighlight
       getOptionLabel={(option) => option.label}
       renderOption={(props, option) => {

@@ -10,7 +10,10 @@ export async function POST(request: NextRequest) {
 
   // Check if token is null before proceeding
   if (!token) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "You must be logged in" },
+      { status: 404 }
+    );
   }
 
   const userEmail = token.email as string;
@@ -20,7 +23,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (!user) {
-    throw new Error("User not found");
+    throw new Error("You must be logged in");
   }
 
   // Validate the request body against the schema
@@ -74,7 +77,10 @@ export async function GET(request: NextRequest) {
 
   // Check if token is null before proceeding
   if (!token) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "You must be logged in" },
+      { status: 404 }
+    );
   }
 
   const userEmail = token.email as string;
@@ -84,11 +90,12 @@ export async function GET(request: NextRequest) {
   });
 
   if (!user) {
-    throw new Error("User not found");
+    throw new Error("You must be logged in");
   }
 
   const devices = await prisma.device.findMany({
     where: { userId: user.id },
+    include: { user: true, channel: true },
   });
 
   if (!devices || devices.length === 0) {
