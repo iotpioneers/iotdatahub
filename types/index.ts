@@ -85,6 +85,18 @@ export interface Member {
   organizationId: string;
 }
 
+export interface Subscription {
+  id?: string;
+  name: string;
+  description?: string;
+  type: "FREE" | "PREMIUM" | "ENTERPRISE";
+  price: number;
+  maxChannels: number;
+  maxMessagesPerYear: number;
+  features: string[];
+  activation: boolean;
+}
+
 export interface AddMemberProps {
   onNewMember: (newMember: Member) => void;
 }

@@ -11,6 +11,8 @@ import AppNavbar from "@/components/Admin/components/AppNavbar";
 import Header from "@/components/Admin/components/Header";
 import SideMenu from "@/components/Admin/components/SideMenu";
 import NavBar from "@/components/Admin/NavBar";
+import { useSession } from "next-auth/react";
+import LoadingProgressBar from "@/components/LoadingProgressBar";
 
 interface AdminRootLayoutProps {
   children: React.ReactNode;
@@ -44,6 +46,16 @@ const AdminRootLayout: React.FC<AdminRootLayoutProps> = ({ children }) => {
     setShowCustomTheme((prev) => !prev);
   };
 
+  const { status, data: session } = useSession();
+
+  if (
+    (status !== "loading" && status === "unauthenticated") ||
+    !session ||
+    !session.user ||
+    session.user.role !== "ADMIN"
+  ) {
+    return null;
+  }
   return (
     <ThemeProvider theme={showCustomTheme ? dashboardTheme : defaultTheme}>
       <CssBaseline />

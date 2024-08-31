@@ -6,8 +6,14 @@ import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import { LineChart } from "@mui/x-charts/LineChart";
+import axios from "axios";
 
-function AreaGradient({ color, id }: { color: string; id: string }) {
+interface AreaGradientProps {
+  color: string;
+  id: string;
+}
+
+function AreaGradient({ color, id }: AreaGradientProps) {
   return (
     <defs>
       <linearGradient id={id} x1="50%" y1="0%" x2="50%" y2="100%">
@@ -18,30 +24,160 @@ function AreaGradient({ color, id }: { color: string; id: string }) {
   );
 }
 
-function getDaysInMonth(month: number, year: number) {
-  const date = new Date(year, month, 0);
-  const monthName = date.toLocaleDateString("en-US", {
-    month: "short",
-  });
-  const daysInMonth = date.getDate();
-  const days = [];
-  let i = 1;
-  while (days.length < daysInMonth) {
-    days.push(`${monthName} ${i}`);
-    i += 1;
-  }
-  return days;
+interface DataItem {
+  [key: string]: any;
+  createdAt?: string;
+  date: string;
+}
+
+interface ChartDataItem {
+  date: string;
+  value: number;
+}
+
+interface ChartData {
+  devices: ChartDataItem[];
+  channels: ChartDataItem[];
+  dataPoints: ChartDataItem[];
+  users: ChartDataItem[];
+  organizations: ChartDataItem[];
+  fields: ChartDataItem[];
 }
 
 export default function IoTActivityChart() {
   const theme = useTheme();
-  const data = getDaysInMonth(4, 2024);
+  const [chartData, setChartData] = React.useState<ChartData>({
+    devices: [],
+    channels: [],
+    dataPoints: [],
+    users: [],
+    organizations: [],
+    fields: [],
+  });
+  const [totalActivity, setTotalActivity] = React.useState(0);
+  const [percentageChange, setPercentageChange] = React.useState(0);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("/api/overview");
+        const { devices, channels, dataPoints, users, organizations, fields } =
+          response.data;
+
+        // Process the data
+        const processedData = {
+          devices: processTimeSeriesData(devices, "createdAt"),
+          channels: processTimeSeriesData(channels, "createdAt"),
+          dataPoints: processTimeSeriesData(dataPoints, "createdAt"),
+          users: processTimeSeriesData(users, "createdAt"),
+          organizations: processTimeSeriesData(organizations, "createdAt"),
+          fields: processTimeSeriesData(fields, "createdAt"),
+        };
+
+        setChartData(processedData);
+
+        const totalCount = Object.values(processedData).reduce(
+          (acc, curr) => acc + curr.reduce((sum, item) => sum + item.value, 0),
+          0
+        );
+        setTotalActivity(totalCount);
+
+        // Calculate percentage change
+        const change = calculatePercentageChange(processedData);
+        setPercentageChange(change);
+
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const processTimeSeriesData = (
+    data: DataItem[],
+    dateField: string
+  ): ChartDataItem[] => {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    return data
+      .filter((item) => new Date(item[dateField]) >= thirtyDaysAgo)
+      .map((item) => ({
+        date: new Date(item[dateField]).toISOString().split("T")[0],
+        value: 1,
+      }))
+      .reduce((acc: ChartDataItem[], curr) => {
+        const existingEntry = acc.find((item) => item.date === curr.date);
+        if (existingEntry) {
+          existingEntry.value += curr.value;
+        } else {
+          acc.push(curr);
+        }
+        return acc;
+      }, [])
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  };
+
+  const calculatePercentageChange = (data: ChartData): number => {
+    const allDates = Array.from(
+      new Set(
+        Object.values(data)
+          .flatMap((series) => series.map((item: DataItem) => item.date))
+          .sort()
+      )
+    );
+
+    if (allDates.length < 2) return 0; // Not enough data to calculate change
+
+    const firstWeekDates = allDates.slice(0, 7);
+    const lastWeekDates = allDates.slice(-7);
+
+    const calculateWeekTotal = (dates: string[]) => {
+      return dates.reduce((total, date) => {
+        return (
+          total +
+          Object.values(data).reduce((dayTotal, series) => {
+            const item = series.find((i: DataItem) => i.date === date);
+            return dayTotal + (item ? item.value : 0);
+          }, 0)
+        );
+      }, 0);
+    };
+
+    const firstWeekTotal = calculateWeekTotal(firstWeekDates);
+    const lastWeekTotal = calculateWeekTotal(lastWeekDates);
+
+    if (firstWeekTotal === 0) return lastWeekTotal > 0 ? 100 : 0;
+
+    const percentageChange =
+      ((lastWeekTotal - firstWeekTotal) / firstWeekTotal) * 100;
+    return Math.round(percentageChange);
+  };
 
   const colorPalette = [
     theme.palette.primary.light,
     theme.palette.primary.main,
     theme.palette.primary.dark,
+    theme.palette.secondary.light,
+    theme.palette.secondary.main,
+    theme.palette.secondary.dark,
   ];
+
+  if (loading) {
+    return <Typography>Loading...</Typography>;
+  }
+
+  const allDates = Array.from(
+    new Set(
+      Object.values(chartData)
+        .flatMap((data) => data.map((item: { date: string }) => item.date))
+        .sort()
+    )
+  );
 
   return (
     <Card variant="outlined" sx={{ width: "100%" }}>
@@ -59,9 +195,13 @@ export default function IoTActivityChart() {
             }}
           >
             <Typography variant="h4" component="p">
-              25,732
+              {totalActivity}
             </Typography>
-            <Chip size="small" color="success" label="+42%" />
+            <Chip
+              size="small"
+              color={percentageChange >= 0 ? "success" : "error"}
+              label={`${percentageChange >= 0 ? "+" : ""}${percentageChange}%`}
+            />
           </Stack>
           <Typography variant="caption" sx={{ color: "text.secondary" }}>
             Total activity in the last 30 days
@@ -72,83 +212,46 @@ export default function IoTActivityChart() {
           xAxis={[
             {
               scaleType: "point",
-              data,
-              tickInterval: (index, i) => (i + 1) % 5 === 0,
+              data: allDates,
+              tickInterval: (index: number) => index % 5 === 0,
             },
           ]}
-          series={[
-            {
-              id: "devicesConnected",
-              label: "Devices Connected",
-              showMark: false,
-              curve: "linear",
-              stack: "total",
-              area: true,
-              stackOrder: "ascending",
-              data: [
-                500, 1000, 800, 1600, 2000, 2400, 3000, 2700, 3300, 3600, 2200,
-                4000, 4400, 4700, 5100, 5500, 4900, 6000, 6400, 6800, 6200,
-                7200, 7600, 8000, 8400, 8800, 9200, 9600, 10000, 10400,
-              ],
-            },
-            {
-              id: "messagesSent",
-              label: "Messages Sent",
-              showMark: false,
-              curve: "linear",
-              stack: "total",
-              area: true,
-              stackOrder: "ascending",
-              data: [
-                700, 1200, 1000, 1800, 1400, 2100, 2800, 2400, 3100, 3400, 2800,
-                3900, 4300, 4600, 5000, 5400, 3500, 5800, 6200, 6600, 7000,
-                7400, 7800, 8200, 7000, 8600, 9000, 9400, 9800, 10200,
-              ],
-            },
-            {
-              id: "sensorReadings",
-              label: "Sensor Readings",
-              showMark: false,
-              curve: "linear",
-              stack: "total",
-              stackOrder: "ascending",
-              data: [
-                1500, 2000, 1700, 2200, 1800, 2500, 3000, 2700, 3200, 3400,
-                3000, 3600, 4000, 4400, 3900, 4500, 4700, 4100, 4900, 5100,
-                4600, 5300, 5700, 5900, 5500, 6100, 6500, 6900, 7300, 7700,
-              ],
-              area: true,
-            },
-          ]}
+          series={Object.entries(chartData).map(([key, data]) => ({
+            id: key,
+            label: key.charAt(0).toUpperCase() + key.slice(1),
+            showMark: false,
+            curve: "linear",
+            stack: "total",
+            area: true,
+            stackOrder: "ascending",
+            data: allDates.map(
+              (date) =>
+                data.find((item: { date: string }) => item.date === date)
+                  ?.value || 0
+            ),
+          }))}
           height={250}
           margin={{ left: 50, right: 20, top: 20, bottom: 20 }}
           grid={{ horizontal: true }}
-          sx={{
-            "& .MuiAreaElement-series-sensorReadings": {
-              fill: "url('#sensorReadings')",
-            },
-            "& .MuiAreaElement-series-messagesSent": {
-              fill: "url('#messagesSent')",
-            },
-            "& .MuiAreaElement-series-devicesConnected": {
-              fill: "url('#devicesConnected')",
-            },
-          }}
+          sx={Object.fromEntries(
+            Object.keys(chartData).map((key) => [
+              `& .MuiAreaElement-series-${key}`,
+              { fill: `url('#${key}')` },
+            ])
+          )}
           slotProps={{
             legend: {
               hidden: true,
             },
           }}
         >
-          <AreaGradient
-            color={theme.palette.primary.dark}
-            id="sensorReadings"
-          />
-          <AreaGradient color={theme.palette.primary.main} id="messagesSent" />
-          <AreaGradient
-            color={theme.palette.primary.light}
-            id="devicesConnected"
-          />
+          {Object.keys(chartData).map((key, index) => (
+            <AreaGradient
+              key={key}
+              color={colorPalette[index % colorPalette.length]}
+              id={key}
+            />
+          ))}
         </LineChart>
       </CardContent>
     </Card>

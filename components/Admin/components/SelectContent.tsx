@@ -12,6 +12,7 @@ import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import DevicesRoundedIcon from "@mui/icons-material/DevicesRounded";
 import SmartphoneRoundedIcon from "@mui/icons-material/SmartphoneRounded";
 import ConstructionRoundedIcon from "@mui/icons-material/ConstructionRounded";
+import { AnalyticsOutlined } from "@mui/icons-material";
 
 const Avatar = styled(MuiAvatar)(({ theme }) => ({
   width: 28,
@@ -40,7 +41,7 @@ export default function SelectContent() {
       value={company}
       onChange={handleChange}
       displayEmpty
-      inputProps={{ "aria-label": "Select company" }}
+      inputProps={{ "aria-label": "Select platform" }}
       fullWidth
       sx={{
         maxHeight: 56,
@@ -59,43 +60,49 @@ export default function SelectContent() {
       <ListSubheader sx={{ pt: 0 }}>Production</ListSubheader>
       <MenuItem value="">
         <ListItemAvatar>
-          <Avatar alt="Sitemark web">
+          <Avatar alt="IoT Data Hub User Dashboard">
             <DevicesRoundedIcon sx={{ fontSize: "1rem" }} />
           </Avatar>
         </ListItemAvatar>
-        <ListItemText primary="Sitemark-web" secondary="Web app" />
+        <ListItemText primary="Dashboard" secondary="The user dashboard" />
       </MenuItem>
       <MenuItem value={10}>
         <ListItemAvatar>
-          <Avatar alt="Sitemark App">
+          <Avatar alt="Channel Management">
             <SmartphoneRoundedIcon sx={{ fontSize: "1rem" }} />
           </Avatar>
         </ListItemAvatar>
-        <ListItemText primary="Sitemark-app" secondary="Mobile application" />
+        <ListItemText
+          primary="Channel Management"
+          secondary="The channel management"
+        />
       </MenuItem>
       <MenuItem value={20}>
         <ListItemAvatar>
-          <Avatar alt="Sitemark Store">
-            <DevicesRoundedIcon sx={{ fontSize: "1rem" }} />
+          <Avatar alt="Data Analytics">
+            <AnalyticsOutlined sx={{ fontSize: "1rem" }} />
           </Avatar>
         </ListItemAvatar>
-        <ListItemText primary="Sitemark-Store" secondary="Web app" />
+        <ListItemText
+          primary="Data-Analytics"
+          secondary="Web-based analytics"
+        />
       </MenuItem>
       <ListSubheader>Development</ListSubheader>
       <MenuItem value={30}>
         <ListItemAvatar>
-          <Avatar alt="Sitemark Store">
+          <Avatar alt="Admin Console">
             <ConstructionRoundedIcon sx={{ fontSize: "1rem" }} />
           </Avatar>
         </ListItemAvatar>
-        <ListItemText primary="Sitemark-Admin" secondary="Web app" />
+        <ListItemText primary="Admin-Console" secondary="Development tools" />
       </MenuItem>
       <Divider sx={{ mx: -1 }} />
       <MenuItem value={40}>
         <ListItemIcon>
           <AddRoundedIcon />
         </ListItemIcon>
-        <ListItemText primary="Add product" secondary="Web app" />
+        <ListItemText primary="Add Device" secondary="Register new device" />
       </MenuItem>
     </Select>
   );

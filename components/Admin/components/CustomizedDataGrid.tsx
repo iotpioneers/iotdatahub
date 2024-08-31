@@ -122,7 +122,13 @@ function renderSparklineCell(
 // Column definitions
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 70 },
-  { field: "name", headerName: "Organization Name", flex: 1 },
+  {
+    field: "name",
+    headerName: "Organization Name",
+    flex: 1,
+    width: 230,
+    minWidth: 200,
+  },
   { field: "memberCount", headerName: "Members", type: "number", width: 130 },
   { field: "deviceCount", headerName: "Devices", type: "number", width: 130 },
   { field: "channelCount", headerName: "Channels", type: "number", width: 130 },

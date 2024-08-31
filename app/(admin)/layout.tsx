@@ -1,7 +1,6 @@
 import React from "react";
 import { Metadata } from "next";
 import ClientRootLayout from "@/app/ClientRootLayout";
-import { Container } from "@radix-ui/themes";
 
 import AdminRootLayout from "@/components/Admin/components/AdminRootLayout";
 

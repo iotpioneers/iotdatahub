@@ -11,5 +11,5 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "IoTDataHub - Dashboard - Admin",
-  description: "IoTDataHub - Admin - Dashboard",
+  description: "The admin dashboard of the IoTDataHub platform",
 };

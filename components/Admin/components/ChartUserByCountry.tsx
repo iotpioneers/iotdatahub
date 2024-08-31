@@ -145,7 +145,7 @@ export default function ChartUserByCountry() {
               {
                 data,
                 innerRadius: 75,
-                outerRadius: 100,
+                outerRadius: 90,
                 paddingAngle: 0,
                 highlightScope: { faded: "global", highlighted: "item" },
               },
