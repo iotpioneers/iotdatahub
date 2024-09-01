@@ -7,8 +7,6 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const token = await getToken({ req: request });
 
-  console.log("body:", body);
-
   if (!token) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }

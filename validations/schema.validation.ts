@@ -34,13 +34,14 @@ export const userSchema = z
       .min(1, "Email is required")
       .email("Must be a valid email"),
 
-    country: z.string().max(255).min(1, "Country is required"),
+    country: z.string().optional(),
     phonenumber: z.string().max(255).min(1, "Phone is required"),
     image: z.string().optional(),
     password: passwordValidation,
     confirmPassword: z.string().min(8, {
       message: "Confirm Password must be at least 8 characters long",
     }),
+    emailVerified: z.union([z.boolean(), z.date(), z.null()]).optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords must match",

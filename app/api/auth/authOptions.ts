@@ -1,6 +1,6 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { AuthOptions } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
@@ -26,7 +26,7 @@ const login = async (credentials: Credentials) => {
   }
 
   if (!user.emailVerified) {
-    throw new Error("Email not verified");
+    throw new Error("The ");
   }
 
   const passwordMatch = await bcrypt.compare(
@@ -54,6 +54,24 @@ const authOptions: AuthOptions = {
       httpOptions: {
         timeout: Number(process.env.GOOGLE_TIMEOUT!),
       },
+      profile(profile) {
+        console.log("====================================");
+        console.log("profile", profile);
+        console.log("====================================");
+
+        return {
+          id: profile.sub,
+          name: profile.name || "",
+          email: profile.email!,
+          emailVerified: new Date(),
+          image: profile.picture || null,
+          country: "",
+          phonenumber: "",
+          role: Role.USER,
+          subscriptionId: null,
+          organizationId: null,
+        };
+      },
     }),
     CredentialsProvider({
       name: "credentials",
@@ -77,6 +95,7 @@ const authOptions: AuthOptions = {
       },
     }),
   ],
+  debug: true,
   session: {
     strategy: "jwt",
     maxAge: Number(process.env.NEXT_AUTH_TIMEOUT!),

@@ -8,7 +8,7 @@ declare module "next-auth" {
     image: string | null;
     country: string;
     phonenumber: string;
-    emailVerified: Date | null;
+    emailVerified: Date;
     role: string;
     subscriptionId: string | null;
     organizationId: string | null;
@@ -36,6 +36,7 @@ declare module "next-auth/jwt" {
     email: string;
     country: string;
     phonenumber: string;
+    emailVerified: Date;
     role: string;
     subscriptionId: string | null;
     organizationId: string | null;

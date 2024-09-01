@@ -2,7 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import { Box, Typography, IconButton } from "@mui/material";
-import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridToolbarProps,
+  GridToolbar,
+} from "@mui/x-data-grid";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import EditIcon from "@mui/icons-material/Edit";
@@ -20,21 +25,14 @@ interface Device {
   createdAt: Date;
 }
 
-const formatDate = (date: Date) =>
-  new Intl.DateTimeFormat("en", {
-    day: "numeric",
-    month: "long",
-    year: "2-digit",
-  }).format(new Date(date));
-
-const DeviceTable = () => {
+const DeviceTable: React.FC = () => {
   const [devices, setDevices] = useState<Device[]>([]);
 
   useEffect(() => {
     const fetchDevices = async () => {
       try {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BASE_URL + "/api/devices"
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/devices`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch devices");
@@ -42,29 +40,27 @@ const DeviceTable = () => {
         const data: Device[] = await response.json();
         setDevices(data);
       } catch (error) {
-        return null;
+        console.error("Error fetching devices:", error);
       }
     };
 
     fetchDevices();
   }, []);
 
-  if (!devices) return null;
-
   const handleEdit = (id: number) => {
-    // Handle edit action
+    console.log(`Edit device with id: ${id}`);
   };
 
   const handleView = (id: number) => {
-    // Handle view action
+    console.log(`View device with id: ${id}`);
   };
 
   const handleDelete = (id: number) => {
-    // Handle delete action
+    console.log(`Delete device with id: ${id}`);
   };
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID" },
+    { field: "id", headerName: "ID", width: 70 },
     {
       field: "name",
       headerName: "Device",
@@ -77,38 +73,36 @@ const DeviceTable = () => {
     {
       field: "description",
       headerName: "Description",
-      type: "number",
-      headerAlign: "left",
-      align: "left",
+      flex: 1,
     },
     {
       field: "status",
       headerName: "Status",
       flex: 1,
-      renderCell: ({ row: { status } }) => {
-        return (
-          <RadixUIBox
-            className={`flex p-1 justify-center ${
-              status === "OFFLINE"
-                ? "bg-red-600"
-                : status === "ONLINE"
-                ? "bg-green-700"
-                : "bg-yellow-700"
-            } rounded-md`}
-          >
-            {status === "admin" && <AdminPanelSettingsOutlinedIcon />}
-            {status === "manager" && <SecurityOutlinedIcon />}
-            <Typography color="#e0e0e0" sx={{ ml: "5px" }}>
-              {status}
-            </Typography>
-          </RadixUIBox>
-        );
-      },
+      renderCell: ({ row: { status } }) => (
+        <RadixUIBox
+          className={`flex p-1 justify-center ${
+            status === "OFFLINE"
+              ? "bg-red-600"
+              : status === "ONLINE"
+              ? "bg-green-700"
+              : "bg-yellow-700"
+          } rounded-md`}
+        >
+          {status === "admin" && <AdminPanelSettingsOutlinedIcon />}
+          {status === "manager" && <SecurityOutlinedIcon />}
+          <Typography color="#e0e0e0" sx={{ ml: "5px" }}>
+            {status}
+          </Typography>
+        </RadixUIBox>
+      ),
     },
     {
       field: "createdAt",
       headerName: "Date created",
       flex: 1,
+      valueFormatter: (params: { value: Date }) =>
+        new Date(params.value).toLocaleDateString(),
     },
     {
       field: "actions",
@@ -116,23 +110,14 @@ const DeviceTable = () => {
       flex: 1,
       renderCell: (params) => (
         <div>
-          <IconButton
-            onClick={() => handleEdit(params.row.id)}
-            className="h-4 w-4"
-          >
-            <EditIcon className="h-3 w-3" color="action" />
+          <IconButton onClick={() => handleEdit(params.row.id)} size="small">
+            <EditIcon fontSize="small" color="action" />
           </IconButton>
-          <IconButton
-            onClick={() => handleView(params.row.id)}
-            className="h-4 w-4"
-          >
-            <VisibilityIcon className="h-3 w-3" color="info" />
+          <IconButton onClick={() => handleView(params.row.id)} size="small">
+            <VisibilityIcon fontSize="small" color="info" />
           </IconButton>
-          <IconButton
-            onClick={() => handleDelete(params.row.id)}
-            className="h-4 w-4"
-          >
-            <DeleteIcon className="h-3 w-3" color="warning" />
+          <IconButton onClick={() => handleDelete(params.row.id)} size="small">
+            <DeleteIcon fontSize="small" color="warning" />
           </IconButton>
         </div>
       ),
@@ -152,11 +137,9 @@ const DeviceTable = () => {
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",
-            color: "#ffffff",
           },
           "& .MuiDataGrid-cell": {
             borderBottom: "none",
-            color: "#000000",
           },
           "& .name-column--cell": {
             color: "#94e2cd",
@@ -177,12 +160,18 @@ const DeviceTable = () => {
           },
         }}
       >
-        {devices && devices.length !== 0 && (
+        {devices.length > 0 && (
           <DataGrid
-            autoHeight
             rows={devices}
             columns={columns}
-            components={{ Toolbar: GridToolbar }}
+            slots={{
+              toolbar: GridToolbar,
+            }}
+            initialState={{
+              pagination: {
+                paginationModel: { pageSize: 10, page: 0 },
+              },
+            }}
           />
         )}
       </Box>

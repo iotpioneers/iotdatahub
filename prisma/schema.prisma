@@ -71,7 +71,7 @@ model User {
   email          String          @unique
   country        String?
   phonenumber    String?
-  emailVerified  Boolean         @default(false)
+  emailVerified  DateTime?
   image          String?
   password       String?
   role           Role            @default(USER)

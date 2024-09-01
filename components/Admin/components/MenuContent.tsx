@@ -33,19 +33,12 @@ const secondaryListItems = [
   { text: "Feedback", icon: <HelpRoundedIcon />, path: "#" },
 ];
 
-interface MenuContentProps {
-  onNavigate: (path: string) => void;
-}
-
-export default function MenuContent({ onNavigate }: MenuContentProps) {
+export default function MenuContent() {
   const router = useRouter();
 
-  const handleNavigate = React.useCallback(
-    (path: string) => {
-      router.push(path);
-    },
-    [onNavigate]
-  );
+  const handleNavigate = React.useCallback((path: string) => {
+    router.push(path);
+  }, []);
 
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: "space-between" }}>

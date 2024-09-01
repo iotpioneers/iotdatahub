@@ -30,7 +30,7 @@ export async function GET(
     // Update the user's emailVerified field
     await prisma.user.update({
       where: { email: verificationToken.email },
-      data: { emailVerified: true },
+      data: { emailVerified: new Date() },
     });
 
     // Delete the verification token
