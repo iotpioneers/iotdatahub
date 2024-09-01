@@ -8,7 +8,8 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
 } from "@mui/icons-material";
-import SubscriptionModal from "./SubscriptionModal";
+import AddSubscriptionModal from "./AddSubscriptionModal";
+import axios from "axios";
 
 interface Subscription {
   id: string;
@@ -30,31 +31,15 @@ const PricingManagementDashboard: React.FC = () => {
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
-      // Placeholder data
-      setSubscriptions([
-        {
-          id: "1",
-          name: "Free",
-          description: "Basic plan for starters",
-          type: "FREE",
-          price: 0,
-          maxChannels: 1,
-          maxMessagesPerYear: 10000,
-          features: ["1 channel", "10k messages/year"],
-          activation: true,
-        },
-        {
-          id: "2",
-          name: "Premium",
-          description: "Advanced plan for growing businesses",
-          type: "PREMIUM",
-          price: 49.99,
-          maxChannels: 10,
-          maxMessagesPerYear: 1000000,
-          features: ["10 channels", "1M messages/year", "Priority support"],
-          activation: true,
-        },
-      ]);
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`
+        );
+
+        setSubscriptions(response.data);
+      } catch (error) {
+        console.error("Error fetching subscriptions:", error);
+      }
     };
 
     fetchSubscriptions();
@@ -95,7 +80,6 @@ const PricingManagementDashboard: React.FC = () => {
       field: "price",
       headerName: "Price",
       width: 100,
-      valueFormatter: ({ value }) => `$${value}`,
     },
     { field: "maxChannels", headerName: "Max Channels", width: 130 },
     {
@@ -159,7 +143,7 @@ const PricingManagementDashboard: React.FC = () => {
         Add Subscription
       </Button>
       <DataGrid rows={subscriptions} columns={columns} checkboxSelection />
-      <SubscriptionModal
+      <AddSubscriptionModal
         open={openModal}
         onClose={handleCloseModal}
         subscription={currentSubscription}

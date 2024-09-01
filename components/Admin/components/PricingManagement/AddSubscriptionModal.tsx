@@ -58,7 +58,7 @@ interface SubscriptionModalProps {
   subscription: Subscription | null;
 }
 
-const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
+const AddSubscriptionModal: React.FC<SubscriptionModalProps> = ({
   open,
   onClose,
   subscription,
@@ -96,17 +96,18 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
 
       try {
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/subscription`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`,
           values
         );
 
-        if (response.status === 200) {
+        if (response.status === 201) {
           setSnackbar({
             open: true,
             message: "Subscription saved successfully",
             severity: "success",
           });
           onClose();
+          return values;
         } else {
           throw new Error("Failed to save subscription");
         }
@@ -117,6 +118,8 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
           message: "Failed to save subscription",
           severity: "error",
         });
+
+        return values;
       } finally {
         setIsLoading(false);
       }
@@ -171,18 +174,23 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
             helperText={formik.touched.description && formik.errors.description}
           />
           <FormControl fullWidth margin="dense">
-            <InputLabel>Type</InputLabel>
+            <InputLabel>Plan Type</InputLabel>
             <Select
               id="type"
+              name="type"
               value={formik.values.type}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               error={formik.touched.type && Boolean(formik.errors.type)}
+              label="Type"
             >
               <MenuItem value="FREE">Free</MenuItem>
               <MenuItem value="PREMIUM">Premium</MenuItem>
               <MenuItem value="ENTERPRISE">Enterprise</MenuItem>
             </Select>
+            {formik.touched.type && formik.errors.type && (
+              <p style={{ color: "red" }}>{formik.errors.type}</p>
+            )}
           </FormControl>
           <TextField
             margin="dense"
@@ -271,4 +279,4 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
   );
 };
 
-export default SubscriptionModal;
+export default AddSubscriptionModal;

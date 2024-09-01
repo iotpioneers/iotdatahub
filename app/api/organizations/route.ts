@@ -78,6 +78,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        emailVerified: new Date(),
+      },
+    });
+
     return NextResponse.json({ newOrganization, member }, { status: 201 });
   } catch (error) {
     return NextResponse.json(

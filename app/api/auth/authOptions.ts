@@ -25,8 +25,8 @@ const login = async (credentials: Credentials) => {
     throw new Error("User not found");
   }
 
-  if (!user.emailVerified) {
-    throw new Error("The ");
+  if (user.emailVerified === null) {
+    throw new Error("Please verify your email address first");
   }
 
   const passwordMatch = await bcrypt.compare(
@@ -55,10 +55,6 @@ const authOptions: AuthOptions = {
         timeout: Number(process.env.GOOGLE_TIMEOUT!),
       },
       profile(profile) {
-        console.log("====================================");
-        console.log("profile", profile);
-        console.log("====================================");
-
         return {
           id: profile.sub,
           name: profile.name || "",
@@ -113,6 +109,7 @@ const authOptions: AuthOptions = {
         token.image = user.image ?? null;
         token.country = user.country;
         token.phonenumber = user.phonenumber;
+        token.emailVerified = user.emailVerified;
         token.role = user.role;
         token.subscriptionId = user.subscriptionId;
         token.organizationId = user.organizationId;
@@ -129,6 +126,7 @@ const authOptions: AuthOptions = {
         session.user.role = token.role;
         session.user.country = token.country;
         session.user.phonenumber = token.phonenumber;
+        session.user.emailVerified = token.emailVerified as Date | null;
         session.user.subscriptionId = token.subscriptionId;
         session.user.organizationId = token.organizationId;
       }

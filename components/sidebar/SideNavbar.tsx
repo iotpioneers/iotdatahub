@@ -19,6 +19,8 @@ import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import Drawer from "@mui/material/Drawer";
 import LoadingProgressBar from "../LoadingProgressBar";
 import UpgradePlanCard from "./UpgradePlanCard";
+import { AdminPanelSettingsOutlined } from "@mui/icons-material";
+import { useSession } from "next-auth/react";
 
 interface SidebarContentProps {
   isLoading: boolean;
@@ -101,6 +103,14 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
   activeLink,
   handleSetActiveLink,
 }) => {
+  const { status, data: session } = useSession();
+
+  if (status !== "loading" && status === "unauthenticated") {
+    return null;
+  }
+
+  const userRole = session!.user!.role;
+
   return (
     <div className="flex flex-col justify-start item-center mt-0 lg:mt-14">
       <div className="border-b border-gray-100 pb-4">
@@ -153,22 +163,22 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
       </div>
       {/* setting  */}
       <div className=" border-b border-gray-100 pb-4">
-        <Link href="#">
-          <div
-            className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
-              activeLink === "/dashboard/analytics"
-                ? "bg-gray-300 text-white"
-                : "hover:bg-gray-200 text-gray-600"
-            }`}
-            onClick={() => handleSetActiveLink("/dashboard/analytics")}
-          >
-            <MdOutlineAnalytics className="text-2xl text-gray-600" />
-            <h3 className="text-base font-semibold">Analytics</h3>
-          </div>
-          {activeLink === "/dashboard/analytics" && isLoading && (
-            <LoadingProgressBar />
-          )}
-        </Link>
+        {userRole === "ADMIN" && (
+          <Link href="/admin">
+            <div
+              className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
+                activeLink === "/admin"
+                  ? "bg-gray-300 text-white"
+                  : "hover:bg-gray-200 text-gray-600"
+              }`}
+              onClick={() => handleSetActiveLink("/admin")}
+            >
+              <AdminPanelSettingsOutlined className="text-2xl text-gray-600" />
+              <h3 className="text-base font-semibold">Administration</h3>
+            </div>
+            {activeLink === "/admin" && isLoading && <LoadingProgressBar />}
+          </Link>
+        )}
         <Link href="/dashboard/organization">
           <div
             className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${

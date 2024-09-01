@@ -41,7 +41,7 @@ export const userSchema = z
     confirmPassword: z.string().min(8, {
       message: "Confirm Password must be at least 8 characters long",
     }),
-    emailVerified: z.union([z.boolean(), z.date(), z.null()]).optional(),
+    emailVerified: z.union([z.date(), z.null()]).optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords must match",

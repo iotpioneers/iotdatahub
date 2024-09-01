@@ -15,6 +15,7 @@ export interface UserData {
   image: string;
   country: string;
   phonenumber: string;
+  emailVerified: Date | null;
   role: string;
   subscriptionId?: string;
   organizationId?: string;

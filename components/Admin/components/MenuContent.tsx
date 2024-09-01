@@ -15,6 +15,7 @@ import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 import HelpRoundedIcon from "@mui/icons-material/HelpRounded";
 import { useRouter } from "next/navigation";
+import { MoneyOffCsredOutlined } from "@mui/icons-material";
 
 const mainListItems = [
   { text: "Overview", icon: <HomeRoundedIcon />, path: "/admin" },
@@ -24,7 +25,7 @@ const mainListItems = [
     path: "#",
   },
   { text: "Users", icon: <PeopleRoundedIcon />, path: "/admin/users" },
-  { text: "Tasks", icon: <AssignmentRoundedIcon />, path: "#" },
+  { text: "Pricing", icon: <MoneyOffCsredOutlined />, path: "/admin/pricing" },
 ];
 
 const secondaryListItems = [

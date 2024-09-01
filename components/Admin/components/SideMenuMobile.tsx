@@ -66,6 +66,7 @@ export default function SideMenuMobile({
         <CardAlert />
         <Stack sx={{ p: 2 }}>
           <Button
+            href="/api/auth/signout"
             variant="outlined"
             fullWidth
             startIcon={<LogoutRoundedIcon />}
