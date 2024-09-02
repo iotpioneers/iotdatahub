@@ -1,16 +1,79 @@
+"use client";
+
 import React, { useState } from "react";
 import { styled } from "@mui/system";
 import { Modal as BaseModal } from "@mui/base/Modal";
 import { Button } from "@mui/base/Button";
+import { Channel } from "@/types";
+import axios from "axios";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
 
-const NewFieldNestedModal = () => {
+interface NewFieldNestedModalProps {
+  channel: Channel;
+}
+
+const NewFieldNestedModal = ({ channel }: NewFieldNestedModalProps) => {
   const [open, setOpen] = useState(false);
   const [fieldName, setFieldName] = useState("");
-  const [fieldType, setFieldType] = useState("string");
   const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
+    "success"
+  );
+  const [alertMessage, setAlertMessage] = useState("");
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
+  const showAlert = (severity: "success" | "error", message: string) => {
+    setAlertSeverity(severity);
+    setAlertMessage(message);
+    setSnackbarOpen(true);
+  };
+
+  const handleAddField = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/${channel.id}/field`,
+        {
+          name: fieldName,
+          channelId: channel.id,
+          organizationId: channel.organizationId,
+        }
+      );
+
+      if (response.status === 200) {
+        showAlert("success", "Field added successfully!");
+        handleClose();
+        setFieldName("");
+        setDescription("");
+      } else {
+        showAlert("error", "Failed to add field. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error adding field:", error);
+      showAlert(
+        "error",
+        "An error occurred while adding the field. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
@@ -36,9 +99,14 @@ const NewFieldNestedModal = () => {
       >
         <ModalContent>
           <h2 id="new-field-modal-title" className="modal-title">
-            Add New IoT Channel Field
+            Add New Channel Field
           </h2>
-          <form>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleAddField();
+            }}
+          >
             <FormField>
               <label htmlFor="fieldName">Field Name:</label>
               <input
@@ -50,21 +118,48 @@ const NewFieldNestedModal = () => {
               />
             </FormField>
             <FormField>
-              <label htmlFor="description">Comment:</label>
+              <label htmlFor="description">Description:</label>
               <textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
             </FormField>
+            <ButtonGroup>
+              <ModalButton type="submit" disabled={loading}>
+                {loading ? (
+                  <>
+                    <CircularProgress
+                      size={20}
+                      color="inherit"
+                      style={{ marginRight: "8px" }}
+                    />
+                    Adding Field...
+                  </>
+                ) : (
+                  "Add Field"
+                )}
+              </ModalButton>
+              <ModalButton onClick={handleClose} disabled={loading}>
+                Cancel
+              </ModalButton>
+            </ButtonGroup>
           </form>
-          <ConfirmationModal
-            fieldName={fieldName}
-            fieldType={fieldType}
-            description={description}
-          />
         </ModalContent>
       </StyledModal>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={alertSeverity}
+          sx={{ width: "100%" }}
+        >
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
@@ -205,6 +300,8 @@ const ModalContent = styled("div")(
     theme.palette.mode === "dark" ? "rgb(0 0 0 / 0.5)" : "rgb(0 0 0 / 0.2)"
   };
   padding: 24px;
+  width: 600px;
+  height: 400px;
   color: ${theme.palette.mode === "dark" ? grey[50] : grey[900]};
 
   & .modal-title {

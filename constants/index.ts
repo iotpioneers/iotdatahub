@@ -98,51 +98,6 @@ export const collabContent = [
   },
 ];
 
-export const pricing = [
-  {
-    id: "0",
-    title: "Free",
-    price: "0",
-    description: "Device control, data storage",
-    features: [
-      "3 users included",
-      "2 GB of storage",
-      "Help center access",
-      "Email support",
-    ],
-    buttonText: "Sign up for free",
-  },
-  {
-    id: "1",
-    title: "Professional",
-    subheader: "Recommended",
-    price: "15",
-    description: "Advanced analytics, priority support, extended storage",
-    features: [
-      "20 users included",
-      "10 GB of storage",
-      "Help center access",
-      "Priority email support",
-      "Dedicated team",
-      "Best deals",
-    ],
-    buttonText: "Start now",
-  },
-  {
-    id: "2",
-    title: "Enterprise",
-    price: "30",
-    description: "Custom solutions, dedicated support, unlimited storage",
-    features: [
-      "50 users included",
-      "30 GB of storage",
-      "Help center access",
-      "Phone & email support",
-    ],
-    buttonText: "Contact us",
-  },
-];
-
 export const benefits = [
   {
     id: "0",

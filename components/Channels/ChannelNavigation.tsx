@@ -8,7 +8,7 @@ import Stream from "./navigation/Stream";
 import CodeSnippet from "./navigation/CodeSnippet";
 import ExportChannelData from "./ExportChannelData";
 import { ApiKeys } from "./navigation";
-import { ChannelNavigationProps, DataPoint, Field } from "@/types";
+import { ChannelNavigationProps } from "@/types";
 import ChannelSettings from "./navigation/ChannelSettings";
 
 function classNames(...classes: any) {
@@ -111,7 +111,7 @@ const ChannelNavigation = ({
           </div>
           <Tab.Panels as={Fragment}>
             <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
-              <Stream fields={fields} dataPoint={dataPoint} />
+              <Stream channel={channel} fields={fields} dataPoint={dataPoint} />
             </Tab.Panel>
             <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
               <CodeSnippet sampleCodes={sampleCodes} />

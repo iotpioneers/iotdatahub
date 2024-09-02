@@ -4,10 +4,10 @@ import prisma from "@/prisma/client";
 // GET a field by its ID and return related data
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { fieldId: string } }
 ) {
   const field = await prisma.field.findUnique({
-    where: { id: params.id },
+    where: { id: params.fieldId },
   });
 
   if (!field)
@@ -57,12 +57,12 @@ export async function GET(
 // Update a field by its ID
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { fieldId: string } }
 ) {
   const body = await request.json();
 
   const field = await prisma.field.findUnique({
-    where: { id: params.id },
+    where: { id: params.fieldId },
   });
 
   if (!field)
@@ -87,16 +87,16 @@ export async function PUT(
 // Delete a field and its related data
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { fieldId: string } }
 ) {
   // Delete related data points
   await prisma.dataPoint.deleteMany({
-    where: { fieldId: params.id },
+    where: { fieldId: params.fieldId },
   });
 
   // Delete the field itself
   const field = await prisma.field.delete({
-    where: { id: params.id },
+    where: { id: params.fieldId },
   });
 
   if (!field)

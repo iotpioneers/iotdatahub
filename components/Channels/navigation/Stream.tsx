@@ -10,7 +10,7 @@ import { gridSpacing } from "./constant";
 import LineChartComponent from "../charts/LineChartComponent";
 import GaugeChart from "../charts/GaugeChart";
 import MainCard from "@/components/dashboard/cards/MainCard";
-import { DataPoint, Field } from "@/types";
+import { Channel, DataPoint, Field } from "@/types";
 import BarChartWidget from "../charts/BarChartWidget";
 import { AddChartComponent } from "../charts";
 
@@ -53,11 +53,12 @@ const widgets = [
 ];
 
 interface Props {
+  channel: Channel;
   dataPoint: DataPoint[];
   fields: Field[];
 }
 
-const Stream = ({ fields, dataPoint }: Props) => {
+const Stream = ({ channel, fields, dataPoint }: Props) => {
   const [value, setValue] = useState("today");
   const [widget, setWidget] = useState("lineChart");
 
@@ -153,7 +154,7 @@ const Stream = ({ fields, dataPoint }: Props) => {
             </Grid>
           </Grid>
           <Grid item xs={12} className="flex justify-center items-center">
-            <AddChartComponent />
+            <AddChartComponent channel={channel} />
           </Grid>
         </Grid>
       </MainCard>

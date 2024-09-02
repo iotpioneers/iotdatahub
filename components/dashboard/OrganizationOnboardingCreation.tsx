@@ -142,7 +142,10 @@ const OrganizationOnboardingCreation: React.FC = () => {
     }
 
     try {
-      const response = await axios.post("/api/organizations", organizationData);
+      const response = await axios.post(
+        process.env.NEXT_PUBLIC_BASE_URL + "/api/organizations",
+        organizationData
+      );
 
       if (response.status !== 201) {
         setError(response.statusText || "Error creating organization");

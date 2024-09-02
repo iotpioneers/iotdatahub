@@ -10,6 +10,7 @@ import {
 } from "@mui/icons-material";
 import AddSubscriptionModal from "./AddSubscriptionModal";
 import axios from "axios";
+import LoadingProgressBar from "@/components/LoadingProgressBar";
 
 interface Subscription {
   id: string;
@@ -28,9 +29,11 @@ const PricingManagementDashboard: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
   const [currentSubscription, setCurrentSubscription] =
     useState<Subscription | null>(null);
+  const [IsLoading, setIsLoading] = React.useState<boolean>(false);
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
+      setIsLoading(true);
       try {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`
@@ -39,6 +42,8 @@ const PricingManagementDashboard: React.FC = () => {
         setSubscriptions(response.data);
       } catch (error) {
         console.error("Error fetching subscriptions:", error);
+      } finally {
+        setIsLoading(true);
       }
     };
 
@@ -131,6 +136,8 @@ const PricingManagementDashboard: React.FC = () => {
       ),
     },
   ];
+
+  if (IsLoading) return <LoadingProgressBar />;
 
   return (
     <Box sx={{ height: 400, width: "100%" }}>

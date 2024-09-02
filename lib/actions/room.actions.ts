@@ -36,18 +36,6 @@ export const createChannelRoom = async ({
       defaultAccesses: [],
     });
 
-    const notificationId = nanoid();
-    await liveblocks.triggerInboxNotification({
-      userId: email,
-      kind: "$channelCreated",
-      subjectId: notificationId,
-      activityData: {
-        title: `You have successfully created the channel "${title}"`,
-        channelId: roomId,
-      },
-      roomId,
-    });
-
     revalidatePath("/dashboard/channels");
 
     return parseStringify(room);

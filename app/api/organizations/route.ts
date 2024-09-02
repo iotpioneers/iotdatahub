@@ -78,10 +78,18 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    const freSubscrption = await prisma.subscription.findFirst({
+      where: {
+        name: "Free",
+      },
+    });
+
     await prisma.user.update({
       where: { id: user.id },
       data: {
         emailVerified: new Date(),
+        subscriptionId: freSubscrption?.id,
+        organizationId: newOrganization.id,
       },
     });
 

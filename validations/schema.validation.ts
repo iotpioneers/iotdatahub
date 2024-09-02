@@ -84,6 +84,16 @@ export const channelSchema = z.object({
   access: z.string().optional(),
 });
 
+// The schema for the field data
+export const fieldSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(255, { message: "Name must be 255 characters or less" }),
+  channelId: z.string().min(1, "Channel is required"),
+  organizationId: z.string().min(1, "Organization is required"),
+});
+
 // The schema for the device data
 export const deviceSchema = z.object({
   name: z
