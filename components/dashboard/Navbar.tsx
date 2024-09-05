@@ -88,8 +88,6 @@ const Navbar = ({
         </ButtonBase>
       </Box>
 
-      {/* header search */}
-      <SearchSection />
       <Box sx={{ flexGrow: 1 }} />
       <Box sx={{ flexGrow: 1 }} />
 

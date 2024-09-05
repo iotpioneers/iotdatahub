@@ -38,7 +38,7 @@ const HeroSection = () => {
         style={{
           fontSize: "2em",
           display: "inline-block",
-          color: "wheat",
+          color: "revert-layer",
         }}
         repeat={Infinity}
       />

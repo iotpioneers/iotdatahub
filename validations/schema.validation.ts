@@ -146,10 +146,13 @@ export const subscriptionSchema = z.object({
     .min(1, "Name is required")
     .max(255, { message: "Name must be 255 characters or less" }),
   description: z.string().optional(),
+  price: z.number().min(0, "Price must be a non-negative number"),
   type: z.enum(["FREE", "PREMIUM", "ENTERPRISE"], {
     message: "Invalid subscription type",
   }),
-  price: z.number().min(0, "Price must be a non-negative number"),
+  billingCycle: z.enum(["MONTHLY", "YEARLY"], {
+    message: "Invalid billing cycle",
+  }),
   maxChannels: z.number().min(0, "Max channels must be a non-negative number"),
   maxMessagesPerYear: z
     .number()

@@ -58,7 +58,7 @@ const UpgradePricingPlan = () => {
           <Link
             href={
               item.price === 0
-                ? "/signup"
+                ? "#"
                 : item.name === "Enterprise"
                 ? "#"
                 : "https://buy.stripe.com/test_28o3fF8wIbpn4LuaEE"
@@ -74,6 +74,8 @@ const UpgradePricingPlan = () => {
                 ? "Contact us"
                 : item.price === 0
                 ? "Try for free"
+                : item.name.includes("Enterprise")
+                ? "Contact us"
                 : "Get started"}{" "}
             </Button>
           </Link>

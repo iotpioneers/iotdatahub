@@ -21,8 +21,9 @@ export async function POST(request: NextRequest) {
   const {
     name,
     description,
-    type,
     price,
+    type,
+    billingCycle,
     maxChannels,
     maxMessagesPerYear,
     features,
@@ -30,12 +31,13 @@ export async function POST(request: NextRequest) {
   } = validation.data;
 
   try {
-    const newSubscription = await prisma.subscription.create({
+    const newSubscription = await prisma.pricingTier.create({
       data: {
         name,
         description,
-        type,
         price,
+        type,
+        billingCycle,
         maxChannels,
         maxMessagesPerYear,
         features,
@@ -54,9 +56,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const subscriptions = await prisma.subscription.findMany({
-      orderBy: { createdAt: "desc" },
-    });
+    const subscriptions = await prisma.pricingTier.findMany({});
 
     if (!subscriptions || subscriptions.length === 0) {
       return NextResponse.json(
@@ -69,54 +69,6 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "Error retrieving subscriptions" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const body = await request.json();
-
-  try {
-    const updatedSubscription = await prisma.subscription.update({
-      where: { id: params.id },
-      data: {
-        name: body.name,
-        description: body.description,
-        type: body.type,
-        price: body.price,
-        maxChannels: body.maxChannels,
-        maxMessagesPerYear: body.maxMessagesPerYear,
-        features: body.features,
-        activation: body.activation,
-      },
-    });
-
-    return NextResponse.json(updatedSubscription);
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Error updating subscription" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const deletedSubscription = await prisma.subscription.delete({
-      where: { id: params.id },
-    });
-
-    return NextResponse.json(deletedSubscription);
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Error deleting subscription" },
       { status: 500 }
     );
   }

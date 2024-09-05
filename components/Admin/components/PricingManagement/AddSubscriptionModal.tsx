@@ -20,6 +20,7 @@ import axios from "axios";
 import * as yup from "yup";
 import { Subscription } from "@/types";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
+import { useRouter } from "next/navigation";
 
 export const subscriptionSchema = yup.object({
   name: yup
@@ -32,6 +33,10 @@ export const subscriptionSchema = yup.object({
     .mixed<"FREE" | "PREMIUM" | "ENTERPRISE">()
     .oneOf(["FREE", "PREMIUM", "ENTERPRISE"], "Invalid subscription type")
     .required("Type is required"),
+  billingCycle: yup
+    .mixed<"MONTHLY" | "YEARLY">()
+    .oneOf(["MONTHLY", "YEARLY"], "Invalid billing cycle")
+    .required("Billing cycle is required"),
   price: yup
     .number()
     .min(0, "Price must be a non-negative number")
@@ -63,7 +68,6 @@ const AddSubscriptionModal: React.FC<SubscriptionModalProps> = ({
   onClose,
   subscription,
 }) => {
-  const [value, setValue] = useState<Subscription | null>(subscription || null);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -75,6 +79,8 @@ const AddSubscriptionModal: React.FC<SubscriptionModalProps> = ({
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const router = useRouter();
+
   const handleSnackbarClose = () => {
     setSnackbar({ ...snackbar, open: false });
   };
@@ -84,6 +90,7 @@ const AddSubscriptionModal: React.FC<SubscriptionModalProps> = ({
       name: "",
       description: "",
       type: "FREE",
+      billingCycle: "MONTHLY",
       price: 0,
       maxChannels: 0,
       maxMessagesPerYear: 0,
@@ -107,6 +114,7 @@ const AddSubscriptionModal: React.FC<SubscriptionModalProps> = ({
             severity: "success",
           });
           onClose();
+
           return values;
         } else {
           throw new Error("Failed to save subscription");
@@ -122,6 +130,8 @@ const AddSubscriptionModal: React.FC<SubscriptionModalProps> = ({
         return values;
       } finally {
         setIsLoading(false);
+
+        router.refresh();
       }
     },
   });
@@ -190,6 +200,27 @@ const AddSubscriptionModal: React.FC<SubscriptionModalProps> = ({
             </Select>
             {formik.touched.type && formik.errors.type && (
               <p style={{ color: "red" }}>{formik.errors.type}</p>
+            )}
+          </FormControl>
+          <FormControl fullWidth margin="dense">
+            <InputLabel>Billing Cycle</InputLabel>
+            <Select
+              id="billingCycle"
+              name="billingCycle"
+              value={formik.values.billingCycle}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={
+                formik.touched.billingCycle &&
+                Boolean(formik.errors.billingCycle)
+              }
+              label="Billing Cycle"
+            >
+              <MenuItem value="MONTHLY">Monthly</MenuItem>
+              <MenuItem value="YEARLY">Yearly</MenuItem>
+            </Select>
+            {formik.touched.billingCycle && formik.errors.billingCycle && (
+              <p style={{ color: "red" }}>{formik.errors.billingCycle}</p>
             )}
           </FormControl>
           <TextField

@@ -11,7 +11,7 @@ import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
 import UserActivityOverviewCard from "@/components/dashboard/Overview/UserActivityOverviewCard";
 import OrganizarionOverviewCard from "@/components/dashboard/Overview/OrganizarionOverviewCard";
 import TotalDataGeneratedCard from "@/components/dashboard/Overview/TotalDataGeneratedCard";
-import TotalGrowthBarChart from "@/components/dashboard/Overview/TotalGrowthBarChart";
+import ChannelActivityOverview from "@/components/dashboard/Overview/DeviceActivityOverview";
 import TotalChannelCard from "@/components/dashboard/Overview/TotalChannelCard";
 import TotalDevicesCard from "@/components/dashboard/Overview/TotalDevicesCard";
 import { gridSpacing } from "@/app/store/constant";
@@ -116,7 +116,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item xs={12} md={8}>
-            <TotalGrowthBarChart
+            <ChannelActivityOverview
               isLoading={isLoading}
               channels={channels}
               fields={fields}

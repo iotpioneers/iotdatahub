@@ -17,6 +17,7 @@ interface Subscription {
   name: string;
   description?: string;
   type: "FREE" | "PREMIUM" | "ENTERPRISE";
+  billingCycle: "MONTHLY" | "YEARLY";
   price: number;
   maxChannels: number;
   maxMessagesPerYear: number;
@@ -43,12 +44,12 @@ const PricingManagementDashboard: React.FC = () => {
       } catch (error) {
         console.error("Error fetching subscriptions:", error);
       } finally {
-        setIsLoading(true);
+        setIsLoading(false);
       }
     };
 
     fetchSubscriptions();
-  }, []);
+  }, [openModal, currentSubscription]);
 
   const handleOpenModal = (subscription?: Subscription) => {
     if (subscription) {
@@ -59,6 +60,7 @@ const PricingManagementDashboard: React.FC = () => {
         name: "",
         description: "",
         type: "FREE",
+        billingCycle: "MONTHLY",
         price: 0,
         maxChannels: 0,
         maxMessagesPerYear: 0,
@@ -137,8 +139,6 @@ const PricingManagementDashboard: React.FC = () => {
     },
   ];
 
-  if (IsLoading) return <LoadingProgressBar />;
-
   return (
     <Box sx={{ height: 400, width: "100%" }}>
       <Button
@@ -147,9 +147,12 @@ const PricingManagementDashboard: React.FC = () => {
         onClick={() => handleOpenModal()}
         sx={{ mb: 2 }}
       >
-        Add Subscription
+        Add A NEW SUBSCRIPTION PLAN
       </Button>
-      <DataGrid rows={subscriptions} columns={columns} checkboxSelection />
+      {IsLoading ? <LoadingProgressBar /> : null}
+      {subscriptions.length > 0 && (
+        <DataGrid rows={subscriptions} columns={columns} checkboxSelection />
+      )}
       <AddSubscriptionModal
         open={openModal}
         onClose={handleCloseModal}

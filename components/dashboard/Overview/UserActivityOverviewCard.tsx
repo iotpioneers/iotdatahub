@@ -15,51 +15,7 @@ import ChevronRightOutlinedIcon from "@mui/icons-material/ChevronRightOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
 import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
-
-export interface Device {
-  id: string;
-  name: string;
-  description: string;
-  channelId: string | null;
-  organizationId: string;
-  status: "ONLINE" | "OFFLINE" | "DISCONNECTED";
-  createdAt: Date;
-  updatedAt: Date;
-  userId: string;
-}
-
-export interface Channel {
-  id: string;
-  name: string;
-  description: string;
-  deviceId?: string | null;
-  organizationId: string;
-  access: "PUBLIC" | "PRIVATE";
-  createdAt: Date;
-  updatedAt: Date;
-  userId: string;
-}
-
-export interface DataPoint {
-  id: string;
-  timestamp: string;
-  value: number;
-  fieldId: string;
-  channelId: string;
-  organizationId: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Field {
-  id: string;
-  name: string;
-  description: string;
-  channelId: string;
-  organizationId: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Channel, DataPoint, Device, Field } from "@/types";
 
 interface UserActivityOverviewCardProps {
   isLoading: boolean;
@@ -69,7 +25,7 @@ interface UserActivityOverviewCardProps {
   dataPoints: DataPoint[] | null;
 }
 
-type Period = "today" | "month" | "year";
+type Period = "last30days" | "last60days" | "last90days";
 
 const UserActivityOverviewCard = ({
   isLoading,
@@ -79,7 +35,7 @@ const UserActivityOverviewCard = ({
   dataPoints,
 }: UserActivityOverviewCardProps) => {
   const [anchorEl, setAnchorEl] = useState<null | SVGSVGElement>(null);
-  const [selectedPeriod, setSelectedPeriod] = useState<Period>("today");
+  const [selectedPeriod, setSelectedPeriod] = useState<Period>("last30days");
 
   const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
     setAnchorEl(event.currentTarget);
@@ -102,16 +58,14 @@ const UserActivityOverviewCard = ({
     const startDate = new Date();
 
     switch (period) {
-      case "today":
-        startDate.setHours(0, 0, 0, 0);
+      case "last30days":
+        startDate.setDate(now.getDate() - 30);
         break;
-      case "month":
-        startDate.setDate(1);
-        startDate.setHours(0, 0, 0, 0);
+      case "last60days":
+        startDate.setDate(now.getDate() - 60);
         break;
-      case "year":
-        startDate.setMonth(0, 1);
-        startDate.setHours(0, 0, 0, 0);
+      case "last90days":
+        startDate.setDate(now.getDate() - 90);
         break;
     }
 
@@ -147,7 +101,13 @@ const UserActivityOverviewCard = ({
     };
 
     const currentData = getDataForPeriod(selectedPeriod);
-    const previousData = getDataForPeriod("today");
+    const previousPeriod: Period =
+      selectedPeriod === "last30days"
+        ? "last60days"
+        : selectedPeriod === "last60days"
+        ? "last90days"
+        : "last90days";
+    const previousData = getDataForPeriod(previousPeriod);
 
     const changes: Record<string, number> = {};
     Object.keys(currentData).forEach((key) => {
@@ -170,7 +130,7 @@ const UserActivityOverviewCard = ({
             <Grid container alignItems="center" justifyContent="space-between">
               <Grid item>
                 <Typography variant="subtitle1" color="inherit">
-                  {count} {label}
+                  {count}
                 </Typography>
               </Grid>
               <Grid item>
@@ -207,7 +167,8 @@ const UserActivityOverviewCard = ({
           variant="subtitle2"
           sx={{ color: change >= 0 ? "success.dark" : "orange.dark" }}
         >
-          {Math.abs(change).toFixed(2)}% {change >= 0 ? "Increase" : "Decrease"}
+          {Math.abs(change).toFixed(2)}% {change >= 0 ? "Increase" : "Decrease"}{" "}
+          from previous period
         </Typography>
       </Grid>
     </Grid>
@@ -228,7 +189,7 @@ const UserActivityOverviewCard = ({
                   justifyContent="space-between"
                 >
                   <Grid item>
-                    <Typography variant="h4">Activity Overview</Typography>
+                    <Typography variant="h4">Data Activity Overview</Typography>
                   </Grid>
                   <Grid item>
                     <MoreHorizOutlinedIcon
@@ -257,14 +218,20 @@ const UserActivityOverviewCard = ({
                         horizontal: "right",
                       }}
                     >
-                      <MenuItem onClick={() => handlePeriodChange("today")}>
-                        Today
+                      <MenuItem
+                        onClick={() => handlePeriodChange("last30days")}
+                      >
+                        Last 30 Days
                       </MenuItem>
-                      <MenuItem onClick={() => handlePeriodChange("month")}>
-                        This Month
+                      <MenuItem
+                        onClick={() => handlePeriodChange("last60days")}
+                      >
+                        Last 60 Days
                       </MenuItem>
-                      <MenuItem onClick={() => handlePeriodChange("year")}>
-                        This Year
+                      <MenuItem
+                        onClick={() => handlePeriodChange("last90days")}
+                      >
+                        Last 90 Days
                       </MenuItem>
                     </Menu>
                   </Grid>

@@ -90,6 +90,7 @@ export interface Subscription {
   name: string;
   description?: string;
   type: "FREE" | "PREMIUM" | "ENTERPRISE";
+  billingCycle: "MONTHLY" | "YEARLY";
   price: number;
   maxChannels: number;
   maxMessagesPerYear: number;

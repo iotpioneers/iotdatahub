@@ -87,9 +87,7 @@ const OrganizarionOverviewCard: React.FC<OrganizarionOverviewProps> = ({
                   sx={{ py: 0, my: 0.45 }}
                   primary={
                     <Typography variant="h4" sx={{ color: "#fff" }}>
-                      {members && members!.length > 1
-                        ? `${members?.length} Members`
-                        : "1 Member"}
+                      {organization?.name}
                     </Typography>
                   }
                   secondary={
@@ -97,7 +95,9 @@ const OrganizarionOverviewCard: React.FC<OrganizarionOverviewProps> = ({
                       variant="subtitle2"
                       sx={{ color: "primary.light", mt: 0.25 }}
                     >
-                      {organization?.name}
+                      {members && members!.length > 1
+                        ? `${members?.length} Members`
+                        : "1 Member"}
                     </Typography>
                   }
                 />
