@@ -47,9 +47,9 @@ const UpgradePricingPlan = () => {
           <div className="flex items-center text-teal-50 h-[5.5rem] mb-6">
             {item.price && (
               <>
-                <div className="h3">$</div>
+                <div className="h3">{item.price > 0 ? "Rwf" : ""}</div>
                 <div className="text-[5.5rem] leading-none font-bold">
-                  <div className="flex">{item.price}</div>
+                  <div className="flex">{item.price > 0 ? item.price : ""}</div>
                 </div>
               </>
             )}
@@ -69,11 +69,14 @@ const UpgradePricingPlan = () => {
                 : "bg-blue-500 text-white"
             } `}
           >
-            <Button disabled={!item.activation} className="w-full">
+            <Button
+              disabled={!item.activation || item.price === 0}
+              className="w-full"
+            >
               {item.activation && item.name === "Enterprise"
                 ? "Contact us"
                 : item.price === 0
-                ? "Try for free"
+                ? "Demo"
                 : item.name.includes("Enterprise")
                 ? "Contact us"
                 : "Get started"}{" "}
