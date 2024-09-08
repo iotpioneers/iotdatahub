@@ -1,15 +1,39 @@
 "use client";
 
 import * as React from "react";
-import Avatar from "@mui/material/Avatar";
-import Chip from "@mui/material/Chip";
+import {
+  Avatar,
+  Chip,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+  Box,
+  Snackbar,
+  Alert,
+  CircularProgress,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  SelectChangeEvent,
+} from "@mui/material";
+
 import {
   DataGrid,
   GridCellParams,
   GridRowsProp,
   GridColDef,
+  GridToolbar,
+  GridRenderCellParams,
 } from "@mui/x-data-grid";
+
 import { SparkLineChart } from "@mui/x-charts/SparkLineChart";
+import LoadingProgressBar from "@/components/LoadingProgressBar";
+import axios from "axios";
 
 type SparkLineData = number[];
 
@@ -62,10 +86,28 @@ function renderRole(role: "ADMIN" | "USER") {
 }
 
 export function renderAvatar(
-  params: GridCellParams<{ name: string; color: string }, any, any>
+  params: GridCellParams<
+    { name: string; color: string; image?: string },
+    any,
+    any
+  >
 ) {
   if (params.value == null) {
     return "";
+  }
+
+  if (params.value.image) {
+    return (
+      <Avatar
+        src={params.value.image}
+        alt={params.value.name}
+        sx={{
+          width: "32px",
+          height: "32px",
+          mt: "5px",
+        }}
+      />
+    );
   }
 
   return (
@@ -74,6 +116,7 @@ export function renderAvatar(
         backgroundColor: params.value.color,
         width: "32px",
         height: "32px",
+        mt: "5px",
         fontSize: "1rem",
       }}
     >
@@ -82,247 +125,346 @@ export function renderAvatar(
   );
 }
 
-export const columns: GridColDef[] = [
-  {
-    field: "avatar",
-    headerName: "Avatar",
-    width: 60,
-    renderCell: renderAvatar,
-  },
-  { field: "name", headerName: "Name", flex: 1, minWidth: 150 },
-  { field: "email", headerName: "Email", flex: 1.5, minWidth: 200 },
-  {
-    field: "role",
-    headerName: "Role",
-    flex: 0.7,
-    minWidth: 100,
-    renderCell: (params) => renderRole(params.value as any),
-  },
-  {
-    field: "devices",
-    headerName: "Devices",
-    headerAlign: "right",
-    align: "right",
-    flex: 0.5,
-    minWidth: 80,
-  },
-  {
-    field: "channels",
-    headerName: "Channels",
-    headerAlign: "right",
-    align: "right",
-    flex: 0.5,
-    minWidth: 80,
-  },
-  {
-    field: "fields",
-    headerName: "Fields",
-    headerAlign: "right",
-    align: "right",
-    flex: 0.5,
-    minWidth: 80,
-  },
-  {
-    field: "dataUploads",
-    headerName: "Data Uploads",
-    headerAlign: "right",
-    align: "right",
-    flex: 0.8,
-    minWidth: 120,
-  },
-  {
-    field: "lastLogin",
-    headerName: "Last Login",
-    flex: 1,
-    minWidth: 120,
-  },
-  {
-    field: "activityTrend",
-    headerName: "Activity Trend",
-    flex: 1,
-    minWidth: 150,
-    renderCell: renderSparklineCell,
-  },
-];
-
-export const rows: GridRowsProp = [
-  {
-    id: 1,
-    avatar: { name: "Jean Mugisha", color: "#1976d2" },
-    name: "Jean Mugisha",
-    email: "jean.mugisha@example.rw",
-    role: "ADMIN",
-    devices: 15,
-    channels: 45,
-    fields: 120,
-    dataUploads: 15000,
-    lastLogin: "2m ago",
-    activityTrend: [
-      10, 8, 12, 15, 20, 18, 22, 25, 23, 27, 30, 28, 32, 35, 33, 38, 40, 42, 45,
-      43, 48, 50, 52, 55, 53, 58, 60, 62, 65, 63,
-    ],
-  },
-  {
-    id: 2,
-    avatar: { name: "Marie Uwase", color: "#388e3c" },
-    name: "Marie Uwase",
-    email: "marie.uwase@example.rw",
-    role: "USER",
-    devices: 8,
-    channels: 24,
-    fields: 64,
-    dataUploads: 8000,
-    lastLogin: "1h ago",
-    activityTrend: [
-      5, 7, 6, 8, 10, 9, 11, 13, 12, 15, 14, 16, 18, 17, 20, 19, 21, 23, 22, 25,
-      24, 26, 28, 27, 30, 29, 31, 33, 32, 35,
-    ],
-  },
-  {
-    id: 3,
-    avatar: { name: "Eric Nshimiyimana", color: "#f57c00" },
-    name: "Eric Nshimiyimana",
-    email: "eric.nshimiyimana@example.rw",
-    role: "USER",
-    devices: 5,
-    channels: 15,
-    fields: 40,
-    dataUploads: 5000,
-    lastLogin: "3h ago",
-    activityTrend: [
-      3, 4, 5, 4, 6, 7, 8, 7, 9, 10, 11, 10, 12, 13, 14, 13, 15, 16, 17, 16, 18,
-      19, 20, 19, 21, 22, 23, 22, 24, 25,
-    ],
-  },
-  {
-    id: 4,
-    avatar: { name: "Diane Karenzi", color: "#d32f2f" },
-    name: "Diane Karenzi",
-    email: "diane.karenzi@example.rw",
-    role: "USER",
-    devices: 2,
-    channels: 6,
-    fields: 16,
-    dataUploads: 2000,
-    lastLogin: "1d ago",
-    activityTrend: [
-      1, 2, 1, 3, 2, 4, 3, 5, 4, 6, 5, 7, 6, 8, 7, 9, 8, 10, 9, 11, 10, 12, 11,
-      13, 12, 14, 13, 15, 14, 16,
-    ],
-  },
-  {
-    id: 5,
-    avatar: { name: "Claude Habimana", color: "#7b1fa2" },
-    name: "Claude Habimana",
-    email: "claude.habimana@example.rw",
-    role: "ADMIN",
-    devices: 12,
-    channels: 36,
-    fields: 96,
-    dataUploads: 12000,
-    lastLogin: "5m ago",
-    activityTrend: [
-      8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44,
-      46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66,
-    ],
-  },
-  {
-    id: 6,
-    avatar: { name: "Olivia Umutoni", color: "#0288d1" },
-    name: "Olivia Umutoni",
-    email: "olivia.umutoni@example.rw",
-    role: "USER",
-    devices: 6,
-    channels: 18,
-    fields: 48,
-    dataUploads: 6000,
-    lastLogin: "2h ago",
-    activityTrend: [
-      4, 6, 5, 7, 9, 8, 10, 12, 11, 14, 13, 15, 17, 16, 19, 18, 20, 22, 21, 24,
-      23, 25, 27, 26, 29, 28, 30, 32, 31, 34,
-    ],
-  },
-  {
-    id: 7,
-    avatar: { name: "Pascal Ndayisenga", color: "#fbc02d" },
-    name: "Pascal Ndayisenga",
-    email: "pascal.ndayisenga@example.rw",
-    role: "USER",
-    devices: 4,
-    channels: 12,
-    fields: 32,
-    dataUploads: 4000,
-    lastLogin: "4h ago",
-    activityTrend: [
-      2, 3, 4, 3, 5, 6, 7, 6, 8, 9, 10, 9, 11, 12, 13, 12, 14, 15, 16, 15, 17,
-      18, 19, 18, 20, 21, 22, 21, 23, 24,
-    ],
-  },
-  {
-    id: 8,
-    avatar: { name: "Yvette Ishimwe", color: "#00796b" },
-    name: "Yvette Ishimwe",
-    email: "yvette.ishimwe@example.rw",
-    role: "ADMIN",
-    devices: 10,
-    channels: 30,
-    fields: 80,
-    dataUploads: 10000,
-    lastLogin: "10m ago",
-    activityTrend: [
-      7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43,
-      45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 65,
-    ],
-  },
-  {
-    id: 9,
-    avatar: { name: "Alphonse Niyonshuti", color: "#e64a19" },
-    name: "Alphonse Niyonshuti",
-    email: "alphonse.niyonshuti@example.rw",
-    role: "USER",
-    devices: 3,
-    channels: 9,
-    fields: 24,
-    dataUploads: 3000,
-    lastLogin: "6h ago",
-    activityTrend: [
-      1, 2, 3, 2, 4, 5, 6, 5, 7, 8, 9, 8, 10, 11, 12, 11, 13, 14, 15, 14, 16,
-      17, 18, 17, 19, 20, 21, 20, 22, 23,
-    ],
-  },
-  {
-    id: 10,
-    avatar: { name: "Jacqueline Mukamana", color: "#5e35b1" },
-    name: "Jacqueline Mukamana",
-    email: "jacqueline.mukamana@example.rw",
-    role: "USER",
-    devices: 7,
-    channels: 21,
-    fields: 56,
-    dataUploads: 7000,
-    lastLogin: "30m ago",
-    activityTrend: [
-      6, 8, 7, 9, 11, 10, 12, 14, 13, 16, 15, 17, 19, 18, 21, 20, 22, 24, 23,
-      26, 25, 27, 29, 28, 31, 30, 32, 34, 33, 36,
-    ],
-  },
-];
-
 export default function UserManagementDashboard() {
+  const [rows, setRows] = React.useState<GridRowsProp>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = React.useState(false);
+  const [selectedUser, setSelectedUser] = React.useState<any>(null);
+  const [editedRole, setEditedRole] = React.useState<any>(null);
+  const [error, setError] = React.useState<string | null>(null);
+  const [success, setSuccess] = React.useState<string | null>(null);
+  const [actionLoading, setActionLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  async function fetchUsers() {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        process.env.NEXT_PUBLIC_BASE_URL + "/api/users/overview"
+      );
+      if (response.status !== 200) {
+        throw new Error("Failed to fetch users");
+      }
+      const data = await response.data;
+      const formattedData = data.map((user: any) => ({
+        ...user,
+        avatar: {
+          name: user.name,
+          color: getRandomColor(),
+          image: user.image,
+        },
+      }));
+      setRows(formattedData);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      setError("Failed to fetch users. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function deleteUser(userId: string) {
+    try {
+      setActionLoading(true);
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${userId}`
+      );
+      await fetchUsers();
+      setSuccess("User deleted successfully");
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      setError("Failed to delete user. Please try again.");
+    } finally {
+      setActionLoading(false);
+      setDeleteDialogOpen(false);
+    }
+  }
+
+  async function updateUserRole(userId: string, newRole: string) {
+    try {
+      setActionLoading(true);
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${userId}`,
+        { role: newRole }
+      );
+      await fetchUsers();
+      setSuccess("User role updated successfully");
+    } catch (error) {
+      console.error("Error updating user role:", error);
+      setError("Failed to update user role. Please try again.");
+    } finally {
+      setActionLoading(false);
+      setViewDialogOpen(false);
+    }
+  }
+
+  const handleDeleteClick = (user: any) => {
+    setSelectedUser(user);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleViewClick = (user: any) => {
+    setSelectedUser(user);
+    setEditedRole(user.role);
+    setViewDialogOpen(true);
+  };
+
+  const handleRoleChange = (event: SelectChangeEvent<{ value: unknown }>) => {
+    setEditedRole(event.target.value as string);
+  };
+
+  const handleCloseSnackbar = () => {
+    setError(null);
+    setSuccess(null);
+  };
+
+  function getRandomColor() {
+    const colors = [
+      "#1976d2",
+      "#388e3c",
+      "#f57c00",
+      "#d32f2f",
+      "#7b1fa2",
+      "#0288d1",
+      "#fbc02d",
+      "#00796b",
+      "#e64a19",
+      "#5e35b1",
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  const columns: GridColDef[] = [
+    { field: "name", headerName: "Name", flex: 1, minWidth: 150 },
+    {
+      field: "avatar",
+      headerName: "Avatar",
+      width: 60,
+      renderCell: renderAvatar,
+    },
+    { field: "email", headerName: "Email", flex: 1.5, minWidth: 200 },
+    {
+      field: "role",
+      headerName: "Role",
+      flex: 0.7,
+      minWidth: 100,
+      renderCell: (params: GridRenderCellParams) =>
+        renderRole(params.value as "ADMIN" | "USER"),
+    },
+    {
+      field: "devices",
+      headerName: "Devices",
+      headerAlign: "right",
+      align: "right",
+      flex: 0.5,
+      minWidth: 80,
+    },
+    {
+      field: "channels",
+      headerName: "Channels",
+      headerAlign: "right",
+      align: "right",
+      flex: 0.5,
+      minWidth: 80,
+    },
+    {
+      field: "fields",
+      headerName: "Fields",
+      headerAlign: "right",
+      align: "right",
+      flex: 0.5,
+      minWidth: 80,
+    },
+    {
+      field: "dataUploads",
+      headerName: "Data Uploads",
+      headerAlign: "right",
+      align: "right",
+      flex: 0.8,
+      minWidth: 120,
+    },
+    {
+      field: "activityTrend",
+      headerName: "Activity Trend",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderSparklineCell,
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 150,
+      renderCell: (params) => (
+        <>
+          <Button onClick={() => handleViewClick(params.row)}>Edit</Button>
+          <Button onClick={() => handleDeleteClick(params.row)}>Delete</Button>
+        </>
+      ),
+    },
+  ];
+
   return (
-    <div style={{ height: 650, width: "100%" }}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: { pageSize: 10, page: 0 },
-          },
-        }}
-        pageSizeOptions={[5, 10]}
-        checkboxSelection
-        disableRowSelectionOnClick
-      />
+    <div style={{ height: "100%", width: "100%" }}>
+      {loading ? (
+        <LoadingProgressBar />
+      ) : (
+        <>
+          <Box m="40px 0 0 0" height="75vh">
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              initialState={{
+                pagination: {
+                  paginationModel: { pageSize: 10, page: 0 },
+                },
+              }}
+              pageSizeOptions={[5, 10, 20, 50, 100]}
+              checkboxSelection
+              disableRowSelectionOnClick
+              slots={{
+                toolbar: GridToolbar,
+              }}
+            />
+          </Box>
+          <Dialog
+            open={deleteDialogOpen}
+            onClose={() => setDeleteDialogOpen(false)}
+          >
+            <DialogTitle>Confirm Delete</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Are you sure you want to delete {selectedUser?.name}?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => setDeleteDialogOpen(false)}
+                disabled={actionLoading}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => deleteUser(selectedUser?.id)}
+                color="error"
+                disabled={actionLoading}
+              >
+                {actionLoading ? <CircularProgress size={24} /> : "Delete"}
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            open={viewDialogOpen}
+            onClose={() => setViewDialogOpen(false)}
+          >
+            <DialogTitle>User Details</DialogTitle>
+            <DialogContent>
+              <TextField
+                margin="dense"
+                label="Name"
+                type="text"
+                fullWidth
+                value={selectedUser?.name || ""}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+              <TextField
+                margin="dense"
+                label="Email"
+                type="email"
+                fullWidth
+                value={selectedUser?.email || ""}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="role-select-label">Role</InputLabel>
+                <Select
+                  labelId="role-select-label"
+                  value={editedRole}
+                  onChange={handleRoleChange}
+                  label="Role"
+                >
+                  <MenuItem value="ADMIN">ADMIN</MenuItem>
+                  <MenuItem value="USER">USER</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                margin="dense"
+                label="Devices"
+                type="number"
+                fullWidth
+                value={selectedUser?.devices || ""}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+              <TextField
+                margin="dense"
+                label="Channels"
+                type="number"
+                fullWidth
+                value={selectedUser?.channels || ""}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+              <TextField
+                margin="dense"
+                label="Fields"
+                type="number"
+                fullWidth
+                value={selectedUser?.fields || ""}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+              <TextField
+                margin="dense"
+                label="Data Uploads"
+                type="number"
+                fullWidth
+                value={selectedUser?.dataUploads || ""}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => setViewDialogOpen(false)}
+                disabled={actionLoading}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => updateUserRole(selectedUser?.id, editedRole)}
+                disabled={actionLoading || editedRole === selectedUser?.role}
+              >
+                {actionLoading ? <CircularProgress size={24} /> : "Update Role"}
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Snackbar
+            open={!!error || !!success}
+            autoHideDuration={6000}
+            onClose={handleCloseSnackbar}
+          >
+            <Alert
+              onClose={handleCloseSnackbar}
+              severity={error ? "error" : "success"}
+              sx={{ width: "100%" }}
+            >
+              {error || success}
+            </Alert>
+          </Snackbar>
+        </>
+      )}
     </div>
   );
 }

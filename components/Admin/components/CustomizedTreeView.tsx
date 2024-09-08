@@ -22,6 +22,7 @@ import { TreeItem2Icon } from "@mui/x-tree-view/TreeItem2Icon";
 import { TreeItem2Provider } from "@mui/x-tree-view/TreeItem2Provider";
 import { TreeViewBaseItem } from "@mui/x-tree-view/models";
 import { useTheme } from "@mui/material/styles";
+import { useRouter } from "next/navigation";
 
 type Color = "blue" | "green";
 
@@ -29,43 +30,76 @@ type ExtendedTreeItemProps = {
   color?: Color;
   id: string;
   label: string;
+  href?: string;
 };
 
 const ITEMS: TreeViewBaseItem<ExtendedTreeItemProps>[] = [
   {
     id: "1",
-    label: "IoT Dashboard",
+    label: "Dashboard",
     children: [
-      { id: "1.1", label: "Overview", color: "green" },
-      { id: "1.2", label: "Device Management", color: "green" },
-      { id: "1.3", label: "Data Analysis", color: "green" },
+      { id: "1.1", label: "Overview", color: "green", href: "/dashboard" },
+      {
+        id: "1.2",
+        label: "Device Management",
+        color: "green",
+        href: "/dashboard/devices",
+      },
+      {
+        id: "1.3",
+        label: "Channels",
+        color: "green",
+        href: "/dashboard/channels",
+      },
       {
         id: "1.4",
-        label: "Reports",
+        label: "Organization Management",
+        color: "green",
+        href: "/dashboard/organization",
+      },
+      {
+        id: "1.5",
+        label: "Upgrade Management",
+        color: "green",
+        href: "/dashboard/subscription",
+      },
+      {
+        id: "1.6",
+        label: "Account Management",
         children: [
-          { id: "1.4.1", label: "Daily Reports", color: "blue" },
-          { id: "1.4.2", label: "Weekly Reports", color: "blue" },
-          { id: "1.4.3", label: "Monthly Reports", color: "blue" },
-          { id: "1.4.4", label: "Custom Reports", color: "blue" },
+          {
+            id: "1.6.1",
+            label: "Settings",
+            color: "blue",
+            href: "/dashboard/settings",
+          },
+          {
+            id: "1.6.2",
+            label: "Profile",
+            color: "blue",
+            href: "/dashboard/account",
+          },
         ],
       },
     ],
   },
   {
     id: "2",
-    label: "User Management",
+    label: "Administartion Management",
     children: [
-      { id: "2.1", label: "All Users", color: "green" },
+      { id: "2.1", label: "Overview", color: "green", href: "/admin" },
       {
         id: "2.2",
-        label: "Roles & Permissions",
-        children: [
-          { id: "2.2.1", label: "Admin", color: "blue" },
-          { id: "2.2.2", label: "User", color: "blue" },
-          { id: "2.2.3", label: "Guest", color: "blue" },
-        ],
+        label: "User Management",
+        color: "green",
+        href: "/admin/users",
       },
-      { id: "2.3", label: "User Groups", color: "green" },
+      {
+        id: "2.3",
+        label: "Pricing Management",
+        color: "green",
+        href: "/admin/pricing",
+      },
     ],
   },
   { id: "3", label: "Settings", color: "blue" },
@@ -99,12 +133,14 @@ interface CustomLabelProps {
   children: React.ReactNode;
   color?: Color;
   expandable?: boolean;
+  href?: string;
 }
 
 function CustomLabel({
   color,
   expandable,
   children,
+  href,
   ...other
 }: CustomLabelProps) {
   const theme = useTheme();
@@ -114,8 +150,23 @@ function CustomLabel({
   };
 
   const iconColor = color ? colors[color] : null;
+
+  const router = useRouter();
+
+  const handleClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (href) {
+      router.push(href);
+    }
+  };
+
   return (
-    <TreeItem2Label {...other} sx={{ display: "flex", alignItems: "center" }}>
+    <TreeItem2Label
+      {...other}
+      sx={{ display: "flex", alignItems: "center" }}
+      onClick={handleClick}
+    >
       {iconColor && <DotIcon color={iconColor} />}
       <Typography
         className="labelText"
@@ -150,6 +201,8 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
 
   const item = publicAPI.getItem(itemId);
   const color = item?.color;
+  const href = item?.href;
+
   return (
     <TreeItem2Provider itemId={itemId}>
       <TreeItem2Root {...getRootProps(other)}>
@@ -169,7 +222,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
             </TreeItem2IconContainer>
           )}
 
-          <CustomLabel {...getLabelProps({ color })} />
+          <CustomLabel {...getLabelProps({ color, href })} />
         </TreeItem2Content>
         {children && (
           <TransitionComponent
@@ -189,7 +242,7 @@ export default function CustomizedTreeView() {
     >
       <CardContent>
         <Typography component="h2" variant="subtitle2">
-          IoT Platform Navigation
+          Platform Navigation
         </Typography>
         <RichTreeView
           items={ITEMS}

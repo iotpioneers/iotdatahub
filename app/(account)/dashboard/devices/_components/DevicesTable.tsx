@@ -2,12 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Box, Typography, IconButton } from "@mui/material";
-import {
-  DataGrid,
-  GridColDef,
-  GridToolbarProps,
-  GridToolbar,
-} from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import EditIcon from "@mui/icons-material/Edit";
@@ -131,35 +126,7 @@ const DeviceTable: React.FC = () => {
         <Link href="/dashboard/devices/new">New Device</Link>
       </Button>
 
-      <Box
-        m="40px 0 0 0"
-        height="75vh"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: "#94e2cd",
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: "#888888",
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: "#927382",
-          },
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: "none",
-            backgroundColor: "#ffffff",
-          },
-          "& .MuiCheckbox-root": {
-            color: "#b7ebde !important",
-          },
-        }}
-      >
+      <Box m="40px 0 0 0" height="75vh">
         {devices.length > 0 && (
           <DataGrid
             rows={devices}

@@ -61,10 +61,27 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: number } }
+  { params }: { params: { id: string } }
 ) {
-  if (params.id > 10)
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: params.id },
+    });
 
-  return NextResponse.json({});
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Delete the user and all related data
+    await prisma.user.delete({
+      where: { id: params.id },
+    });
+
+    return NextResponse.json({
+      message: "User and related data deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return NextResponse.json({ error: "Error deleting user" }, { status: 500 });
+  }
 }

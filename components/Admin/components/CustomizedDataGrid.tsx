@@ -121,10 +121,9 @@ function renderSparklineCell(
 
 // Column definitions
 const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
   {
     field: "name",
-    headerName: "Organization Name",
+    headerName: "Organization",
     flex: 1,
     width: 230,
     minWidth: 200,
@@ -167,7 +166,7 @@ export default function OrganizationDataGrid() {
           paginationModel: { pageSize: 20 },
         },
       }}
-      pageSizeOptions={[10, 20, 50]}
+      pageSizeOptions={[10, 20, 50, 100]}
       disableColumnResize
       density="compact"
       slotProps={{

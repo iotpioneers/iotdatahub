@@ -72,7 +72,7 @@ export const roadmap = [
   {
     id: "3",
     title: "API Integrations",
-    text: "Allow integration with third-party APIs to extend the functionality and capabilities of the IoT platform.",
+    text: "Allow integration with third-party APIs to extend the functionality and capabilities.",
     date: "Sept 2024",
     status: "progress",
     imageUrl: "roadmap/image-5.jpg",

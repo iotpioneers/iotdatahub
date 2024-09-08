@@ -44,7 +44,7 @@ interface ChartData {
   fields: ChartDataItem[];
 }
 
-export default function IoTActivityChart() {
+export default function PlatformActivityChart() {
   const theme = useTheme();
   const [chartData, setChartData] = React.useState<ChartData>({
     devices: [],
@@ -159,12 +159,12 @@ export default function IoTActivityChart() {
   };
 
   const colorPalette = [
-    theme.palette.primary.light,
-    theme.palette.primary.main,
-    theme.palette.primary.dark,
-    theme.palette.secondary.light,
+    theme.palette.error.light,
+    theme.palette.grey[800],
+    theme.palette.warning.light,
+    theme.palette.success.light,
     theme.palette.secondary.main,
-    theme.palette.secondary.dark,
+    theme.palette.primary.main,
   ];
 
   if (loading) {

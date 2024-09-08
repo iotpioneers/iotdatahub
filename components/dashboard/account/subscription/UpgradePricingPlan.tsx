@@ -79,7 +79,7 @@ const UpgradePricingPlan = () => {
                 ? "Demo"
                 : item.name.includes("Enterprise")
                 ? "Contact us"
-                : "Get started"}{" "}
+                : "Get started"}
             </Button>
           </Link>
 

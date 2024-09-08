@@ -12,7 +12,7 @@ import ChartUserByCountry from "./ChartUserByCountry";
 import CustomizedTreeView from "./CustomizedTreeView";
 import CustomizedDataGrid from "./CustomizedDataGrid";
 import HighlightedCard from "./HighlightedCard";
-import SessionsChart from "./SessionsChart";
+import PlatformActivityChart from "./PlatformActivityChart";
 import StatCard, { StatCardProps } from "./StatCard";
 import { UserData } from "@/types/user";
 import { Channel, Device, Organization } from "@/types";
@@ -110,7 +110,7 @@ export default function MainGrid() {
           <HighlightedCard />
         </Grid>
         <Grid xs={12} md={6}>
-          <SessionsChart />
+          <PlatformActivityChart />
         </Grid>
       </Grid>
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
