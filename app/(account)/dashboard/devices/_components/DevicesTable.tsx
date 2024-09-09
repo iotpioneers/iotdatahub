@@ -55,7 +55,6 @@ const DeviceTable: React.FC = () => {
   };
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 70 },
     {
       field: "name",
       headerName: "Device",
@@ -82,7 +81,7 @@ const DeviceTable: React.FC = () => {
               : status === "ONLINE"
               ? "bg-green-700"
               : "bg-yellow-700"
-          } rounded-md`}
+          } rounded-md mt-2`}
         >
           {status === "admin" && <AdminPanelSettingsOutlinedIcon />}
           {status === "manager" && <SecurityOutlinedIcon />}
@@ -131,13 +130,16 @@ const DeviceTable: React.FC = () => {
           <DataGrid
             rows={devices}
             columns={columns}
-            slots={{
-              toolbar: GridToolbar,
-            }}
             initialState={{
               pagination: {
                 paginationModel: { pageSize: 10, page: 0 },
               },
+            }}
+            pageSizeOptions={[5, 10, 20, 50, 100]}
+            autoHeight
+            disableRowSelectionOnClick
+            slots={{
+              toolbar: GridToolbar,
             }}
           />
         )}

@@ -323,6 +323,7 @@ export default function UserManagementDashboard() {
                 },
               }}
               pageSizeOptions={[5, 10, 20, 50, 100]}
+              autoHeight
               checkboxSelection
               disableRowSelectionOnClick
               slots={{

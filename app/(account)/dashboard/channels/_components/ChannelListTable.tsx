@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridRenderCellParams,
+  GridToolbar,
+} from "@mui/x-data-grid";
 import Link from "next/link";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
@@ -214,8 +219,17 @@ const ChannelListTable = ({
         rows={channels}
         columns={columns}
         getRowId={(row) => row.id}
-        pagination
-        autoPageSize
+        initialState={{
+          pagination: {
+            paginationModel: { pageSize: 10, page: 0 },
+          },
+        }}
+        pageSizeOptions={[5, 10, 20, 50, 100]}
+        autoHeight
+        disableRowSelectionOnClick
+        slots={{
+          toolbar: GridToolbar,
+        }}
       />
     </div>
   );

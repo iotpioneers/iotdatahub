@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridRenderCellParams,
+  GridToolbar,
+} from "@mui/x-data-grid";
 import { SparkLineChart } from "@mui/x-charts/SparkLineChart";
 import { DataPoint, Organization } from "@/types";
 import { dateConverter } from "@/lib/utils";
+import LoadingProgressBar from "@/components/LoadingProgressBar";
 
 // Custom hook for fetching organization data
 function useOrganizationData() {
@@ -154,47 +160,30 @@ const columns: GridColDef[] = [
 export default function OrganizationDataGrid() {
   const { rows, loading, error } = useOrganizationData();
 
-  if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <DataGrid
-      rows={rows}
-      columns={columns}
-      initialState={{
-        pagination: {
-          paginationModel: { pageSize: 20 },
-        },
-      }}
-      pageSizeOptions={[10, 20, 50, 100]}
-      disableColumnResize
-      density="compact"
-      slotProps={{
-        filterPanel: {
-          filterFormProps: {
-            logicOperatorInputProps: {
-              variant: "outlined",
-              size: "small",
+    <div style={{ height: "100%", width: "100%" }}>
+      {loading ? (
+        <LoadingProgressBar />
+      ) : (
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: { pageSize: 10, page: 0 },
             },
-            columnInputProps: {
-              variant: "outlined",
-              size: "small",
-              sx: { mt: "auto" },
-            },
-            operatorInputProps: {
-              variant: "outlined",
-              size: "small",
-              sx: { mt: "auto" },
-            },
-            valueInputProps: {
-              InputComponentProps: {
-                variant: "outlined",
-                size: "small",
-              },
-            },
-          },
-        },
-      }}
-    />
+          }}
+          pageSizeOptions={[5, 10, 20, 50, 100]}
+          autoHeight
+          checkboxSelection
+          disableRowSelectionOnClick
+          slots={{
+            toolbar: GridToolbar,
+          }}
+        />
+      )}
+    </div>
   );
 }

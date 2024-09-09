@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import { Box, Button, Chip, IconButton } from "@mui/material";
 import {
   Add as AddIcon,
@@ -151,7 +151,22 @@ const PricingManagementDashboard: React.FC = () => {
       </Button>
       {IsLoading ? <LoadingProgressBar /> : null}
       {subscriptions.length > 0 && (
-        <DataGrid rows={subscriptions} columns={columns} checkboxSelection />
+        <DataGrid
+          rows={subscriptions}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: { pageSize: 10, page: 0 },
+            },
+          }}
+          pageSizeOptions={[5, 10, 20, 50, 100]}
+          autoHeight
+          checkboxSelection
+          disableRowSelectionOnClick
+          slots={{
+            toolbar: GridToolbar,
+          }}
+        />
       )}
       <AddSubscriptionModal
         open={openModal}
