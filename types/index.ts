@@ -85,7 +85,7 @@ export interface Member {
   organizationId: string;
 }
 
-export interface Subscription {
+export interface PricingPlanType {
   id?: string;
   name: string;
   description?: string;
@@ -96,6 +96,20 @@ export interface Subscription {
   maxMessagesPerYear: number;
   features: string[];
   activation: boolean;
+}
+
+export interface UserSubscriptionData {
+  id: string;
+  name: string;
+  type: string;
+  status: string;
+  currentPeriodStart: Date;
+  currentPeriodEnd: Date;
+  cancelAtPeriodEnd: boolean;
+  pricingTierId: string;
+  organizationId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface AddMemberProps {

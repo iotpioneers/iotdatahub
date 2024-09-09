@@ -5,10 +5,12 @@ import { Button } from "@radix-ui/themes";
 import axios from "axios";
 import Link from "next/link";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
-import { Subscription } from "@/types";
+import { PricingPlanType } from "@/types";
 
 const UpgradePricingPlan = () => {
-  const [subscriptions, setSubscriptions] = React.useState<Subscription[]>([]);
+  const [subscriptions, setSubscriptions] = React.useState<PricingPlanType[]>(
+    []
+  );
   const [IsLoading, setIsLoading] = React.useState<boolean>(false);
 
   React.useEffect(() => {

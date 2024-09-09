@@ -1,15 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { GiOrganigram, GiUpgrade } from "react-icons/gi";
+import { useSession } from "next-auth/react";
+import { GiOrganigram } from "react-icons/gi";
 import { Disclosure } from "@headlessui/react";
-import {
-  MdOutlineAnalytics,
-  MdOutlineDevices,
-  MdOutlineSettings,
-  MdOutlineLogout,
-  MdManageAccounts,
-} from "react-icons/md";
+import { MdOutlineDevices } from "react-icons/md";
 import { BiNetworkChart } from "react-icons/bi";
 import Link from "next/link";
 import { HiViewGrid } from "react-icons/hi";
@@ -17,10 +12,10 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import Drawer from "@mui/material/Drawer";
-import LoadingProgressBar from "../LoadingProgressBar";
-import UpgradePlanCard from "./UpgradePlanCard";
 import { AdminPanelSettingsOutlined } from "@mui/icons-material";
-import { useSession } from "next-auth/react";
+
+import LoadingProgressBar from "../LoadingProgressBar";
+import UpgradePlanCardAlert from "./UpgradePlanCardAlert";
 
 interface SidebarContentProps {
   isLoading: boolean;
@@ -199,7 +194,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
 
       {/* Upgrade Plan Card */}
       <div className="my-2">
-        <UpgradePlanCard />
+        <UpgradePlanCardAlert />
       </div>
     </div>
   );

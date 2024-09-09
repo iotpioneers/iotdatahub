@@ -1,5 +1,7 @@
-import PropTypes from "prop-types";
-import { memo } from "react";
+"use client";
+
+import { memo, useState, useEffect } from "react";
+import axios from "axios";
 
 // material-ui
 import { useTheme } from "@mui/material/styles";
@@ -21,18 +23,37 @@ import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 
 // assets
-import TableChartOutlinedIcon from "@mui/icons-material/TableChartOutlined";
+import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
+import { useSession } from "next-auth/react";
+import { UserSubscriptionData } from "@/types";
 
 // ==============================|| PROGRESS BAR WITH LABEL ||============================== //
 
-interface LinearProgressWithLabelProps {
-  value: number;
-}
+const formatDate = (date: Date) =>
+  new Intl.DateTimeFormat("en", {
+    day: "numeric",
+    month: "long",
+    weekday: "long",
+  }).format(new Date(date));
 
-function LinearProgressWithLabel({
+const LinearProgressWithLabel = ({
   value,
+  remainingDays,
   ...others
-}: LinearProgressWithLabelProps) {
+}: {
+  value: number;
+  remainingDays: number | null;
+}) => {
+  const getProgressBarColor = () => {
+    if (remainingDays !== null && remainingDays <= 10) {
+      return "warning";
+    } else if (value >= 80) {
+      return "error";
+    } else {
+      return "primary";
+    }
+  };
+
   return (
     <Grid container direction="column" spacing={1} sx={{ mt: 1.5 }}>
       <Grid item>
@@ -43,9 +64,9 @@ function LinearProgressWithLabel({
             </Typography>
           </Grid>
           <Grid item>
-            <Typography variant="h6" color="inherit">{`${Math.round(
-              value
-            )}%`}</Typography>
+            <Typography variant="h6" color="inherit">
+              {`${Math.round(value)}%`} of limit
+            </Typography>
           </Grid>
         </Grid>
       </Grid>
@@ -54,6 +75,7 @@ function LinearProgressWithLabel({
           aria-label="progress of theme"
           variant="determinate"
           value={value}
+          color={getProgressBarColor()}
           {...others}
           sx={{
             height: 10,
@@ -70,12 +92,62 @@ function LinearProgressWithLabel({
       </Grid>
     </Grid>
   );
-}
+};
 
-// ==============================|| SIDEBAR - MENU CARD ||============================== //
-
-const UpgradePlanCard = () => {
+const UpgradePlanCardAlert = () => {
   const theme = useTheme();
+  const { status, data: session } = useSession();
+  const [subscription, setSubscription] = useState<UserSubscriptionData | null>(
+    null
+  );
+
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      if (status !== "loading" && status === "authenticated") {
+        try {
+          const res = await axios.get(
+            process.env.NEXT_PUBLIC_BASE_URL +
+              `/api/pricing/current/${session.user.subscriptionId}`
+          );
+          setSubscription(res.data);
+        } catch (error) {
+          console.error("Error fetching subscription data:", error);
+        }
+      }
+    };
+
+    fetchSubscription();
+  }, [status, session?.user.subscriptionId]);
+
+  // Calculate the remaining days before subscription expiration
+  const currentPeriodStart = subscription?.currentPeriodStart
+    ? new Date(subscription.currentPeriodStart).getTime()
+    : null;
+  const currentPeriodEnd = subscription?.currentPeriodEnd
+    ? new Date(subscription.currentPeriodEnd).getTime()
+    : null;
+
+  const remainingDays =
+    currentPeriodStart !== null && currentPeriodEnd !== null
+      ? Math.floor(
+          (currentPeriodEnd - currentPeriodStart) / (1000 * 60 * 60 * 24)
+        )
+      : null;
+
+  const usagePercentage =
+    remainingDays !== null &&
+    currentPeriodStart !== null &&
+    currentPeriodEnd !== null
+      ? Math.round(
+          ((currentPeriodEnd - Date.now()) /
+            (currentPeriodEnd - currentPeriodStart)) *
+            100
+        )
+      : 0;
+
+  if ((status !== "loading" && status === "unauthenticated") || !subscription) {
+    return null;
+  }
 
   return (
     <Card
@@ -111,23 +183,28 @@ const UpgradePlanCard = () => {
                   bgcolor: "background.paper",
                 }}
               >
-                <TableChartOutlinedIcon fontSize="inherit" />
+                <AutoAwesomeRoundedIcon fontSize="small" />
               </Avatar>
             </ListItemAvatar>
             <ListItemText
               sx={{ mt: 0 }}
               primary={
                 <Typography variant="subtitle1" sx={{ color: "primary.800" }}>
-                  Professional
+                  {subscription.type}
                 </Typography>
               }
               secondary={
-                <Typography variant="caption">Your current plan</Typography>
+                <Typography variant="caption">
+                  Expires on {formatDate(subscription.currentPeriodEnd)}
+                </Typography>
               }
             />
           </ListItem>
         </List>
-        <LinearProgressWithLabel value={80} />
+        <LinearProgressWithLabel
+          value={usagePercentage}
+          remainingDays={remainingDays}
+        />
         <Grid item sx={{ marginTop: 2 }}>
           <Stack direction="row">
             <Link
@@ -137,10 +214,18 @@ const UpgradePlanCard = () => {
               <AnimateButton>
                 <Button
                   variant="contained"
-                  color="warning"
+                  color={
+                    remainingDays !== null && remainingDays <= 10
+                      ? "warning"
+                      : "primary"
+                  }
                   sx={{ boxShadow: "none" }}
                 >
-                  Try entreprise
+                  {subscription.type === "Free"
+                    ? "Upgrade"
+                    : remainingDays !== null && remainingDays <= 10
+                    ? "Renew"
+                    : "Manage"}
                 </Button>
               </AnimateButton>
             </Link>
@@ -151,4 +236,4 @@ const UpgradePlanCard = () => {
   );
 };
 
-export default memo(UpgradePlanCard);
+export default memo(UpgradePlanCardAlert);

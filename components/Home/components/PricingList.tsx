@@ -13,11 +13,13 @@ import Typography from "@mui/material/Typography";
 
 import AngledButton from "./design/AngledButton";
 import axios from "axios";
-import { Subscription } from "@/types";
+import { PricingPlanType } from "@/types";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 const PricingList = () => {
-  const [subscriptions, setSubscriptions] = React.useState<Subscription[]>([]);
+  const [subscriptions, setSubscriptions] = React.useState<PricingPlanType[]>(
+    []
+  );
   const [IsLoading, setIsLoading] = React.useState<boolean>(false);
 
   React.useEffect(() => {

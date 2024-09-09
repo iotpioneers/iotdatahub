@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/client";
 import { getToken } from "next-auth/jwt";
-import { subscriptionSchema } from "@/validations/schema.validation";
+import { pricingPlanSchema } from "@/validations/schema.validation";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Validate the request body against the schema
-  const validation = subscriptionSchema.safeParse(body);
+  const validation = pricingPlanSchema.safeParse(body);
 
   if (!validation.success) {
     return NextResponse.json(validation.error.errors, { status: 400 });

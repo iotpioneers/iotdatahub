@@ -140,7 +140,7 @@ export const organizationSchema = z.object({
 });
 
 // The schema for the pricing data
-export const subscriptionSchema = z.object({
+export const pricingPlanSchema = z.object({
   name: z
     .string()
     .min(1, "Name is required")

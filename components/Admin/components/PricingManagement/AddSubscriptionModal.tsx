@@ -18,7 +18,7 @@ import {
 import { useFormik } from "formik";
 import axios from "axios";
 import * as yup from "yup";
-import { Subscription } from "@/types";
+import { PricingPlanType } from "@/types";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import { useRouter } from "next/navigation";
 
@@ -60,7 +60,7 @@ export const subscriptionSchema = yup.object({
 interface SubscriptionModalProps {
   open: boolean;
   onClose: () => void;
-  subscription: Subscription | null;
+  subscription: PricingPlanType | null;
 }
 
 const AddSubscriptionModal: React.FC<SubscriptionModalProps> = ({

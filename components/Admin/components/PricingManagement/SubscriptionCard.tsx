@@ -1,9 +1,9 @@
 import React from "react";
 import { Card, CardContent, Typography, Button } from "@mui/material";
-import { Subscription } from "@/types";
+import { PricingPlanType } from "@/types";
 
 interface SubscriptionCardProps {
-  subscription: Subscription;
+  subscription: PricingPlanType;
   onSubscribe: (subscriptionId: string, paymentMethodId: string) => void;
 }
 

@@ -10,7 +10,6 @@ import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
 
 import MenuButton from "./MenuButton";
 import MenuContent from "./MenuContent";
-import CardAlert from "./CardAlert";
 
 interface SideMenuMobileProps {
   open: boolean | undefined;
@@ -63,7 +62,6 @@ export default function SideMenuMobile({
           <MenuContent />
           <Divider />
         </Stack>
-        <CardAlert />
         <Stack sx={{ p: 2 }}>
           <Button
             href="/api/auth/signout"

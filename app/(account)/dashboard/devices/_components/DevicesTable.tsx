@@ -3,8 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, IconButton } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
-import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
-import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -83,8 +81,6 @@ const DeviceTable: React.FC = () => {
               : "bg-yellow-700"
           } rounded-md mt-2`}
         >
-          {status === "admin" && <AdminPanelSettingsOutlinedIcon />}
-          {status === "manager" && <SecurityOutlinedIcon />}
           <Typography color="#e0e0e0" sx={{ ml: "5px" }}>
             {status}
           </Typography>
