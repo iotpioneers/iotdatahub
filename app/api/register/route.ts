@@ -11,6 +11,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     // Validate the request body against the schema
     const validation = userSchema.safeParse(body);
+    console.log("validation", validation);
 
     if (!validation.success) {
       return NextResponse.json(
@@ -19,8 +20,15 @@ export async function POST(req: NextRequest, res: NextResponse) {
       );
     }
 
-    const { name, email, country, phonenumber, password, image } =
-      validation.data;
+    const {
+      name,
+      email,
+      country,
+      phonenumber,
+      password,
+      image,
+      emailVerified,
+    } = validation.data;
 
     const exist = await prisma.user.findUnique({
       where: { email },
@@ -43,6 +51,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         phonenumber,
         password: hashedPassword,
         image,
+        emailVerified: emailVerified ? new Date() : null,
       },
     });
 

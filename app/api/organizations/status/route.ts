@@ -40,11 +40,31 @@ export async function GET(request: NextRequest) {
       where: { organizationId: userOrganization.id },
     });
 
+    const devices = await prisma.device.findMany({
+      where: { organizationId: userOrganization.id },
+    });
+
+    const channels = await prisma.channel.findMany({
+      where: { organizationId: userOrganization.id },
+    });
+
+    const fields = await prisma.field.findMany({
+      where: { organizationId: userOrganization.id },
+    });
+
+    const datapoints = await prisma.dataPoint.findMany({
+      where: { organizationId: userOrganization.id },
+    });
+
     return NextResponse.json(
       {
         hasOrganization: !!userOrganization,
         organization: userOrganization,
         members,
+        devices,
+        channels,
+        fields,
+        datapoints,
       },
       { status: 200 }
     );

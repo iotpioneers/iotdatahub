@@ -14,8 +14,9 @@ interface CountryListProps {
   selectedCountry: CountryType | null;
   setSelectedCountry: (country: CountryType | null) => void;
 }
-// Full list of countries with phone codes
-const countries: CountryType[] = [
+
+// List of countries with phone codes
+export const allCountries: CountryType[] = [
   { code: "AD", label: "Andorra", phone: "376" },
   {
     code: "AE",
@@ -440,6 +441,13 @@ const countries: CountryType[] = [
   { code: "ZW", label: "Zimbabwe", phone: "263" },
 ];
 
+// Function to convert country code to emoji flag
+const getFlagEmoji = (countryCode: string) => {
+  return countryCode
+    .toUpperCase()
+    .replace(/./g, (char) => String.fromCodePoint(127397 + char.charCodeAt(0)));
+};
+
 const CountryList: React.FC<CountryListProps> = ({
   selectedCountry,
   setSelectedCountry,
@@ -448,7 +456,7 @@ const CountryList: React.FC<CountryListProps> = ({
     <Autocomplete
       id="country-select"
       value={selectedCountry}
-      options={countries}
+      options={allCountries}
       autoHighlight
       getOptionLabel={(option) => option.label}
       renderOption={(props, option) => {
@@ -472,12 +480,16 @@ const CountryList: React.FC<CountryListProps> = ({
         );
       }}
       onChange={(event, newValue) => setSelectedCountry(newValue)}
+      isOptionEqualToValue={(option, value) =>
+        option.code === value.code && option.label === value.label
+      }
       renderInput={(params) => (
         <TextField
           {...params}
-          label="Choose a country"
+          label="Country"
           inputProps={{
             ...params.inputProps,
+            autoComplete: "new-password",
           }}
         />
       )}

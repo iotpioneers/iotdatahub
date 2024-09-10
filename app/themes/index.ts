@@ -1,3 +1,5 @@
+"use client";
+
 // material-ui
 import { createTheme, ThemeOptions, Theme } from "@mui/material/styles";
 

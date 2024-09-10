@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { configureStore } from "@reduxjs/toolkit";
 import { useSelector } from "react-redux";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 
 // material-ui
 import { useTheme } from "@mui/material/styles";
@@ -61,6 +61,7 @@ type FormData = Yup.InferType<typeof schema>;
 
 const AuthLogin = ({ ...others }) => {
   const theme = useTheme();
+  const { data: session } = useSession();
   const router = useRouter();
   const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
   const customization = useSelector((state: RootState) => state.customization);
@@ -99,25 +100,34 @@ const AuthLogin = ({ ...others }) => {
   };
 
   const loginUser = async (data: FormData) => {
-    setError(null);
     setLoading(true);
-    const response = await signIn("credentials", {
-      email: data.email,
-      password: data.password,
-      redirect: false,
-      callbackUrl: "/dashboard",
-    });
-    setLoading(false);
-    if (response?.error) {
-      setError(response.error);
-      setOpen(true);
-    } else {
-      setError(null);
-      setOpen(true);
-      router.push(process.env.NEXT_PUBLIC_BASE_URL + "/dashboard");
-    }
+    try {
+      const response = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
 
-    setLoading(false);
+      if (response?.error) {
+        setError(response.error);
+        setOpen(true);
+        return;
+      }
+
+      if (response?.ok && response?.url) {
+        if (session!.user!.role === "ADMIN") {
+          router.push("/admin");
+        } else {
+          router.push("/dashboard");
+        }
+      }
+    } catch (error) {
+      console.log("error", error);
+      setError("Failed to login");
+      setOpen(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -125,7 +135,7 @@ const AuthLogin = ({ ...others }) => {
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
-        autoHideDuration={6000}
+        autoHideDuration={20000}
         onClose={handleCloseResult}
       >
         <Alert
@@ -134,7 +144,7 @@ const AuthLogin = ({ ...others }) => {
           variant="filled"
           sx={{ width: "100%" }}
         >
-          {error ? error : "User logged successfully"}
+          {error ? error : "Login Successful ! Redirecting please wait ..."}
         </Alert>
       </Snackbar>
 
@@ -280,6 +290,7 @@ const AuthLogin = ({ ...others }) => {
               <OutlinedInput
                 id="outlined-adornment-password-login"
                 type={showPassword ? "text" : "password"}
+                autoComplete="off"
                 value={values.password}
                 name="password"
                 onBlur={handleBlur}
@@ -326,7 +337,7 @@ const AuthLogin = ({ ...others }) => {
                 }
                 label="Remember me"
               />
-              <Link href="#">
+              <Link href="/forgot-password">
                 <Typography
                   variant="subtitle1"
                   color="secondary"

@@ -8,30 +8,24 @@ import Stream from "./navigation/Stream";
 import CodeSnippet from "./navigation/CodeSnippet";
 import ExportChannelData from "./ExportChannelData";
 import { ApiKeys } from "./navigation";
-import { DataPointProps, FieldProps } from "@/types";
+import { ChannelNavigationProps } from "@/types";
+import ChannelSettings from "./navigation/ChannelSettings";
 
-interface Props {
-  channelId: string;
-  dataPoint: DataPointProps[];
-  fields: FieldProps[];
-  sampleCodes: string;
-  apiKey: string;
-}
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
 }
 
 const ChannelNavigation = ({
-  channelId,
+  channel,
   fields,
   dataPoint,
   sampleCodes,
   apiKey,
-}: Props) => {
+}: ChannelNavigationProps) => {
   return (
     <div className="bg-white">
       <header className="relative bg-white">
-        <Text className="flex h-10 items-center justify-center bg-primary-blue px-4 text-sm font-medium text-white sm:px-6 lg:px-8 mr-5">
+        <Text className="flex h-10 items-center justify-center bg-primary-blue px-4 text-sm font-medium text-white sm:px-6 lg:px-8 ">
           Onboard your devices as quick as possible
         </Text>
 
@@ -111,16 +105,19 @@ const ChannelNavigation = ({
                   )
                 }
               >
-                <ExportChannelData channelId={channelId} />
+                <ExportChannelData channelId={channel.id} />
               </Tab>
             </Tab.List>
           </div>
           <Tab.Panels as={Fragment}>
             <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
-              <Stream fields={fields} dataPoint={dataPoint} />
+              <Stream channel={channel} fields={fields} dataPoint={dataPoint} />
             </Tab.Panel>
             <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
               <CodeSnippet sampleCodes={sampleCodes} />
+            </Tab.Panel>
+            <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
+              <ChannelSettings fields={fields} channel={channel} />
             </Tab.Panel>
             <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
               <ApiKeys apiKey={apiKey} />

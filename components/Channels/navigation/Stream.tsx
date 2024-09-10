@@ -8,12 +8,11 @@ import { Grid, MenuItem, TextField, Typography } from "@mui/material";
 // project imports
 import { gridSpacing } from "./constant";
 import LineChartComponent from "../charts/LineChartComponent";
-import AddChartComponent from "../charts/AddChartComponent";
-import { DataPointProps, FieldProps } from "@/types";
-import MainCard from "@/components/dashboard/Header/cards/MainCard";
-
-// types
-import PropTypes from "prop-types";
+import GaugeChart from "../charts/GaugeChart";
+import MainCard from "@/components/dashboard/cards/MainCard";
+import { Channel, DataPoint, Field } from "@/types";
+import BarChartWidget from "../charts/BarChartWidget";
+import { AddChartComponent } from "../charts";
 
 const status = [
   {
@@ -30,56 +29,55 @@ const status = [
   },
 ];
 
-const widget = [
+const widgets = [
   {
     value: "lineChart",
-    label: "Line Chart - Displays time-series data",
+    label: "Line Chart",
   },
   {
     value: "barChart",
-    label: "Bar Chart - Compares different data points",
+    label: "Bar Chart",
   },
   {
     value: "gauge",
-    label: "Gauge - Shows real-time values",
+    label: "Gauge",
   },
   {
     value: "numericDisplay",
-    label: "Numeric Display - Shows current value readings",
+    label: "Numeric Display",
   },
   {
     value: "map",
-    label: "Map - Visualizes geographical data",
-  },
-  {
-    value: "histogram",
-    label: "Histogram - Analyzes data distribution",
-  },
-  {
-    value: "pieChart",
-    label: "Pie Chart - Displays parts of a whole",
-  },
-  {
-    value: "scatterPlot",
-    label: "Scatter Plot - Shows correlations between variables",
-  },
-  {
-    value: "heatMap",
-    label: "Heat Map - Visualizes data density",
-  },
-  {
-    value: "table",
-    label: "Table - Displays data in tabular format",
+    label: "Map",
   },
 ];
 
 interface Props {
-  dataPoint: DataPointProps[];
-  fields: FieldProps[];
+  channel: Channel;
+  dataPoint: DataPoint[];
+  fields: Field[];
 }
 
-const Stream = ({ fields, dataPoint }: Props) => {
+const Stream = ({ channel, fields, dataPoint }: Props) => {
   const [value, setValue] = useState("today");
+  const [widget, setWidget] = useState("lineChart");
+
+  const renderChart = (chartData: DataPoint[]) => {
+    switch (widget) {
+      case "lineChart":
+        return <LineChartComponent chartData={chartData} />;
+      case "barChart":
+        return <BarChartWidget chartData={chartData} />;
+      case "gauge":
+        return <GaugeChart chartData={chartData} />;
+      case "numericDisplay":
+      //   return <NumericDisplay chartData={chartData} />;
+      // case "map":
+      //   return <MapComponent chartData={chartData} />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -121,10 +119,7 @@ const Stream = ({ fields, dataPoint }: Props) => {
                   </Grid>
                 </Grid>
                 <Grid item xs={12}>
-                  <LineChartComponent
-                    chartData={chartData}
-                    field={field.name}
-                  />
+                  {renderChart(chartData)}
                 </Grid>
               </Grid>
             </MainCard>
@@ -146,10 +141,10 @@ const Stream = ({ fields, dataPoint }: Props) => {
                 <TextField
                   id="standard-select-currency"
                   select
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
+                  value={widget}
+                  onChange={(e) => setWidget(e.target.value)}
                 >
-                  {widget.map((option) => (
+                  {widgets.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.label}
                     </MenuItem>
@@ -159,16 +154,12 @@ const Stream = ({ fields, dataPoint }: Props) => {
             </Grid>
           </Grid>
           <Grid item xs={12} className="flex justify-center items-center">
-            <AddChartComponent />
+            <AddChartComponent channel={channel} />
           </Grid>
         </Grid>
       </MainCard>
     </div>
   );
-};
-
-Stream.propTypes = {
-  isLoading: PropTypes.bool,
 };
 
 export default Stream;

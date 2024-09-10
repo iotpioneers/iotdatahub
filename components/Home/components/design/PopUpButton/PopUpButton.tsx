@@ -1,7 +1,8 @@
+"use client";
+
 import React, { useState } from "react";
-import Modal from "./Modal";
 import { motion } from "framer-motion";
-import { Tooltip } from "@material-tailwind/react";
+import Modal from "./Modal";
 
 type PopUpButtonProps = {
   handleScroll: () => void;

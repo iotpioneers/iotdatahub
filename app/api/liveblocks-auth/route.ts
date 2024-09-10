@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (!userFound) {
-    throw new Error("User not found");
+    throw new Error("You need to be logged in");
   }
 
   const { id, name, email, image } = userFound;
@@ -28,9 +28,9 @@ export async function POST(request: NextRequest) {
     id,
     info: {
       id,
-      name: name,
-      email: email,
-      avatar: image!,
+      name,
+      email,
+      avatar: image || "",
       color: getUserColor(id),
     },
   };

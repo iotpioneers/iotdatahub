@@ -2,7 +2,7 @@ import { CustomThemeProperties } from "./index";
 
 export default function themeTypography(theme: CustomThemeProperties) {
   return {
-    fontFamily: theme?.customization?.fontFamily || "Arial, sans-serif",
+    fontFamily: theme?.customization?.fontFamily,
     h6: {
       fontWeight: 500,
       color: theme.heading,
@@ -60,7 +60,7 @@ export default function themeTypography(theme: CustomThemeProperties) {
       color: theme.darkTextPrimary,
     },
     button: {
-      textTransform: "capitalize" as const,
+      textTransform: "uppercase" as any,
     },
     customInput: {
       marginTop: 1,
@@ -84,14 +84,16 @@ export default function themeTypography(theme: CustomThemeProperties) {
       },
     },
     mainContent: {
-      backgroundColor: theme.background || "#ffffff",
+      backgroundColor: theme.background,
       width: "100%",
       minHeight: "calc(100vh - 88px)",
       flexGrow: 1,
       padding: "20px",
       marginTop: "88px",
       marginRight: "20px",
-      borderRadius: `${theme?.customization?.borderRadius}px` || "4px",
+      fontSize: "1.2rem",
+      fontWeight: "bold",
+      borderRadius: `${theme?.customization?.borderRadius}px`,
     },
     menuCaption: {
       fontSize: "0.875rem",

@@ -77,7 +77,14 @@ const schema = Yup.object().shape({
     .typeError("Must be a valid phone number")
     .required("Phone is required"),
 
-  password: Yup.string().min(8).max(255).required("Password is required"),
+  password: Yup.string()
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
+    )
+    .min(8)
+    .max(255)
+    .required("Password is required"),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Passwords must match")
     .required("Confirm Password is required"),
@@ -97,7 +104,6 @@ const AuthRegister = ({ ...others }) => {
   const [level, setLevel] = useState<LevelType>(undefined);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const [open, setOpen] = React.useState(false);
   const [selectedCountry, setSelectedCountry] = useState<CountryType | null>(
     null
@@ -146,7 +152,6 @@ const AuthRegister = ({ ...others }) => {
       ? `${phoneCode} ${data.phonenumber}`
       : data.phonenumber;
 
-    setError(null);
     setLoading(true);
 
     const response = await fetch("/api/register", {
@@ -163,15 +168,11 @@ const AuthRegister = ({ ...others }) => {
     const result = await response.json();
 
     if (!response.ok) {
-      setLoading(false);
       setError(result.message);
       setOpen(true);
-      return;
     }
 
     try {
-      setError(null);
-      setLoading(true);
       const response = await axios.post("/api/email/send", {
         userFullName: data.firstname + " " + data.lastname,
         userEmail: data.email,
@@ -180,26 +181,16 @@ const AuthRegister = ({ ...others }) => {
       if (response.status !== 200) {
         setError("Failed to send verification email");
         setOpen(true);
-        setLoading(false);
       }
 
-      setSuccess(
-        `We have sent an email to your email account : ${data.email}. Please check your email and click on the link to verify your email address.`
-      );
-      setOpen(true);
-      setLoading(false);
-      setError(null);
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 10000);
+      router.push("/verify-account");
     } catch (error) {
       setError("Failed to send verification email");
       setOpen(true);
+    } finally {
       setLoading(false);
+      setError(null);
     }
-
-    setError(result.message);
-    setOpen(true);
   };
 
   return (
@@ -207,17 +198,16 @@ const AuthRegister = ({ ...others }) => {
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
-        autoHideDuration={6000}
+        autoHideDuration={12000}
         onClose={handleCloseResult}
       >
         <Alert
           onClose={handleCloseResult}
-          severity={error ? "error" : "success"}
+          severity="error"
           variant="standard"
           sx={{ width: "100%" }}
         >
           {error && error}
-          {success && success}
         </Alert>
       </Snackbar>
 
@@ -246,7 +236,7 @@ const AuthRegister = ({ ...others }) => {
                   style={{ marginRight: matchDownSM ? 8 : 16 }}
                 />
               </Box>
-              Sign in with Google
+              Sign up with Google
             </Button>
           </AnimateButton>
           {isGoogleSign && <LoadingProgressBar />}
@@ -428,54 +418,67 @@ const AuthRegister = ({ ...others }) => {
                 </FormHelperText>
               )}
             </FormControl>
-            <Grid container spacing={matchDownSM ? 0 : 2}>
-              {selectedCountry?.phone && (
-                <Grid item xs={12} sm={3}>
+            {selectedCountry && selectedCountry !== null && (
+              <Grid container spacing={matchDownSM ? 0 : 2}>
+                {selectedCountry?.phone && (
+                  <Grid item xs={12} sm={3}>
+                    <FormControl
+                      fullWidth
+                      sx={{ ...theme.typography.customInput }}
+                    >
+                      <InputLabel
+                        htmlFor="outlined-adornment-phonecode-register"
+                        className="flex justify-between items-center gap-2"
+                      >
+                        Code
+                        <img
+                          loading="lazy"
+                          width="20"
+                          srcSet={`https://flagcdn.com/w40/${selectedCountry?.code.toLowerCase()}.png 2x`}
+                          src={`https://flagcdn.com/w20/${selectedCountry?.code.toLowerCase()}.png`}
+                          alt=""
+                          style={{ marginRight: "8px" }}
+                        />
+                      </InputLabel>
+                      <OutlinedInput
+                        id="outlined-adornment-phonecode"
+                        type="text"
+                        value={`+ ${selectedCountry?.phone}`}
+                        name="phonecode"
+                      />
+                    </FormControl>
+                  </Grid>
+                )}
+                <Grid item xs={12} sm={selectedCountry?.phone ? 9 : 12}>
                   <FormControl
                     fullWidth
+                    error={Boolean(touched.phonenumber && errors.phonenumber)}
                     sx={{ ...theme.typography.customInput }}
                   >
-                    <InputLabel htmlFor="outlined-adornment-phonecode-register">
-                      Code
+                    <InputLabel htmlFor="outlined-adornment-phonenumber-register">
+                      Phone Number
                     </InputLabel>
                     <OutlinedInput
-                      id="outlined-adornment-phonecode"
-                      type="text"
-                      value={`+ ${selectedCountry?.phone}`}
-                      name="phonecode"
+                      id="outlined-adornment-phonenumber-register"
+                      type="number"
+                      value={values.phonenumber}
+                      name="phonenumber"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      inputProps={{}}
                     />
+                    {touched.phonenumber && errors.phonenumber && (
+                      <FormHelperText
+                        error
+                        id="standard-weight-helper-text--register"
+                      >
+                        {errors.phonenumber}
+                      </FormHelperText>
+                    )}
                   </FormControl>
                 </Grid>
-              )}
-              <Grid item xs={12} sm={selectedCountry?.phone ? 9 : 12}>
-                <FormControl
-                  fullWidth
-                  error={Boolean(touched.phonenumber && errors.phonenumber)}
-                  sx={{ ...theme.typography.customInput }}
-                >
-                  <InputLabel htmlFor="outlined-adornment-phonenumber-register">
-                    Phone Number
-                  </InputLabel>
-                  <OutlinedInput
-                    id="outlined-adornment-phonenumber-register"
-                    type="number"
-                    value={values.phonenumber}
-                    name="phonenumber"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    inputProps={{}}
-                  />
-                  {touched.phonenumber && errors.phonenumber && (
-                    <FormHelperText
-                      error
-                      id="standard-weight-helper-text--register"
-                    >
-                      {errors.phonenumber}
-                    </FormHelperText>
-                  )}
-                </FormControl>
               </Grid>
-            </Grid>
+            )}
             <FormControl
               fullWidth
               error={Boolean(touched.password && errors.password)}
@@ -490,6 +493,7 @@ const AuthRegister = ({ ...others }) => {
                 value={values.password}
                 name="password"
                 label="Password"
+                autoComplete="off"
                 onBlur={handleBlur}
                 onChange={(e) => {
                   handleChange(e);
@@ -553,6 +557,7 @@ const AuthRegister = ({ ...others }) => {
                 <OutlinedInput
                   id="outlined-adornment-confirmPassword-register"
                   type="password"
+                  autoComplete="off"
                   value={values.confirmPassword}
                   name="confirmPassword"
                   label="Confirm Password"

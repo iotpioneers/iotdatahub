@@ -135,7 +135,6 @@ export async function POST(req: NextRequest) {
         </html>
         `,
     };
-    console.log("NEXT_PUBLIC_BASE_URL", process.env.NEXT_PUBLIC_BASE_URL);
 
     await transporter.sendMail(message);
 

@@ -1,10 +1,15 @@
 "use client";
 
+import { SampleCodes } from "@/types";
 import { Callout } from "@radix-ui/themes";
 import { error } from "console";
 import React, { useState } from "react";
 
-const CodeSnippet = ({ sampleCodes }: { sampleCodes: string }) => {
+interface CodeSnippetProps {
+  sampleCodes: SampleCodes;
+}
+
+const CodeSnippet = ({ sampleCodes }: CodeSnippetProps) => {
   const [copied, setCopied] = useState(false);
 
   const copyToClipBoard = async (copyMe: string) => {
@@ -33,14 +38,14 @@ const CodeSnippet = ({ sampleCodes }: { sampleCodes: string }) => {
           <span className="text-gray-100 text-2xl">Sample Code</span>
           <button
             className="code bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1 rounded-md"
-            onClick={() => copyToClipBoard(sampleCodes)}
+            onClick={() => copyToClipBoard(sampleCodes.codes)}
           >
             Copy
           </button>
         </div>
         <div className="overflow-x-auto">
           <pre id="code" className="text-gray-300">
-            <code>{sampleCodes}</code>
+            <code>{sampleCodes.codes}</code>
           </pre>
         </div>
       </div>

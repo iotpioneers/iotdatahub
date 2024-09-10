@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "@mui/material/styles";
-import Avatar from "@mui/material/Avatar";
 import Badge from "@mui/material/Badge";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
@@ -20,15 +19,13 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ButtonBase from "@mui/material/ButtonBase";
-import Transitions from "../extended/Transitions";
+import Transitions from "../../extended/Transitions";
 import NotificationList from "./NotificationList";
 import { IconBell } from "@tabler/icons-react";
-import PerfectScrollbar from "react-perfect-scrollbar";
-import MainCard from "../cards/MainCard";
+import MainCard from "../../cards/MainCard";
 import { useUnreadInboxNotificationsCount } from "@liveblocks/react/suspense";
 import Link from "next/link";
 
-// notification status options
 const status = [
   { value: "all", label: "All Notification" },
   { value: "new", label: "New" },
@@ -76,37 +73,38 @@ const NotificationSection = () => {
           [theme.breakpoints.down("md")]: {
             mr: 2,
           },
+          zIndex: theme.zIndex.drawer + 100,
         }}
       >
         <ButtonBase sx={{ borderRadius: "24px" }}>
-          <Avatar
-            component="button"
-            variant="rounded"
-            sx={{
-              ...theme.typography.commonAvatar,
-              ...theme.typography.mediumAvatar,
-              transition: "all .2s ease-in-out",
-              background: theme.palette.secondary.light,
-              color: theme.palette.secondary.dark,
-              '&[aria-controls="menu-list-grow"],&:hover': {
-                background: theme.palette.secondary.dark,
-                color: theme.palette.secondary.light,
-              },
-            }}
-            ref={anchorRef}
-            aria-controls={open ? "menu-list-grow" : undefined}
-            aria-haspopup="true"
-            onClick={handleToggle}
-            color="inherit"
-          >
-            <Tooltip title="Notifications">
-              <Badge badgeContent={count} color="info" variant="standard">
-                <IconButton>
-                  <IconBell stroke={1.5} size="1.3rem" />
-                </IconButton>
-              </Badge>
-            </Tooltip>
-          </Avatar>
+          <Tooltip title="Notifications">
+            <Badge
+              badgeContent={count > 9 ? "9+" : count}
+              color="error"
+              variant="standard"
+            >
+              <IconButton
+                sx={{
+                  ...theme.typography.commonAvatar,
+                  ...theme.typography.mediumAvatar,
+                  transition: "all .2s ease-in-out",
+                  background: theme.palette.secondary.light,
+                  color: theme.palette.secondary.dark,
+                  '&[aria-controls="menu-list-grow"],&:hover': {
+                    background: theme.palette.secondary.dark,
+                    color: theme.palette.secondary.light,
+                  },
+                }}
+                ref={anchorRef}
+                aria-controls={open ? "menu-list-grow" : undefined}
+                aria-haspopup="true"
+                onClick={handleToggle}
+                color="inherit"
+              >
+                <IconBell stroke={1.5} size="1.3rem" />
+              </IconButton>
+            </Badge>
+          </Tooltip>
         </ButtonBase>
       </Box>
       <Popper
@@ -151,14 +149,14 @@ const NotificationSection = () => {
                         justifyContent="space-between"
                         sx={{ pt: 2, px: 2 }}
                       >
-                        <Grid item>
-                          <Stack direction="row" spacing={2}>
+                        <Grid item sx={{ mr: 1 }}>
+                          <Stack direction="row" spacing={1}>
                             <Typography variant="subtitle1">
                               All Notification
                             </Typography>
                             <Chip
                               size="small"
-                              label={count}
+                              label={count > 9 ? "9+" : count}
                               sx={{
                                 color: theme.palette.background.default,
                                 bgcolor: theme.palette.warning.dark,
@@ -176,52 +174,34 @@ const NotificationSection = () => {
                       </Grid>
                     </Grid>
                     <Grid item xs={12}>
-                      <PerfectScrollbar
-                        style={{
-                          height: "100%",
-                          maxHeight: "calc(100vh - 20px)",
-                          overflowX: "hidden",
-                        }}
-                      >
-                        <Grid container direction="column" spacing={2}>
-                          <Grid item xs={12}>
-                            <Box sx={{ px: 2, pt: 0.25 }}>
-                              <TextField
-                                id="outlined-select-currency-native"
-                                select
-                                fullWidth
-                                value={value}
-                                onChange={handleChange}
-                                SelectProps={{
-                                  native: true,
-                                }}
-                              >
-                                {status.map((option) => (
-                                  <option
-                                    key={option.value}
-                                    value={option.value}
-                                  >
-                                    {option.label}
-                                  </option>
-                                ))}
-                              </TextField>
-                            </Box>
-                          </Grid>
-                          <Grid item xs={12} p={0}>
-                            <Divider sx={{ my: 0 }} />
-                          </Grid>
-                        </Grid>
-
+                      <Box sx={{ px: 2, pt: 0.25 }}>
+                        <TextField
+                          id="outlined-select-currency-native"
+                          select
+                          fullWidth
+                          value={value}
+                          onChange={handleChange}
+                          SelectProps={{
+                            native: true,
+                          }}
+                        >
+                          {status.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </TextField>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} p={0}>
+                      <Divider sx={{ my: 0 }} />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Box sx={{ height: "400px", overflowY: "auto" }}>
                         <NotificationList />
-                      </PerfectScrollbar>
+                      </Box>
                     </Grid>
                   </Grid>
-                  <Divider />
-                  <CardActions sx={{ p: 1.25, justifyContent: "center" }}>
-                    <Button size="small" disableElevation>
-                      View All
-                    </Button>
-                  </CardActions>
                 </MainCard>
               </ClickAwayListener>
             </Paper>

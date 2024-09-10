@@ -1,32 +1,75 @@
 import { BaseMetadata } from "@liveblocks/client";
 import { ThreadData } from "@liveblocks/node";
 
-export interface ChannelProps {
+export interface ApiKey {
+  id: string;
+  apiKey: string;
+  userId: string;
+  channelId: string;
+  organizationId: string;
+}
+
+export interface SampleCodes {
+  id: string;
+  codes: string;
+  apiKeyId: string;
+  organizationId: string;
+}
+
+export interface Device {
+  id: string;
+  name: string;
+  description: string;
+  channelId: string | null;
+  organizationId: string;
+  status: "ONLINE" | "OFFLINE" | "DISCONNECTED";
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+}
+
+export interface Channel {
   id: string;
   name: string;
   description: string;
   deviceId?: string | null;
+  organizationId: string;
   access: "PUBLIC" | "PRIVATE";
-  createdAt: string;
-  updatedAt: string;
+  ownerEmail: string;
+  ownerImage: string;
+  createdAt: Date;
+  updatedAt: Date;
   userId: string;
 }
-export interface DataPointProps {
+
+export interface DataPoint {
   id: string;
   timestamp: string;
   value: number;
   fieldId: string;
   channelId: string;
+  organizationId: string;
   createdAt: string;
   updatedAt: string;
 }
-export interface FieldProps {
+export interface Field {
   id: string;
   name: string;
   description: string;
   channelId: string;
+  organizationId: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Organization {
+  areaOfInterest: string;
+  createdAt: Date;
+  id: string;
+  name: string;
+  type: string;
+  updatedAt: Date;
+  userId: string;
 }
 
 export interface Member {
@@ -42,21 +85,46 @@ export interface Member {
   organizationId: string;
 }
 
+export interface PricingPlanType {
+  id?: string;
+  name: string;
+  description?: string;
+  type: "FREE" | "PREMIUM" | "ENTERPRISE";
+  billingCycle: "MONTHLY" | "YEARLY";
+  price: number;
+  maxChannels: number;
+  maxMessagesPerYear: number;
+  features: string[];
+  activation: boolean;
+}
+
+export interface UserSubscriptionData {
+  id: string;
+  name: string;
+  type: string;
+  status: string;
+  currentPeriodStart: Date;
+  currentPeriodEnd: Date;
+  cancelAtPeriodEnd: boolean;
+  pricingTierId: string;
+  organizationId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface AddMemberProps {
   onNewMember: (newMember: Member) => void;
 }
 
 /* eslint-disable no-unused-vars */
-export type SearchParamProps = {
-  params: { [key: string]: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
 
-export type AccessType = ["room:write"] | ["room:read", "room:presence:write"];
+export type ChannelAccessType =
+  | ["room:write"]
+  | ["room:read", "room:presence:write"];
 
-export type RoomAccesses = Record<string, AccessType>;
+export type RoomAccesses = Record<string, ChannelAccessType>;
 
-export type UserType = "creator" | "editor" | "viewer";
+export type UserAccessType = "viewer" | "editor";
 
 export type RoomMetadata = {
   creatorId: string;
@@ -67,9 +135,8 @@ export type RoomMetadata = {
 export type CreateChannelRoomParams = {
   roomId: string;
   email: string;
-  creator: string;
+  userId: string;
   title: string;
-  description: string;
 };
 
 export type User = {
@@ -78,27 +145,30 @@ export type User = {
   email: string;
   avatar?: string;
   color: string;
-  userType?: UserType;
+  userType?: UserAccessType;
 };
 
-export type ShareDocumentParams = {
+export interface ShareChannelParams {
   roomId: string;
-  email: string;
-  userType: UserType;
+  collaborators: Array<{
+    email: string;
+    userType: UserAccessType;
+  }>;
+  notifyPeople: boolean;
+  message?: string;
   updatedBy: User;
-};
+}
 
 export type UserTypeSelectorParams = {
   userType: string;
-  setUserType: React.Dispatch<React.SetStateAction<UserType>>;
+  setUserType: React.Dispatch<React.SetStateAction<UserAccessType>>;
   onClickHandler?: (value: string) => void;
 };
 
-export type ShareDocumentDialogProps = {
+export type ShareChannelRoomAccessDialogProps = {
   roomId: string;
-  collaborators: User[];
   creator: string;
-  currentUserType: UserType;
+  currentUserType: UserAccessType;
 };
 
 export type HeaderProps = {
@@ -108,17 +178,37 @@ export type HeaderProps = {
 
 export type CollaboratorProps = {
   roomId: string;
-  email: string;
+  receiverEmail: string;
   creator: string;
   collaborator: User;
   user: User;
 };
 
-export type CollaborativeRoomProps = {
+export type ChannelHeadingProps = {
   roomId: string;
   roomMetadata: RoomMetadata;
-  users: User[];
-  currentUserType: UserType;
+  currentUserType: UserAccessType;
+  channel: Channel;
+  dataPoint: DataPoint[];
+};
+
+export type ChannelNavigationProps = {
+  channel: Channel;
+  dataPoint: DataPoint[];
+  fields: Field[];
+  sampleCodes: SampleCodes;
+  apiKey: ApiKey;
+};
+
+export type ChannelCollaborativeRoomProps = {
+  roomId: string;
+  roomMetadata: RoomMetadata;
+  currentUserType: UserAccessType;
+  channel: Channel;
+  dataPoint: DataPoint[];
+  fields: Field[];
+  apiKey: ApiKey;
+  sampleCodes: SampleCodes;
 };
 
 export type AddDocumentBtnProps = {
@@ -126,6 +216,6 @@ export type AddDocumentBtnProps = {
   email: string;
 };
 
-export type DeleteModalProps = { roomId: string };
+export type DeleteModalProps = { channelId: string };
 
 export type ThreadWrapperProps = { thread: ThreadData<BaseMetadata> };

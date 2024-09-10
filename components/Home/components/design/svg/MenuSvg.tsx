@@ -18,7 +18,7 @@ const MenuSvg = ({ openNavigation }: MenuSvgProps) => {
         width="20"
         height="2"
         rx="1"
-        fill="white"
+        fill="violet"
         transform={`rotate(${openNavigation ? "45" : "0"})`}
       />
       <rect
@@ -27,7 +27,7 @@ const MenuSvg = ({ openNavigation }: MenuSvgProps) => {
         width="20"
         height="2"
         rx="1"
-        fill="white"
+        fill="violet"
         transform={`rotate(${openNavigation ? "-45" : "0"})`}
       />
     </svg>

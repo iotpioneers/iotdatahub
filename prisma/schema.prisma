@@ -69,13 +69,11 @@ model User {
   id             String          @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   email          String          @unique
-  country        String
-  phonenumber    String
+  country        String?
+  phonenumber    String?
   emailVerified  DateTime?
   image          String?
   password       String?
-  position       String?
-  isNew          Boolean         @default(true)
   role           Role            @default(USER)
   accounts       Account[]
   sessions       Session[]
@@ -88,122 +86,9 @@ model User {
   subscription   Subscription?   @relation(fields: [subscriptionId], references: [id])
   organization   Organization?   @relation(fields: [organizationId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
-}
-
-model Device {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String?
-  userId      String       @db.ObjectId
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  channelId   String       @db.ObjectId
-  channel     Channel      @relation(fields: [channelId], references: [id])
-  status      DeviceStatus @default(OFFLINE)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
-
-  @@index([channelId])
-  @@index([userId])
-}
-
-model Channel {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String?
-  access      Access      @default(PRIVATE)
-  fields      Field[]
-  dataPoints  DataPoint[]
-  userId      String      @db.ObjectId
-  user        User        @relation(fields: [userId], references: [id])
-  apiKeys     ApiKey[]
-  devices     Device[]
-
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt()
-  SampleCodes SampleCodes[]
-
-  @@index([userId])
-}
-
-model Field {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String?
-  channelId   String      @db.ObjectId
-  channel     Channel     @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  dataPoints  DataPoint[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
-
-  @@index([channelId])
-}
-
-model DataPoint {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  timestamp DateTime @default(now())
-  value     Float
-  fieldId   String   @db.ObjectId
-  field     Field    @relation(fields: [fieldId], references: [id], onDelete: Cascade)
-  channelId String   @db.ObjectId
-  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
-
-  @@index([fieldId])
-  @@index([channelId])
-}
-
-model ApiKey {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  apiKey      String        @unique
-  userId      String        @db.ObjectId
-  user        User          @relation(fields: [userId], references: [id])
-  channelId   String        @db.ObjectId
-  channel     Channel       @relation(fields: [channelId], references: [id])
-  fields      String[]
-  expiresAt   DateTime?
-  SampleCodes SampleCodes[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
-
-  @@index([userId])
-  @@index([channelId])
-}
-
-model SampleCodes {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  codes     String
-  apiKeyId  String   @db.ObjectId
-  apiKey    ApiKey   @relation(fields: [apiKeyId], references: [id])
-  channelId String   @db.ObjectId
-  channel   Channel  @relation(fields: [channelId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
-
-  @@index([apiKeyId])
-  @@index([channelId])
-}
-
-model Subscription {
-  id                 String           @id @default(auto()) @map("_id") @db.ObjectId
-  name               String
-  description        String?
-  type               SubscriptionType
-  price              Float
-  maxChannels        Int
-  maxMessagesPerYear Int
-  features           String[]
-  activation         Boolean          @default(false)
-  users              User[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt()
+  Invoice   Invoice[]
 }
 
 model Organization {
@@ -216,8 +101,15 @@ model Organization {
   users          User[]
   members        Member[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt()
+  Channel      Channel[]
+  Device       Device[]
+  Field        Field[]
+  DataPoint    DataPoint[]
+  ApiKey       ApiKey[]
+  SampleCodes  SampleCodes[]
+  Subscription Subscription[]
 
   @@index([userId])
 }
@@ -237,6 +129,210 @@ model Member {
   updatedAt DateTime @updatedAt()
 
   @@unique([email, organizationId])
+}
+
+model Device {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  description    String?
+  userId         String       @db.ObjectId
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channelId      String       @db.ObjectId
+  channel        Channel      @relation(fields: [channelId], references: [id])
+  organizationId String       @db.ObjectId
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  status         DeviceStatus @default(OFFLINE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  @@index([organizationId])
+  @@index([channelId])
+  @@index([userId])
+}
+
+model Channel {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  description    String?
+  access         Access       @default(PRIVATE)
+  fields         Field[]
+  dataPoints     DataPoint[]
+  userId         String       @db.ObjectId
+  user           User         @relation(fields: [userId], references: [id])
+  organizationId String       @db.ObjectId
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  apiKeys        ApiKey[]
+  devices        Device[]
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt()
+  SampleCodes SampleCodes[]
+
+  @@index([userId])
+  @@index([organizationId])
+}
+
+model Field {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  description    String?
+  channelId      String       @db.ObjectId
+  channel        Channel      @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  organizationId String       @db.ObjectId
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  dataPoints     DataPoint[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  @@index([channelId])
+  @@index([organizationId])
+}
+
+model DataPoint {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  timestamp      DateTime     @default(now())
+  value          Float
+  fieldId        String       @db.ObjectId
+  field          Field        @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  channelId      String       @db.ObjectId
+  channel        Channel      @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  organizationId String       @db.ObjectId
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  @@index([fieldId])
+  @@index([channelId])
+  @@index([organizationId])
+}
+
+model ApiKey {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  apiKey         String        @unique
+  userId         String        @db.ObjectId
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channelId      String        @db.ObjectId
+  channel        Channel       @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  organizationId String        @db.ObjectId
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  fields         String[]
+  expiresAt      DateTime?
+  SampleCodes    SampleCodes[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  @@index([userId])
+  @@index([channelId])
+  @@index([organizationId])
+}
+
+model SampleCodes {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  codes          String
+  apiKeyId       String       @db.ObjectId
+  apiKey         ApiKey       @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  channelId      String       @db.ObjectId
+  channel        Channel      @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  organizationId String       @db.ObjectId
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt()
+
+  @@index([apiKeyId])
+  @@index([channelId])
+  @@index([organizationId])
+}
+
+model PricingTier {
+  id                 String           @id @default(auto()) @map("_id") @db.ObjectId
+  name               String
+  description        String?
+  price              Float
+  type               SubscriptionType
+  billingCycle       BillingCycleType
+  maxChannels        Int
+  maxMessagesPerYear Int
+  features           String[]
+  subscriptions      Subscription[]
+  activation         Boolean          @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model Subscription {
+  id                 String             @id @default(auto()) @map("_id") @db.ObjectId
+  name               String
+  description        String?
+  type               SubscriptionType
+  status             SubscriptionStatus @default(ACTIVE)
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean            @default(false)
+  pricingTierId      String             @db.ObjectId
+  pricingTier        PricingTier        @relation(fields: [pricingTierId], references: [id])
+  users              User[]
+  organizationId     String?            @db.ObjectId
+  organization       Organization?      @relation(fields: [organizationId], references: [id])
+  paymentIntentId    String?            @db.ObjectId
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt()
+  Invoice   Invoice[]
+}
+
+model Invoice {
+  id                 String            @id @default(auto()) @map("_id") @db.ObjectId
+  userId             String            @db.ObjectId
+  user               User              @relation(fields: [userId], references: [id])
+  subscriptionId     String            @db.ObjectId
+  subscription       Subscription      @relation(fields: [subscriptionId], references: [id])
+  amount             Float
+  status             InvoiceStatus
+  stripeChargeId     String
+  paymentMethod      String
+  paymentType        PaymentMethodType
+  lastFourCardDigits String?
+  expiryDate         DateTime?
+  paidAt             DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  CANCELED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  UNPAID
+}
+
+enum BillingCycleType {
+  MONTHLY
+  YEARLY
+}
+
+enum PaymentMethodType {
+  CREDIT_CARD
+  PAYPAL
+  BANK_TRANSFER
+}
+
+enum InvoiceStatus {
+  PAID
+  UNPAID
+  VOID
 }
 
 enum Role {

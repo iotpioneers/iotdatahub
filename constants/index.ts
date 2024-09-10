@@ -19,12 +19,6 @@ export const navigation = [
     title: "Pricing",
     url: "/pricing",
   },
-  {
-    id: "4",
-    title: "New account",
-    url: "/register",
-    onlyMobile: true,
-  },
 ];
 
 export const heroIcons = ["star.svg", "star.svg", "star.svg", "star.svg"];
@@ -78,7 +72,7 @@ export const roadmap = [
   {
     id: "3",
     title: "API Integrations",
-    text: "Allow integration with third-party APIs to extend the functionality and capabilities of the IoT platform.",
+    text: "Allow integration with third-party APIs to extend the functionality and capabilities.",
     date: "Sept 2024",
     status: "progress",
     imageUrl: "roadmap/image-5.jpg",
@@ -101,42 +95,6 @@ export const collabContent = [
   {
     id: "2",
     title: "Top-notch Security",
-  },
-];
-
-export const pricing = [
-  {
-    id: "0",
-    title: "Basic",
-    description: "Device control, data storage",
-    price: "0",
-    features: [
-      "Basic device control",
-      "Data storage for up to 3 devices",
-      "Community support",
-    ],
-  },
-  {
-    id: "1",
-    title: "Premium",
-    description: "Advanced analytics, priority support, extended storage",
-    price: "9.99",
-    features: [
-      "Advanced analytics and reporting",
-      "Priority support",
-      "Extended data storage for up to 10 devices",
-    ],
-  },
-  {
-    id: "2",
-    title: "Enterprise",
-    description: "Custom solutions, dedicated support, unlimited storage",
-    price: null,
-    features: [
-      "Custom IoT solutions",
-      "Dedicated support team",
-      "Unlimited data storage",
-    ],
   },
 ];
 

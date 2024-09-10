@@ -4,11 +4,11 @@ const LoadingSpinner = () => {
   return (
     <div className="loader">
       <Image
-        src="/assets/icons/loader.svg"
+        src="/icons/loader.svg"
         alt="loader"
         width={44}
         height={44}
-        className="animate-spin mr-1"
+        className="animate-spin"
       />
       Loading...
     </div>

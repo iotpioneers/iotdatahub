@@ -45,8 +45,8 @@ export async function GET(
     channel,
     dataPoint,
     fields,
-    apiKey: apiKey.apiKey,
-    sampleCodes: sampleCodes.codes,
+    apiKey,
+    sampleCodes,
   });
 }
 
@@ -68,6 +68,7 @@ export async function PUT(
     data: {
       name: body.name || channel.name,
       description: body.description || channel.description,
+      access: body.access || channel.access,
     },
   });
 

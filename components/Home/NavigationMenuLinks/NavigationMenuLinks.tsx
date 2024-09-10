@@ -47,7 +47,7 @@ const NavigationMenuLinks = () => {
                 <ListItem title="Documentation" href="#">
                   Access API and user documentation.
                 </ListItem>
-                <ListItem title="Featured Hardware" href="#">
+                <ListItem title="Featured Hardware" href="/featured">
                   Discover featured IoT hardware.
                 </ListItem>
               </ul>
@@ -113,7 +113,7 @@ const NavigationMenuLinks = () => {
                 <ListItem title="About Us" href="#">
                   Learn more about our company.
                 </ListItem>
-                <ListItem title="Blogs" href="#">
+                <ListItem title="Blogs" href="/blogs">
                   Read our latest blogs and updates.
                 </ListItem>
               </ul>

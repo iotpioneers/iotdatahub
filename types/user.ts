@@ -1,4 +1,4 @@
-export interface User {
+export interface CollaborationUser {
   id: string;
   name: string;
   avatar?: string;
@@ -6,4 +6,17 @@ export interface User {
   color: string;
 
   [key: string]: unknown;
+}
+
+export interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  image: string;
+  country: string;
+  phonenumber: string;
+  emailVerified: Date | null;
+  role: string;
+  subscriptionId?: string;
+  organizationId?: string;
 }

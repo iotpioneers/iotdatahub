@@ -1,7 +1,7 @@
 import React from "react";
 import { SxProps } from "@mui/system";
 import Box from "@mui/material/Box";
-import MainCard from "../dashboard/Header/cards/MainCard";
+import MainCard from "../dashboard/cards/MainCard";
 
 // Define the props for AuthCardWrapper
 interface AuthCardWrapperProps {

@@ -4,13 +4,13 @@ import ClientRootLayout from "@/app/ClientRootLayout";
 import "../globals.css";
 import { Container } from "@radix-ui/themes";
 
-import Provider from "../Provider";
+import CollaborationProvider from "../CollaborationProvider";
 import DashboardNavigation from "@/components/dashboard/DashboardNavigation";
 
 export const metadata: Metadata = {
-  title: "IoTDataHub",
+  title: "IoTDataHub - Dashboard",
   description:
-    "Your one-stop destination for seamless and efficient IoT Plug and Play services. Our cutting-edge solutions empower businesses to effortlessly connect, manage, and optimize their IoT devices, enabling a smarter and more connected world.",
+    "Manage your IoT devices with ease. Our IoT Plug and Play solutions empower businesses to seamlessly connect, manage, and optimize their IoT devices, enabling a smarter and more connected world.",
 };
 
 export default function RootLayout({
@@ -22,12 +22,12 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <ClientRootLayout>
-          <Provider>
+          <CollaborationProvider>
             <DashboardNavigation />
-            <div className="flex flex-col flex-gro lg:ml-64 xs:mx-2">
+            <div className="flex flex-col flex-grow lg:ml-64 xs:mx-2 mt-24">
               <Container>{children}</Container>
             </div>
-          </Provider>
+          </CollaborationProvider>
         </ClientRootLayout>
       </body>
     </html>

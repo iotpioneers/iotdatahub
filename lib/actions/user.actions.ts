@@ -2,26 +2,27 @@
 
 import { parseStringify } from "../utils";
 import { liveblocks } from "../liveblocks";
-import { User } from "@/types/user";
+import { UserData } from "@/types/user";
+import axios from "axios";
 
-export const getUsersByEmails = async ({ userIds }: { userIds: string[] }) => {
+export const getUsers = async ({ userIds }: { userIds: string[] }) => {
   try {
-    const response = await fetch(
-      process.env.NEXT_PUBLIC_BASE_URL + "/api/users",
+    const response = await axios.post(
+      process.env.NEXT_PUBLIC_BASE_URL + "/api/users/emails",
       {
-        method: "GET",
+        userIds,
       }
     );
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       return;
     }
 
-    const data = await response.json();
+    const data = await response.data;
 
     if (!data) return;
 
-    const users = data.map((user: User) => ({
+    const users = data.map((user: UserData) => ({
       id: user.id,
       name: user.name,
       email: user.email,
@@ -29,7 +30,7 @@ export const getUsersByEmails = async ({ userIds }: { userIds: string[] }) => {
     }));
 
     const sortedUsers = userIds.map((email) =>
-      users.find((user: User) => user.email === email)
+      users.find((user: UserData) => user.email === email)
     );
 
     return parseStringify(sortedUsers);
@@ -38,20 +39,20 @@ export const getUsersByEmails = async ({ userIds }: { userIds: string[] }) => {
   }
 };
 
-export const getDocumentUsers = async ({
+export const getChannelRoomUsers = async ({
   roomId,
-  currentUser,
+  userEmail,
   text,
 }: {
   roomId: string;
-  currentUser: string;
+  userEmail: string;
   text: string;
 }) => {
   try {
     const room = await liveblocks.getRoom(roomId);
 
     const users = Object.keys(room.usersAccesses).filter(
-      (email) => email !== currentUser
+      (email) => email !== userEmail
     );
 
     if (text.length) {

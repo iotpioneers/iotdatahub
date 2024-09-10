@@ -1,36 +1,49 @@
 "use client";
 
-import React, { ChangeEvent, useState } from "react";
-import Snackbar from "@mui/material/Snackbar";
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { Button } from "@radix-ui/themes";
+import axios from "axios";
+import "easymde/dist/easymde.min.css";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { Controller, useForm } from "react-hook-form";
+import SimpleMDE from "react-simplemde-editor";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+// material-ui
 import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
+
+// Project Imports
+import ErrorMessage from "@/components/ErrorMessage";
+import { useGlobalState } from "@/context";
+import { createChannelRoom } from "@/lib/actions/room.actions";
+import { channelSchema } from "@/validations/schema.validation";
+
+// Icons
 import {
   ArchiveBoxXMarkIcon,
   CloudArrowUpIcon,
 } from "@heroicons/react/24/outline";
-import { redirect, useRouter } from "next/navigation";
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@radix-ui/themes";
-import SimpleMDE from "react-simplemde-editor";
-import "easymde/dist/easymde.min.css";
-import { channelSchema } from "@/validations/schema.validation";
-import ErrorMessage from "@/components/ErrorMessage";
-import { useSession } from "next-auth/react";
-import { createChannelRoom } from "@/lib/actions/room.actions";
 
+// Types
 type ChannelForm = z.infer<typeof channelSchema>;
 
 export default function ChannelForm() {
   const { status, data: session } = useSession();
-
-  if (status === "unauthenticated") redirect("/login");
-
+  const { state, fetchCurrentOrganization } = useGlobalState();
   const router = useRouter();
+
   const [fields, setFields] = useState<string[]>([""]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [open, setOpen] = React.useState(false);
+
+  if (status !== "loading" && status === "unauthenticated") return null;
+
+  const currentOrganization = state.currentOrganization;
+  const { id: userId, email } = session!.user;
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
@@ -42,6 +55,7 @@ export default function ChannelForm() {
 
     setOpen(false);
   };
+
   const {
     register,
     control,
@@ -70,50 +84,50 @@ export default function ChannelForm() {
     }
   };
 
+  useEffect(() => {
+    fetchCurrentOrganization();
+  }, [currentOrganization]);
+
   const onSubmit = handleSubmit(async (data) => {
     try {
       setIsSubmitting(true);
-      const response = await fetch("/api/channels", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+      const response = await axios.post("/api/channels", {
+        ...data,
+        organizationId: currentOrganization!.id,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (response.status !== 201) {
         setError("Failed to create channel");
         throw new Error("Failed to create channel");
       }
 
-      const result = await response.json();
+      const result = await response.data;
 
-      const { id, name: channelName, description } = result.newChannel;
+      const { id: roomId, name: title } = result.newChannel;
 
-      if (result) {
-        const room = await createChannelRoom({
-          roomId: id,
-          creator: session!.user!.name!,
-          email: session!.user!.email!,
-          title: channelName,
-          description,
-        });
+      const room = await createChannelRoom({
+        roomId,
+        userId,
+        email,
+        title,
+      });
 
-        if (!room) {
-          setError("Failed to create room");
-          throw new Error("Failed to create room");
-        }
-
+      if (!room) {
+        setError("Failed to create channel");
         setOpen(true);
-
         setIsSubmitting(false);
-        setError("");
-        router.push(`/dashboard/channels/${id}`);
+        throw new Error("Failed to create channel");
       }
+      setOpen(true);
+
+      setIsSubmitting(false);
+      setError("");
+      router.push(`/dashboard/channels/${room.id}`);
     } catch (error) {
       setIsSubmitting(false);
       setError("An unexpected error occurred.");
+    } finally {
+      setIsSubmitting(false);
     }
   });
 
@@ -122,7 +136,7 @@ export default function ChannelForm() {
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
-        autoHideDuration={6000}
+        autoHideDuration={12000}
         onClose={handleCloseResult}
       >
         <Alert
@@ -134,8 +148,7 @@ export default function ChannelForm() {
           {error ? error : "Channel created successfully"}
         </Alert>
       </Snackbar>
-      <h1>Add a new channel</h1>
-      <div className="mt-10 border-t border-gray-200"></div>
+      <div className="border-t border-gray-200"></div>
       <form className="mt-6" onSubmit={onSubmit}>
         <div className="mb-4">
           <label

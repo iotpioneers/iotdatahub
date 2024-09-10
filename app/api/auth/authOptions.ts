@@ -1,6 +1,6 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { AuthOptions } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
@@ -21,16 +21,12 @@ const login = async (credentials: Credentials) => {
     where: { email: credentials.email },
   });
 
-  console.log("user", user);
-
   if (!user) {
     throw new Error("User not found");
   }
 
-  console.log("user.emailVerified", user.emailVerified);
-
-  if (user.emailVerified == null) {
-    throw new Error("Email not verified");
+  if (user.emailVerified === null) {
+    throw new Error("Please verify your email address first");
   }
 
   const passwordMatch = await bcrypt.compare(
@@ -55,6 +51,23 @@ const authOptions: AuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      httpOptions: {
+        timeout: Number(process.env.GOOGLE_TIMEOUT!),
+      },
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name || "",
+          email: profile.email!,
+          emailVerified: new Date(),
+          image: profile.picture || null,
+          country: "",
+          phonenumber: "",
+          role: Role.USER,
+          subscriptionId: null,
+          organizationId: null,
+        };
+      },
     }),
     CredentialsProvider({
       name: "credentials",
@@ -73,15 +86,52 @@ const authOptions: AuthOptions = {
           }
           return user;
         } catch (error) {
-          // Handle the error or throw it again
           throw error;
         }
       },
     }),
   ],
+  debug: true,
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: Number(process.env.NEXT_AUTH_TIMEOUT!),
+  },
+  callbacks: {
+    async jwt({ token, user, trigger, session }) {
+      if (trigger === "update") {
+        return { ...token, ...session.user };
+      }
+
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+        token.image = user.image ?? null;
+        token.country = user.country;
+        token.phonenumber = user.phonenumber;
+        token.emailVerified = user.emailVerified;
+        token.role = user.role;
+        token.subscriptionId = user.subscriptionId;
+        token.organizationId = user.organizationId;
+      }
+
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id;
+        session.user.name = token.name;
+        session.user.email = token.email;
+        session.user.image = token.image as string | null;
+        session.user.role = token.role;
+        session.user.country = token.country;
+        session.user.phonenumber = token.phonenumber;
+        session.user.emailVerified = token.emailVerified as Date | null;
+        session.user.subscriptionId = token.subscriptionId;
+        session.user.organizationId = token.organizationId;
+      }
+      return session;
+    },
   },
 };
 

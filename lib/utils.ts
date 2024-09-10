@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { UserType } from "@/types";
+import { UserAccessType } from "@/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -8,10 +8,8 @@ export function cn(...inputs: ClassValue[]) {
 
 export const parseStringify = (value: any) => JSON.parse(JSON.stringify(value));
 
-export const getAccessType = (userType: UserType) => {
+export const getAccessType = (userType: UserAccessType) => {
   switch (userType) {
-    case "creator":
-      return ["room:write"];
     case "editor":
       return ["room:write"];
     case "viewer":

@@ -1,44 +1,46 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ChannelNavigation from "@/components/Channels/ChannelNavigation";
-import { ChannelProps, DataPointProps, FieldProps } from "@/types";
-import dynamic from "next/dynamic";
+
+// Project imports
+import { ApiKey, Channel, DataPoint, Field, SampleCodes } from "@/types";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-
-const ChannelDetailsHeading = dynamic(
-  () => import("@/components/Channels/ChannelDetailsHeading"),
-  {
-    ssr: false,
-    loading: () => <LoadingProgressBar />,
-  }
-);
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { getUsers } from "@/lib/actions/user.actions";
+import { CollaborationUser } from "@/types/user";
+import { getRoomAccess } from "@/lib/actions/room.actions";
+import ChannelCollaborationRoom from "@/components/Channels/collaboration/ChannelCollaborationRoom";
 
 interface ChannelData {
-  channel: ChannelProps;
-  dataPoint: DataPointProps[];
-  fields: FieldProps[];
-  apiKey: string;
-  sampleCodes: string;
+  channel: Channel;
+  dataPoint: DataPoint[];
+  fields: Field[];
+  apiKey: ApiKey;
+  sampleCodes: SampleCodes;
 }
 
-export default function ChannelDetails({ channelID }: { channelID: string }) {
+const ChannelDetails = ({ channelID }: { channelID: string }) => {
+  const { status, data: session } = useSession();
+  const router = useRouter();
+
   const [channelData, setChannelData] = useState<ChannelData | null>(null);
   const [open, setOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const [currentUserType, setCurrentUserType] = useState<"editor" | "viewer">(
+    "viewer"
+  );
+  const [usersData, setUsersData] = useState<any[]>([]);
+  const [room, setRoom] = useState<any>(null);
 
-  const handleCloseResult = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
+  useEffect(() => {
+    if (status !== "loading" && status === "unauthenticated") {
       return;
     }
-    setOpen(false);
-  };
+  }, [status, router]);
 
   useEffect(() => {
     const fetchChannel = async () => {
@@ -50,21 +52,11 @@ export default function ChannelDetails({ channelID }: { channelID: string }) {
         );
 
         if (!res.ok) {
-          const errorData = await res.json();
-          setError("Failed to fetch channel");
-          setIsLoading(false);
-          return;
+          throw new Error("Failed to fetch channel data");
         }
 
-        const channelData: ChannelData = await res.json();
-
-        if (!channelData) {
-          setError("Failed to fetch channel");
-          setIsLoading(false);
-          return;
-        }
-
-        setChannelData(channelData);
+        const data: ChannelData = await res.json();
+        setChannelData(data);
       } catch (error) {
         setError("An error occurred while fetching the channel");
       } finally {
@@ -73,10 +65,77 @@ export default function ChannelDetails({ channelID }: { channelID: string }) {
     };
 
     fetchChannel();
+  }, [channelID]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!channelData || !session?.user) return;
+
+      const userEmail = session.user.email;
+
+      try {
+        const roomData = await getRoomAccess({
+          roomId: channelID,
+          userEmail,
+        });
+
+        if (!roomData) {
+          setIsLoading(false);
+          setError("You do not have access to this channel");
+          setOpen(true);
+        }
+
+        setRoom(roomData);
+
+        const userIds = Object.keys(roomData.usersAccesses);
+
+        const users = await getUsers({ userIds });
+
+        if (!users) {
+          setError("No users found or an error occurred");
+          return;
+        }
+
+        const usersData = users.map((user: CollaborationUser) => ({
+          ...user,
+          userType: roomData.usersAccesses[user.email]?.includes("room:write")
+            ? "editor"
+            : "viewer",
+        }));
+
+        setUsersData(usersData);
+
+        const currentUserType = roomData.usersAccesses[userEmail]?.includes(
+          "room:write"
+        )
+          ? "editor"
+          : "viewer";
+
+        setCurrentUserType(currentUserType);
+      } catch (error) {
+        console.error("Error fetching room data:", error);
+      }
+    };
+
+    fetchData();
   }, [channelData]);
 
+  const handleCloseResult = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  };
+
+  if (isLoading) {
+    return <LoadingProgressBar />;
+  }
+
   if (!channelData) {
-    return;
+    return <LoadingProgressBar />;
   }
 
   const {
@@ -89,11 +148,10 @@ export default function ChannelDetails({ channelID }: { channelID: string }) {
 
   return (
     <main className="overflow-hidden">
-      {isLoading && <LoadingProgressBar />}
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
-        autoHideDuration={6000}
+        autoHideDuration={12000}
         onClose={handleCloseResult}
       >
         <Alert
@@ -105,18 +163,18 @@ export default function ChannelDetails({ channelID }: { channelID: string }) {
           {error ? error : "Success"}
         </Alert>
       </Snackbar>
-      <ChannelDetailsHeading
+      <ChannelCollaborationRoom
+        roomId={channelID}
+        roomMetadata={room?.metadata}
+        currentUserType={currentUserType}
         channel={channel}
-        dataReceived={dataPoint.length}
-      />
-      <div className="mt-10 border-t border-gray-200"></div>
-      <ChannelNavigation
-        channelId={channelID}
-        fields={fields}
         dataPoint={dataPoint}
-        sampleCodes={sampleCodes}
+        fields={fields}
         apiKey={apiKey}
+        sampleCodes={sampleCodes}
       />
     </main>
   );
-}
+};
+
+export default ChannelDetails;

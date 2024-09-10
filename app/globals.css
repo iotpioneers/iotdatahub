@@ -71,16 +71,16 @@ body {
     @apply bg-gradient-to-t from-red-500 to-red-400;
   }
 
-  .shad-dialog {
-    @apply w-full max-w-[400px] rounded-xl border-none bg-doc bg-cover px-5 py-7 shadow-xl sm:min-w-[500px] !important;
+  .action-dialog {
+    @apply w-full max-w-[400px] rounded-xl border-none  px-5 py-7 shadow-xl sm:min-w-[500px] !important;
   }
 
-  .shad-dialog button {
+  .action-dialog button {
     @apply focus:ring-0 focus:ring-offset-0 focus-visible:border-none focus-visible:outline-none focus-visible:ring-transparent focus-visible:ring-offset-0 !important;
   }
 
   .shad-select {
-    @apply w-fit border-none bg-transparent text-blue-100 !important;
+    @apply w-fit border-none bg-transparent text-slate-950 !important;
   }
 
   .shad-select svg {
@@ -88,7 +88,7 @@ body {
   }
 
   .shad-select-item {
-    @apply cursor-pointer bg-slate-700 text-blue-100 focus:bg-slate-900 hover:bg-slate-900 focus:text-blue-100 !important;
+    @apply cursor-pointer bg-n-9 text-slate-950 focus:bg-slate-900 hover:bg-n-9 focus:text-slate-950 !important;
   }
 
   .shad-popover {
@@ -120,7 +120,7 @@ body {
   }
 
   .collaborators-list {
-    @apply hidden items-center justify-end -space-x-3 overflow-hidden sm:flex;
+    @apply flex justify-center items-center overflow-hidden;
   }
 
   .share-input {
@@ -136,11 +136,11 @@ body {
   }
 
   .comment-composer {
-    @apply w-full max-w-[800px] border border-slate-900 bg-slate-700 shadow-sm lg:w-[350px];
+    @apply w-full max-w-[800px] border border-slate-900 bg-slate-100 shadow-sm lg:w-[350px];
   }
 
   .comment-thread {
-    @apply w-full max-w-[800px] border border-slate-900 bg-slate-700 shadow-sm lg:w-[350px] transition-all;
+    @apply w-full max-w-[800px] border border-slate-900 bg-slate-100 shadow-sm lg:w-[350px] transition-all;
   }
 
   .loader {
@@ -233,26 +233,26 @@ body {
 
 /* ======================== Liveblocks Override */
 .lb-root {
-  --lb-accent-subtle: #0b1527;
+  --lb-accent-subtle: #0f1c34;
   --lb-radius: 0px;
-  --lb-dynamic-background: #1b2840;
+  --lb-dynamic-background: #b4c6ee;
 }
 
 .lb-comment,
 .lb-thread-comments,
 .lb-composer,
 .lb-comment-reaction {
-  background-color: #0f1c34;
-  color: #fff;
+  background-color: #fff;
+  color: #0f1c34;
 }
 
 .lb-button {
-  --lb-foreground-moderate: #fff;
+  --lb-foreground-moderate: #0f1c34;
 }
 
 .lb-button:where([data-variant="primary"]) {
-  background-color: #161e30;
-  color: #b4c6ee;
+  background-color: #b4c6ee;
+  color: #161e30;
   padding: 8px;
 }
 
@@ -275,9 +275,9 @@ body {
     [aria-expanded="true"],
     [aria-selected="true"]
   ) {
-  --lb-button-background: #161e30;
+  --lb-button-background: #b4c6ee;
 
-  color: #b4c6ee;
+  color: #161e30;
 }
 
 .lb-inbox-notification-list-item:where(:not(:last-of-type)) {
@@ -288,7 +288,7 @@ body {
 .lb-dropdown-item,
 .lb-dropdown-item-icon,
 .lb-composer-editor {
-  color: #fff;
+  color: #b4c6ee;
 }
 
 .lb-composer-action {
@@ -296,7 +296,7 @@ body {
 }
 
 .lb-comment-content {
-  background: #0b1527;
+  background: #fff;
   margin-top: 16px;
   padding: 12px;
   border-radius: 4px;
@@ -311,7 +311,7 @@ body {
 .lb-emoji-picker-search-icon,
 .lb-emoji-picker-category-header-title,
 .lb-emoji-picker-search::placeholder {
-  color: #b4c6ee;
+  color: #0f1c34;
 }
 
 .data-liveblocks-portal {
@@ -319,8 +319,8 @@ body {
 }
 
 .lb-root:where(:not(.lb-root .lb-root)) {
-  --lb-dynamic-background: #1b2840;
-  color: #fff;
+  --lb-dynamic-background: #b4c6ee;
+  color: #1b2840;
 }
 
 .lb-composer-editor :where([data-placeholder]) {
@@ -333,5 +333,5 @@ body {
 }
 
 .lb-elevation {
-  background: #0f1c34;
+  background: #b4c6ee;
 }

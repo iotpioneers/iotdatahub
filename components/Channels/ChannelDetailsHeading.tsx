@@ -1,51 +1,38 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { ClientSideSuspense, RoomProvider } from "@liveblocks/react/suspense";
 import Image from "next/image";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { CalendarIcon } from "@heroicons/react/20/solid";
 import { ChartPieIcon } from "@heroicons/react/24/solid";
-import { ChannelProps } from "@/types";
-import { Input } from "@/components/Actions/input";
-
-import { updateChannelRoom, getChannelRoom } from "@/lib/actions/room.actions";
-import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
-import { getUsersByEmails } from "@/lib/actions/user.actions";
-import { User } from "@/types/user";
 import { ViewIcon } from "lucide-react";
-import LoadingSpinner from "../LoadingSpinner";
+import ReactMarkdown from "react-markdown";
+
+import { updateChannelRoomData } from "@/lib/actions/room.actions";
+import { Input } from "@/components/Actions/TextEditingInput";
 import { dateConverter } from "@/lib/utils";
+import { ChannelHeadingProps } from "@/types";
 
-import InviteMember from "./collaboration/InviteMember";
-
-interface ChannelHeadingProps {
-  channel: ChannelProps;
-  dataReceived: number;
-}
+import InviteCollaboratorModal from "./collaboration/InviteCollaboratorModal";
+import ActiveCollaborators from "./collaboration/ActiveCollaborators";
+import { Card } from "@mui/material";
 
 const ChannelDetailsHeading = ({
+  roomId,
+  roomMetadata,
+  currentUserType,
   channel,
-  dataReceived,
+  dataPoint,
 }: ChannelHeadingProps) => {
-  const { status, data: session } = useSession();
-
-  if (status === "unauthenticated") {
-    redirect("/login");
-  }
+  const { id: channelId } = channel;
 
   const [channelTitle, setChannelTitle] = useState(channel?.name);
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
-  const [currentUserType, setCurrentUserType] = useState<"editor" | "viewer">(
-    "viewer"
-  );
+
   const [showResult, setShowResult] = useState(false);
-  const [usersData, setUsersData] = useState<[]>([]);
-  const [room, setRoom] = useState<any>(null);
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
@@ -74,8 +61,8 @@ const ChannelDetailsHeading = ({
 
       try {
         if (channelTitle !== channel?.name) {
-          const updatedChannel = await updateChannelRoom(
-            channel.id,
+          const updatedChannel = await updateChannelRoomData(
+            channelId,
             channelTitle
           );
 
@@ -89,13 +76,15 @@ const ChannelDetailsHeading = ({
 
           setShowResult(true);
           setEditing(false);
+          setLoading(false);
         }
       } catch (error) {
         setError((error as Error).message);
         setShowResult(true);
+      } finally {
+        setLoading(false);
+        setEditing(false);
       }
-
-      setLoading(false);
     }
   };
 
@@ -106,7 +95,7 @@ const ChannelDetailsHeading = ({
         !containerRef.current.contains(e.target as Node)
       ) {
         setEditing(false);
-        updateChannelRoom(channel.id, channelTitle);
+        updateChannelRoomData(channelId, channelTitle);
       }
     };
 
@@ -115,7 +104,7 @@ const ChannelDetailsHeading = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [channel.id, channelTitle]);
+  }, [channel!.id, channelTitle]);
 
   useEffect(() => {
     if (editing && inputRef.current) {
@@ -123,144 +112,102 @@ const ChannelDetailsHeading = ({
     }
   }, [editing]);
 
-  const fetchData = async () => {
-    const currentUserEmail = session?.user?.email;
-
-    if (!currentUserEmail) {
-      throw new Error("User email is not defined");
-    }
-
-    const roomData = await getChannelRoom({
-      roomId: channel.id,
-      userId: currentUserEmail,
-    });
-
-    if (!roomData) return;
-
-    setRoom(roomData);
-
-    const userIds = Object.keys(roomData.usersAccesses);
-    const users = await getUsersByEmails({ userIds });
-
-    if (!users || users.length === 0) return;
-
-    const usersData = users.map((user: User) => ({
-      ...user,
-      userType: roomData.usersAccesses[user!.email as string]?.includes(
-        "room:write"
-      )
-        ? "editor"
-        : "viewer",
-    }));
-
-    setUsersData(usersData);
-
-    const currentUserType = roomData.usersAccesses[currentUserEmail]?.includes(
-      "room:write"
-    )
-      ? "editor"
-      : "viewer";
-
-    setCurrentUserType(currentUserType);
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, [channel.id, session]);
-
   return (
-    <RoomProvider id={channel.id}>
-      <ClientSideSuspense fallback={<LoadingSpinner />}>
-        <div className="lg:flex lg:items-center lg:justify-between mt-12 padding-x padding-y max-width">
-          <Snackbar
-            anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            open={showResult}
-            autoHideDuration={6000}
-            onClose={handleCloseResult}
-          >
-            <Alert
-              onClose={handleCloseResult}
-              severity={error && error !== "" ? "error" : "success"}
-              variant="filled"
-              sx={{ width: "100%" }}
-            >
-              {error && error !== "" ? error : "Channel updated successfully"}
-            </Alert>
-          </Snackbar>
+    <div className="lg:flex lg:items-center lg:justify-between mt-12 padding-x padding-y max-width">
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={showResult}
+        autoHideDuration={12000}
+        onClose={handleCloseResult}
+      >
+        <Alert
+          onClose={handleCloseResult}
+          severity={error && error !== "" ? "error" : "success"}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {error && error !== "" ? error : "Channel updated successfully"}
+        </Alert>
+      </Snackbar>
 
-          <div className="min-w-0 flex-1">
-            <div
-              ref={containerRef}
-              className="flex w-fit items-center justify-center gap-2"
-            >
-              {editing && !loading ? (
-                <Input
-                  type="text"
-                  value={channelTitle}
-                  ref={inputRef}
-                  placeholder="Enter title"
-                  onChange={(e) => setChannelTitle(e.target.value)}
-                  onKeyDown={updateChannelTitleHandler}
-                  disabled={!editing}
-                  className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:tracking-tight"
-                />
-              ) : (
-                <>
-                  <p className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:tracking-tight">
-                    {channelTitle}
-                  </p>
-                </>
-              )}
+      <div className="min-w-0 flex-1">
+        <div
+          ref={containerRef}
+          className="flex w-fit items-center justify-center gap-2"
+        >
+          {editing && !loading ? (
+            <Input
+              type="text"
+              value={channelTitle}
+              ref={inputRef}
+              placeholder="Enter channel name here"
+              onChange={(e) => setChannelTitle(e.target.value)}
+              onKeyDown={updateChannelTitleHandler}
+              disabled={!editing}
+              className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:tracking-tight"
+            />
+          ) : (
+            <>
+              <p className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:tracking-tight">
+                {channelTitle}
+              </p>
+            </>
+          )}
 
-              {currentUserType === "editor" && !editing && (
-                <Image
-                  src="/assets/icons/edit.svg"
-                  alt="edit"
-                  width={24}
-                  height={24}
-                  onClick={() => setEditing(true)}
-                  className="pointer"
-                />
-              )}
+          {!loading && currentUserType === "editor" && !editing && (
+            <Image
+              src="/icons/edit.svg"
+              alt="edit"
+              width={24}
+              height={24}
+              onClick={() => setEditing(true)}
+              className="pointer"
+            />
+          )}
 
-              {currentUserType !== "editor" && (
-                <p className="view-only-tag">
-                  <ViewIcon width={12} height={12} /> View only
-                </p>
-              )}
-              {loading && <p className="text-sm text-gray-400">saving...</p>}
+          {!loading && currentUserType !== "editor" && (
+            <p className="view-only-tag">
+              <ViewIcon width={12} height={12} /> View only
+            </p>
+          )}
+          {loading && <p className="text-sm text-gray-400">saving...</p>}
+        </div>
+
+        <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+          <div className="mt-2 max-w-xl">
+            <Card sx={{ p: 2, border: "1px solid", borderColor: "divider" }}>
+              <ReactMarkdown>{channel.description}</ReactMarkdown>
+            </Card>
+          </div>
+          <div className="flex flex-col">
+            <div className="mt-2 flex items-center text-sm text-gray-500">
+              <ChartPieIcon
+                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                aria-hidden="true"
+              />
+              Generated {dataPoint.length} data
             </div>
-
-            <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-              <div className="mt-2 flex items-center text-sm text-gray-500">
-                <ChartPieIcon
-                  className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                  aria-hidden="true"
-                />
-                Generated {dataReceived} data
-              </div>
-              <div className="mt-2 flex items-center text-sm text-gray-500">
-                <CalendarIcon
-                  className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                  aria-hidden="true"
-                />
-                Created about {dateConverter(channel.createdAt)}
-              </div>
-            </div>
-            <div className="mt-5">
-              {room && (
-                <InviteMember
-                  roomId={channel.id}
-                  collaborators={usersData}
-                  creator={room.metadata.creator || ""}
-                  currentUserType={currentUserType}
-                />
-              )}
+            <div className="mt-2 flex items-center text-sm text-gray-500">
+              <CalendarIcon
+                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                aria-hidden="true"
+              />
+              Created about {dateConverter(channel.createdAt.toString())}
             </div>
           </div>
         </div>
-      </ClientSideSuspense>
-    </RoomProvider>
+        <div className="flex justify-between items-center my-5 ">
+          {roomMetadata && (
+            <InviteCollaboratorModal
+              roomId={roomId}
+              creator={roomMetadata.creatorId}
+              currentUserType={currentUserType}
+            />
+          )}
+          <ActiveCollaborators />
+        </div>
+      </div>
+    </div>
   );
 };
 

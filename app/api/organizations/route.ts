@@ -78,6 +78,21 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    const freSubscrption = await prisma.subscription.findFirst({
+      where: {
+        name: "Free",
+      },
+    });
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        emailVerified: new Date(),
+        subscriptionId: freSubscrption?.id,
+        organizationId: newOrganization.id,
+      },
+    });
+
     return NextResponse.json({ newOrganization, member }, { status: 201 });
   } catch (error) {
     return NextResponse.json(
@@ -86,22 +101,48 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
 export async function GET(request: NextRequest) {
   try {
+    const token = await getToken({ req: request });
+
+    if (!token) {
+      return NextResponse.json(
+        { error: "You must be logged in" },
+        { status: 401 }
+      );
+    }
+
+    const userEmail = token.email as string;
+
+    const user = await prisma.user.findUnique({
+      where: { email: userEmail },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
     const organizations = await prisma.organization.findMany({
       orderBy: { createdAt: "desc" },
+      include: {
+        members: true,
+        Device: true,
+        Channel: true,
+        Field: true,
+        DataPoint: true,
+      },
     });
 
     if (!organizations || organizations.length === 0) {
       return NextResponse.json(
-        { error: "No organizations found" },
+        { error: "There are no organizations" },
         { status: 404 }
       );
     }
 
     return NextResponse.json(organizations);
   } catch (error) {
+    console.error("Error retrieving organizations:", error);
     return NextResponse.json(
       { error: "Error retrieving organizations" },
       { status: 500 }
