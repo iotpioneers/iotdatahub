@@ -201,10 +201,12 @@ const UpgradePlanCardAlert = () => {
             />
           </ListItem>
         </List>
-        <LinearProgressWithLabel
-          value={usagePercentage}
-          remainingDays={remainingDays}
-        />
+        {subscription.type !== "Free" && (
+          <LinearProgressWithLabel
+            value={usagePercentage}
+            remainingDays={remainingDays}
+          />
+        )}
         <Grid item sx={{ marginTop: 2 }}>
           <Stack direction="row">
             <Link
