@@ -14,8 +14,8 @@ const HeroSection = () => {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
+        top: 0,
       }}
-      className="mt-0 lg:-mt-8"
     >
       <Typography
         variant="h2"

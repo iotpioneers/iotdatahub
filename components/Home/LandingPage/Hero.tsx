@@ -6,12 +6,11 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import Section from "../components/Section";
 import HeroSection from "./LandingPage";
 
 const Hero = () => {
   return (
-    <Section>
+    <>
       <HeroSection />
       <Box
         id="hero"
@@ -30,8 +29,6 @@ const Hero = () => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            pt: { xs: 0, sm: 14 },
-            pb: { xs: 1, sm: 2 },
           }}
         >
           <Stack
@@ -104,7 +101,7 @@ const Hero = () => {
           </Stack>
         </Container>
       </Box>
-    </Section>
+    </>
   );
 };
 

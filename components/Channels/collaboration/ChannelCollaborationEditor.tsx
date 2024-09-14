@@ -24,6 +24,7 @@ import { useThreads } from "@liveblocks/react/suspense";
 import ChannelComments from "./ChannelComments";
 import { UserAccessType } from "@/types";
 import LoadingSpinner from "../../LoadingSpinner";
+import { Typography } from "@mui/material";
 
 const ChannelCollaborationEditor = ({
   roomId,
@@ -47,16 +48,19 @@ const ChannelCollaborationEditor = ({
     editable: currentUserType === "editor",
   });
 
-  function Placeholder({ channelDescription }: { channelDescription: string }) {
+  function Placeholder() {
     return (
       <div className="editor-placeholder">
-        {channelDescription || "Enter some rich text..."}
+        Enter some rich text to communicate with others
       </div>
     );
   }
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
+      <Typography variant="h4" sx={{ my: 2 }}>
+        The collaboration room workspace{" "}
+      </Typography>
       <div className="w-full mx-1">
         <div className="toolbar-wrapper flex justify-between">
           <ToolbarPlugin />
@@ -71,9 +75,7 @@ const ChannelCollaborationEditor = ({
                 contentEditable={
                   <ContentEditable className="editor-input h-full" />
                 }
-                placeholder={
-                  <Placeholder channelDescription={channelDescription} />
-                }
+                placeholder={<Placeholder />}
                 ErrorBoundary={LexicalErrorBoundary}
               />
               {currentUserType === "editor" && <FloatingToolbarPlugin />}

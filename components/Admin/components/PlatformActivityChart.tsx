@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import { LineChart } from "@mui/x-charts/LineChart";
 import axios from "axios";
+import LoadingProgressBar from "@/components/LoadingProgressBar";
 
 interface AreaGradientProps {
   color: string;
@@ -167,10 +168,6 @@ export default function PlatformActivityChart() {
     theme.palette.primary.main,
   ];
 
-  if (loading) {
-    return <Typography>Loading...</Typography>;
-  }
-
   const allDates = Array.from(
     new Set(
       Object.values(chartData)
@@ -181,6 +178,7 @@ export default function PlatformActivityChart() {
 
   return (
     <Card variant="outlined" sx={{ width: "100%" }}>
+      {loading && <LoadingProgressBar />}
       <CardContent>
         <Typography component="h2" variant="subtitle2" gutterBottom>
           Activities

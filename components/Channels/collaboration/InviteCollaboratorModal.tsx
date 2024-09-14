@@ -40,7 +40,7 @@ const InviteCollaboratorModal = ({
   currentUserType,
 }: ShareChannelRoomAccessDialogProps & {}) => {
   const user = useSelf();
-  const { status, data: session } = useSession();
+  const { data: session } = useSession();
 
   const [openInviteModal, setOpenInviteModal] = useState(false);
   const [error, setError] = useState("");
@@ -105,7 +105,6 @@ const InviteCollaboratorModal = ({
         userEmail,
       });
 
-      console.log("roomData:", roomData);
       if (!roomData) {
         setError("You do not have access to this channel");
         return;

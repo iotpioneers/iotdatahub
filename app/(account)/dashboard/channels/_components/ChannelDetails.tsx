@@ -1,16 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-// Project imports
+import useSWR from "swr";
+import { useSession } from "next-auth/react";
 import { ApiKey, Channel, DataPoint, Field, SampleCodes } from "@/types";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { getUsers } from "@/lib/actions/user.actions";
-import { CollaborationUser } from "@/types/user";
 import { getRoomAccess } from "@/lib/actions/room.actions";
 import ChannelCollaborationRoom from "@/components/Channels/collaboration/ChannelCollaborationRoom";
 
@@ -22,73 +19,48 @@ interface ChannelData {
   sampleCodes: SampleCodes;
 }
 
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 const ChannelDetails = ({ channelID }: { channelID: string }) => {
   const { status, data: session } = useSession();
-  const router = useRouter();
 
-  const [channelData, setChannelData] = useState<ChannelData | null>(null);
   const [open, setOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [currentUserType, setCurrentUserType] = useState<"editor" | "viewer">(
     "viewer"
   );
-  const [usersData, setUsersData] = useState<any[]>([]);
   const [room, setRoom] = useState<any>(null);
+
+  const { data: channelData, error: channelError } = useSWR<ChannelData>(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/${channelID}`,
+    fetcher
+  );
 
   useEffect(() => {
     if (status !== "loading" && status === "unauthenticated") {
       return;
     }
-  }, [status, router]);
+  }, [status]);
 
   useEffect(() => {
-    const fetchChannel = async () => {
-      setIsLoading(true);
-      setError("");
-      try {
-        const res = await fetch(
-          process.env.NEXT_PUBLIC_BASE_URL + `/api/channels/${channelID}`
-        );
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch channel data");
-        }
-
-        const data: ChannelData = await res.json();
-        setChannelData(data);
-      } catch (error) {
-        setError("An error occurred while fetching the channel");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchChannel();
-  }, [channelID]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!channelData || !session?.user) return;
-
-      const userEmail = session.user.email;
+    const fetchRoomData = async () => {
+      if (!channelData || !session?.user?.email) return;
 
       try {
         const roomData = await getRoomAccess({
           roomId: channelID,
-          userEmail,
+          userEmail: session.user.email,
         });
 
-        if (!roomData) {
-          setIsLoading(false);
-          setError("You do not have access to this channel");
+        if ("error" in roomData) {
+          setError(roomData.error);
           setOpen(true);
+          return;
         }
 
         setRoom(roomData);
 
         const userIds = Object.keys(roomData.usersAccesses);
-
         const users = await getUsers({ userIds });
 
         if (!users) {
@@ -96,29 +68,21 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
           return;
         }
 
-        const usersData = users.map((user: CollaborationUser) => ({
-          ...user,
-          userType: roomData.usersAccesses[user.email]?.includes("room:write")
-            ? "editor"
-            : "viewer",
-        }));
-
-        setUsersData(usersData);
-
-        const currentUserType = roomData.usersAccesses[userEmail]?.includes(
-          "room:write"
-        )
+        const currentUserType = roomData.usersAccesses[
+          session.user.email
+        ]?.includes("room:write")
           ? "editor"
           : "viewer";
 
         setCurrentUserType(currentUserType);
       } catch (error) {
         console.error("Error fetching room data:", error);
+        setError("An error occurred while fetching room data");
       }
     };
 
-    fetchData();
-  }, [channelData]);
+    fetchRoomData();
+  }, [channelData, session]);
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
@@ -130,13 +94,8 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
     setOpen(false);
   };
 
-  if (isLoading) {
-    return <LoadingProgressBar />;
-  }
-
-  if (!channelData) {
-    return <LoadingProgressBar />;
-  }
+  if (channelError) return <div>Failed to load channel data</div>;
+  if (!channelData) return <LoadingProgressBar />;
 
   const {
     channel,

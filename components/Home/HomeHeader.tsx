@@ -4,7 +4,7 @@ import * as React from "react";
 import { useSession } from "next-auth/react";
 
 // Material UI
-import { Link, PaletteMode, Typography } from "@mui/material";
+import { Link, PaletteMode } from "@mui/material";
 import Box from "@mui/material/Box";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -21,7 +21,7 @@ import { navigation } from "@/constants";
 import AngledButton from "./components/design/AngledButton";
 import MenuSvg from "./components/design/svg/MenuSvg";
 import LoadingProgressBar from "../LoadingProgressBar";
-import Image from "next/image";
+import Logo from "./Logo";
 
 const logoStyle = {
   width: "140px",
@@ -90,17 +90,7 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                 px: 0,
               }}
             >
-              <Link
-                href="/"
-                className={`${logoStyle} flex justify-center items-center mx-5`}
-              >
-                <img
-                  src="./IOT_DATA_HUB.png"
-                  alt="logo"
-                  width={140}
-                  height={40}
-                />
-              </Link>
+              <Logo />
               <Box
                 sx={{
                   display: { xs: "none", md: "flex", marginLeft: "10rem" },
@@ -116,7 +106,7 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                 alignItems: "center",
               }}
             >
-              {/* <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} /> */}
+              <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} />
               {status !== "loading" && (
                 <Button
                   className="flex  xs:mr-1 text-orange-200"

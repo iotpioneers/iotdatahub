@@ -145,7 +145,11 @@ const UpgradePlanCardAlert = () => {
         )
       : 0;
 
-  if ((status !== "loading" && status === "unauthenticated") || !subscription) {
+  if (status !== "loading" && status === "unauthenticated") {
+    return null;
+  }
+
+  if (!subscription) {
     return null;
   }
 

@@ -238,20 +238,34 @@ export async function GET(request: NextRequest) {
     throw new Error("You must be logged in");
   }
 
-  const allChannels = await prisma.channel.findMany({
+  // Fetch channels owned by the user
+  const OwnerUserChannels = await prisma.channel.findMany({
     where: { userId: user.id },
     orderBy: { createdAt: "desc" },
   });
 
-  if (!allChannels || allChannels.length === 0) {
+  // Fetch invites for channels where the user is invited
+  const UserChannelInvites = await prisma.channelAccess.findMany({
+    where: { userEmail: userEmail },
+    include: {
+      channel: true,
+    },
+  });
+
+  // Return an error if no owned channels or invites exist
+  if (
+    (!OwnerUserChannels || OwnerUserChannels.length === 0) &&
+    (!UserChannelInvites || UserChannelInvites.length === 0)
+  ) {
     return NextResponse.json(
       { error: "No channels found for this user" },
       { status: 404 }
     );
   }
 
-  const channels = await Promise.all(
-    allChannels.map(async (channel) => {
+  // Map over the owned channels and add owner details
+  const ownedChannels = await Promise.all(
+    OwnerUserChannels.map(async (channel) => {
       const channelOwner = await prisma.user.findUnique({
         where: { id: channel.userId },
       });
@@ -264,5 +278,23 @@ export async function GET(request: NextRequest) {
     })
   );
 
-  return NextResponse.json(channels);
+  // Map over the invited channels and add invite details
+  const invitedChannels = await Promise.all(
+    UserChannelInvites.map(async (invite) => {
+      const channelOwner = await prisma.user.findUnique({
+        where: { id: invite.channel.userId },
+      });
+
+      return {
+        ...invite.channel,
+        ownerEmail: channelOwner?.email,
+        ownerImage: channelOwner?.image,
+      };
+    })
+  );
+
+  // Merge owned and invited channels
+  const mergedChannels = [...ownedChannels, ...invitedChannels];
+
+  return NextResponse.json(mergedChannels);
 }
