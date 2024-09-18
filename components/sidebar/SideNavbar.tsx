@@ -35,11 +35,14 @@ function SideNavbar({
   const [activeLink, setActiveLink] = useState("");
 
   const handleSetActiveLink = (link: string) => {
-    setActiveLink(link);
-    setIsLoading(true);
-    setTimeout(() => {
+    try {
+      setActiveLink(link);
+      setIsLoading(true);
+    } catch (error) {
+    } finally {
       setIsLoading(false);
-    }, 5000);
+    }
+    setTimeout(() => {}, 5000);
   };
 
   const toggleSidebar = () => {
@@ -104,7 +107,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
   const userRole = session!.user!.role;
 
   return (
-    <div className="flex flex-col justify-start item-center mt-0 lg:mt-14">
+    <div className="flex flex-col justify-start item-center mt-0 lg:mt-24">
       <div className="border-b border-gray-100 pb-4">
         <Link href="/dashboard">
           <div

@@ -60,9 +60,7 @@ export default function DeviceForm() {
         );
 
         if (!response.ok) {
-          const errorData = await response.json();
           setError("Failed to create channel");
-          throw new Error("Failed to create channel");
         }
         const channelsData: Channel[] = await response.json();
 

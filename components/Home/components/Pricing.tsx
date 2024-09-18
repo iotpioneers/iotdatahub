@@ -1,6 +1,6 @@
 import Section from "./Section";
 import PricingList from "./PricingList";
-import { LeftLine, RightLine } from "./design/Pricing";
+import { LeftLine, RightLine } from "./design/PricingDesigns";
 import { Heading } from "@radix-ui/themes";
 
 const Pricing = () => {

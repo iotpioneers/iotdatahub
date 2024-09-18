@@ -71,7 +71,8 @@ const AddCollaboratorSelector: React.FC<AddCollaboratorSelectorProps> = ({
 
   const { data: users, error: fetchError } = useSWR<UserData[]>(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/users`,
-    fetcher
+    fetcher,
+    { refreshInterval: 5000 }
   );
 
   useEffect(() => {

@@ -36,7 +36,8 @@ const UserDashboardOverview = () => {
   const router = useRouter();
   const { data, error } = useSWR<ApiResponse, Error>(
     "/api/organizations/status",
-    fetcher
+    fetcher,
+    { refreshInterval: 5000 }
   );
 
   useEffect(() => {

@@ -225,6 +225,13 @@ export const removeCollaborator = async ({
       usersAccesses: updatedUsersAccesses,
     });
 
+    await prisma.channelAccess.deleteMany({
+      where: {
+        channelId: roomId,
+        userEmail: email,
+      },
+    });
+
     const notificationId = nanoid();
     await liveblocks.triggerInboxNotification({
       userId: email,

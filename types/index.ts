@@ -9,13 +9,6 @@ export interface ApiKey {
   organizationId: string;
 }
 
-export interface SampleCodes {
-  id: string;
-  codes: string;
-  apiKeyId: string;
-  organizationId: string;
-}
-
 export interface Device {
   id: string;
   name: string;
@@ -32,6 +25,7 @@ export interface Channel {
   id: string;
   name: string;
   description: string;
+  fields?: Field[] | null;
   deviceId?: string | null;
   organizationId: string;
   access: "PUBLIC" | "PRIVATE";
@@ -196,8 +190,8 @@ export type ChannelNavigationProps = {
   channel: Channel;
   dataPoint: DataPoint[];
   fields: Field[];
-  sampleCodes: SampleCodes;
   apiKey: ApiKey;
+  currentUserType: UserAccessType;
 };
 
 export type ChannelCollaborativeRoomProps = {
@@ -208,7 +202,6 @@ export type ChannelCollaborativeRoomProps = {
   dataPoint: DataPoint[];
   fields: Field[];
   apiKey: ApiKey;
-  sampleCodes: SampleCodes;
 };
 
 export type AddDocumentBtnProps = {

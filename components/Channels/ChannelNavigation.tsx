@@ -4,12 +4,12 @@ import { Fragment } from "react";
 import { Tab } from "@headlessui/react";
 import { Text } from "@radix-ui/themes";
 import { AdjustmentsVerticalIcon } from "@heroicons/react/16/solid";
-import Stream from "./navigation/Stream";
-import CodeSnippet from "./navigation/CodeSnippet";
+import ChannelDataStream from "./navigation/ChannelDataStream";
 import ExportChannelData from "./ExportChannelData";
 import { ApiKeys } from "./navigation";
 import { ChannelNavigationProps } from "@/types";
 import ChannelSettings from "./navigation/ChannelSettings";
+import SampleCodeSnippet from "./navigation/SampleCodeSnippet";
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
@@ -19,8 +19,8 @@ const ChannelNavigation = ({
   channel,
   fields,
   dataPoint,
-  sampleCodes,
   apiKey,
+  currentUserType,
 }: ChannelNavigationProps) => {
   return (
     <div className="bg-white">
@@ -30,6 +30,7 @@ const ChannelNavigation = ({
         </Text>
 
         {/* Links */}
+
         <Tab.Group
           as="div"
           className="mt-2 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
@@ -111,17 +112,25 @@ const ChannelNavigation = ({
           </div>
           <Tab.Panels as={Fragment}>
             <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
-              <Stream channel={channel} fields={fields} dataPoint={dataPoint} />
+              <ChannelDataStream
+                channel={channel}
+                fields={fields}
+                dataPoint={dataPoint}
+              />
             </Tab.Panel>
             <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
-              <CodeSnippet sampleCodes={sampleCodes} />
+              <SampleCodeSnippet fields={fields} />
             </Tab.Panel>
-            <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
-              <ChannelSettings fields={fields} channel={channel} />
-            </Tab.Panel>
-            <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
-              <ApiKeys apiKey={apiKey} />
-            </Tab.Panel>
+            {currentUserType === "editor" && (
+              <>
+                <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
+                  <ChannelSettings fields={fields} channel={channel} />
+                </Tab.Panel>
+                <Tab.Panel className="space-y-10 px-4 pb-8 pt-10">
+                  <ApiKeys apiKey={apiKey} />
+                </Tab.Panel>
+              </>
+            )}
           </Tab.Panels>
         </Tab.Group>
       </header>

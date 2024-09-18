@@ -71,14 +71,8 @@ const ChannelListTable = ({
         }
       );
 
-      console.log("====================================");
-      console.log("Channel access updated successfully", response);
-      console.log("====================================");
-
       if (response.status !== 200) {
-        console.log("Error updating room access", error);
-
-        setError("Failed to update channel access");
+        setError(response.data.message);
         setShowMessage(true);
         return;
       }
@@ -177,6 +171,16 @@ const ChannelListTable = ({
       headerName: "Access",
       width: 120,
       renderCell: renderAccessBadge,
+    },
+    {
+      field: "description",
+      headerName: "Description",
+      width: 180,
+      renderCell: (params: GridRenderCellParams) => (
+        <Typography variant="body2" sx={{ color: "text.secondary", mt: 2 }}>
+          {params.row.description}
+        </Typography>
+      ),
     },
     {
       field: "createdAt",

@@ -8,11 +8,11 @@ import { Grid, MenuItem, TextField, Typography } from "@mui/material";
 // project imports
 import { gridSpacing } from "./constant";
 import LineChartComponent from "../charts/LineChartComponent";
-import GaugeChart from "../charts/GaugeChart";
 import MainCard from "@/components/dashboard/cards/MainCard";
 import { Channel, DataPoint, Field } from "@/types";
 import BarChartWidget from "../charts/BarChartWidget";
 import { AddChartComponent } from "../charts";
+import GaugeWidget from "../charts/GaugeWidget";
 
 const status = [
   {
@@ -42,14 +42,6 @@ const widgets = [
     value: "gauge",
     label: "Gauge",
   },
-  {
-    value: "numericDisplay",
-    label: "Numeric Display",
-  },
-  {
-    value: "map",
-    label: "Map",
-  },
 ];
 
 interface Props {
@@ -58,7 +50,7 @@ interface Props {
   fields: Field[];
 }
 
-const Stream = ({ channel, fields, dataPoint }: Props) => {
+const ChannelDataStream = ({ channel, fields, dataPoint }: Props) => {
   const [value, setValue] = useState("today");
   const [widget, setWidget] = useState("lineChart");
 
@@ -69,11 +61,8 @@ const Stream = ({ channel, fields, dataPoint }: Props) => {
       case "barChart":
         return <BarChartWidget chartData={chartData} />;
       case "gauge":
-        return <GaugeChart chartData={chartData} />;
-      case "numericDisplay":
-      //   return <NumericDisplay chartData={chartData} />;
-      // case "map":
-      //   return <MapComponent chartData={chartData} />;
+        return <GaugeWidget chartData={chartData} />;
+
       default:
         return null;
     }
@@ -162,4 +151,4 @@ const Stream = ({ channel, fields, dataPoint }: Props) => {
   );
 };
 
-export default Stream;
+export default ChannelDataStream;

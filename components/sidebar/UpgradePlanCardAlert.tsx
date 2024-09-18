@@ -64,9 +64,15 @@ const LinearProgressWithLabel = ({
             </Typography>
           </Grid>
           <Grid item>
-            <Typography variant="h6" color="inherit">
-              {`${Math.round(value)}%`} of limit
-            </Typography>
+            {Math.round(value) > 0 ? (
+              <Typography variant="h6" color="inherit">
+                {`${Math.round(value)}%`} of limit
+              </Typography>
+            ) : (
+              <Typography variant="h6" color="red">
+                Exosted
+              </Typography>
+            )}
           </Grid>
         </Grid>
       </Grid>
@@ -198,9 +204,7 @@ const UpgradePlanCardAlert = () => {
                 </Typography>
               }
               secondary={
-                <Typography variant="caption">
-                  Expires on {formatDate(subscription.currentPeriodEnd)}
-                </Typography>
+                <Typography variant="caption">Your current plan </Typography>
               }
             />
           </ListItem>

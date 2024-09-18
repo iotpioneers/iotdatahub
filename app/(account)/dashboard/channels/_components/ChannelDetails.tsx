@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
-import { ApiKey, Channel, DataPoint, Field, SampleCodes } from "@/types";
+import { ApiKey, Channel, DataPoint, Field } from "@/types";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
@@ -16,7 +16,6 @@ interface ChannelData {
   dataPoint: DataPoint[];
   fields: Field[];
   apiKey: ApiKey;
-  sampleCodes: SampleCodes;
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -33,7 +32,8 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
 
   const { data: channelData, error: channelError } = useSWR<ChannelData>(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/${channelID}`,
-    fetcher
+    fetcher,
+    { refreshInterval: 5000 }
   );
 
   useEffect(() => {
@@ -97,13 +97,7 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
   if (channelError) return <div>Failed to load channel data</div>;
   if (!channelData) return <LoadingProgressBar />;
 
-  const {
-    channel,
-    dataPoint = [],
-    fields = [],
-    apiKey,
-    sampleCodes,
-  } = channelData;
+  const { channel, dataPoint = [], fields = [], apiKey } = channelData;
 
   return (
     <main className="overflow-hidden">
@@ -130,7 +124,6 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
         dataPoint={dataPoint}
         fields={fields}
         apiKey={apiKey}
-        sampleCodes={sampleCodes}
       />
     </main>
   );

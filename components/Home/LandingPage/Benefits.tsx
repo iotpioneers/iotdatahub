@@ -9,7 +9,7 @@ import { Heading } from "@radix-ui/themes";
 import { benefits } from "@/constants";
 import Section from "../components/Section";
 import Arrow from "../components/design/svg/Arrow";
-import { GradientLight } from "../components/design/Benefits";
+import { GradientLight } from "../components/design/BenefitsDesigns";
 import ClipPath from "../components/design/svg/ClipPath";
 import HorizontalWrapper from "../components/HorizontalWrapper";
 

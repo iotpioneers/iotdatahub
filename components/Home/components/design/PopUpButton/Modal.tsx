@@ -1,19 +1,44 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Tooltip } from "@material-tailwind/react";
+import useSWR from "swr";
+import {
+  CircularProgress,
+  Typography,
+  Button,
+  TextField,
+  Box,
+} from "@mui/material";
 
 type ModalProps = {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
+const fetcher = (url: string, query: string) =>
+  fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query }),
+  })
+    .then((res) => res.json())
+    .catch((error) => console.log(error));
+
 const Modal: React.FC<ModalProps> = ({ open, setOpen }) => {
   const [message, setMessage] = useState("");
+  const [query, setQuery] = useState<string | null>(null);
+
+  const { data, error, isLoading } = useSWR(
+    query ? ["http://localhost:8080/ai", query] : null,
+    ([url, q]) => fetcher(url, q),
+    { revalidateOnFocus: false }
+  );
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setMessage("");
-    setOpen(false);
+    setQuery(message);
   };
+
   return (
     <div>
       <motion.div
@@ -23,7 +48,7 @@ const Modal: React.FC<ModalProps> = ({ open, setOpen }) => {
           x: open ? -30 : 0,
           y: open ? -30 : 0,
           width: open ? "300px" : 0,
-          height: open ? "375px" : 0,
+          height: open ? "400px" : 0,
           opacity: 1,
         }}
         transition={{ type: "spring", duration: 2, ease: "easeInOut" }}
@@ -34,27 +59,46 @@ const Modal: React.FC<ModalProps> = ({ open, setOpen }) => {
           animate={{ opacity: 1 }}
           transition={{ type: "Tween", duration: 2 }}
         >
-          <h5 className="cursor-pointer text-4xl text-blue-500 font-inter font-medium tracking-tight pt-4">
+          <Typography variant="h5" gutterBottom>
             Hello There 🖐🏻
-          </h5>
-          <span className="text-md text-blue-500 font-inter font-medium tracking-tight pt-4">
+          </Typography>
+          <Typography variant="body1">
             Ask us anything about IoTDataHub.
-          </span>
-          <div className="pt-8 mr-5">
-            <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                name="message"
-                className="w-full h-28 outline-none border-none text-black rounded-md"
-                placeholder="Send us a message..."
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-              ></input>
-              <button className="h-full w-full py-2 mt-2 bg-n-9 rounded-md justify-center items-center text-center text-blue-500 hover:bg-n-5 hover:text-blue-50">
-                Submit
-              </button>
-            </form>
-          </div>
+          </Typography>
+
+          <Box component="form" onSubmit={handleSubmit} mt={2} mr={2}>
+            <TextField
+              fullWidth
+              multiline
+              rows={4}
+              variant="outlined"
+              label="Send us a message..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              fullWidth
+              sx={{ mt: 2 }}
+            >
+              Submit
+            </Button>
+          </Box>
+
+          <Box mt={2}>
+            {isLoading && <CircularProgress />}
+
+            {error && (
+              <Typography color="error">Failed to fetch response</Typography>
+            )}
+
+            {data && (
+              <Typography variant="body1">Response: {data.result}</Typography>
+            )}
+          </Box>
+
           <Tooltip
             content="Close"
             placement="left"

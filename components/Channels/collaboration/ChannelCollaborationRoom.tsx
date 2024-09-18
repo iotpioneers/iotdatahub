@@ -16,7 +16,6 @@ const ChannelCollaborationRoom = ({
   channel,
   dataPoint,
   fields,
-  sampleCodes,
   apiKey,
 }: ChannelCollaborativeRoomProps) => {
   return (
@@ -34,8 +33,8 @@ const ChannelCollaborationRoom = ({
             channel={channel}
             fields={fields}
             dataPoint={dataPoint}
-            sampleCodes={sampleCodes}
             apiKey={apiKey}
+            currentUserType={currentUserType}
           />
           <ChannelCollaborationEditor
             roomId={roomId}
