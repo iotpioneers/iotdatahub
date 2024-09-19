@@ -84,6 +84,12 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
     fetchRoomData();
   }, [channelData, session]);
 
+  useEffect(() => {
+    if (status !== "loading" && status === "unauthenticated") {
+      return;
+    }
+  }, [status]);
+
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
     reason?: string
@@ -91,7 +97,8 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
     if (reason === "clickaway") {
       return;
     }
-  }, [status, router]);
+    setOpen(false);
+  };
 
   if (channelError) return <div>Failed to load channel data</div>;
   if (!channelData) return <LoadingProgressBar />;
@@ -103,7 +110,6 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
-        autoHideDuration={12000}
         autoHideDuration={12000}
         onClose={handleCloseResult}
       >
@@ -120,10 +126,6 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
         roomId={channelID}
         roomMetadata={room?.metadata}
         currentUserType={currentUserType}
-      <ChannelCollaborationRoom
-        roomId={channelID}
-        roomMetadata={room?.metadata}
-        currentUserType={currentUserType}
         channel={channel}
         dataPoint={dataPoint}
         fields={fields}
@@ -131,9 +133,6 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
       />
     </main>
   );
-};
-
-export default ChannelDetails;
 };
 
 export default ChannelDetails;

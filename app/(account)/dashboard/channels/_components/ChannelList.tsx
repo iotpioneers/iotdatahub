@@ -38,7 +38,6 @@ const ChannelList = () => {
       </Link>
 
       {channels && channels.length === 0 && !isLoading && (
-      {channels && channels.length === 0 && !isLoading && (
         <div className="mb-8 w-full flex flex-row justify-between items-center text-center max-w-2xl mx-auto">
           <Text>
             Channels serve as a fundamental structure for organizing and storing
@@ -51,9 +50,6 @@ const ChannelList = () => {
       )}
 
       <Suspense fallback={<LoadingSpinner />}>
-        {channels && channels.length > 0 && (
-          <ChannelListTable initialChannels={channels} />
-        )}
         {channels && channels.length > 0 && (
           <ChannelListTable initialChannels={channels} />
         )}
