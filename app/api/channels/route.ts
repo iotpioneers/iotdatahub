@@ -24,10 +24,35 @@ export async function POST(request: NextRequest) {
   // Find the user by email
   const user = await prisma.user.findUnique({
     where: { email: userEmail },
+    include: { subscription: { include: { pricingTier: true } } },
   });
 
   if (!user) {
     throw new Error("User not found");
+  }
+
+  // Check if the user has an active subscription
+  if (!user.subscription || user.subscription.status !== "ACTIVE") {
+    return NextResponse.json(
+      { error: "Active subscription required" },
+      { status: 403 }
+    );
+  }
+
+  // Get the user's current channel count
+  const userChannelCount = await prisma.channel.count({
+    where: { userId: user.id },
+  });
+
+  // Check if the user has reached their channel limit
+  if (userChannelCount >= user.subscription.pricingTier.maxChannels) {
+    return NextResponse.json(
+      {
+        error:
+          "Channel limit reached for your subscription tier, please upgrade your subscription",
+      },
+      { status: 403 }
+    );
   }
 
   // Validate the request body against the schema

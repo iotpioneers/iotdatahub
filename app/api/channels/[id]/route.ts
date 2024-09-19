@@ -46,7 +46,6 @@ export async function GET(
     dataPoint,
     fields,
     apiKey,
-    sampleCodes,
   });
 }
 

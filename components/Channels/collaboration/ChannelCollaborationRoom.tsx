@@ -18,6 +18,7 @@ const ChannelCollaborationRoom = ({
   fields,
   apiKey,
 }: ChannelCollaborativeRoomProps) => {
+  console.log("Channel", channel);
   return (
     <RoomProvider id={roomId}>
       <ClientSideSuspense fallback={<LoadingProgressBar />}>
