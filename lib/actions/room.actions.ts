@@ -10,8 +10,10 @@ import {
   CreateChannelRoomParams,
   RoomAccesses,
   ShareChannelParams,
+  UserAccessType,
 } from "@/types";
 import axios from "axios";
+import prisma from "@/prisma/client";
 
 export const createChannelRoom = async ({
   roomId,
@@ -36,11 +38,15 @@ export const createChannelRoom = async ({
       defaultAccesses: [],
     });
 
+    if (!room) {
+      return { error: "Failed to create channel room" };
+    }
+
     revalidatePath("/dashboard/channels");
 
     return parseStringify(room);
   } catch (error) {
-    return;
+    return { error: "Failed to create channel room" };
   }
 };
 
@@ -54,15 +60,9 @@ export const getRoomAccess = async ({
   try {
     const room = await liveblocks.getRoom(roomId);
 
-    const hasAccess = Object.keys(room.usersAccesses).includes(userEmail);
-
-    if (!hasAccess) {
-      throw new Error("You do not have access to this channel");
-    }
-
     return parseStringify(room);
   } catch (error) {
-    throw new Error(error as string);
+    return { error: error };
   }
 };
 
@@ -73,19 +73,15 @@ export const updateChannelRoomData = async (
   try {
     const response = await axios.patch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/${channelId}`,
-      {
-        name: title,
-      }
+      { name: title }
     );
 
     if (response.status !== 200) {
-      return null;
+      return { error: "Failed to update channel data" };
     }
 
     const updateChannelRoom = await liveblocks.updateRoom(channelId, {
-      metadata: {
-        title,
-      },
+      metadata: { title },
     });
 
     const creatorId = Array.isArray(updateChannelRoom.metadata.creatorId)
@@ -110,7 +106,7 @@ export const updateChannelRoomData = async (
 
     return parseStringify(updateChannelRoom);
   } catch (error) {
-    return null;
+    return { error: "Failed to update channel room data" };
   }
 };
 
@@ -134,7 +130,42 @@ export const updateChannelAccess = async ({
     });
 
     if (!room) {
-      throw new Error("Error updating room access");
+      return { error: "Error updating room access" };
+    }
+
+    // Update or create ChannelAccess records
+    for (const collaborator of collaborators) {
+      const ChannelAccessType =
+        collaborator.userType === "editor" ? "EDITOR" : "VIEWER";
+
+      const channelAccess = await prisma.channelAccess.findFirst({
+        where: {
+          userEmail: collaborator.email,
+          channelId: roomId,
+        },
+      });
+
+      if (channelAccess) {
+        await prisma.channelAccess.update({
+          where: {
+            id: channelAccess.id,
+          },
+          data: {
+            accessType: ChannelAccessType,
+          },
+        });
+      } else {
+        await prisma.channelAccess.create({
+          data: {
+            channelId: roomId,
+            accessType: ChannelAccessType,
+            userEmail: collaborator.email,
+            ownerName: updatedBy.name,
+            ownerEmail: updatedBy.email,
+            ownerImage: updatedBy.avatar || "",
+          },
+        });
+      }
     }
 
     if (notifyPeople) {
@@ -166,8 +197,8 @@ export const updateChannelAccess = async ({
     );
     return parseStringify(room);
   } catch (error) {
-    console.error("Error updating channel access:", error);
-    return null;
+    console.log("Error updating room access", error);
+    return { error: "Failed to update channel access" };
   }
 };
 
@@ -182,7 +213,7 @@ export const removeCollaborator = async ({
     const room = await liveblocks.getRoom(roomId);
 
     if (room.metadata.email === email) {
-      throw new Error("You cannot remove yourself from the document");
+      return { error: "You cannot remove yourself from the document" };
     }
 
     const updatedUsersAccesses = {
@@ -192,6 +223,13 @@ export const removeCollaborator = async ({
 
     const updatedRoom = await liveblocks.updateRoom(roomId, {
       usersAccesses: updatedUsersAccesses,
+    });
+
+    await prisma.channelAccess.deleteMany({
+      where: {
+        channelId: roomId,
+        userEmail: email,
+      },
     });
 
     const notificationId = nanoid();
@@ -211,8 +249,7 @@ export const removeCollaborator = async ({
     );
     return parseStringify(updatedRoom);
   } catch (error) {
-    console.error("Error removing collaborator:", error);
-    return null;
+    return { error: "Failed to remove collaborator" };
   }
 };
 
@@ -225,7 +262,7 @@ export const deleteChannel = async (channelId: string) => {
     );
 
     if (response.status !== 200) {
-      return null;
+      return { error: "Failed to delete channel" };
     }
 
     const creatorId = Array.isArray(room.metadata.creatorId)
@@ -249,6 +286,7 @@ export const deleteChannel = async (channelId: string) => {
     return parseStringify(response.data);
   } catch (error) {
     revalidatePath(process.env.NEXT_PUBLIC_BASE_URL + "/dashboard/channels");
+    return { error: "Failed to delete channel" };
   }
 };
 
@@ -264,7 +302,7 @@ export const updateRoomDefaultAccess = async (
     });
 
     if (!updatedRoom) {
-      throw new Error("Error updating room default access");
+      return { error: "Error updating room default access" };
     }
 
     const creatorId = Array.isArray(room.metadata.creatorId)
@@ -286,6 +324,6 @@ export const updateRoomDefaultAccess = async (
     revalidatePath(`/dashboard/channels/${roomId}`);
     return parseStringify(updatedRoom);
   } catch (error) {
-    return null;
+    return { error: "Failed to update room default access" };
   }
 };

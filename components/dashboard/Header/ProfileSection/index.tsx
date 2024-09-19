@@ -27,6 +27,7 @@ import { useTheme } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 
 // project imports
+import { useGlobalState } from "@/context";
 import reducer from "@/app/store/reducer";
 import MainCard from "../../cards/MainCard";
 import Transitions from "../../extended/Transitions";
@@ -41,7 +42,6 @@ import {
 } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useGlobalState } from "@/context";
 
 // ==============================|| PROFILE MENU ||============================== //
 

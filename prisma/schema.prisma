@@ -152,18 +152,19 @@ model Device {
 }
 
 model Channel {
-  id             String       @id @default(auto()) @map("_id") @db.ObjectId
-  name           String
-  description    String?
-  access         Access       @default(PRIVATE)
-  fields         Field[]
-  dataPoints     DataPoint[]
-  userId         String       @db.ObjectId
-  user           User         @relation(fields: [userId], references: [id])
-  organizationId String       @db.ObjectId
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  apiKeys        ApiKey[]
-  devices        Device[]
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  description     String?
+  access          Access          @default(PRIVATE)
+  fields          Field[]
+  dataPoints      DataPoint[]
+  channelAccesses ChannelAccess[]
+  userId          String          @db.ObjectId
+  user            User            @relation(fields: [userId], references: [id])
+  organizationId  String          @db.ObjectId
+  organization    Organization    @relation(fields: [organizationId], references: [id])
+  apiKeys         ApiKey[]
+  devices         Device[]
 
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt()
@@ -171,6 +172,21 @@ model Channel {
 
   @@index([userId])
   @@index([organizationId])
+}
+
+model ChannelAccess {
+  id         String            @id @default(auto()) @map("_id") @db.ObjectId
+  userEmail  String
+  ownerEmail String
+  ownerImage String?
+  ownerName  String
+  channelId  String            @db.ObjectId
+  channel    Channel           @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  accessType ChannelAccessType
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  @@index([channelId])
 }
 
 model Field {
@@ -349,6 +365,13 @@ enum MemberAccess {
 enum Access {
   PUBLIC
   PRIVATE
+}
+
+enum ChannelAccessType {
+  VIEWER
+  EDITOR
+
+  @@map("AccessType")
 }
 
 enum DeviceStatus {

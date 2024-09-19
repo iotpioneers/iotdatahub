@@ -4,7 +4,7 @@ import * as React from "react";
 import { useSession } from "next-auth/react";
 
 // Material UI
-import { Link, PaletteMode, Typography } from "@mui/material";
+import { Link, PaletteMode } from "@mui/material";
 import Box from "@mui/material/Box";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -21,6 +21,7 @@ import { navigation } from "@/constants";
 import AngledButton from "./components/design/AngledButton";
 import MenuSvg from "./components/design/svg/MenuSvg";
 import LoadingProgressBar from "../LoadingProgressBar";
+import Logo from "./Logo";
 
 const logoStyle = {
   width: "140px",
@@ -89,14 +90,7 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                 px: 0,
               }}
             >
-              <Link
-                href="/"
-                className={`${logoStyle} flex justify-center items-center mx-5`}
-              >
-                <h1 className="flex text-lg text-center justify-center cursor-pointer font-bold text-blue-900">
-                  <span className="hover:text-zinc-950">IoTDataHub</span>
-                </h1>
-              </Link>
+              <Logo />
               <Box
                 sx={{
                   display: { xs: "none", md: "flex", marginLeft: "10rem" },
@@ -112,25 +106,14 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                 alignItems: "center",
               }}
             >
-              {/* <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} /> */}
+              <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} />
               {status !== "loading" && (
                 <Button
-                  className="flex  xs:mr-1 "
+                  className="flex  xs:mr-1 text-orange-200"
                   href={status === "authenticated" ? "/dashboard" : "/login"}
                 >
                   {status === "authenticated" ? "DASHBOARD" : "SIGN IN"}
                 </Button>
-              )}
-              {status !== "loading" && status === "unauthenticated" && (
-                <Link
-                  type="button"
-                  href="/register"
-                  className="underline hover:text-emerald-600 hover:bg-slate-700 hover:p-2 hover:rounded-2xl "
-                >
-                  <Typography variant="body1" sx={{ textDecoration: "none" }}>
-                    SIGN UP
-                  </Typography>
-                </Link>
               )}
             </Box>
             <Box sx={{ display: { sm: "", md: "none" } }}>
@@ -165,10 +148,10 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                     >
                       <MenuSvg openNavigation={openNavigation} />
                     </AngledButton>
-                    {/* <ToggleColorMode
+                    <ToggleColorMode
                       mode={mode}
                       toggleColorMode={toggleColorMode}
-                    /> */}
+                    />
                   </Box>
                   {navigation.map((item) => (
                     <Link
@@ -177,7 +160,10 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                       onClick={() => setOpenNavigation(false)}
                       className={`lg:hidden block relative font-code text-2xl uppercase text-n-1 transition-colors hover:text-color-1 px-6 py-2`}
                     >
-                      <MenuItem onClick={() => setOpenNavigation(false)}>
+                      <MenuItem
+                        onClick={() => setOpenNavigation(false)}
+                        className="text-orange-50"
+                      >
                         {item.title}
                       </MenuItem>
                     </Link>
@@ -186,20 +172,12 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                   {status === "loading" && <LoadingProgressBar />}
                   {status !== "loading" && (
                     <AngledButton
-                      className="flex text-pink-500 mt-2"
+                      className="grid text-orange-200 mt-2"
                       href={
                         status === "authenticated" ? "/dashboard" : "/login"
                       }
                     >
                       {status === "authenticated" ? "DASHBOARD" : "SIGN IN"}
-                    </AngledButton>
-                  )}
-                  {status !== "loading" && status === "unauthenticated" && (
-                    <AngledButton
-                      className="flex text-pink-500 mt-2"
-                      href="/register"
-                    >
-                      Sign up
                     </AngledButton>
                   )}
                 </Box>

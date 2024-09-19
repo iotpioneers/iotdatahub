@@ -105,21 +105,14 @@ const AuthLogin = ({ ...others }) => {
       const response = await signIn("credentials", {
         email: data.email,
         password: data.password,
-        redirect: false,
+        redirect: true,
+        callbackUrl: "/dashboard",
       });
 
       if (response?.error) {
         setError(response.error);
         setOpen(true);
         return;
-      }
-
-      if (response?.ok && response?.url) {
-        if (session!.user!.role === "ADMIN") {
-          router.push("/admin");
-        } else {
-          router.push("/dashboard");
-        }
       }
     } catch (error) {
       console.log("error", error);

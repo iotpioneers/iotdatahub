@@ -2,7 +2,6 @@
 
 import { ReactNode } from "react";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
 import {
   ClientSideSuspense,
   LiveblocksProvider,
@@ -14,7 +13,7 @@ const CollaborationProvider = ({ children }: { children: ReactNode }) => {
   const { status, data: session } = useSession();
 
   if (status !== "loading" && status === "unauthenticated") {
-    redirect("/login");
+    return null;
   }
 
   if (!session || !session.user) {

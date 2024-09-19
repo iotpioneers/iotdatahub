@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import useSWR from "swr";
 import DashboardOverview from "@/components/dashboard/DashboardOverview";
-import OrganizationOnboardingCreation from "@/components/dashboard/OrganizationOnboardingCreation";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import {
   Channel,
@@ -13,76 +14,54 @@ import {
   Organization,
 } from "@/types";
 
+interface ApiResponse {
+  hasOrganization: boolean;
+  organization: Organization | null;
+  members: Member[];
+  devices: Device[];
+  channels: Channel[];
+  fields: Field[];
+  datapoints: DataPoint[];
+}
+
+const fetcher = async (url: string): Promise<ApiResponse> => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error("An error occurred while fetching the data.");
+  }
+  return response.json();
+};
+
 const UserDashboardOverview = () => {
-  const [hasOrganization, setHasOrganization] = useState<boolean | null>(null);
-  const [organization, setOrganization] = useState<Organization | null>(null);
-  const [members, setMembers] = useState<Member[] | null>(null);
-  const [devices, setDevices] = useState<Device[] | null>(null);
-  const [channels, setChannels] = useState<Channel[] | null>(null);
-  const [fields, setFields] = useState<Field[] | null>(null);
-  const [dataPoints, setDataPoints] = useState<DataPoint[] | null>(null);
-  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const { data, error } = useSWR<ApiResponse, Error>(
+    "/api/organizations/status",
+    fetcher,
+    { refreshInterval: 5000 }
+  );
 
   useEffect(() => {
-    const checkOrganizationStatus = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("/api/organizations/status", {
-          method: "GET",
-        });
+    if (data && !data.hasOrganization) {
+      router.push("/feature-creation");
+    }
+  }, [data, router]);
 
-        if (!response.ok) {
-          return;
-        }
-        setLoading(false);
+  if (error) return <div>Failed to load</div>;
+  if (!data) return <LoadingProgressBar />;
 
-        const data = await response.json();
-        setHasOrganization(data.hasOrganization);
-        setOrganization(data.organization);
-        setMembers(data.members);
-        setDevices(data.devices);
-        setChannels(data.channels);
-        setFields(data.fields);
-        setDataPoints(data.datapoints);
-      } catch (error) {
-        return null;
-      }
-    };
+  const { organization, members, devices, channels, fields, datapoints } = data;
 
-    checkOrganizationStatus();
-  }, [
-    channels?.length,
-    devices?.length,
-    fields?.length,
-    dataPoints?.length,
-    members?.length,
-  ]);
-
-  if (hasOrganization === null) {
-    return;
-  }
+  if (!organization) return null;
 
   return (
-    <>
-      {loading && <LoadingProgressBar />}
-      {!hasOrganization && <OrganizationOnboardingCreation />}
-      {!loading &&
-        organization &&
-        members &&
-        devices &&
-        channels &&
-        fields &&
-        dataPoints && (
-          <DashboardOverview
-            organization={organization}
-            members={members}
-            devices={devices}
-            channels={channels}
-            fields={fields}
-            datapoints={dataPoints}
-          />
-        )}
-    </>
+    <DashboardOverview
+      organization={organization}
+      members={members}
+      devices={devices}
+      channels={channels}
+      fields={fields}
+      datapoints={datapoints}
+    />
   );
 };
 

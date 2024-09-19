@@ -72,7 +72,7 @@ const ChannelListTable = ({
       );
 
       if (response.status !== 200) {
-        setError("Failed to update channel access");
+        setError(response.data.message);
         setShowMessage(true);
         return;
       }
@@ -154,7 +154,7 @@ const ChannelListTable = ({
       headerName: "Owner",
       width: 200,
       renderCell: (params: GridRenderCellParams) => (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center mt-1 gap-1">
           <Avatar src={params.row.ownerImage} alt={params.row.ownerEmail}>
             {params.row.ownerEmail[0].toUpperCase()}
           </Avatar>
@@ -173,11 +173,23 @@ const ChannelListTable = ({
       renderCell: renderAccessBadge,
     },
     {
+      field: "description",
+      headerName: "Description",
+      width: 180,
+      renderCell: (params: GridRenderCellParams) => (
+        <Typography variant="body2" sx={{ color: "text.secondary", mt: 2 }}>
+          {params.row.description}
+        </Typography>
+      ),
+    },
+    {
       field: "createdAt",
       headerName: "Created",
       width: 120,
       renderCell: (params: GridRenderCellParams) => (
-        <Typography variant="body2">{formatDate(params.value)}</Typography>
+        <Typography variant="body2" sx={{ color: "text.secondary", mt: 2 }}>
+          {formatDate(params.value)}
+        </Typography>
       ),
     },
   ];

@@ -2,6 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { useSelf } from "@liveblocks/react/suspense";
+import axios from "axios";
+import useSWR from "swr";
+
+// material-ui
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import {
@@ -23,10 +27,12 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import axios from "axios";
+
+// Types
 import { UserData } from "@/types/user";
 import { UserAccessType } from "@/types";
 import { updateChannelAccess } from "@/lib/actions/room.actions";
+import { useRouter } from "next/navigation";
 
 interface Collaborator {
   id: string;
@@ -41,11 +47,14 @@ interface AddCollaboratorSelectorProps {
   onCollaboratorsAdded: () => void;
 }
 
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 const AddCollaboratorSelector: React.FC<AddCollaboratorSelectorProps> = ({
   roomId,
   onCollaboratorsAdded,
 }) => {
   const user = useSelf();
+  const router = useRouter();
 
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedCollaborators, setSelectedCollaborators] = useState<
@@ -53,7 +62,6 @@ const AddCollaboratorSelector: React.FC<AddCollaboratorSelectorProps> = ({
   >([]);
   const [notifyPeople, setNotifyPeople] = useState<boolean>(true);
   const [message, setMessage] = useState<string>("");
-  const [users, setUsers] = useState<UserData[]>([]);
   const [noUserFound, setNoUserFound] = useState<boolean>(false);
 
   const [loading, setLoading] = useState(false);
@@ -61,23 +69,17 @@ const AddCollaboratorSelector: React.FC<AddCollaboratorSelectorProps> = ({
   const [success, setSuccess] = useState("");
   const [showResult, setShowResult] = useState<boolean>(false);
 
+  const { data: users, error: fetchError } = useSWR<UserData[]>(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/users`,
+    fetcher,
+    { refreshInterval: 5000 }
+  );
+
   useEffect(() => {
-    fetchUserData();
-  }, []);
-
-  const fetchUserData = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users`
-      );
-
-      if (response.status === 200) {
-        setUsers(response.data);
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
+    if (fetchError) {
+      console.error("Error fetching user data:", fetchError);
     }
-  };
+  }, [fetchError]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -116,15 +118,16 @@ const AddCollaboratorSelector: React.FC<AddCollaboratorSelectorProps> = ({
     );
   };
 
-  const filteredUsers = users.filter(
-    (user) =>
-      !selectedCollaborators.some(
-        (collaborator) => collaborator.id === user.id
-      ) &&
-      (user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (user.name &&
-          user.name.toLowerCase().includes(searchTerm.toLowerCase())))
-  );
+  const filteredUsers =
+    users?.filter(
+      (user) =>
+        !selectedCollaborators.some(
+          (collaborator) => collaborator.id === user.id
+        ) &&
+        (user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (user.name &&
+            user.name.toLowerCase().includes(searchTerm.toLowerCase())))
+    ) || [];
 
   useEffect(() => {
     if (searchTerm && filteredUsers.length === 0) {
@@ -134,7 +137,7 @@ const AddCollaboratorSelector: React.FC<AddCollaboratorSelectorProps> = ({
     }
   }, [searchTerm, filteredUsers]);
 
-  const handleInviteCollaborators = async () => {
+  const handleInviteCollaborators = async (): Promise<void> => {
     setLoading(true);
     setError("");
     setSuccess("");
@@ -151,8 +154,7 @@ const AddCollaboratorSelector: React.FC<AddCollaboratorSelectorProps> = ({
         email: collaborator.email,
         userType: collaborator.accessType.toLowerCase() as UserAccessType,
       }));
-
-      const response = await updateChannelAccess({
+      const result = await updateChannelAccess({
         roomId,
         collaborators,
         notifyPeople,
@@ -160,24 +162,27 @@ const AddCollaboratorSelector: React.FC<AddCollaboratorSelectorProps> = ({
         updatedBy: user.info,
       });
 
-      if (response) {
-        setSuccess(
-          "Collaborators have been invited to the channel successfully"
-        );
-        setSelectedCollaborators([]);
-        setMessage("");
-        onCollaboratorsAdded(); // Call this to refresh the collaborator list
-      } else {
-        setError("Failed to invite collaborators");
+      if ("error" in result) {
+        setError(result.error);
+        setLoading(false);
+        setShowResult(true);
+        return;
       }
+
+      setSuccess("The invitation has been sent successfully");
+      setSelectedCollaborators([]);
+      setMessage("");
+      onCollaboratorsAdded();
+
+      router.push(`/dashboard/channels/${roomId}`);
     } catch (error) {
-      console.error("Error inviting collaborators:", error);
       setError("Failed to invite collaborators");
     } finally {
       setLoading(false);
       setShowResult(true);
     }
   };
+
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
     reason?: string

@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import SearchSection from "./Header/SearchSection";
 import NotificationSection from "./Header/NotificationSection";
 import ProfileSection from "./Header/ProfileSection";
 
@@ -18,6 +17,7 @@ import Tooltip from "@mui/material/Tooltip";
 
 // assets
 import { IconMenu2 } from "@tabler/icons-react";
+import Logo from "../Home/Logo";
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
@@ -52,11 +52,7 @@ const Navbar = ({
         }}
       >
         <Box component="span" sx={{ display: "block", mr: 2, flexGrow: 1 }}>
-          <h1 className="text-2xl text-start cursor-pointer font-bold text-blue-900">
-            <Link href="/">
-              <span className="hover:text-zinc-950">IoTDataHub</span>
-            </Link>
-          </h1>
+          <Logo />
         </Box>
         <ButtonBase
           sx={{

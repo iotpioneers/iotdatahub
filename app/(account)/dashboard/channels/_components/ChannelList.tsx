@@ -1,6 +1,7 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense } from "react";
+import useSWR from "swr";
 import ChannelListTable from "./ChannelListTable";
 import { Text } from "@radix-ui/themes";
 import Link from "next/link";
@@ -9,39 +10,28 @@ import LoadingProgressBar from "@/components/LoadingProgressBar";
 import Image from "next/image";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { Channel } from "@/types";
-import axios from "axios";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const ChannelList = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [channels, setChannels] = useState<Channel[] | []>([]);
+  const {
+    data: channels,
+    error,
+    isLoading,
+  } = useSWR<Channel[]>(
+    process.env.NEXT_PUBLIC_BASE_URL + "/api/channels",
+    fetcher,
+    { refreshInterval: 5000 }
+  );
 
-  useEffect(() => {
-    const fetchChannels = async () => {
-      try {
-        setIsLoading(true);
-        const res = await axios.get(
-          process.env.NEXT_PUBLIC_BASE_URL + "/api/channels"
-        );
-        if (res.status !== 200) {
-          throw new Error("Failed to fetch channels");
-        }
-        const channelsData: Channel[] = await res.data;
-        setChannels(channelsData);
-      } catch (error) {
-        return null;
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchChannels();
-  }, [channels.length]);
+  if (error) return <div>Failed to load channels</div>;
 
   return (
     <div className="w-full">
       {isLoading && <LoadingProgressBar />}
-      <Link href="/dashboard/channels/new" onClick={() => setIsLoading(true)}>
+      <Link href="/dashboard/channels/new">
         <Button className="button bg-gray-600 p-3 rounded-md gap-1 mb-2">
+          <Image src="/icons/add.svg" alt="add" width={24} height={24} />
           <Image src="/icons/add.svg" alt="add" width={24} height={24} />
           <p className="block">Add New Channel</p>
         </Button>

@@ -16,6 +16,7 @@ import { AdminPanelSettingsOutlined } from "@mui/icons-material";
 
 import LoadingProgressBar from "../LoadingProgressBar";
 import UpgradePlanCardAlert from "./UpgradePlanCardAlert";
+import Logo from "../Home/Logo";
 
 interface SidebarContentProps {
   isLoading: boolean;
@@ -34,11 +35,14 @@ function SideNavbar({
   const [activeLink, setActiveLink] = useState("");
 
   const handleSetActiveLink = (link: string) => {
-    setActiveLink(link);
-    setIsLoading(true);
-    setTimeout(() => {
+    try {
+      setActiveLink(link);
+      setIsLoading(true);
+    } catch (error) {
+    } finally {
       setIsLoading(false);
-    }, 5000);
+    }
+    setTimeout(() => {}, 5000);
   };
 
   const toggleSidebar = () => {
@@ -57,11 +61,7 @@ function SideNavbar({
         }}
       >
         <div className="flex justify-between items-center px-4 py-8">
-          <h1 className="flex lg:hidden text-lg text-center justify-center cursor-pointer font-bold text-blue-900">
-            <Link href="/" className="flex justify-center items-center gap-1">
-              <span className="hover:text-zinc-950">IoTDataHub</span>
-            </Link>
-          </h1>
+          <Logo />
           <IconButton
             aria-label="toggle drawer"
             edge="start"
@@ -107,7 +107,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
   const userRole = session!.user!.role;
 
   return (
-    <div className="flex flex-col justify-start item-center mt-0 lg:mt-14">
+    <div className="flex flex-col justify-start item-center mt-0 lg:mt-24">
       <div className="border-b border-gray-100 pb-4">
         <Link href="/dashboard">
           <div

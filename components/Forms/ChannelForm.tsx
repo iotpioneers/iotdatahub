@@ -2,7 +2,6 @@
 
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { Button } from "@radix-ui/themes";
-import axios from "axios";
 import "easymde/dist/easymde.min.css";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -10,6 +9,7 @@ import { Controller, useForm } from "react-hook-form";
 import SimpleMDE from "react-simplemde-editor";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSWRConfig } from "swr";
 
 // material-ui
 import Alert from "@mui/material/Alert";
@@ -30,6 +30,15 @@ import {
 // Types
 type ChannelForm = z.infer<typeof channelSchema>;
 
+const fetcher = (url: string, data: any) =>
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  }).then((res) => res.json());
+
 export default function ChannelForm() {
   const { status, data: session } = useSession();
   const { state, fetchCurrentOrganization } = useGlobalState();
@@ -39,6 +48,8 @@ export default function ChannelForm() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [open, setOpen] = React.useState(false);
+
+  const { mutate } = useSWRConfig();
 
   if (status !== "loading" && status === "unauthenticated") return null;
 
@@ -91,17 +102,21 @@ export default function ChannelForm() {
   const onSubmit = handleSubmit(async (data) => {
     try {
       setIsSubmitting(true);
-      const response = await axios.post("/api/channels", {
-        ...data,
-        organizationId: currentOrganization!.id,
-      });
+      const result = await mutate(
+        "/api/channels",
+        fetcher("/api/channels", {
+          ...data,
+          organizationId: currentOrganization!.id,
+        }),
+        false
+      );
 
-      if (response.status !== 201) {
-        setError("Failed to create channel");
-        throw new Error("Failed to create channel");
+      if (!result || "error" in result) {
+        setError(result?.error || "Failed to create channel");
+        setOpen(true);
+        setIsSubmitting(false);
+        return;
       }
-
-      const result = await response.data;
 
       const { id: roomId, name: title } = result.newChannel;
 
@@ -112,22 +127,21 @@ export default function ChannelForm() {
         title,
       });
 
-      if (!room) {
-        setError("Failed to create channel");
+      if ("error" in room) {
+        setError(room.error);
         setOpen(true);
         setIsSubmitting(false);
-        throw new Error("Failed to create channel");
+        return;
       }
-      setOpen(true);
 
+      setOpen(true);
       setIsSubmitting(false);
       setError("");
       router.push(`/dashboard/channels/${room.id}`);
     } catch (error) {
       setIsSubmitting(false);
       setError("An unexpected error occurred.");
-    } finally {
-      setIsSubmitting(false);
+      setOpen(true);
     }
   });
 

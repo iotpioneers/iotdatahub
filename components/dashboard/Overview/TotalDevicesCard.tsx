@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 // material-ui
 import { useTheme } from "@mui/material/styles";
@@ -21,70 +21,129 @@ import { Channel, Device, Field } from "@/types";
 
 // ==============================|| DASHBOARD - TOTAL ORDER LINE CHART CARD ||============================== //
 
-const ChartDeviceData = {
-  type: "line" as "line",
-  height: 90,
-  options: {
-    chart: {
-      sparkline: {
-        enabled: true,
-      },
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    colors: ["#fff"],
-    fill: {
-      type: "solid",
-      opacity: 1,
-    },
-    stroke: {
-      curve: "smooth" as "smooth",
-      width: 3,
-    },
-    yaxis: {
-      min: 0,
-      max: 100,
-    },
-    tooltip: {
-      theme: "dark",
-      fixed: {
-        enabled: false,
-      },
-      x: {
-        show: false,
-      },
-      y: {
-        title: {
-          formatter: () => "Total channels",
-        },
-      },
-      marker: {
-        show: false,
-      },
-    },
-  },
-  series: [
-    {
-      name: "series1",
-      data: [45, 66, 41, 89, 25, 44, 9, 54],
-    },
-  ],
-};
+// const ChartDeviceData = {
+//   type: "line" as "line",
+//   height: 90,
+//   options: {
+//     chart: {
+//       sparkline: {
+//         enabled: true,
+//       },
+//     },
+//     dataLabels: {
+//       enabled: false,
+//     },
+//     colors: ["#fff"],
+//     fill: {
+//       type: "solid",
+//       opacity: 1,
+//     },
+//     stroke: {
+//       curve: "smooth" as "smooth",
+//       width: 3,
+//     },
+//     yaxis: {
+//       min: 0,
+//       max: 100,
+//     },
+//     tooltip: {
+//       theme: "dark",
+//       fixed: {
+//         enabled: false,
+//       },
+//       x: {
+//         show: false,
+//       },
+//       y: {
+//         title: {
+//           formatter: () => "Total channels",
+//         },
+//       },
+//       marker: {
+//         show: false,
+//       },
+//     },
+//   },
+//   series: [
+//     {
+//       name: "series1",
+//       data: [45, 66, 41, 89, 25, 44, 9, 54],
+//     },
+//   ],
+// };
 interface TotalDevicesCardProps {
   isLoading: boolean;
   devices: Device[] | null;
-  channels: Channel[] | null;
-  fields: Field[] | null;
 }
 
 const TotalDevicesCard: React.FC<TotalDevicesCardProps> = ({
   isLoading,
   devices,
-  channels,
-  fields,
 }) => {
   const theme = useTheme();
+
+  const chartData = useMemo(() => {
+    if (!devices) return [];
+
+    return devices.map((device, index) => ({
+      x: index,
+      y: device.status === "ONLINE" ? 1 : 0,
+    }));
+  }, [devices]);
+
+  const ChartDeviceData = useMemo(
+    () => ({
+      type: "line" as const,
+      height: 90,
+      options: {
+        chart: {
+          sparkline: {
+            enabled: true,
+          },
+        },
+        dataLabels: {
+          enabled: false,
+        },
+        colors: ["#fff"],
+        fill: {
+          type: "solid",
+          opacity: 1,
+        },
+        stroke: {
+          curve: "smooth" as const,
+          width: 3,
+        },
+        yaxis: {
+          min: 0,
+          max: 1,
+        },
+        tooltip: {
+          theme: "dark",
+          fixed: {
+            enabled: false,
+          },
+          x: {
+            show: false,
+          },
+          y: {
+            title: {
+              formatter: () => "Device Status",
+            },
+          },
+          marker: {
+            show: false,
+          },
+        },
+      },
+      series: [
+        {
+          name: "Device Status",
+          data: chartData,
+        },
+      ],
+    }),
+    [chartData]
+  );
 
   return (
     <>

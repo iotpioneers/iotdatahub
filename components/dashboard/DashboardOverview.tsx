@@ -103,12 +103,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           </Grid>
           <Grid item lg={6} md={6} sm={6} xs={12}>
             <div onClick={() => handleRedirect("/dashboard/devices")}>
-              <TotalDevicesCard
-                isLoading={isLoading}
-                devices={devices}
-                channels={channels}
-                fields={fields}
-              />
+              <TotalDevicesCard isLoading={isLoading} devices={devices} />
             </div>
           </Grid>
         </Grid>

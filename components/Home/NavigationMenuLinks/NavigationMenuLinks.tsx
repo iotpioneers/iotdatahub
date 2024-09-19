@@ -38,16 +38,22 @@ const NavigationMenuLinks = () => {
             </NavigationMenu.Trigger>
             <NavigationMenu.Content className="NavigationMenuContent">
               <ul className="List one">
-                <ListItem title="Tech Support" href="#">
+                <ListItem title="Tech Support" href="/tech-support">
                   Get assistance with technical issues.
                 </ListItem>
-                <ListItem title="Developer Resources" href="#">
+                <ListItem
+                  title="Developer Resources"
+                  href="/developer-resources"
+                >
                   Explore resources for developers.
                 </ListItem>
                 <ListItem title="Documentation" href="#">
                   Access API and user documentation.
                 </ListItem>
-                <ListItem title="Featured Hardware" href="/featured">
+                <ListItem
+                  title="Featured Hardware"
+                  href="https://iotpioneersshop.com/"
+                >
                   Discover featured IoT hardware.
                 </ListItem>
               </ul>

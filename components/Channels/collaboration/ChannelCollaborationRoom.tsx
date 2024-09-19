@@ -16,9 +16,9 @@ const ChannelCollaborationRoom = ({
   channel,
   dataPoint,
   fields,
-  sampleCodes,
   apiKey,
 }: ChannelCollaborativeRoomProps) => {
+  console.log("Channel", channel);
   return (
     <RoomProvider id={roomId}>
       <ClientSideSuspense fallback={<LoadingProgressBar />}>
@@ -34,8 +34,8 @@ const ChannelCollaborationRoom = ({
             channel={channel}
             fields={fields}
             dataPoint={dataPoint}
-            sampleCodes={sampleCodes}
             apiKey={apiKey}
+            currentUserType={currentUserType}
           />
           <ChannelCollaborationEditor
             roomId={roomId}

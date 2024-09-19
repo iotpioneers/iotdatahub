@@ -3,13 +3,30 @@
 import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import axios from "axios";
-import { nanoid } from "nanoid";
 import { useRouter } from "next/navigation";
-import { Button, Callout, Heading, Text } from "@radix-ui/themes";
-
-import OutlinedInput from "@mui/material/OutlinedInput";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+import {
+  Button,
+  TextField,
+  Typography,
+  Container,
+  Grid,
+  Paper,
+  Checkbox,
+  FormControlLabel,
+  Snackbar,
+  Alert,
+  Box,
+  Stepper,
+  Step,
+  StepLabel,
+  StepConnector,
+  stepConnectorClasses,
+  StepIconProps,
+} from "@mui/material";
+import { styled } from "@mui/system";
+import SettingsIcon from "@mui/icons-material/Settings";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 import { organizationSchema } from "@/validations/schema.validation";
 import { useGlobalState } from "@/context";
@@ -32,6 +49,97 @@ enum AreaOfInterest {
   FOOD = "FOOD",
 }
 
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(3),
+  marginTop: theme.spacing(4),
+  marginBottom: theme.spacing(4),
+  backgroundColor: theme.palette.background.paper,
+}));
+
+const ImageButton = styled(Button)(({ theme }) => ({
+  width: "100%",
+  height: "200px",
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  color: theme.palette.common.white,
+  textShadow: "1px 1px 2px black",
+  "&:hover": {
+    opacity: 0.8,
+  },
+}));
+
+const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
+  [`&.${stepConnectorClasses.alternativeLabel}`]: {
+    top: 22,
+  },
+  [`&.${stepConnectorClasses.active}`]: {
+    [`& .${stepConnectorClasses.line}`]: {
+      backgroundImage:
+        "linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)",
+    },
+  },
+  [`&.${stepConnectorClasses.completed}`]: {
+    [`& .${stepConnectorClasses.line}`]: {
+      backgroundImage:
+        "linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)",
+    },
+  },
+  [`& .${stepConnectorClasses.line}`]: {
+    height: 3,
+    border: 0,
+    backgroundColor: "#eaeaf0",
+    borderRadius: 1,
+  },
+}));
+
+const ColorlibStepIconRoot = styled("div")<{
+  ownerState: { completed?: boolean; active?: boolean };
+}>(({ theme, ownerState }) => ({
+  backgroundColor: "#ccc",
+  zIndex: 1,
+  color: "#fff",
+  width: 50,
+  height: 50,
+  display: "flex",
+  borderRadius: "50%",
+  justifyContent: "center",
+  alignItems: "center",
+  ...(ownerState.active && {
+    backgroundImage:
+      "linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)",
+    boxShadow: "0 4px 10px 0 rgba(0,0,0,.25)",
+  }),
+  ...(ownerState.completed && {
+    backgroundImage:
+      "linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)",
+  }),
+}));
+
+function ColorlibStepIcon(props: StepIconProps) {
+  const { active, completed, className } = props;
+
+  const icons: { [index: string]: React.ReactElement } = {
+    1: <SettingsIcon />,
+    2: <GroupAddIcon />,
+    3: <CheckCircleIcon />,
+  };
+
+  return (
+    <ColorlibStepIconRoot
+      ownerState={{ completed, active }}
+      className={className}
+    >
+      {icons[String(props.icon)]}
+    </ColorlibStepIconRoot>
+  );
+}
+
+const steps = [
+  "Select organization type",
+  "Choose preferences",
+  "Create organization",
+];
+
 const OrganizationOnboardingCreation: React.FC = () => {
   const { status } = useSession();
   const router = useRouter();
@@ -40,7 +148,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
   if (status !== "loading" && status === "unauthenticated") return null;
 
   const [error, setError] = useState<string>("");
-  const [step, setStep] = useState<number>(0);
+  const [activeStep, setActiveStep] = useState<number>(0);
   const [organizationName, setOrganizationName] = useState<string>("");
   const [organizationType, setOrganizationType] = useState<
     "PERSONAL" | "ENTREPRISE" | ""
@@ -62,21 +170,18 @@ const OrganizationOnboardingCreation: React.FC = () => {
     if (reason === "clickaway") {
       return;
     }
-
     setOpen(false);
   };
 
-  // Function to handle organization type selection
   const selectOrganizationType = (type: "PERSONAL" | "ENTREPRISE") => {
     if (!organizationName) {
       setError("Please enter an organization name");
       return;
     }
     setOrganizationType(type);
-    setStep(1);
+    setActiveStep(1);
   };
 
-  // Function to handle organization name input
   const handleOrganizationNameChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -84,26 +189,20 @@ const OrganizationOnboardingCreation: React.FC = () => {
     setError("");
   };
 
-  // Function to handle area of interest selection
-  const handleAreaOfInterestChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = event.target.value;
+  const handleAreaOfInterestChange = (interest: string) => {
     setSelectedAreasOfInterest((prevSelectedAreas) =>
-      prevSelectedAreas.includes(value)
-        ? prevSelectedAreas.filter((area) => area !== value)
-        : [...prevSelectedAreas, value]
+      prevSelectedAreas.includes(interest)
+        ? prevSelectedAreas.filter((area) => area !== interest)
+        : [...prevSelectedAreas, interest]
     );
   };
 
-  // Function to handle custom area of interest input change
   const handleCustomAreaOfInterestChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setCustomAreaOfInterest(event.target.value.toUpperCase());
   };
 
-  // Function to add custom area of interest
   const addCustomAreaOfInterest = () => {
     if (
       customAreaOfInterest &&
@@ -118,12 +217,14 @@ const OrganizationOnboardingCreation: React.FC = () => {
     }
   };
 
-  // Function to go back to previous step
-  const prevStep = () => {
-    setStep((prevStep) => prevStep - 1);
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
-  // Function to submit organization data
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     const organizationData = {
@@ -167,13 +268,11 @@ const OrganizationOnboardingCreation: React.FC = () => {
     } catch (error) {
       setError("Error creating organization");
       setLoading(false);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center px-5">
+    <Container maxWidth="md">
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
@@ -183,145 +282,186 @@ const OrganizationOnboardingCreation: React.FC = () => {
         <Alert
           onClose={handleCloseResult}
           severity="success"
-          variant="filled"
-          sx={{ width: "100%" }}
+          className="text-orange-400"
         >
           Your organization has been created successfully
         </Alert>
       </Snackbar>
-      <div className="bg-n-9 rounded-lg px-5 max-w-3xl w-full min-h-96 mx-5">
+
+      <StyledPaper elevation={3}>
+        <Stepper
+          alternativeLabel
+          activeStep={activeStep}
+          connector={<ColorlibConnector />}
+        >
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel
+                StepIconComponent={ColorlibStepIcon}
+                className="text-orange-400"
+              >
+                {label}
+              </StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+
         {error && (
-          <Callout.Root
-            color="red"
-            className="flex justify-center items-center mt-2 text-lg text-red-500"
-          >
-            <Callout.Text>{error}</Callout.Text>
-          </Callout.Root>
+          <Alert severity="error" sx={{ marginBottom: 2, marginTop: 2 }}>
+            {error}
+          </Alert>
         )}
-        {step === 0 && (
-          <div className="grid">
-            <Heading
-              as="h2"
-              className="font-bold text-gray-10 text-center text-3xl my-5"
-            >
-              Which feature do you need more?
-            </Heading>
-            <Heading
-              as="h5"
-              className="font-medium text-gray-10 text-center text-md mb-5"
+
+        {activeStep === 0 && (
+          <Box>
+            <Typography
+              variant="h5"
+              align="center"
+              gutterBottom
+              sx={{ mt: 4, color: "orange" }}
             >
               Organizing your work and collaborating with others is easier with
               an organization. Choose a name and type that best suits your
               needs.
-            </Heading>
-            <div className="flex justify-center items-center gap-2 mb-4">
-              <OutlinedInput
-                type="text"
-                value={organizationName}
-                onChange={handleOrganizationNameChange}
-                required
-                placeholder="Enter your organization name"
-                className="px-3 py-2"
-              />
-            </div>
-            <div className="flex w-full justify-between mb-5 gap-5 xs:gap-2">
-              <div
-                className="grid cursor-pointer"
-                onClick={() => selectOrganizationType("PERSONAL")}
-              >
-                <Text className="text-gray-10 font-semibold">
-                  For makers <br />
-                  <br />
-                </Text>
-                <img
-                  src="/makers.jpg"
-                  alt="makers"
-                  className="w-56 h-56 md:min-w-80 rounded-md"
-                />
-              </div>
-              <div
-                className="grid cursor-pointer"
-                onClick={() => selectOrganizationType("ENTREPRISE")}
-              >
-                <Text className="text-gray-10 font-semibold">
-                  For businesses <br />
-                  <br />
-                </Text>
-                <img
-                  src="/businesses.jpg"
-                  alt="businesses"
-                  className="w-56 h-56 md:min-w-80 rounded-md"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-        {step === 1 && (
-          <div className="grid">
-            <div>
-              <Heading
-                as="h2"
-                className="font-bold text-gray-10 text-center text-4xl mb-5 lg:mb-10"
-              >
-                What are your preferences?
-              </Heading>
-              <ul className="grid xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 w-full p-2 mb-4 rounded gap-5">
-                {areasOfInterest.map((interest) => (
-                  <li
-                    key={interest}
-                    value={interest}
-                    className="flex items-center text-gray-10 font-semibold text-lg gap-2"
-                  >
-                    <input
-                      type="checkbox"
-                      id={interest}
-                      value={interest}
-                      checked={selectedAreasOfInterest.includes(interest)}
-                      onChange={handleAreaOfInterestChange}
-                    />
-                    {interest}
-                  </li>
-                ))}
-              </ul>
-              <div className="flex justify-center items-center gap-2 mb-4">
-                <input
-                  type="text"
-                  value={customAreaOfInterest}
-                  onChange={handleCustomAreaOfInterestChange}
-                  placeholder="Add your own area of interest"
-                  className="px-3 py-2 border rounded"
-                />
-                <Button
-                  type="button"
-                  className="bg-blue-500 text-white py-2 px-4 rounded"
-                  onClick={addCustomAreaOfInterest}
+            </Typography>
+            <TextField
+              fullWidth
+              label="Organization Name"
+              value={organizationName}
+              onChange={handleOrganizationNameChange}
+              margin="normal"
+              required
+            />
+            <Typography
+              variant="h4"
+              align="center"
+              gutterBottom
+              sx={{ mt: 4 }}
+              className="text-orange-400"
+            >
+              Choose your organization type
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <ImageButton
+                  fullWidth
+                  onClick={() => selectOrganizationType("PERSONAL")}
+                  style={{
+                    backgroundImage: "url('/makers.jpg')",
+                  }}
                 >
-                  Add
-                </Button>
-              </div>
-            </div>
+                  <Typography variant="h6" className="text-orange-400">
+                    For makers
+                  </Typography>
+                </ImageButton>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <ImageButton
+                  fullWidth
+                  onClick={() => selectOrganizationType("ENTREPRISE")}
+                  style={{
+                    backgroundImage: "url('/businesses.jpg')",
+                  }}
+                >
+                  <Typography variant="h6" color={"orange"}>
+                    For businesses
+                  </Typography>
+                </ImageButton>
+              </Grid>
+            </Grid>
+          </Box>
+        )}
 
-            <div className="flex items-end justify-between">
-              <Button
-                className="bg-gray-500 text-white py-2 px-4 rounded"
-                onClick={prevStep}
-              >
+        {activeStep === 1 && (
+          <Box>
+            <Typography
+              variant="h4"
+              align="center"
+              gutterBottom
+              sx={{ mt: 4 }}
+              className="text-orange-400"
+            >
+              What are your preferences?
+            </Typography>
+            <Grid container spacing={2}>
+              {areasOfInterest.map((interest) => (
+                <Grid item xs={12} sm={6} md={4} key={interest}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={selectedAreasOfInterest.includes(interest)}
+                        onChange={() => handleAreaOfInterestChange(interest)}
+                      />
+                    }
+                    label={interest}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+            <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
+              <TextField
+                fullWidth
+                label="Add your own area of interest"
+                value={customAreaOfInterest}
+                onChange={handleCustomAreaOfInterestChange}
+              />
+              <Button variant="contained" onClick={addCustomAreaOfInterest}>
+                Add
+              </Button>
+            </Box>
+            <Box
+              sx={{ mt: 4, display: "flex", justifyContent: "space-between" }}
+            >
+              <Button variant="outlined" onClick={handleBack}>
                 Back
               </Button>
               <Button
-                type="submit"
-                className="bg-blue-500 text-white py-2 px-4 rounded"
-                onClick={handleSubmit}
-                disabled={loading || !organizationName}
-                style={{ zIndex: 10 }}
+                variant="contained"
+                onClick={handleNext}
+                disabled={selectedAreasOfInterest.length === 0}
               >
-                {loading ? "Submitting..." : "Create Organization"}
+                Next
               </Button>
-            </div>
-          </div>
+            </Box>
+          </Box>
         )}
-      </div>
-    </div>
+
+        {activeStep === 2 && (
+          <Box sx={{ mt: 4 }}>
+            <Typography variant="h4" align="center" gutterBottom>
+              Create Your Organization
+            </Typography>
+            <Typography variant="body1" align="center" paragraph>
+              Please review your information before creating your organization:
+            </Typography>
+            <Typography variant="body1">
+              <strong>Name:</strong> {organizationName}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Type:</strong> {organizationType}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Areas of Interest:</strong>{" "}
+              {selectedAreasOfInterest.join(", ")}
+            </Typography>
+            <Box
+              sx={{ mt: 4, display: "flex", justifyContent: "space-between" }}
+            >
+              <Button variant="outlined" onClick={handleBack}>
+                Back
+              </Button>
+              <Button
+                variant="contained"
+                onClick={handleSubmit}
+                disabled={loading}
+              >
+                {loading ? "Creating..." : "Create Organization"}
+              </Button>
+            </Box>
+          </Box>
+        )}
+      </StyledPaper>
+    </Container>
   );
 };
 

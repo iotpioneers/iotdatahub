@@ -49,7 +49,7 @@ const VerifyEmail = ({ params }: Props) => {
 
         setMessage(response.data.message);
         setOpen(true);
-        router.push("/dashboard");
+        router.push("/feature-creation");
       } catch (err) {
         setError("An error occurred while verifying your email.");
         setOpen(true);
