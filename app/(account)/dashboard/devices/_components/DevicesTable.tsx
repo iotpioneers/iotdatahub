@@ -91,8 +91,6 @@ const DeviceTable: React.FC = () => {
       field: "createdAt",
       headerName: "Date created",
       flex: 1,
-      valueFormatter: (params: { value: Date }) =>
-        new Date(params.value).toLocaleDateString(),
     },
     {
       field: "actions",

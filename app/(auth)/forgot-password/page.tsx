@@ -1,8 +1,9 @@
 import ForgotPassword from "@/components/Auth/authentication/auth-forms/ForgotPassword";
+import OnboardingResetPassword from "@/components/Auth/authentication/auth-forms/OnboardingResetPassword";
 import { Metadata } from "next";
 
 export default function ForgotPasswordPage() {
-  return <ForgotPassword />;
+  return <OnboardingResetPassword />;
 }
 
 export const dynamic = "force-dynamic";

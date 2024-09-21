@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import { configureStore } from "@reduxjs/toolkit";
 import { useSelector } from "react-redux";
-import { signIn, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 
 // material-ui
 import { useTheme } from "@mui/material/styles";
@@ -61,8 +60,6 @@ type FormData = Yup.InferType<typeof schema>;
 
 const AuthLogin = ({ ...others }) => {
   const theme = useTheme();
-  const { data: session } = useSession();
-  const router = useRouter();
   const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
   const customization = useSelector((state: RootState) => state.customization);
   const [loading, setLoading] = useState(false);

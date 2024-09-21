@@ -90,9 +90,7 @@ const OrganizationMembers = () => {
   };
 
   if (!hasOrganization && !organization) {
-    return (
-      <div>No organization found. Please create an organization first.</div>
-    );
+    return null;
   }
 
   const handleSort = (event: React.MouseEvent<unknown>, id: string) => {

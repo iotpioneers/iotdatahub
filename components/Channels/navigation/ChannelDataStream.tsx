@@ -14,21 +14,6 @@ import BarChartWidget from "../charts/BarChartWidget";
 import { AddChartComponent } from "../charts";
 import GaugeWidget from "../charts/GaugeWidget";
 
-const status = [
-  {
-    value: "today",
-    label: "Today",
-  },
-  {
-    value: "month",
-    label: "This Month",
-  },
-  {
-    value: "year",
-    label: "This Year",
-  },
-];
-
 const widgets = [
   {
     value: "lineChart",
@@ -90,20 +75,6 @@ const ChannelDataStream = ({ channel, fields, dataPoint }: Props) => {
                           <Typography variant="h3">{field.name}</Typography>
                         </Grid>
                       </Grid>
-                    </Grid>
-                    <Grid item>
-                      <TextField
-                        id="standard-select-currency"
-                        select
-                        value={value}
-                        onChange={(e) => setValue(e.target.value)}
-                      >
-                        {status.map((option) => (
-                          <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                          </MenuItem>
-                        ))}
-                      </TextField>
                     </Grid>
                   </Grid>
                 </Grid>
