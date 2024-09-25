@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/client";
+import bcrypt from "bcrypt";
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,14 +21,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "" }, { status: 400 });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     // Update the user's emailVerified field
     await prisma.user.update({
       where: { email: user.email },
-      data: { password: password },
+      data: { password: hashedPassword },
     });
 
-    return NextResponse.json({ message: "" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Regitered successfully" },
+      { status: 200 }
+    );
   } catch (error) {
-    return NextResponse.json({ error: "" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to register a user" },
+      { status: 500 }
+    );
   }
 }

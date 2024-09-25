@@ -282,7 +282,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
         <Alert
           onClose={handleCloseResult}
           severity="success"
-          className="text-orange-400"
+          className="text-orange-50"
         >
           Your organization has been created successfully
         </Alert>
@@ -298,7 +298,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
             <Step key={label}>
               <StepLabel
                 StepIconComponent={ColorlibStepIcon}
-                className="text-orange-400"
+                className="text-orange-50"
               >
                 {label}
               </StepLabel>
@@ -333,40 +333,37 @@ const OrganizationOnboardingCreation: React.FC = () => {
               required
             />
             <Typography
-              variant="h4"
+              variant="h1"
               align="center"
               gutterBottom
-              sx={{ mt: 4 }}
-              className="text-orange-400"
+              className="text-orange-50"
             >
               Choose your organization type
             </Typography>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
+                <Typography variant="h2" className="text-orange-50">
+                  Developer
+                </Typography>
                 <ImageButton
                   fullWidth
                   onClick={() => selectOrganizationType("PERSONAL")}
                   style={{
                     backgroundImage: "url('/makers.jpg')",
                   }}
-                >
-                  <Typography variant="h6" className="text-orange-400">
-                    For makers
-                  </Typography>
-                </ImageButton>
+                ></ImageButton>
               </Grid>
               <Grid item xs={12} sm={6}>
+                <Typography variant="h2" color={"orange"}>
+                  Business
+                </Typography>
                 <ImageButton
                   fullWidth
                   onClick={() => selectOrganizationType("ENTREPRISE")}
                   style={{
                     backgroundImage: "url('/businesses.jpg')",
                   }}
-                >
-                  <Typography variant="h6" color={"orange"}>
-                    For businesses
-                  </Typography>
-                </ImageButton>
+                ></ImageButton>
               </Grid>
             </Grid>
           </Box>
@@ -379,7 +376,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
               align="center"
               gutterBottom
               sx={{ mt: 4 }}
-              className="text-orange-400"
+              className="text-orange-50"
             >
               What are your preferences?
             </Typography>

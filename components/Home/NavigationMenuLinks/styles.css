@@ -37,7 +37,6 @@ p {
   line-height: 1;
   border-radius: 4px;
   font-size: 15px;
-  color: orange;
 }
 .NavigationMenuTrigger:focus,
 .NavigationMenuLink:focus {
@@ -170,7 +169,6 @@ p {
   font-weight: 700;
   line-height: 1.2;
   margin-bottom: 5px;
-  color: var(--violet-12);
 }
 
 .ListItemText {
@@ -223,7 +221,6 @@ p {
 
 .CaretDown {
   position: relative;
-  color: var(--violet-10);
   top: 1px;
   transition: transform 250ms ease;
 }

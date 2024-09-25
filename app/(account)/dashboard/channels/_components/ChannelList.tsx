@@ -32,7 +32,6 @@ const ChannelList = () => {
       <Link href="/dashboard/channels/new">
         <Button className="button bg-gray-600 p-3 rounded-md gap-1 mb-2">
           <Image src="/icons/add.svg" alt="add" width={24} height={24} />
-          <Image src="/icons/add.svg" alt="add" width={24} height={24} />
           <p className="block">Add New Channel</p>
         </Button>
       </Link>

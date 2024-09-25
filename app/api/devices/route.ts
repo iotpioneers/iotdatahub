@@ -2,7 +2,6 @@ import prisma from "@/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { deviceSchema } from "@/validations/schema.validation";
-import { redirect } from "next/navigation";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();

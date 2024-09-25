@@ -66,25 +66,26 @@ model Authenticator {
 }
 
 model User {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
-  name           String
-  email          String          @unique
-  country        String?
-  phonenumber    String?
-  emailVerified  DateTime?
-  image          String?
-  password       String?
-  role           Role            @default(USER)
-  accounts       Account[]
-  sessions       Session[]
-  Authenticator  Authenticator[]
-  devices        Device[]
-  channels       Channel[]
-  apiKeys        ApiKey[]
-  subscriptionId String?         @db.ObjectId
-  organizationId String?         @db.ObjectId
-  subscription   Subscription?   @relation(fields: [subscriptionId], references: [id])
-  organization   Organization?   @relation(fields: [organizationId], references: [id])
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  email           String          @unique
+  country         String?
+  phonenumber     String?
+  emailVerified   DateTime?
+  image           String?
+  password        String?
+  role            Role            @default(USER)
+  accounts        Account[]
+  sessions        Session[]
+  Authenticator   Authenticator[]
+  devices         Device[]
+  channels        Channel[]
+  apiKeys         ApiKey[]
+  feedbackReplies FeedbackReply[]
+  subscriptionId  String?         @db.ObjectId
+  organizationId  String?         @db.ObjectId
+  subscription    Subscription?   @relation(fields: [subscriptionId], references: [id])
+  organization    Organization?   @relation(fields: [organizationId], references: [id])
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt()
@@ -100,6 +101,7 @@ model Organization {
   userId         String           @db.ObjectId
   users          User[]
   members        Member[]
+  feedbacks      Feedback[]
 
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt()
@@ -320,6 +322,38 @@ model Invoice {
   updatedAt DateTime @updatedAt()
 }
 
+model Feedback {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  email          String
+  subject        String
+  message        String
+  status         FeedbackStatus  @default(PENDING)
+  organizationId String?         @db.ObjectId
+  organization   Organization?   @relation(fields: [organizationId], references: [id])
+  replies        FeedbackReply[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId])
+}
+
+model FeedbackReply {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  message    String
+  feedbackId String   @db.ObjectId
+  feedback   Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+  userId     String   @db.ObjectId
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([feedbackId])
+  @@index([userId])
+}
+
 enum PaymentStatus {
   PENDING
   SUCCEEDED
@@ -389,4 +423,11 @@ enum SubscriptionType {
   FREE
   PREMIUM
   ENTERPRISE
+}
+
+enum FeedbackStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
 }

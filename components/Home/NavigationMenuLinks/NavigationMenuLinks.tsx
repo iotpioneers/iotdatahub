@@ -18,7 +18,7 @@ const ListItem = React.forwardRef<HTMLAnchorElement, ListItemProps>(
           {...props}
           ref={forwardedRef}
         >
-          <div className="ListItemHeading">{props.title}</div>
+          <div className="ListItemHeading text-orange-50">{props.title}</div>
           <p className="ListItemText">{props.children}</p>
         </a>
       </NavigationMenu.Link>
@@ -33,8 +33,9 @@ const NavigationMenuLinks = () => {
         <NavigationMenu.List className="NavigationMenuList">
           {/* Developers Section */}
           <NavigationMenu.Item>
-            <NavigationMenu.Trigger className="NavigationMenuTrigger">
-              Developers <CaretDownIcon className="CaretDown" aria-hidden />
+            <NavigationMenu.Trigger className="NavigationMenuTrigger text-orange-50">
+              Developers{" "}
+              <CaretDownIcon className="CaretDown text-orange-50" aria-hidden />
             </NavigationMenu.Trigger>
             <NavigationMenu.Content className="NavigationMenuContent">
               <ul className="List one">
@@ -62,8 +63,8 @@ const NavigationMenuLinks = () => {
 
           {/* Enterprise Section */}
           <NavigationMenu.Item>
-            <NavigationMenu.Trigger className="NavigationMenuTrigger">
-              Enterprise <CaretDownIcon className="CaretDown" aria-hidden />
+            <NavigationMenu.Trigger className="NavigationMenuTrigger text-orange-50">
+              Enterprise <CaretDownIcon className="CaretDown cc" aria-hidden />
             </NavigationMenu.Trigger>
             <NavigationMenu.Content className="NavigationMenuContent">
               <ul className="List one">
@@ -85,8 +86,9 @@ const NavigationMenuLinks = () => {
 
           {/* Features Section */}
           <NavigationMenu.Item>
-            <NavigationMenu.Trigger className="NavigationMenuTrigger">
-              Features <CaretDownIcon className="CaretDown" aria-hidden />
+            <NavigationMenu.Trigger className="NavigationMenuTrigger text-orange-50">
+              Features{" "}
+              <CaretDownIcon className="CaretDown text-orange-50" aria-hidden />
             </NavigationMenu.Trigger>
             <NavigationMenu.Content className="NavigationMenuContent">
               <ul className="List two">
@@ -111,8 +113,9 @@ const NavigationMenuLinks = () => {
 
           {/* Company Section */}
           <NavigationMenu.Item>
-            <NavigationMenu.Trigger className="NavigationMenuTrigger">
-              Company <CaretDownIcon className="CaretDown" aria-hidden />
+            <NavigationMenu.Trigger className="NavigationMenuTrigger text-orange-50">
+              Company{" "}
+              <CaretDownIcon className="CaretDown text-orange-50" aria-hidden />
             </NavigationMenu.Trigger>
             <NavigationMenu.Content className="NavigationMenuContent">
               <ul className="List one">
@@ -128,7 +131,10 @@ const NavigationMenuLinks = () => {
 
           {/* Pricing Section */}
           <NavigationMenu.Item>
-            <NavigationMenu.Link className="NavigationMenuLink" href="/pricing">
+            <NavigationMenu.Link
+              className="NavigationMenuLink text-orange-50"
+              href="/pricing"
+            >
               Pricing
             </NavigationMenu.Link>
           </NavigationMenu.Item>

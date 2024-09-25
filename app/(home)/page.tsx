@@ -1,10 +1,10 @@
 import React from "react";
 
 import { Metadata } from "next";
-import HomeBody from "@/components/Home/HomeBody";
+import HomePageComponent from "@/components/Home/HomePage";
 
 export default function Home() {
-  return <HomeBody />;
+  return <HomePageComponent />;
 }
 
 export const dynamic = "force-dynamic";

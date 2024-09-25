@@ -173,3 +173,17 @@ export const memberSchema = z.object({
     message: "Invalid member access",
   }),
 });
+
+export const feedbackSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  subject: z.string().min(1, "Subject is required"),
+  message: z.string().min(1, "Message is required"),
+  organizationId: z.string().optional(),
+  status: z.enum(["PENDING", "IN_PROGRESS", "RESOLVED", "CLOSED"]).optional(),
+});
+
+export const feedbackReplySchema = z.object({
+  message: z.string().min(1, "Message is required"),
+  feedbackId: z.string().min(1, "Feedback ID is required"),
+});

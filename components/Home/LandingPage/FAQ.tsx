@@ -32,11 +32,11 @@ const FAQ = () => {
       <Typography
         component="h2"
         variant="h4"
-        color="text.primary"
         sx={{
           width: { sm: "100%", md: "60%" },
           textAlign: { sm: "left", md: "center" },
         }}
+        className="text-orange-50"
       >
         Frequently Asked Questions
       </Typography>
