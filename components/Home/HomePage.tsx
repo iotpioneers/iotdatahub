@@ -30,7 +30,7 @@ const Hero: React.FC = () => (
 const Services: React.FC = () => (
   <Container sx={{ py: 8 }}>
     <Typography variant="h4" component="h2" gutterBottom>
-      IoT Dashboard Development Services
+      IoTDataHub Development Services
     </Typography>
     <Grid container spacing={4}>
       {[
@@ -88,7 +88,7 @@ const Process: React.FC = () => (
 const Features: React.FC = () => (
   <Container sx={{ py: 8 }}>
     <Typography variant="h4" component="h2" gutterBottom>
-      IoT Dashboards Features
+      IoTDataHub Features
     </Typography>
     <Grid container spacing={4}>
       <Grid item xs={12} md={6}>

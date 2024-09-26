@@ -1,6 +1,5 @@
-import ForgotPassword from "@/components/Auth/authentication/auth-forms/ForgotPassword";
-import OnboardingResetPassword from "@/components/Auth/authentication/auth-forms/OnboardingResetPassword";
 import { Metadata } from "next";
+import OnboardingResetPassword from "@/components/Auth/authentication/auth-forms/OnboardingResetPassword";
 
 export default function ForgotPasswordPage() {
   return <OnboardingResetPassword />;

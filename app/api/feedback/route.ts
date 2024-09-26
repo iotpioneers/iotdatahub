@@ -63,10 +63,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  const feedback = await prisma.feedback.findMany({
-    where: { organizationId: user.organizationId },
-    include: { replies: true },
-  });
+  const feedback = await prisma.feedback.findMany();
 
   return NextResponse.json(feedback);
 }

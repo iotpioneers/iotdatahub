@@ -18,16 +18,8 @@ import {
   Snackbar,
 } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+import { BarChart } from "@mui/x-charts/BarChart";
+import AnalyticsChart from "./AnalyticsChart";
 
 // Fetcher function for SWR
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -49,33 +41,17 @@ const replySchema = yup.object({
   message: yup.string().required("Reply message is required"),
 });
 
-// AnalyticsChart component
-const AnalyticsChart = () => {
-  const { data, error } = useSWR(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/feedback/analytics`,
-    fetcher
-  );
-
-  if (error) return <div>Failed to load analytics</div>;
-  if (!data) return <div>Loading analytics...</div>;
-
-  return (
-    <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="status" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="count" fill="#8884d8" />
-      </BarChart>
-    </ResponsiveContainer>
-  );
-};
+// Define FeedbackStatus enum
+enum FeedbackStatus {
+  PENDING = "PENDING",
+  IN_PROGRESS = "IN_PROGRESS",
+  RESOLVED = "RESOLVED",
+  CLOSED = "CLOSED",
+}
 
 // RequestList component
 const RequestList = () => {
-  const { data, error } = useSWR(
+  const { data, error } = useSWR<any[]>(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/feedback`,
     fetcher
   );
@@ -183,7 +159,7 @@ const RequestDetail = ({
   feedbackId: string;
   onClose: () => void;
 }) => {
-  const { data, error } = useSWR(
+  const { data, error } = useSWR<any>(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/feedback/${feedbackId}`,
     fetcher
   );
