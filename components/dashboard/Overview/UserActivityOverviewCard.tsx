@@ -1,9 +1,10 @@
+"use client";
+
 import React, { useState, useMemo } from "react";
-import Avatar from "@mui/material/Avatar";
+import { PieChart } from "@mui/x-charts/PieChart";
 import Button from "@mui/material/Button";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
-import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -13,9 +14,9 @@ import SkeletonUserActivityOverviewCard from "../cards/Skeleton/SkeletonUserActi
 import { gridSpacing } from "@/app/store/constant";
 import ChevronRightOutlinedIcon from "@mui/icons-material/ChevronRightOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
-import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
-import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
 import { Channel, DataPoint, Device, Field } from "@/types";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 interface UserActivityOverviewCardProps {
   isLoading: boolean;
@@ -36,6 +37,9 @@ const UserActivityOverviewCard = ({
 }: UserActivityOverviewCardProps) => {
   const [anchorEl, setAnchorEl] = useState<null | SVGSVGElement>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<Period>("last30days");
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
   const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
     setAnchorEl(event.currentTarget);
@@ -76,103 +80,35 @@ const UserActivityOverviewCard = ({
     );
   };
 
-  const calculateChange = (
-    currentCount: number,
-    previousCount: number
-  ): number => {
-    if (previousCount === 0) return currentCount > 0 ? 100 : 0;
-    return ((currentCount - previousCount) / previousCount) * 100;
-  };
-
   const activityData = useMemo(() => {
     if (!dataPoints || !fields) return null;
 
-    const getDataForPeriod = (period: Period) => {
-      const filteredData = filterDataByPeriod(dataPoints, period);
-      const result: Record<string, number> = {};
+    const filteredData = filterDataByPeriod(dataPoints, selectedPeriod);
+    const result: { id: string; value: number; label: string }[] = [];
 
-      fields.forEach((field) => {
-        result[field.name] = filteredData.filter(
-          (point) => point.fieldId === field.id
-        ).length;
-      });
-
-      return result;
-    };
-
-    const currentData = getDataForPeriod(selectedPeriod);
-    const previousPeriod: Period =
-      selectedPeriod === "last30days"
-        ? "last60days"
-        : selectedPeriod === "last60days"
-        ? "last90days"
-        : "last90days";
-    const previousData = getDataForPeriod(previousPeriod);
-
-    const changes: Record<string, number> = {};
-    Object.keys(currentData).forEach((key) => {
-      changes[key] = calculateChange(currentData[key], previousData[key]);
+    fields.forEach((field) => {
+      const count = filteredData.filter(
+        (point) => point.fieldId === field.id
+      ).length;
+      result.push({ id: field.name, value: count, label: field.name });
     });
 
-    return { currentData, changes };
+    return result;
   }, [dataPoints, fields, selectedPeriod]);
 
-  const renderActivityItem = (label: string, count: number, change: number) => (
-    <Grid container direction="column" key={label}>
-      <Grid item>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item>
-            <Typography variant="subtitle1" color="inherit">
-              {label}
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Grid container alignItems="center" justifyContent="space-between">
-              <Grid item>
-                <Typography variant="subtitle1" color="inherit">
-                  {count}
-                </Typography>
-              </Grid>
-              <Grid item>
-                <Avatar
-                  variant="rounded"
-                  sx={{
-                    width: 16,
-                    height: 16,
-                    borderRadius: "5px",
-                    bgcolor: change >= 0 ? "success.light" : "orange.light",
-                    color: change >= 0 ? "success.dark" : "orange.dark",
-                    ml: 2,
-                  }}
-                >
-                  {change >= 0 ? (
-                    <KeyboardArrowUpOutlinedIcon
-                      fontSize="small"
-                      color="inherit"
-                    />
-                  ) : (
-                    <KeyboardArrowDownOutlinedIcon
-                      fontSize="small"
-                      color="inherit"
-                    />
-                  )}
-                </Avatar>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid item>
-        <Typography
-          variant="subtitle2"
-          sx={{ color: change >= 0 ? "success.dark" : "orange.dark" }}
-        >
-          {Math.abs(change).toFixed(2)}% {change >= 0 ? "Increase" : "Decrease"}{" "}
-          from previous period
-        </Typography>
-      </Grid>
-    </Grid>
-  );
+  const getChartDimensions = () => {
+    if (isMobile) {
+      return { width: 300, height: 300 };
+    } else if (isTablet) {
+      return { width: 400, height: 400 };
+    } else {
+      return { width: 500, height: 500 };
+    }
+  };
+
+  const { width, height } = getChartDimensions();
+
+  const valueFormatter = (item: { value: number }) => `${item.value} points`;
 
   return (
     <>
@@ -239,22 +175,28 @@ const UserActivityOverviewCard = ({
               </Grid>
               <Grid item xs={12}>
                 {activityData && (
-                  <>
-                    {Object.entries(activityData.currentData).map(
-                      ([key, value], index) => (
-                        <React.Fragment key={key}>
-                          {renderActivityItem(
-                            key,
-                            value,
-                            activityData.changes[key]
-                          )}
-                          {index <
-                            Object.entries(activityData.currentData).length -
-                              1 && <Divider sx={{ my: 1.5 }} />}
-                        </React.Fragment>
-                      )
-                    )}
-                  </>
+                  <PieChart
+                    series={[
+                      {
+                        data: activityData,
+                        highlightScope: {
+                          faded: "global",
+                          highlighted: "item",
+                        },
+                        faded: { innerRadius: 30, additionalRadius: -30 },
+                        valueFormatter,
+                      },
+                    ]}
+                    height={height}
+                    width={width}
+                    slotProps={{
+                      legend: {
+                        direction: isMobile ? "column" : "row",
+                        position: { vertical: "bottom", horizontal: "middle" },
+                        padding: 0,
+                      },
+                    }}
+                  />
                 )}
               </Grid>
             </Grid>

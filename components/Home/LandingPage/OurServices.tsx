@@ -75,23 +75,16 @@ const HighlightWrapper = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const Highlights = () => {
+const OurServices = () => {
   const theme = useTheme();
 
   return (
     <Box
       id="highlights"
       sx={{
-        backgroundImage:
-          theme.palette.mode === "light"
-            ? "linear-gradient(180deg, #CEE5FD, #FFF)"
-            : `linear-gradient(180deg, #011010, #000)",
-                  0.0
-                )})`,
         pt: { xs: 4, sm: 12 },
         pb: { xs: 8, sm: 16 },
-        color: "white",
-        bgcolor: "#06090a",
+        background: theme.palette.background.paperChannel,
       }}
     >
       <Container
@@ -109,10 +102,14 @@ const Highlights = () => {
             textAlign: { sm: "left", md: "center" },
           }}
         >
-          <Typography component="h2" variant="h4">
-            Highlights
+          <Typography component="h2" variant="h4" className="text-orange-50">
+            Our Services
           </Typography>
-          <Typography variant="body1" sx={{ color: "grey.400" }}>
+          <Typography
+            variant="body1"
+            sx={{ color: "grey.400" }}
+            className="text-orange-50"
+          >
             Discover what makes our platform exceptional: scalability,
             robustness, user-friendliness, advanced analytics, precision tools,
             and unmatched support.
@@ -135,15 +132,20 @@ const Highlights = () => {
                       border: "1px solid",
                       borderColor: "grey.800",
                       background: "transparent",
-                      backgroundColor: "grey.900",
                     }}
                   >
-                    <Box sx={{ opacity: "50%" }}>{item.icon}</Box>
+                    <Box sx={{ opacity: "50%" }} className="text-orange-50">
+                      {item.icon}
+                    </Box>
                     <div className="grid">
-                      <Typography fontWeight="medium" gutterBottom>
+                      <Typography
+                        fontWeight="medium"
+                        gutterBottom
+                        className="text-orange-50"
+                      >
                         {item.title}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: "grey.400" }}>
+                      <Typography variant="body2" className="text-orange-50">
                         {item.description}
                       </Typography>
                     </div>
@@ -162,4 +164,4 @@ const HighlightSectionStyled = styled.section`
   width: 100%;
 `;
 
-export default Highlights;
+export default OurServices;

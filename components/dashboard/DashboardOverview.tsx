@@ -118,15 +118,15 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               dataPoints={datapoints}
             />
           </Grid>
-          <Grid item xs={12} md={4}>
-            <UserActivityOverviewCard
-              isLoading={isLoading}
-              devices={devices}
-              channels={channels}
-              fields={fields}
-              dataPoints={datapoints}
-            />
-          </Grid>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          {/* <UserActivityOverviewCard
+            isLoading={isLoading}
+            devices={devices}
+            channels={channels}
+            fields={fields}
+            dataPoints={datapoints}
+          /> */}
         </Grid>
       </Grid>
     </Grid>

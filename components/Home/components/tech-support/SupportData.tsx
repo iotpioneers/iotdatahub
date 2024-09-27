@@ -55,7 +55,6 @@ export const supportResources = [
   { title: "Tutorials", icon: <PlayArrow />, link: "#" },
   { title: "Community Forum", icon: <Message />, link: "#" },
   { title: "Webinars", icon: <CloudUpload />, link: "#" },
-  { title: "Case Studies", icon: <BarChart />, link: "#" },
 ];
 
 export const troubleshootingGuide = [

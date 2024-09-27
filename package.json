@@ -83,6 +83,7 @@
     "react-router-dom": "^6.25.1",
     "react-simplemde-editor": "^5.2.0",
     "react-slick": "^0.30.2",
+    "react-spring": "^9.7.4",
     "react-type-animation": "^3.2.0",
     "recharts": "^2.12.7",
     "sass": "^1.77.8",

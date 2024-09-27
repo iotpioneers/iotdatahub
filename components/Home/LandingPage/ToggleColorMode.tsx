@@ -20,6 +20,7 @@ const ToggleColorMode = ({ mode, toggleColorMode }: ToggleColorModeProps) => {
         size="small"
         aria-label="button to toggle theme"
         sx={{ minWidth: "32px", height: "32px", p: "4px" }}
+        className={`text-${mode === "dark" ? "white" : "orange-50"}`}
       >
         {mode === "dark" ? (
           <WbSunnyRoundedIcon fontSize="small" />
