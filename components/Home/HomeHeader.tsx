@@ -5,7 +5,6 @@ import { useSession } from "next-auth/react";
 
 // Material UI
 import { Link, PaletteMode } from "@mui/material";
-import { Link, PaletteMode } from "@mui/material";
 import Box from "@mui/material/Box";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -22,7 +21,6 @@ import { navigation } from "@/constants";
 import AngledButton from "./components/design/AngledButton";
 import MenuSvg from "./components/design/svg/MenuSvg";
 import LoadingProgressBar from "../LoadingProgressBar";
-import Logo from "./Logo";
 import Logo from "./Logo";
 
 const logoStyle = {
@@ -153,10 +151,8 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                       <MenuSvg openNavigation={openNavigation} />
                     </AngledButton>
                     <ToggleColorMode
-                    <ToggleColorMode
                       mode={mode}
                       toggleColorMode={toggleColorMode}
-                    />
                     />
                   </Box>
                   {navigation.map((item) => (
@@ -166,10 +162,6 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                       onClick={() => setOpenNavigation(false)}
                       className={`lg:hidden block relative font-code text-2xl uppercase text-n-1 transition-colors hover:text-color-1 px-6 py-2`}
                     >
-                      <MenuItem
-                        onClick={() => setOpenNavigation(false)}
-                        className="text-orange-50"
-                      >
                       <MenuItem
                         onClick={() => setOpenNavigation(false)}
                         className="text-orange-50"

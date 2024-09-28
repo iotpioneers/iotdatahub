@@ -11,10 +11,8 @@ import {
   RoomAccesses,
   ShareChannelParams,
   UserAccessType,
-  UserAccessType,
 } from "@/types";
 import axios from "axios";
-import prisma from "@/prisma/client";
 import prisma from "@/prisma/client";
 
 export const createChannelRoom = async ({
@@ -82,7 +80,6 @@ export const updateChannelRoomData = async (
     const response = await axios.patch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/${channelId}`,
       { name: title }
-      { name: title }
     );
 
     if (response.status !== 200) {
@@ -91,7 +88,6 @@ export const updateChannelRoomData = async (
     }
 
     const updateChannelRoom = await liveblocks.updateRoom(channelId, {
-      metadata: { title },
       metadata: { title },
     });
 

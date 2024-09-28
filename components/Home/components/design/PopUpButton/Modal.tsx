@@ -51,7 +51,6 @@ const Modal: React.FC<ModalProps> = ({ open, setOpen }) => {
           y: open ? -30 : 0,
           width: open ? "300px" : 0,
           height: open ? "400px" : 0,
-          height: open ? "400px" : 0,
           opacity: 1,
         }}
         transition={{ type: "spring", duration: 2, ease: "easeInOut" }}

@@ -3,7 +3,6 @@
 import { Suspense, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
-import DashboardOverview from "@/components/dashboard/DashboardOverview";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import {
   Channel,
@@ -14,6 +13,7 @@ import {
   Organization,
 } from "@/types";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { DashboardOverview } from "@/components/dashboard";
 
 interface ApiResponse {
   hasOrganization: boolean;
@@ -40,23 +40,8 @@ const UserDashboardOverview = () => {
     fetcher,
     { refreshInterval: 5000 }
   );
-  const router = useRouter();
-  const { data, error } = useSWR<ApiResponse, Error>(
-    "/api/organizations/status",
-    fetcher,
-    { refreshInterval: 5000 }
-  );
 
   useEffect(() => {
-    if (data && !data.hasOrganization) {
-      router.push("/feature-creation");
-    }
-  }, [data, router]);
-
-  if (error) return <div>Failed to load</div>;
-  if (!data) return <LoadingProgressBar />;
-
-  const { organization, members, devices, channels, fields, datapoints } = data;
     if (data && !data.hasOrganization) {
       router.push("/feature-creation");
     }
