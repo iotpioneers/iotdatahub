@@ -91,7 +91,6 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
               }}
             >
               <Logo />
-              <Logo />
               <Box
                 sx={{
                   display: { xs: "none", md: "flex", marginLeft: "10rem" },
@@ -107,7 +106,6 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                 alignItems: "center",
               }}
             >
-              <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} />
               <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} />
               {status !== "loading" && (
                 <Button
