@@ -178,8 +178,6 @@ function ConfirmationModal({
   const handleClose = () => setOpen(false);
 
   const handleConfirm = () => {
-    // Here you would typically send the data to your backend
-    console.log("New field confirmed:", { fieldName, fieldType, description });
     handleClose();
   };
 

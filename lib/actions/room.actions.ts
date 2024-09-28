@@ -197,7 +197,6 @@ export const updateChannelAccess = async ({
     );
     return parseStringify(room);
   } catch (error) {
-    console.log("Error updating room access", error);
     return { error: "Failed to update channel access" };
   }
 };

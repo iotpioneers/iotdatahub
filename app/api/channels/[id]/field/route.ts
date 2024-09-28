@@ -11,8 +11,6 @@ export async function POST(
     const body = await request.json();
     const token = await getToken({ req: request });
 
-    console.log("body", body);
-
     if (!token?.email) {
       return NextResponse.json(
         { error: "You must be logged in to create a field" },
@@ -43,8 +41,6 @@ export async function POST(
     const channel = await prisma.channel.findUnique({
       where: { id: params.id },
     });
-
-    console.log("channel", channel);
 
     if (!channel) {
       return NextResponse.json({ error: "Channel not found" }, { status: 404 });

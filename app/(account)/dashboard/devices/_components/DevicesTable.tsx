@@ -39,17 +39,11 @@ const DeviceTable: React.FC = () => {
     fetchDevices();
   }, []);
 
-  const handleEdit = (id: number) => {
-    console.log(`Edit device with id: ${id}`);
-  };
+  const handleEdit = (id: number) => {};
 
-  const handleView = (id: number) => {
-    console.log(`View device with id: ${id}`);
-  };
+  const handleView = (id: number) => {};
 
-  const handleDelete = (id: number) => {
-    console.log(`Delete device with id: ${id}`);
-  };
+  const handleDelete = (id: number) => {};
 
   const columns: GridColDef[] = [
     {

@@ -31,12 +31,11 @@ export async function POST(request: NextRequest) {
     throw new Error("User not found");
   }
 
+  let maxChannels = user.subscription?.pricingTier.maxChannels || 0;
+
   // Check if the user has an active subscription
   if (!user.subscription || user.subscription.status !== "ACTIVE") {
-    return NextResponse.json(
-      { error: "Active subscription required" },
-      { status: 403 }
-    );
+    maxChannels = 5;
   }
 
   // Get the user's current channel count
@@ -45,7 +44,7 @@ export async function POST(request: NextRequest) {
   });
 
   // Check if the user has reached their channel limit
-  if (userChannelCount >= user.subscription.pricingTier.maxChannels) {
+  if (userChannelCount >= maxChannels) {
     return NextResponse.json(
       {
         error:

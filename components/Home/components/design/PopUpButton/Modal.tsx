@@ -1,6 +1,7 @@
+"use client";
+
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Tooltip } from "@material-tailwind/react";
 import useSWR from "swr";
 import {
   CircularProgress,
@@ -22,14 +23,14 @@ const fetcher = (url: string, query: string) =>
     body: JSON.stringify({ query }),
   })
     .then((res) => res.json())
-    .catch((error) => console.log(error));
+    .catch((error) => new Error(error));
 
 const Modal: React.FC<ModalProps> = ({ open, setOpen }) => {
   const [message, setMessage] = useState("");
   const [query, setQuery] = useState<string | null>(null);
 
   const { data, error, isLoading } = useSWR(
-    query ? ["http://localhost:8080/ai", query] : null,
+    query ? ["/ai", query] : null,
     ([url, q]) => fetcher(url, q),
     { revalidateOnFocus: false }
   );
@@ -59,10 +60,10 @@ const Modal: React.FC<ModalProps> = ({ open, setOpen }) => {
           animate={{ opacity: 1 }}
           transition={{ type: "Tween", duration: 2 }}
         >
-          <Typography variant="h5" gutterBottom>
+          <Typography variant="h5" gutterBottom className="text-orange-50">
             Hello There 🖐🏻
           </Typography>
-          <Typography variant="body1">
+          <Typography variant="body1" className="text-orange-50">
             Ask us anything about IoTDataHub.
           </Typography>
 
@@ -77,11 +78,11 @@ const Modal: React.FC<ModalProps> = ({ open, setOpen }) => {
               onChange={(e) => setMessage(e.target.value)}
             />
             <Button
-              variant="contained"
-              color="primary"
+              variant="outlined"
               type="submit"
               fullWidth
               sx={{ mt: 2 }}
+              className="bg-orange-50 text-white"
             >
               Submit
             </Button>
@@ -99,34 +100,25 @@ const Modal: React.FC<ModalProps> = ({ open, setOpen }) => {
             )}
           </Box>
 
-          <Tooltip
-            content="Close"
-            placement="left"
-            interactive={false}
-            placeholder={undefined}
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
+          <div
+            className="absolute top-4 right-4 text-white cursor-pointer"
+            onClick={() => setOpen(false)}
           >
-            <div
-              className="absolute top-4 right-4 text-white cursor-pointer"
-              onClick={() => setOpen(false)}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="#fff"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="#000"
+              className="w-6 h-6"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="#fff"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="#000"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-          </Tooltip>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
         </motion.div>
       </motion.div>
     </div>

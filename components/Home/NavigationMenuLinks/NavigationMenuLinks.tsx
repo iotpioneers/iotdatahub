@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import classNames from "classnames";
@@ -10,16 +12,16 @@ interface ListItemProps extends React.HTMLAttributes<HTMLAnchorElement> {
 }
 
 const ListItem = React.forwardRef<HTMLAnchorElement, ListItemProps>(
-  (props, forwardedRef) => (
+  ({ className, title, children, ...props }, forwardedRef) => (
     <li>
       <NavigationMenu.Link asChild>
         <a
-          className={classNames("ListItemLink", props.className)}
+          className={classNames("ListItemLink", className)}
           {...props}
           ref={forwardedRef}
         >
-          <div className="ListItemHeading text-orange-50">{props.title}</div>
-          <p className="ListItemText">{props.children}</p>
+          <div className="ListItemHeading text-orange-50">{title}</div>
+          <p className="ListItemText">{children}</p>
         </a>
       </NavigationMenu.Link>
     </li>
@@ -31,32 +33,7 @@ const NavigationMenuLinks = () => {
     <div className="lg:w-full lg:block hidden my-5">
       <NavigationMenu.Root className="NavigationMenuRoot">
         <NavigationMenu.List className="NavigationMenuList">
-          {/* Developers Section */}
           <NavigationMenu.Item>
-            {/* Company Section */}
-            <NavigationMenu.Item>
-              <NavigationMenu.Trigger className="NavigationMenuTrigger text-orange-50">
-                Company{" "}
-                <CaretDownIcon
-                  className="CaretDown text-orange-50"
-                  aria-hidden
-                />
-              </NavigationMenu.Trigger>
-              <NavigationMenu.Content className="NavigationMenuContent">
-                <ul className="List one">
-                  <ListItem title="About Us" href="#">
-                    Learn more about our company.
-                  </ListItem>
-                  <ListItem title="Blogs" href="/blogs">
-                    Read our latest blogs and updates.
-                  </ListItem>
-                  <ListItem title="Contact Us" href="/contact">
-                    Get in touch with us.
-                  </ListItem>
-                </ul>
-              </NavigationMenu.Content>
-            </NavigationMenu.Item>
-
             <NavigationMenu.Trigger className="NavigationMenuTrigger text-orange-50">
               Developers{" "}
               <CaretDownIcon className="CaretDown text-orange-50" aria-hidden />
@@ -85,7 +62,6 @@ const NavigationMenuLinks = () => {
             </NavigationMenu.Content>
           </NavigationMenu.Item>
 
-          {/* Enterprise Section */}
           <NavigationMenu.Item>
             <NavigationMenu.Trigger className="NavigationMenuTrigger text-orange-50">
               Enterprise <CaretDownIcon className="CaretDown cc" aria-hidden />
@@ -108,7 +84,6 @@ const NavigationMenuLinks = () => {
             </NavigationMenu.Content>
           </NavigationMenu.Item>
 
-          {/* Features Section */}
           <NavigationMenu.Item>
             <NavigationMenu.Trigger className="NavigationMenuTrigger text-orange-50">
               Features{" "}
@@ -135,7 +110,6 @@ const NavigationMenuLinks = () => {
             </NavigationMenu.Content>
           </NavigationMenu.Item>
 
-          {/* Company Section */}
           <NavigationMenu.Item>
             <NavigationMenu.Trigger className="NavigationMenuTrigger text-orange-50">
               Company{" "}
@@ -156,7 +130,6 @@ const NavigationMenuLinks = () => {
             </NavigationMenu.Content>
           </NavigationMenu.Item>
 
-          {/* Pricing Section */}
           <NavigationMenu.Item>
             <NavigationMenu.Link
               className="NavigationMenuLink text-orange-50"

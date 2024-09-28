@@ -31,16 +31,12 @@ const AnalyticsChart = () => {
     fetcher
   );
 
-  console.log("Data:", data);
-
   if (error) return <div>Failed to load analytics</div>;
   if (!data) return <div>Loading analytics...</div>;
 
   const chartData = Object.values(FeedbackStatus).map((status) =>
     getCountForStatus(data, status as FeedbackStatus)
   );
-
-  console.log("Processed chart data:", chartData);
 
   return (
     <BarChart

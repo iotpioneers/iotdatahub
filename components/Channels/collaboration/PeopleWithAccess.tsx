@@ -65,7 +65,7 @@ const PeopleWithAccess = ({
     if (result) {
       onCollaboratorRemoved(email);
     } else {
-      console.log("Failed to remove collaborator. Please try again.");
+      new Error("Failed to remove collaborator. Please try again.");
     }
 
     setLoading(false);

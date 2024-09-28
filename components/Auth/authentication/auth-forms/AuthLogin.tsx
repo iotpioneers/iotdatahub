@@ -112,7 +112,6 @@ const AuthLogin = ({ ...others }) => {
         return;
       }
     } catch (error) {
-      console.log("error", error);
       setError("Failed to login");
       setOpen(true);
     } finally {

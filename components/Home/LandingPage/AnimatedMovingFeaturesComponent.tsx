@@ -18,21 +18,17 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
-import { BarChart, PieChart, LineChart } from "@mui/x-charts";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { PieChart } from "@mui/x-charts";
 
 import {
   DevicesOther,
   Speed,
-  AccessTime,
   Opacity,
-  AcUnit,
   WbSunny,
   Thermostat,
   Battery20,
   BatteryFull,
-  SignalCellular4Bar,
-  SignalCellularAlt,
 } from "@mui/icons-material";
 
 const GaugeComponent = dynamic(() => import("react-gauge-component"), {
@@ -276,28 +272,6 @@ const features: Feature[] = [
     ),
   },
   {
-    title: "Historical Data",
-    icon: <AccessTime color="warning" />,
-    content: (
-      <Box>
-        <Typography variant="h6" gutterBottom className="text-orange-50">
-          Sensor Data Over Time
-        </Typography>
-        <LineChart
-          xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
-          series={[
-            {
-              data: [2, 5.5, 2, 8.5, 1.5, 5],
-              area: true,
-            },
-          ]}
-          width={500}
-          height={300}
-        />
-      </Box>
-    ),
-  },
-  {
     title: "Environmental Monitoring",
     icon: <Opacity color="warning" />,
     content: (
@@ -356,50 +330,6 @@ const features: Feature[] = [
             </List>
           </Grid>
         </Grid>
-      </Box>
-    ),
-  },
-  {
-    title: "Energy Consumption",
-    icon: <AcUnit color="warning" />,
-    content: (
-      <Box>
-        <Typography variant="h6" gutterBottom className="text-orange-50">
-          Energy Usage by Device
-        </Typography>
-        <BarChart
-          xAxis={[
-            {
-              scaleType: "band",
-              data: ["AC", "Lights", "Fridge", "TV", "Computer"],
-            },
-          ]}
-          series={[{ data: [3000, 1000, 2000, 500, 800] }]}
-          width={500}
-          height={300}
-        />
-        <List>
-          <ListItem>
-            <ListItemIcon>
-              <SignalCellular4Bar color="success" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Total Energy Saved"
-              secondary="1200 kWh"
-              className="text-orange-50"
-            />
-          </ListItem>
-          <ListItem>
-            <ListItemIcon>
-              <SignalCellularAlt color="warning" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Current Power Draw"
-              secondary="3.5 kW"
-              className="text-orange-50"
-            />
-          </ListItem>
-        </List>
       </Box>
     ),
   },

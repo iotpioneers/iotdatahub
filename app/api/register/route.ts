@@ -11,7 +11,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     // Validate the request body against the schema
     const validation = userSchema.safeParse(body);
-    console.log("validation", validation);
 
     if (!validation.success) {
       return NextResponse.json(

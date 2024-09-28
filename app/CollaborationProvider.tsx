@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import {
   ClientSideSuspense,
@@ -8,41 +8,101 @@ import {
 } from "@liveblocks/react/suspense";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { getUsers, getChannelRoomUsers } from "@/lib/actions/user.actions";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 const CollaborationProvider = ({ children }: { children: ReactNode }) => {
   const { status, data: session } = useSession();
 
-  if (status !== "loading" && status === "unauthenticated") {
-    return null;
+  // States
+  const [users, setUsers] = useState([]);
+  const [channelRoomUsers, setChannelRoomUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState<
+    "success" | "error" | "warning" | "info"
+  >("info");
+
+  // Snackbar and Alert management
+  const handleSnackbarClose = () => setSnackbarOpen(false);
+
+  if (status === "loading") {
+    return <LoadingSpinner />;
   }
 
-  if (!session || !session.user) {
-    return null;
+  if (status === "unauthenticated" || !session?.user) {
+    return <p>Your session has expired, please sign in again.</p>; // Show error message
   }
 
   const userEmail = session.user.email;
+
+  // Functions to fetch data with loading and error handling
+  const fetchUsers = async (userIds: string[]) => {
+    setLoading(true);
+    try {
+      const fetchedUsers = await getUsers({ userIds });
+      setUsers(fetchedUsers);
+    } catch (error) {
+      setAlertMessage("Error fetching users");
+      setAlertSeverity("error");
+      setSnackbarOpen(true);
+      console.error("Error fetching users:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchChannelRoomUsers = async (roomId: string, text: string) => {
+    setLoading(true);
+    try {
+      const fetchedChannelRoomUsers = await getChannelRoomUsers({
+        roomId,
+        userEmail,
+        text,
+      });
+      setChannelRoomUsers(fetchedChannelRoomUsers);
+    } catch (error) {
+      setAlertMessage("Error fetching channel room users");
+      setAlertSeverity("error");
+      setSnackbarOpen(true);
+      console.error("Error fetching channel room users:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <LiveblocksProvider
       authEndpoint="/api/liveblocks-auth"
       resolveUsers={async ({ userIds }) => {
-        const users = await getUsers({ userIds });
-
+        await fetchUsers(userIds);
         return users;
       }}
       resolveMentionSuggestions={async ({ text, roomId }) => {
-        const channelRoomUsers = await getChannelRoomUsers({
-          roomId,
-          userEmail,
-          text,
-        });
-
+        await fetchChannelRoomUsers(roomId, text);
         return channelRoomUsers;
       }}
     >
-      <ClientSideSuspense fallback={<LoadingSpinner />}>
-        {children}
-      </ClientSideSuspense>
+      {/* Snackbar for Notifications */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert onClose={handleSnackbarClose} severity={alertSeverity}>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
+
+      {/* Loading Spinner when fetching data */}
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <ClientSideSuspense fallback={<LoadingSpinner />}>
+          {children}
+        </ClientSideSuspense>
+      )}
     </LiveblocksProvider>
   );
 };

@@ -8,6 +8,7 @@ const LoadingSpinner = () => {
         alt="loader"
         width={44}
         height={44}
+        priority
         className="animate-spin"
       />
       Loading...

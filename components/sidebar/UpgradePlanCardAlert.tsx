@@ -117,7 +117,7 @@ const UpgradePlanCardAlert = () => {
           );
           setSubscription(res.data);
         } catch (error) {
-          console.error("Error fetching subscription data:", error);
+          return;
         }
       }
     };
