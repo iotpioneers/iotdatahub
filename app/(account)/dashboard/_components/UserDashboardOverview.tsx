@@ -40,6 +40,12 @@ const UserDashboardOverview = () => {
     fetcher,
     { refreshInterval: 5000 }
   );
+  const router = useRouter();
+  const { data, error } = useSWR<ApiResponse, Error>(
+    "/api/organizations/status",
+    fetcher,
+    { refreshInterval: 5000 }
+  );
 
   useEffect(() => {
     if (data && !data.hasOrganization) {
@@ -51,7 +57,17 @@ const UserDashboardOverview = () => {
   if (!data) return <LoadingProgressBar />;
 
   const { organization, members, devices, channels, fields, datapoints } = data;
+    if (data && !data.hasOrganization) {
+      router.push("/feature-creation");
+    }
+  }, [data, router]);
 
+  if (error) return <div>Failed to load</div>;
+  if (!data) return <LoadingProgressBar />;
+
+  const { organization, members, devices, channels, fields, datapoints } = data;
+
+  if (!organization) return null;
   if (!organization) return null;
 
   return (

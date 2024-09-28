@@ -102,6 +102,7 @@ const Hero = () => {
         </Container>
       </Box>
     </>
+    </>
   );
 };
 

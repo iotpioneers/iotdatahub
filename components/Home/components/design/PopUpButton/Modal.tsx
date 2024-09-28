@@ -38,6 +38,7 @@ const Modal: React.FC<ModalProps> = ({ open, setOpen }) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setQuery(message);
+    setQuery(message);
   };
 
   return (
@@ -49,6 +50,7 @@ const Modal: React.FC<ModalProps> = ({ open, setOpen }) => {
           x: open ? -30 : 0,
           y: open ? -30 : 0,
           width: open ? "300px" : 0,
+          height: open ? "400px" : 0,
           height: open ? "400px" : 0,
           opacity: 1,
         }}
