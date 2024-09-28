@@ -1,11 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-
-// material-ui
 import { Grid, MenuItem, TextField, Typography } from "@mui/material";
-
-// project imports
 import { gridSpacing } from "./constant";
 import LineChartComponent from "../charts/LineChartComponent";
 import MainCard from "@/components/dashboard/cards/MainCard";
@@ -15,18 +11,9 @@ import { AddChartComponent } from "../charts";
 import GaugeWidget from "../charts/GaugeWidget";
 
 const widgets = [
-  {
-    value: "lineChart",
-    label: "Line Chart",
-  },
-  {
-    value: "barChart",
-    label: "Bar Chart",
-  },
-  {
-    value: "gauge",
-    label: "Gauge",
-  },
+  { value: "lineChart", label: "Line Chart" },
+  { value: "barChart", label: "Bar Chart" },
+  { value: "gauge", label: "Gauge" },
 ];
 
 interface Props {
@@ -36,21 +23,25 @@ interface Props {
 }
 
 const ChannelDataStream = ({ channel, fields, dataPoint }: Props) => {
-  const [value, setValue] = useState("today");
-  const [widget, setWidget] = useState("lineChart");
+  const [fieldWidgets, setFieldWidgets] = useState<Record<string, string>>(
+    Object.fromEntries(fields.map((field) => [field.id, "lineChart"]))
+  );
 
-  const renderChart = (chartData: DataPoint[]) => {
-    switch (widget) {
+  const renderChart = (chartData: DataPoint[], widgetType: string) => {
+    switch (widgetType) {
       case "lineChart":
         return <LineChartComponent chartData={chartData} />;
       case "barChart":
         return <BarChartWidget chartData={chartData} />;
       case "gauge":
         return <GaugeWidget chartData={chartData} />;
-
       default:
         return null;
     }
+  };
+
+  const handleWidgetChange = (fieldId: string, newWidget: string) => {
+    setFieldWidgets((prev) => ({ ...prev, [fieldId]: newWidget }));
   };
 
   return (
@@ -70,16 +61,27 @@ const ChannelDataStream = ({ channel, fields, dataPoint }: Props) => {
                     justifyContent="space-between"
                   >
                     <Grid item>
-                      <Grid container direction="column" spacing={1}>
-                        <Grid item>
-                          <Typography variant="h3">{field.name}</Typography>
-                        </Grid>
-                      </Grid>
+                      <Typography variant="h3">{field.name}</Typography>
+                    </Grid>
+                    <Grid item>
+                      <TextField
+                        select
+                        value={fieldWidgets[field.id]}
+                        onChange={(e) =>
+                          handleWidgetChange(field.id, e.target.value)
+                        }
+                      >
+                        {widgets.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </TextField>
                     </Grid>
                   </Grid>
                 </Grid>
                 <Grid item xs={12}>
-                  {renderChart(chartData)}
+                  {renderChart(chartData, fieldWidgets[field.id])}
                 </Grid>
               </Grid>
             </MainCard>
@@ -89,29 +91,7 @@ const ChannelDataStream = ({ channel, fields, dataPoint }: Props) => {
       <MainCard border={true}>
         <Grid container spacing={gridSpacing}>
           <Grid item xs={12}>
-            <Grid container alignItems="center" justifyContent="space-between">
-              <Grid item>
-                <Grid container direction="column" spacing={1}>
-                  <Grid item>
-                    <Typography variant="h3">Choose widget</Typography>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item>
-                <TextField
-                  id="standard-select-currency"
-                  select
-                  value={widget}
-                  onChange={(e) => setWidget(e.target.value)}
-                >
-                  {widgets.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-            </Grid>
+            <Typography variant="h3">Add New Chart</Typography>
           </Grid>
           <Grid item xs={12} className="flex justify-center items-center">
             <AddChartComponent channel={channel} />

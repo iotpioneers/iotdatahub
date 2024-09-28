@@ -63,7 +63,7 @@ const UpgradePricingPlan = () => {
                 ? "#"
                 : item.name === "Enterprise"
                 ? "#"
-                : "https://buy.stripe.com/test_28o3fF8wIbpn4LuaEE"
+                : "https://buy.stripe.com/test_9AQ5nNdR2653a5OcMN"
             }
             className={`w-full mb-6 inline-flex items-center justify-center h-11 transition-colors mt-4 rounded-md ${
               !item.activation

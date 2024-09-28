@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import useSWR from "swr";
 import {
   Box,
   Typography,
@@ -172,6 +171,9 @@ const SampleCodeSnippet: React.FC<{ fields: Field[] }> = ({ fields }) => {
   const [copiedLang, setCopiedLang] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState("");
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const isMobile = useMediaQuery((theme: Theme) =>
     theme.breakpoints.down("sm")
   );
@@ -191,37 +193,41 @@ const SampleCodeSnippet: React.FC<{ fields: Field[] }> = ({ fields }) => {
   };
 
   const handleSubmit = async () => {
+    setIsLoading(true);
+    setError(null);
+    setSuccess(null);
+
     const baseUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/datapoint`;
     const queryParams = new URLSearchParams({ api_key: apiKey });
 
-    Object.entries(fieldValues).forEach(([key, value]) => {
-      if (value) {
-        queryParams.append(key, value);
-      }
+    Object.entries(fieldValues).forEach(([key, value], index) => {
+      queryParams.append(`field${index + 1}`, value);
     });
 
     const url = `${baseUrl}?${queryParams.toString()}`;
 
     try {
       const response = await fetch(url, { method: "POST" });
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
+      setSuccess("Data sent successfully!");
       return data;
     } catch (error) {
-      console.error("Error sending data:", error);
-      throw error;
+      setError(
+        `Error sending data: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const { data, error, isValidating, mutate } = useSWR(
-    apiKey && Object.keys(fieldValues).length ? "sendData" : null,
-    handleSubmit
-  );
-
   const handleSendData = () => {
-    mutate();
+    handleSubmit();
   };
 
   return (
@@ -297,19 +303,19 @@ const SampleCodeSnippet: React.FC<{ fields: Field[] }> = ({ fields }) => {
                 color="primary"
                 startIcon={<SendIcon />}
                 onClick={handleSendData}
-                disabled={isValidating || !apiKey}
+                disabled={isLoading || !apiKey}
                 sx={{ mt: 2 }}
               >
-                {isValidating ? <CircularProgress size={24} /> : "Send Data"}
+                {isLoading ? <CircularProgress size={24} /> : "Send Data"}
               </Button>
               {error && (
                 <Alert severity="error" sx={{ mt: 2 }}>
-                  Error sending data: {error.message}
+                  {error}
                 </Alert>
               )}
-              {data && (
+              {success && (
                 <Alert severity="success" sx={{ mt: 2 }}>
-                  Data sent successfully!
+                  {success}
                 </Alert>
               )}
             </Box>
