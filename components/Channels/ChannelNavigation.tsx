@@ -16,6 +16,7 @@ function classNames(...classes: any) {
 }
 
 const ChannelNavigation = ({
+  channelId,
   channel,
   fields,
   dataPoint,
@@ -106,7 +107,7 @@ const ChannelNavigation = ({
                   )
                 }
               >
-                <ExportChannelData channelId={channel.id} />
+                <ExportChannelData channelId={channelId} />
               </Tab>
             </Tab.List>
           </div>

@@ -234,7 +234,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
   );
 });
 
-export default function CustomizedTreeView() {
+export default function PlatformNavigationTreeView() {
   return (
     <Card
       variant="outlined"

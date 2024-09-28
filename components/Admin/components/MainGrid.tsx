@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import Copyright from "../internals/components/Copyright";
 import ChartUserByCountry from "./ChartUserByCountry";
-import CustomizedTreeView from "./CustomizedTreeView";
+import PlatformNavigationTreeView from "./PlatformNavigationTreeView";
 import CustomizedDataGrid from "./CustomizedDataGrid";
 import HighlightedCard from "./HighlightedCard";
 import PlatformActivityChart from "./PlatformActivityChart";
@@ -122,7 +122,7 @@ export default function MainGrid() {
         </Grid>
         <Grid xs={12} lg={3}>
           <Stack gap={2} direction={{ xs: "column", sm: "row", lg: "column" }}>
-            <CustomizedTreeView />
+            <PlatformNavigationTreeView />
             <ChartUserByCountry />
           </Stack>
         </Grid>

@@ -8,10 +8,16 @@ import {
   Tab,
   Paper,
   Button,
+  TextField,
+  CircularProgress,
+  Alert,
   useMediaQuery,
   Theme,
 } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import SendIcon from "@mui/icons-material/Send";
+
+// types
 import { Field } from "@/types";
 
 interface TabPanelProps {
@@ -46,35 +52,7 @@ interface CodeSnippet {
 }
 
 const codeSnippets: Record<string, CodeSnippet> = {
-  Python: {
-    language: "python",
-    getCode: (fieldsCount: number) =>
-      `
-import requests
-
-url = '${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/datapoint'
-api_key = 'YOUR_WRITE_API_KEY'
-
-# Replace these with your actual sensor readings
-${Array.from(
-  { length: fieldsCount },
-  (_, i) =>
-    `field${i + 1}_value = 0  # Replace with actual value for field${i + 1}`
-).join("\n")}
-
-data = {
-    'api_key': api_key,
-    ${Array.from(
-      { length: fieldsCount },
-      (_, i) => `'field${i + 1}': field${i + 1}_value`
-    ).join(",\n    ")}
-}
-
-response = requests.get(url, params=data)
-print(response.status_code)
-    `.trim(),
-  },
-  Arduino: {
+  ArduinoIDE: {
     language: "cpp",
     getCode: (fieldsCount: number) =>
       `
@@ -191,6 +169,11 @@ curl -X POST "${
 const SampleCodeSnippet: React.FC<{ fields: Field[] }> = ({ fields }) => {
   const [value, setValue] = useState(0);
   const [copiedLang, setCopiedLang] = useState<string | null>(null);
+  const [apiKey, setApiKey] = useState("");
+  const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const isMobile = useMediaQuery((theme: Theme) =>
     theme.breakpoints.down("sm")
   );
@@ -203,6 +186,48 @@ const SampleCodeSnippet: React.FC<{ fields: Field[] }> = ({ fields }) => {
     navigator.clipboard.writeText(code);
     setCopiedLang(lang);
     setTimeout(() => setCopiedLang(null), 3000);
+  };
+
+  const handleFieldChange = (fieldName: string, value: string) => {
+    setFieldValues((prev) => ({ ...prev, [fieldName]: value }));
+  };
+
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    const baseUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/datapoint`;
+    const queryParams = new URLSearchParams({ api_key: apiKey });
+
+    Object.entries(fieldValues).forEach(([key, value], index) => {
+      queryParams.append(`field${index + 1}`, value);
+    });
+
+    const url = `${baseUrl}?${queryParams.toString()}`;
+
+    try {
+      const response = await fetch(url, { method: "POST" });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setSuccess("Data sent successfully!");
+      return data;
+    } catch (error) {
+      setError(
+        `Error sending data: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSendData = () => {
+    handleSubmit();
   };
 
   return (
@@ -253,6 +278,47 @@ const SampleCodeSnippet: React.FC<{ fields: Field[] }> = ({ fields }) => {
                 </pre>
               </Box>
             </Paper>
+            <Box sx={{ mt: 2 }}>
+              <TextField
+                label="API Key"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                fullWidth
+                margin="normal"
+              />
+              {fields.map((field) => (
+                <TextField
+                  key={field.name}
+                  label={field.name}
+                  value={fieldValues[field.name] || ""}
+                  onChange={(e) =>
+                    handleFieldChange(field.name, e.target.value)
+                  }
+                  fullWidth
+                  margin="normal"
+                />
+              ))}
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<SendIcon />}
+                onClick={handleSendData}
+                disabled={isLoading || !apiKey}
+                sx={{ mt: 2 }}
+              >
+                {isLoading ? <CircularProgress size={24} /> : "Send Data"}
+              </Button>
+              {error && (
+                <Alert severity="error" sx={{ mt: 2 }}>
+                  {error}
+                </Alert>
+              )}
+              {success && (
+                <Alert severity="success" sx={{ mt: 2 }}>
+                  {success}
+                </Alert>
+              )}
+            </Box>
           </TabPanel>
         ))}
       </Paper>

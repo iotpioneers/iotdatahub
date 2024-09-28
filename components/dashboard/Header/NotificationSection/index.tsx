@@ -6,8 +6,6 @@ import Badge from "@mui/material/Badge";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import CardActions from "@mui/material/CardActions";
 import Chip from "@mui/material/Chip";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import Divider from "@mui/material/Divider";
@@ -18,7 +16,6 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import ButtonBase from "@mui/material/ButtonBase";
 import Transitions from "../../extended/Transitions";
 import NotificationList from "./NotificationList";
 import { IconBell } from "@tabler/icons-react";
@@ -76,36 +73,34 @@ const NotificationSection = () => {
           zIndex: theme.zIndex.drawer + 100,
         }}
       >
-        <ButtonBase sx={{ borderRadius: "24px" }}>
-          <Tooltip title="Notifications">
-            <Badge
-              badgeContent={count > 9 ? "9+" : count}
-              color="error"
-              variant="standard"
+        <Tooltip title="Notifications">
+          <Badge
+            badgeContent={count > 9 ? "9+" : count}
+            color="error"
+            variant="standard"
+          >
+            <IconButton
+              sx={{
+                ...theme.typography.commonAvatar,
+                ...theme.typography.mediumAvatar,
+                transition: "all .2s ease-in-out",
+                background: theme.palette.secondary.light,
+                color: theme.palette.secondary.dark,
+                '&[aria-controls="menu-list-grow"],&:hover': {
+                  background: theme.palette.secondary.dark,
+                  color: theme.palette.secondary.light,
+                },
+              }}
+              ref={anchorRef}
+              aria-controls={open ? "menu-list-grow" : undefined}
+              aria-haspopup="true"
+              onClick={handleToggle}
+              color="inherit"
             >
-              <IconButton
-                sx={{
-                  ...theme.typography.commonAvatar,
-                  ...theme.typography.mediumAvatar,
-                  transition: "all .2s ease-in-out",
-                  background: theme.palette.secondary.light,
-                  color: theme.palette.secondary.dark,
-                  '&[aria-controls="menu-list-grow"],&:hover': {
-                    background: theme.palette.secondary.dark,
-                    color: theme.palette.secondary.light,
-                  },
-                }}
-                ref={anchorRef}
-                aria-controls={open ? "menu-list-grow" : undefined}
-                aria-haspopup="true"
-                onClick={handleToggle}
-                color="inherit"
-              >
-                <IconBell stroke={1.5} size="1.3rem" />
-              </IconButton>
-            </Badge>
-          </Tooltip>
-        </ButtonBase>
+              <IconBell stroke={1.5} size="1.3rem" />
+            </IconButton>
+          </Badge>
+        </Tooltip>
       </Box>
       <Popper
         placement={matchesXs ? "bottom" : "bottom-end"}

@@ -187,6 +187,7 @@ export type ChannelHeadingProps = {
 };
 
 export type ChannelNavigationProps = {
+  channelId: string;
   channel: Channel;
   dataPoint: DataPoint[];
   fields: Field[];

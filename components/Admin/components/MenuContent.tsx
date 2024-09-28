@@ -24,7 +24,7 @@ const mainListItems = [
 const secondaryListItems = [
   { text: "Settings", icon: <SettingsRoundedIcon />, path: "#" },
   { text: "About", icon: <InfoRoundedIcon />, path: "#" },
-  { text: "Feedback", icon: <HelpRoundedIcon />, path: "#" },
+  { text: "Feedback", icon: <HelpRoundedIcon />, path: "/admin/feedback" },
 ];
 
 export default function MenuContent() {

@@ -17,6 +17,7 @@ import { ChannelHeadingProps } from "@/types";
 import InviteCollaboratorModal from "./collaboration/InviteCollaboratorModal";
 import ActiveCollaborators from "./collaboration/ActiveCollaborators";
 import { Card } from "@mui/material";
+import LoadingSpinner from "../LoadingSpinner";
 
 const ChannelDetailsHeading = ({
   roomId,
@@ -25,8 +26,6 @@ const ChannelDetailsHeading = ({
   channel,
   dataPoint,
 }: ChannelHeadingProps) => {
-  const { id: channelId } = channel;
-
   const [channelTitle, setChannelTitle] = useState(channel?.name);
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -49,7 +48,7 @@ const ChannelDetailsHeading = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   if (!channel) {
-    return null;
+    return <LoadingSpinner />;
   }
 
   const updateChannelTitleHandler = async (
@@ -62,7 +61,7 @@ const ChannelDetailsHeading = ({
       try {
         if (channelTitle !== channel?.name) {
           const updatedChannel = await updateChannelRoomData(
-            channelId,
+            roomId,
             channelTitle
           );
 
@@ -95,7 +94,7 @@ const ChannelDetailsHeading = ({
         !containerRef.current.contains(e.target as Node)
       ) {
         setEditing(false);
-        updateChannelRoomData(channelId, channelTitle);
+        updateChannelRoomData(roomId, channelTitle);
       }
     };
 

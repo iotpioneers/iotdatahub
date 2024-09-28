@@ -16,9 +16,11 @@ export async function POST(request: NextRequest) {
   const userFound = await prisma.user.findUnique({
     where: { email: userEmail },
   });
-
   if (!userFound) {
-    throw new Error("You need to be logged in");
+    return NextResponse.json(
+      { error: "Your session has expired, please sign in again" },
+      { status: 401 }
+    );
   }
 
   const { id, name, email, image } = userFound;

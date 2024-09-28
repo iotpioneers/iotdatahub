@@ -124,7 +124,7 @@ const PricingList = () => {
                     ? "/signup"
                     : item.name === "Enterprise"
                     ? "#"
-                    : "https://buy.stripe.com/test_28o3fF8wIbpn4LuaEE"
+                    : "https://buy.stripe.com/test_9AQ5nNdR2653a5OcMN"
                 }
                 white={!!item.price}
               >

@@ -27,13 +27,9 @@ import LoadingSpinner from "../../LoadingSpinner";
 import { Typography } from "@mui/material";
 
 const ChannelCollaborationEditor = ({
-  roomId,
   currentUserType,
-  channelDescription,
 }: {
-  roomId: string;
   currentUserType: UserAccessType;
-  channelDescription: string;
 }) => {
   const status = useEditorStatus();
   const { threads } = useThreads();

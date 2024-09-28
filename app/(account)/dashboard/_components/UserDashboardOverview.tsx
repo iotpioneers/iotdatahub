@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
-import DashboardOverview from "@/components/dashboard/DashboardOverview";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import {
   Channel,
@@ -13,6 +12,8 @@ import {
   Member,
   Organization,
 } from "@/types";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import { DashboardOverview } from "@/components/dashboard";
 
 interface ApiResponse {
   hasOrganization: boolean;
@@ -52,16 +53,19 @@ const UserDashboardOverview = () => {
   const { organization, members, devices, channels, fields, datapoints } = data;
 
   if (!organization) return null;
+  if (!organization) return null;
 
   return (
-    <DashboardOverview
-      organization={organization}
-      members={members}
-      devices={devices}
-      channels={channels}
-      fields={fields}
-      datapoints={datapoints}
-    />
+    <Suspense fallback={<LoadingSpinner />}>
+      <DashboardOverview
+        organization={organization}
+        members={members}
+        devices={devices}
+        channels={channels}
+        fields={fields}
+        datapoints={datapoints}
+      />
+    </Suspense>
   );
 };
 

@@ -1,36 +1,55 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
-import { Controller, useForm } from "react-hook-form";
-import { Button, Callout, Flex } from "@radix-ui/themes";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
+import useSWR from "swr";
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { deviceSchema } from "@/validations/schema.validation";
-import ErrorMessage from "@/components/ErrorMessage";
-import BackButton from "@/components/BackButton";
-import { CloudArrowUpIcon } from "@heroicons/react/24/outline";
+import {
+  Button,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+  FormHelperText,
+  Grid,
+  Box,
+  Typography,
+  Snackbar,
+  Alert,
+  Select,
+  MenuItem,
+  useTheme,
+} from "@mui/material";
+import { CloudUpload as CloudUploadIcon } from "@mui/icons-material";
+import { Channel } from "@/types";
 
-interface Channel {
-  id: string;
-  name: string;
-  description: string;
-}
+// Define validation schema with Yup
+const deviceSchema = Yup.object().shape({
+  name: Yup.string().required("Device name is required"),
+  description: Yup.string().required("Description is required"),
+  channelId: Yup.string().required("Channel selection is required"),
+});
 
-type DeviceFormData = z.infer<typeof deviceSchema>;
+// Define fetcher function for SWR
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function DeviceForm() {
   const router = useRouter();
-  const [channel, setChannel] = useState<string>("");
+  const theme = useTheme();
+
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [channels, setChannels] = useState<Channel[] | null>(null);
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
+  // Use SWR to fetch channels
+  const { data: channels, error: channelsError } = useSWR<Channel[]>(
+    process.env.NEXT_PUBLIC_BASE_URL + "/api/channels",
+    fetcher
+  );
+
+  // Close result snackbar
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
     reason?: string
@@ -38,190 +57,161 @@ export default function DeviceForm() {
     if (reason === "clickaway") {
       return;
     }
-
     setOpen(false);
   };
 
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<DeviceFormData>({
-    resolver: zodResolver(deviceSchema),
-  });
-
-  useEffect(() => {
-    const fetchChannels = async () => {
-      try {
-        setIsSubmitting(true);
-        const response = await fetch(
-          process.env.NEXT_PUBLIC_BASE_URL + "/api/channels"
-        );
-
-        if (!response.ok) {
-          setError("Failed to create channel");
-        }
-        const channelsData: Channel[] = await response.json();
-
-        setChannels(channelsData);
-      } catch (error) {
-        return null;
-      } finally {
-        setIsSubmitting(false);
-      }
-    };
-
-    fetchChannels();
-  }, []);
-
-  const onSubmit = handleSubmit(async (data) => {
+  const onSubmit = async (values: any) => {
+    setIsSubmitting(true);
     try {
-      setIsSubmitting(true);
       const response = await fetch("/api/devices", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(values),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        setError("Failed to create device");
         throw new Error("Failed to create device");
       }
 
-      const result = await response.json();
-
-      if (result) {
-        setOpen(true);
-        setIsSubmitting(false);
-        setTimeout(() => {
-          router.push("/dashboard/organization");
-        }, 100);
-      }
+      setOpen(true);
+      setTimeout(() => {
+        router.push("/dashboard/organization");
+      }, 100);
     } catch (error) {
-      setIsSubmitting(false);
       setError("An unexpected error occurred.");
+    } finally {
+      setIsSubmitting(false);
     }
-  });
+  };
+
+  if (channelsError) return <div>Failed to load channels</div>;
+  if (!channels) return <div>Loading...</div>;
 
   return (
-    <main className="overflow-hidden p-4">
+    <Box sx={{ p: 4 }}>
       <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
-        autoHideDuration={12000}
+        autoHideDuration={6000}
         onClose={handleCloseResult}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <Alert
-          onClose={handleCloseResult}
-          severity="success"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
+        <Alert onClose={handleCloseResult} severity="success">
           Device created successfully
         </Alert>
       </Snackbar>
-      <Flex gap={"3"}>
-        <h1>Add a new device</h1>
-      </Flex>
+
+      <Typography variant="h4" gutterBottom>
+        Add a new device
+      </Typography>
+
       {error && (
-        <Callout.Root color="red" className="mb-5">
-          <Callout.Text>{error}</Callout.Text>
-        </Callout.Root>
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
       )}
-      <form className="mt-6" onSubmit={onSubmit}>
-        <div className="mb-4">
-          <label
-            className="block text-sm font-medium text-gray-700"
-            htmlFor="name"
-          >
-            Device Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            placeholder="Enter a device name"
-            {...register("name")}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            required
-          />
-          <ErrorMessage>{errors.name?.message}</ErrorMessage>
-        </div>
 
-        <div className="mb-4 flex items-center">
-          <div className="flex-1">
-            <label
-              className="block text-sm font-medium text-gray-700"
-              htmlFor="channel"
-            >
-              Channel
-            </label>
-            <select
-              id="channelId"
-              {...register("channelId")}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              value={channel}
-              onChange={(e) => setChannel(e.target.value)}
-            >
-              <option value="" disabled hidden>
-                Choose a channel
-              </option>
-              {channels?.map((channel) => (
-                <option key={channel.id} value={channel.id}>
-                  {channel.name}
-                </option>
-              ))}
-            </select>
-            <ErrorMessage>{errors.channelId?.message}</ErrorMessage>
-          </div>
-        </div>
-        <div className="mb-4">
-          <label
-            className="block text-sm font-medium text-gray-700"
-            htmlFor="description"
-          >
-            Description
-          </label>
-          <Controller
-            name="description"
-            control={control}
-            render={({ field }) => (
-              <SimpleMDE
-                id="description"
-                placeholder="Enter device description"
-                value={field.value || ""}
-                onChange={(value: string) => field.onChange(value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500  sm:text-sm"
-              />
-            )}
-          />
-          <ErrorMessage>{errors.description?.message}</ErrorMessage>
-        </div>
-
-        <div className="flex justify-between items-center">
-          <BackButton />
-          <Button
-            type="submit"
-            className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-            disabled={isSubmitting}
-          >
-            {isSubmitting && (
-              <svg
-                className="animate-pulse h-5 w-5 -mt-1 mr-1"
-                viewBox="0 0 21 21"
+      <Formik
+        initialValues={{
+          name: "",
+          description: "",
+          channelId: "",
+        }}
+        validationSchema={deviceSchema}
+        onSubmit={onSubmit}
+      >
+        {({ errors, handleBlur, handleChange, touched, values }) => (
+          <Form noValidate>
+            <Grid item xs={12} sm={6}>
+              <FormControl
+                fullWidth
+                error={Boolean(touched.name && errors.name)}
+                sx={{ ...theme.typography.customInput }}
               >
-                <g transform="translate(2.5, 2.5)">
-                  <CloudArrowUpIcon width={20} height={20} color="white" />
-                </g>
-              </svg>
-            )}
-            {isSubmitting ? "Sending..." : "Add device"}
-          </Button>
-        </div>
-      </form>
-    </main>
+                <InputLabel htmlFor="outlined-adornment-name-register">
+                  Device Name
+                </InputLabel>
+                <OutlinedInput
+                  id="outlined-adornment-name-register"
+                  type="text"
+                  value={values.name}
+                  name="name"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  inputProps={{}}
+                />
+                {touched.name && errors.name && (
+                  <FormHelperText
+                    error
+                    id="standard-weight-helper-text-name-register"
+                  >
+                    {errors.name}
+                  </FormHelperText>
+                )}
+              </FormControl>
+            </Grid>
+
+            <FormControl
+              fullWidth
+              error={Boolean(touched.channelId && errors.channelId)}
+              sx={{ ...theme.typography.customInput }}
+            >
+              <InputLabel htmlFor="outlined-adornment-channel-register">
+                Channel
+              </InputLabel>
+              <Select
+                id="outlined-adornment-channel-register"
+                value={values.channelId}
+                name="channelId"
+                label="Channel"
+                onBlur={handleBlur}
+                onChange={handleChange}
+              >
+                {channels.map((channel) => (
+                  <MenuItem key={channel.id} value={channel.id}>
+                    {channel.name}
+                  </MenuItem>
+                ))}
+              </Select>
+              {touched.channelId && errors.channelId && (
+                <FormHelperText
+                  error
+                  id="standard-weight-helper-text-channel-register"
+                >
+                  {errors.channelId}
+                </FormHelperText>
+              )}
+            </FormControl>
+
+            <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
+              <SimpleMDE
+                id="outlined-adornment-description-register"
+                value={values.description}
+                onChange={(value) =>
+                  handleChange({ target: { name: "description", value } })
+                }
+                placeholder="Enter some information about the device..."
+              />
+            </FormControl>
+
+            <Box sx={{ mt: 2 }}>
+              <Button
+                disableElevation
+                disabled={isSubmitting}
+                fullWidth
+                size="large"
+                type="submit"
+                variant="contained"
+                color="secondary"
+                startIcon={<CloudUploadIcon />}
+              >
+                {isSubmitting ? "Submitting..." : "Add Device"}
+              </Button>
+            </Box>
+          </Form>
+        )}
+      </Formik>
+    </Box>
   );
 }

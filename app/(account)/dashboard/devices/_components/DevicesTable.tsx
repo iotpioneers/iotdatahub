@@ -6,9 +6,8 @@ import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
-import HeadingTexts from "@/components/HeadingTexts";
 import { Button, Box as RadixUIBox } from "@radix-ui/themes";
-import Link from "@/components/Link";
+import Link from "next/link";
 
 interface Device {
   id: number;
@@ -40,17 +39,11 @@ const DeviceTable: React.FC = () => {
     fetchDevices();
   }, []);
 
-  const handleEdit = (id: number) => {
-    console.log(`Edit device with id: ${id}`);
-  };
+  const handleEdit = (id: number) => {};
 
-  const handleView = (id: number) => {
-    console.log(`View device with id: ${id}`);
-  };
+  const handleView = (id: number) => {};
 
-  const handleDelete = (id: number) => {
-    console.log(`Delete device with id: ${id}`);
-  };
+  const handleDelete = (id: number) => {};
 
   const columns: GridColDef[] = [
     {
@@ -72,27 +65,17 @@ const DeviceTable: React.FC = () => {
       headerName: "Status",
       flex: 1,
       renderCell: ({ row: { status } }) => (
-        <RadixUIBox
-          className={`flex p-1 justify-center ${
-            status === "OFFLINE"
-              ? "bg-red-600"
-              : status === "ONLINE"
-              ? "bg-green-700"
-              : "bg-yellow-700"
-          } rounded-md mt-2`}
+        <Typography
+          className={status === "ONLINE" ? "text-green-500" : "text-red-500"}
         >
-          <Typography color="#e0e0e0" sx={{ ml: "5px" }}>
-            {status}
-          </Typography>
-        </RadixUIBox>
+          {status}
+        </Typography>
       ),
     },
     {
       field: "createdAt",
       headerName: "Date created",
       flex: 1,
-      valueFormatter: (params: { value: Date }) =>
-        new Date(params.value).toLocaleDateString(),
     },
     {
       field: "actions",
@@ -116,8 +99,7 @@ const DeviceTable: React.FC = () => {
 
   return (
     <Box m="20px">
-      <HeadingTexts title="Devices" subtitle="Managing devices" />
-      <Button className="button bg-gray-600 p-3 rounded-md">
+      <Button className="button bg-orange-50 p-3 rounded-md text-white">
         <Link href="/dashboard/devices/new">New Device</Link>
       </Button>
 

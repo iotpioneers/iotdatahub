@@ -91,6 +91,7 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
               }}
             >
               <Logo />
+              <Logo />
               <Box
                 sx={{
                   display: { xs: "none", md: "flex", marginLeft: "10rem" },
@@ -107,9 +108,10 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
               }}
             >
               <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} />
+              <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} />
               {status !== "loading" && (
                 <Button
-                  className="flex  xs:mr-1 text-orange-200"
+                  className="flex  xs:mr-1 text-orange-50"
                   href={status === "authenticated" ? "/dashboard" : "/login"}
                 >
                   {status === "authenticated" ? "DASHBOARD" : "SIGN IN"}
@@ -172,7 +174,7 @@ const HomeHeader = ({ mode, toggleColorMode }: AppAppBarProps) => {
                   {status === "loading" && <LoadingProgressBar />}
                   {status !== "loading" && (
                     <AngledButton
-                      className="grid text-orange-200 mt-2"
+                      className="grid text-orange-50 mt-2"
                       href={
                         status === "authenticated" ? "/dashboard" : "/login"
                       }

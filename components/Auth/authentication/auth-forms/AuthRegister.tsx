@@ -5,9 +5,12 @@ import { configureStore } from "@reduxjs/toolkit";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 
 // material-ui
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";
@@ -40,10 +43,8 @@ import reducer from "@/app/store/reducer";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 
 // assets
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import CountryList from "./CountryList";
-import { useRouter } from "next/navigation";
+import CountryPhoneModal from "./CountryPhoneModal";
 
 const store = configureStore({ reducer });
 
@@ -62,6 +63,10 @@ interface CountryType {
   label: string;
   phone: string;
   suggested?: boolean;
+}
+
+interface GoogleUserData {
+  email?: string;
 }
 
 const schema = Yup.object().shape({
@@ -108,12 +113,72 @@ const AuthRegister = ({ ...others }) => {
   const [selectedCountry, setSelectedCountry] = useState<CountryType | null>(
     null
   );
+  const [showCountryPhoneModal, setShowCountryPhoneModal] = useState(false);
+  const [googleUserData, setGoogleUserData] = useState<GoogleUserData | null>(
+    null
+  );
 
   const router = useRouter();
 
   const googleHandler = async () => {
     setIsGoogleSign(true);
-    signIn("google", { callbackUrl: "/dashboard" });
+    try {
+      const result = await signIn("google", {
+        callbackUrl: "/dashboard",
+        redirect: false,
+      });
+      if (result && result.error) {
+        setError(result.error);
+        setOpen(true);
+      } else if (result && result.ok) {
+        setShowCountryPhoneModal(true);
+        setGoogleUserData({ email: "Signed in with Google" });
+      }
+    } catch (error) {
+      setError("Failed to sign in with Google");
+      setOpen(true);
+    } finally {
+      setIsGoogleSign(false);
+    }
+  };
+
+  const handleCountryPhoneSubmit = async (data: {
+    country: string;
+    phonenumber: string;
+  }) => {
+    setLoading(true);
+    try {
+      if (!googleUserData) {
+        throw new Error("Google user data is missing");
+      }
+
+      const userData = {
+        ...googleUserData,
+        country: data.country,
+        phonenumber: data.phonenumber,
+      };
+
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to register user");
+      }
+
+      router.push("/dashboard");
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("An unknown error occurred");
+      }
+      setOpen(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClickShowPassword = () => {
@@ -626,6 +691,11 @@ const AuthRegister = ({ ...others }) => {
           </form>
         )}
       </Formik>
+      <CountryPhoneModal
+        open={showCountryPhoneModal}
+        onClose={() => setShowCountryPhoneModal(false)}
+        onSubmit={handleCountryPhoneSubmit}
+      />
     </>
   );
 };
