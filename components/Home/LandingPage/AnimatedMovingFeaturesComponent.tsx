@@ -271,68 +271,6 @@ const features: Feature[] = [
       </Box>
     ),
   },
-  {
-    title: "Environmental Monitoring",
-    icon: <Opacity color="warning" />,
-    content: (
-      <Box>
-        <Typography variant="h6" gutterBottom className="text-orange-50">
-          Environmental Conditions
-        </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
-            <PieChart
-              series={[
-                {
-                  data: [
-                    { id: 0, value: 10, label: "CO2" },
-                    { id: 1, value: 15, label: "O2" },
-                    { id: 2, value: 20, label: "N2" },
-                  ],
-                },
-              ]}
-              width={400}
-              height={200}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <List>
-              <ListItem>
-                <ListItemIcon>
-                  <WbSunny />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Light Intensity"
-                  secondary="500 lux"
-                  className="text-orange-50"
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemIcon>
-                  <Thermostat />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Temperature"
-                  secondary="72°F"
-                  className="text-orange-50"
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemIcon>
-                  <Opacity />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Humidity"
-                  secondary="45%"
-                  className="text-orange-50"
-                />
-              </ListItem>
-            </List>
-          </Grid>
-        </Grid>
-      </Box>
-    ),
-  },
 ];
 
 const AnimatedMovingFeaturesComponent: React.FC = () => {
