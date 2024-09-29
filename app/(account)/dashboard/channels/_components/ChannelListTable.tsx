@@ -22,6 +22,10 @@ const formatDate = (date: Date) =>
     day: "numeric",
     month: "long",
     year: "numeric",
+    weekday: "long",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
   }).format(new Date(date));
 
 const ChannelListTable = ({
@@ -81,8 +85,9 @@ const ChannelListTable = ({
       setShowMessage(true);
       setUpdateTrigger((prev) => prev + 1);
     } catch (error) {
-      setError("Failed to update channel access");
-      setShowMessage(true);
+      console.log("Failed to update channel access:", error);
+      // setError("Failed to update channel access");
+      // setShowMessage(true);
     } finally {
       setLoading(false);
     }
@@ -185,7 +190,7 @@ const ChannelListTable = ({
     {
       field: "createdAt",
       headerName: "Created",
-      width: 120,
+      width: 280,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant="body2" sx={{ color: "text.secondary", mt: 2 }}>
           {formatDate(params.value)}

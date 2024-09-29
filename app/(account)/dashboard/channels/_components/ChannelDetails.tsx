@@ -18,11 +18,19 @@ interface ChannelData {
   apiKey: ApiKey;
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    const error = new Error("An error occurred while fetching the data.");
+    (error as any).info = await res.json();
+    (error as any).status = res.status;
+    throw error;
+  }
+  return res.json();
+};
 
 const ChannelDetails = ({ channelID }: { channelID: string }) => {
-  const { status, data: session } = useSession();
-
+  const { data: session } = useSession();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string>("");
   const [currentUserType, setCurrentUserType] = useState<"editor" | "viewer">(
@@ -37,10 +45,11 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
   );
 
   useEffect(() => {
-    if (status !== "loading" && status === "unauthenticated") {
-      return;
+    if (channelError) {
+      setError(`Failed to load channel data: ${channelError.message}`);
+      setOpen(true);
     }
-  }, [status]);
+  }, [channelError]);
 
   useEffect(() => {
     const fetchRoomData = async () => {
@@ -83,12 +92,6 @@ const ChannelDetails = ({ channelID }: { channelID: string }) => {
 
     fetchRoomData();
   }, [channelData, session]);
-
-  useEffect(() => {
-    if (status !== "loading" && status === "unauthenticated") {
-      return;
-    }
-  }, [status]);
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,

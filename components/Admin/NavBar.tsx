@@ -59,46 +59,6 @@ export default function NavBar({
             sx={{ display: "flex", justifyContent: "space-between" }}
           >
             <Logo />
-            {/* <Button
-              variant="text"
-              size="small"
-              aria-label="IoT Data Hub"
-              startIcon={<HomeIcon />}
-              component="a"
-              href="/"
-              sx={{ display: { xs: "none", sm: "flex" } }}
-            >
-              IoTDataHub
-            </Button> */}
-            {/* <IconButton
-              size="small"
-              aria-label="Back to home"
-              component="a"
-              href="/"
-              sx={{ display: { xs: "auto", sm: "none" } }}
-            >
-              <ArrowBackRoundedIcon />
-            </IconButton> */}
-            {/* <Box sx={{ display: "flex", gap: 1 }}>
-              <FormControl variant="outlined" sx={{ minWidth: 180 }}>
-                <Select
-                  size="small"
-                  labelId="theme-select-label"
-                  id="theme-select"
-                  value={showCustomTheme ? "custom" : "material"}
-                  onChange={handleChange}
-                  label="Design Language"
-                >
-                  <MenuItem value="custom">Default</MenuItem>
-                  <MenuItem value="material">Custom</MenuItem>
-                </Select>
-              </FormControl>
-              <ToggleColorMode
-                data-screenshot="toggle-mode"
-                mode={mode}
-                toggleColorMode={toggleColorMode}
-              />
-            </Box> */}
           </Toolbar>
         </Container>
       </StyledAppBar>

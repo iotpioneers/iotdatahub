@@ -137,10 +137,6 @@ export const updateChannelAccess = async ({
       usersAccesses,
     });
 
-    if (!room) {
-      return { error: "Error updating room access" };
-    }
-
     // Update or create ChannelAccess records
     for (const collaborator of collaborators) {
       const ChannelAccessType =
@@ -174,7 +170,6 @@ export const updateChannelAccess = async ({
           },
         });
       }
-      return { error: "Error updating room access" };
     }
 
     // Update or create ChannelAccess records
@@ -257,7 +252,6 @@ export const removeCollaborator = async ({
 
     if (room.metadata.email === email) {
       return { error: "You cannot remove yourself from the document" };
-      return { error: "You cannot remove yourself from the document" };
     }
 
     const updatedUsersAccesses = {
@@ -301,7 +295,6 @@ export const removeCollaborator = async ({
     return parseStringify(updatedRoom);
   } catch (error) {
     return { error: "Failed to remove collaborator" };
-    return { error: "Failed to remove collaborator" };
   }
 };
 
@@ -314,7 +307,6 @@ export const deleteChannel = async (channelId: string) => {
     );
 
     if (response.status !== 200) {
-      return { error: "Failed to delete channel" };
       return { error: "Failed to delete channel" };
     }
 
@@ -340,7 +332,6 @@ export const deleteChannel = async (channelId: string) => {
   } catch (error) {
     revalidatePath(process.env.NEXT_PUBLIC_BASE_URL + "/dashboard/channels");
     return { error: "Failed to delete channel" };
-    return { error: "Failed to delete channel" };
   }
 };
 
@@ -356,7 +347,6 @@ export const updateRoomDefaultAccess = async (
     });
 
     if (!updatedRoom) {
-      return { error: "Error updating room default access" };
       return { error: "Error updating room default access" };
     }
 
@@ -379,7 +369,6 @@ export const updateRoomDefaultAccess = async (
     revalidatePath(`/dashboard/channels/${roomId}`);
     return parseStringify(updatedRoom);
   } catch (error) {
-    return { error: "Failed to update room default access" };
     return { error: "Failed to update room default access" };
   }
 };

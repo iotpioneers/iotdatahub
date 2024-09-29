@@ -66,6 +66,7 @@ function SideNavbar({
             aria-label="toggle drawer"
             edge="start"
             onClick={toggleSidebar}
+            className="text-orange-50"
           >
             {isSidebarOpen ? <MenuOpenIcon /> : <MenuIcon />}
           </IconButton>
@@ -114,12 +115,12 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             className={`flex mb-0 xs:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
               activeLink === "/dashboard"
                 ? "bg-gray-300 text-white"
-                : "hover:bg-gray-200 text-gray-600"
+                : "hover:bg-gray-200 text-orange-50"
             }`}
             onClick={() => handleSetActiveLink("/dashboard")}
           >
-            <HiViewGrid className="text-2xl text-gray-600" />
-            <h3 className="text-base font-semibold">Overview</h3>
+            <HiViewGrid className="text-2xl text-orange-50" />
+            <h3 className="text-base font-semibold text-orange-50">Overview</h3>
           </div>
           {activeLink === "/dashboard" && isLoading && <LoadingProgressBar />}
         </Link>
@@ -128,12 +129,12 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
               activeLink === "/dashboard/devices"
                 ? "bg-gray-300 text-white"
-                : "hover:bg-gray-200 text-gray-600"
+                : "hover:bg-gray-200 text-orange-50"
             }`}
             onClick={() => handleSetActiveLink("/dashboard/devices")}
           >
-            <MdOutlineDevices className="text-2xl text-gray-600" />
-            <h3 className="text-base font-semibold">Devices</h3>
+            <MdOutlineDevices className="text-2xl text-orange-50" />
+            <h3 className="text-base font-semibold text-orange-50">Devices</h3>
           </div>
           {activeLink === "/dashboard/devices" && isLoading && (
             <LoadingProgressBar />
@@ -144,12 +145,12 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
               activeLink === "/dashboard/channels"
                 ? "bg-gray-300 text-white"
-                : "hover:bg-gray-200 text-gray-600"
+                : "hover:bg-gray-200 text-orange-50"
             }`}
             onClick={() => handleSetActiveLink("/dashboard/channels")}
           >
-            <BiNetworkChart className="text-2xl text-gray-600" />
-            <h3 className="text-base font-semibold">Channels</h3>
+            <BiNetworkChart className="text-2xl text-orange-50" />
+            <h3 className="text-base font-semibold text-orange-50">Channels</h3>
           </div>
           {activeLink === "/dashboard/channels" && isLoading && (
             <LoadingProgressBar />
@@ -164,12 +165,14 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
               className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
                 activeLink === "/admin"
                   ? "bg-gray-300 text-white"
-                  : "hover:bg-gray-200 text-gray-600"
+                  : "hover:bg-gray-200 text-orange-50"
               }`}
               onClick={() => handleSetActiveLink("/admin")}
             >
-              <AdminPanelSettingsOutlined className="text-2xl text-gray-600" />
-              <h3 className="text-base font-semibold">Administration</h3>
+              <AdminPanelSettingsOutlined className="text-2xl text-orange-50" />
+              <h3 className="text-base font-semibold text-orange-50">
+                Administration
+              </h3>
             </div>
             {activeLink === "/admin" && isLoading && <LoadingProgressBar />}
           </Link>
@@ -179,12 +182,14 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
               activeLink === "/dashboard/organization"
                 ? "bg-gray-300 text-white"
-                : "hover:bg-gray-200 text-gray-600"
+                : "hover:bg-gray-200 text-orange-50"
             }`}
             onClick={() => handleSetActiveLink("/dashboard/organization")}
           >
-            <GiOrganigram className="text-2xl text-gray-600" />
-            <h3 className="text-base font-semibold">Organization</h3>
+            <GiOrganigram className="text-2xl text-orange-50" />
+            <h3 className="text-base font-semibold text-orange-50">
+              Organization
+            </h3>
           </div>
           {activeLink === "/dashboard/organization" && isLoading && (
             <LoadingProgressBar />

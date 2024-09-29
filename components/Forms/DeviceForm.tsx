@@ -24,6 +24,7 @@ import {
 } from "@mui/material";
 import { CloudUpload as CloudUploadIcon } from "@mui/icons-material";
 import { Channel } from "@/types";
+import LoadingSpinner from "../LoadingSpinner";
 
 // Define validation schema with Yup
 const deviceSchema = Yup.object().shape({
@@ -86,8 +87,8 @@ export default function DeviceForm() {
     }
   };
 
-  if (channelsError) return <div>Failed to load channels</div>;
-  if (!channels) return <div>Loading...</div>;
+  if (channelsError) return null;
+  if (!channels) return <LoadingSpinner />;
 
   return (
     <Box sx={{ p: 4 }}>
