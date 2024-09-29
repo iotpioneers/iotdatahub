@@ -32,7 +32,12 @@ const CollaborationProvider = ({ children }: { children: ReactNode }) => {
   }
 
   if (status === "unauthenticated" || !session?.user) {
-    return <p>Your session has expired, please sign in again.</p>; // Show error message
+    return (
+      <p>
+        Failed to load resources, you can check your internet connection. If the
+        problem persists, please try to login again or contact support.{" "}
+      </p>
+    );
   }
 
   const userEmail = session.user.email;

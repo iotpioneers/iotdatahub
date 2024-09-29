@@ -18,7 +18,6 @@ import {
   Snackbar,
 } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
-import { BarChart } from "@mui/x-charts/BarChart";
 import AnalyticsChart from "./AnalyticsChart";
 
 // Fetcher function for SWR

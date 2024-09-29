@@ -96,7 +96,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ newOrganization, member }, { status: 201 });
   } catch (error) {
     return NextResponse.json(
-      { error: "Error creating organization" },
+      console.log("Error creating organization:", error),
+      // { error: "Error creating organization" },
       { status: 500 }
     );
   }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -30,6 +30,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 import { organizationSchema } from "@/validations/schema.validation";
 import { useGlobalState } from "@/context";
+import LoadingSpinner from "../LoadingSpinner";
 
 // Define the enum AreaOfInterest
 enum AreaOfInterest {
@@ -144,9 +145,6 @@ const OrganizationOnboardingCreation: React.FC = () => {
   const { status } = useSession();
   const router = useRouter();
   const { setState } = useGlobalState();
-
-  if (status !== "loading" && status === "unauthenticated") return null;
-
   const [error, setError] = useState<string>("");
   const [activeStep, setActiveStep] = useState<number>(0);
   const [organizationName, setOrganizationName] = useState<string>("");
@@ -162,6 +160,16 @@ const OrganizationOnboardingCreation: React.FC = () => {
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [open, setOpen] = React.useState(false);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
+
+  if (status === "loading") {
+    return <LoadingSpinner />;
+  }
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
@@ -266,6 +274,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
         router.push("/dashboard/channels");
       }, 100);
     } catch (error) {
+      console.log("Error creating organization:", error);
       setError("Error creating organization");
       setLoading(false);
     }

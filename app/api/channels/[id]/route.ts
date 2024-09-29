@@ -30,17 +30,6 @@ export async function GET(
   if (!apiKey)
     return NextResponse.json({ error: "API Key not found" }, { status: 404 });
 
-  // Find a sample codes with the channel
-  const sampleCodes = await prisma.sampleCodes.findFirst({
-    where: { channelId: channel.id },
-  });
-
-  if (!sampleCodes)
-    return NextResponse.json(
-      { error: "Sample codes not found" },
-      { status: 404 }
-    );
-
   return NextResponse.json({
     channel,
     dataPoint,

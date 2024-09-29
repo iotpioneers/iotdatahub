@@ -42,6 +42,8 @@ function GaugePointer() {
 }
 
 const GaugeChart = ({ chartData = [] }: GaugeChartProps) => {
+  console.log("chartData", chartData);
+
   let data = chartData.map((dataPoint) => {
     const formatDate = (date: string) =>
       new Intl.DateTimeFormat("en", {

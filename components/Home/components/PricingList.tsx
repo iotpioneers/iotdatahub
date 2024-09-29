@@ -101,7 +101,7 @@ const PricingList = () => {
                 variant="h5"
                 className="text-[2.5rem] leading-none font-bold"
               >
-                ${item.price}
+                Rwf{item.price}
               </Typography>
               <Typography component="h6" variant="h6">
                 &nbsp; per month

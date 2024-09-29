@@ -33,7 +33,7 @@ const Pricing = () => {
             className="text-xs font-code font-bold tracking-wider uppercase border-b"
             href="/dashboard/subscription"
           >
-            See the full details
+            Get Started
           </a>
         </div>
       </div>
