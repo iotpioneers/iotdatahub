@@ -118,11 +118,9 @@ export async function POST(req: NextRequest) {
     </div>
     <div class="contents">
     <p>Dear ${userFullName ? userFullName.split(" ")[0] : "valuable user"}!,</p>
-      <p>Thank you for registering with IoT Data Hub. To complete your registration and verify your email address, please click the button below.</p>
+      <p>Thank you for registering with IoT Data Hub. To complete your registration and verify your email address.</p>
       <p>
-      <a href="${
-        process.env.NEXT_PUBLIC_BASE_URL as string
-      }/email/verify/${token}" class="button">Verify Email</a>
+    Token: ${token}
         </p>
         <p>If you did not create an account, no further action is required.</p>
         </div>

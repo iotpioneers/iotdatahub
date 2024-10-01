@@ -145,7 +145,7 @@ const OurServices = () => {
                       >
                         {item.title}
                       </Typography>
-                      <Typography variant="body2" className="text-orange-50">
+                      <Typography variant="body2" className="text-black">
                         {item.description}
                       </Typography>
                     </div>
