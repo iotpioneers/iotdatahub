@@ -13,20 +13,12 @@ import {
   LinearProgress,
   Button,
   Modal,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { PieChart } from "@mui/x-charts";
 
 import {
   DevicesOther,
   Speed,
-  Opacity,
-  WbSunny,
-  Thermostat,
   Battery20,
   BatteryFull,
 } from "@mui/icons-material";
@@ -158,7 +150,7 @@ interface Feature {
 const features: Feature[] = [
   {
     title: "Device Management",
-    icon: <DevicesOther />,
+    icon: <DevicesOther className="text-orange-50" />,
     content: (
       <Box>
         <Typography variant="h6" gutterBottom className="text-orange-50">

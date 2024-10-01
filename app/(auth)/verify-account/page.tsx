@@ -1,10 +1,10 @@
 import { Metadata } from "next";
-import EmailVerificationMessage from "@/components/Auth/authentication/auth-forms/EmailVerificationMessage";
+import EmailVerificationComponent from "@/components/Auth/authentication/auth-forms/EmailVerificationComponent";
 
 const EmailVerifyMessage = () => {
   return (
     <div className="mt-8">
-      <EmailVerificationMessage />
+      <EmailVerificationComponent />
     </div>
   );
 };

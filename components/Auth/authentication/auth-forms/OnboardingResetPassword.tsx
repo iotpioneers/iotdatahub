@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Stepper,
   Step,
@@ -22,7 +23,6 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 
 // Define types for API responses
 interface EmailSubmitResponse {
@@ -82,7 +82,7 @@ const OnboardingResetPassword: React.FC = () => {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/otp-verification`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/email/otp-verification`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
