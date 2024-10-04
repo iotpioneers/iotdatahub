@@ -35,12 +35,6 @@ export async function PUT(
 
   const body = await request.json();
 
-  const validation = feedbackSchema.safeParse(body);
-
-  if (!validation.success) {
-    return NextResponse.json(validation.error.errors, { status: 400 });
-  }
-
   const feedback = await prisma.feedback.findUnique({
     where: { id: params.id },
   });

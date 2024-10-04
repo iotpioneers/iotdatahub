@@ -9,24 +9,43 @@ import {
   Snackbar,
   IconButton,
   Tooltip,
+  Menu,
+  MenuItem,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
 } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Reply, MessageCircle } from "lucide-react";
+import {
+  DataGrid,
+  GridColDef,
+  GridToolbar,
+  GridRenderCellParams,
+} from "@mui/x-data-grid";
+import {
+  Reply,
+  MoreVertical,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Trash2,
+} from "lucide-react";
 import useSWR from "swr";
 import { ReplyForm } from "./ReplyForm";
-import { FeedbackDetail } from "./FeedbackDetail";
-import { Feedback, ReplyFormValues } from "@/types";
+import { Feedback, FeedbackStatus, ReplyFormValues } from "@/types";
 import AnalyticsChart from "./AnalyticsChart";
+import { FaHourglassHalf } from "react-icons/fa6";
+import { a } from "react-spring";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-// Define the mutation function type
 type SendReplyFn = (
   url: string,
   data: ReplyFormValues & { feedbackId: string }
 ) => Promise<any>;
 
-// Update the sendReply function to match the expected signature
 const sendReply: SendReplyFn = async (url, data) => {
   const response = await fetch(url, {
     method: "POST",
@@ -75,6 +94,8 @@ const FeedbackManagementComponent: React.FC = () => {
   const [replyModalOpen, setReplyModalOpen] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   const { feedbacks, isLoading, mutate: mutateFeedbacks } = useFeedbackData();
   const { feedback: selectedFeedback } = useFeedbackDetail(selectedFeedbackId);
@@ -101,12 +122,118 @@ const FeedbackManagementComponent: React.FC = () => {
     }
   };
 
+  const handleStatusChange = async (
+    feedbackId: string,
+    newStatus: FeedbackStatus
+  ) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/feedback/${feedbackId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
+
+      console.log("response", response);
+
+      if (response.ok) {
+        mutateFeedbacks();
+        setSnackbarMessage(`Status updated to ${newStatus}`);
+        setSnackbarOpen(true);
+      } else {
+        throw new Error("Failed to update status");
+      }
+    } catch (error) {
+      setSnackbarMessage("Failed to update status");
+      setSnackbarOpen(true);
+    }
+  };
+
+  const handleDeleteConfirm = () => {
+    setDeleteConfirmOpen(true);
+    handleMenuClose();
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirmOpen(false);
+    setSelectedFeedbackId(null);
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (!selectedFeedbackId) return;
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/feedback/${selectedFeedbackId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        mutateFeedbacks();
+        setSnackbarMessage("Feedback deleted successfully");
+        setSnackbarOpen(true);
+      } else {
+        throw new Error("Failed to delete feedback");
+      }
+    } catch (error) {
+      console.error("Error deleting feedback:", error);
+      setSnackbarMessage("Failed to delete feedback");
+      setSnackbarOpen(true);
+    } finally {
+      setDeleteConfirmOpen(false);
+      setSelectedFeedbackId(null);
+    }
+  };
+
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    feedbackId: string
+  ) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedFeedbackId(feedbackId);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const getStatusIcon = (status: FeedbackStatus) => {
+    switch (status) {
+      case FeedbackStatus.PENDING:
+        return <Clock size={20} />;
+      case FeedbackStatus.IN_PROGRESS:
+        return <FaHourglassHalf size={20} />;
+      case FeedbackStatus.RESOLVED:
+        return <CheckCircle size={20} />;
+      case FeedbackStatus.CLOSED:
+        return <XCircle size={20} />;
+      default:
+        return null;
+    }
+  };
+
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 70 },
-    { field: "name", headerName: "Name", width: 130 },
+    { field: "name", headerName: "Sender", width: 130 },
     { field: "email", headerName: "Email", width: 200 },
     { field: "subject", headerName: "Subject", width: 200 },
-    { field: "status", headerName: "Status", width: 130 },
+    { field: "message", headerName: "Message" },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 150,
+      renderCell: (params: GridRenderCellParams) => (
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 2 }}>
+          {getStatusIcon(params.value as FeedbackStatus)}
+          <Typography>{params.value}</Typography>
+        </Box>
+      ),
+    },
     {
       field: "createdAt",
       headerName: "Created At",
@@ -117,16 +244,8 @@ const FeedbackManagementComponent: React.FC = () => {
       headerName: "Actions",
       width: 120,
       sortable: false,
-      renderCell: (params) => (
+      renderCell: (params: GridRenderCellParams) => (
         <Box>
-          <Tooltip title="View Details">
-            <IconButton
-              onClick={() => setSelectedFeedbackId(params.row.id)}
-              size="small"
-            >
-              <MessageCircle size={20} />
-            </IconButton>
-          </Tooltip>
           <Tooltip title="Quick Reply">
             <IconButton
               onClick={() => {
@@ -136,6 +255,14 @@ const FeedbackManagementComponent: React.FC = () => {
               size="small"
             >
               <Reply size={20} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="More Actions">
+            <IconButton
+              onClick={(event) => handleMenuOpen(event, params.row.id)}
+              size="small"
+            >
+              <MoreVertical size={20} />
             </IconButton>
           </Tooltip>
         </Box>
@@ -170,10 +297,12 @@ const FeedbackManagementComponent: React.FC = () => {
           pageSizeOptions={[5, 10, 20, 50, 100]}
           autoHeight
           disableRowSelectionOnClick
+          slots={{
+            toolbar: GridToolbar,
+          }}
         />
       </Grid>
 
-      {/* Quick Reply Modal */}
       <Modal open={replyModalOpen} onClose={() => setReplyModalOpen(false)}>
         <Box
           sx={{
@@ -181,49 +310,92 @@ const FeedbackManagementComponent: React.FC = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: 600,
+            height: 600,
             bgcolor: "background.paper",
             boxShadow: 24,
-            p: 4,
+            mt: 4,
             borderRadius: 2,
+            overflow: "hidden",
           }}
         >
-          <Typography variant="h6" mb={2}>
-            Quick Reply to {selectedFeedback?.name}
-          </Typography>
-          <Typography variant="body2" mb={2}>
-            Re: {selectedFeedback?.subject}
-          </Typography>
-          <ReplyForm
-            onSubmit={handleReplySubmit}
-            onCancel={() => setReplyModalOpen(false)}
-          />
+          {selectedFeedback && (
+            <ReplyForm
+              onSubmit={handleReplySubmit}
+              onCancel={() => setReplyModalOpen(false)}
+              feedback={selectedFeedback}
+            />
+          )}
         </Box>
       </Modal>
 
-      {/* Detail Modal */}
-      <Modal
-        open={Boolean(selectedFeedbackId) && !replyModalOpen}
-        onClose={() => setSelectedFeedbackId(null)}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
       >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 600,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: 2,
-            maxHeight: "80vh",
-            overflow: "auto",
+        <MenuItem
+          onClick={() => {
+            handleStatusChange(selectedFeedbackId!, FeedbackStatus.PENDING);
+            handleMenuClose();
           }}
         >
-          {selectedFeedback && <FeedbackDetail feedback={selectedFeedback} />}
-        </Box>
-      </Modal>
+          <Clock size={16} style={{ marginRight: 8 }} />
+          Mark as Pending
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleStatusChange(selectedFeedbackId!, FeedbackStatus.IN_PROGRESS);
+            handleMenuClose();
+          }}
+        >
+          <FaHourglassHalf size={16} style={{ marginRight: 8 }} />
+          Mark as In Progress
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleStatusChange(selectedFeedbackId!, FeedbackStatus.RESOLVED);
+            handleMenuClose();
+          }}
+        >
+          <CheckCircle size={16} style={{ marginRight: 8 }} />
+          Mark as Resolved
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleStatusChange(selectedFeedbackId!, FeedbackStatus.CLOSED);
+            handleMenuClose();
+          }}
+        >
+          <XCircle size={16} style={{ marginRight: 8 }} />
+          Mark as Closed
+        </MenuItem>
+        <MenuItem onClick={handleDeleteConfirm}>
+          <Trash2 size={16} style={{ marginRight: 8, color: "red" }} />
+          Delete
+        </MenuItem>
+      </Menu>
+
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={handleDeleteCancel}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this feedback? This action cannot be
+            undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel}>Cancel</Button>
+          <Button onClick={handleDeleteConfirmed} autoFocus color="error">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={snackbarOpen}
