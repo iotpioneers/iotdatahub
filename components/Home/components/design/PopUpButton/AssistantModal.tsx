@@ -25,7 +25,7 @@ const fetcher = (url: string, query: string) =>
     .then((res) => res.json())
     .catch((error) => new Error(error));
 
-const Modal: React.FC<ModalProps> = ({ open, setOpen }) => {
+const AssistantModal: React.FC<ModalProps> = ({ open, setOpen }) => {
   const [message, setMessage] = useState("");
   const [query, setQuery] = useState<string | null>(null);
 
@@ -126,4 +126,4 @@ const Modal: React.FC<ModalProps> = ({ open, setOpen }) => {
   );
 };
 
-export default Modal;
+export default AssistantModal;

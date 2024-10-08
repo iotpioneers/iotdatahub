@@ -102,14 +102,10 @@ const OurServices = () => {
             textAlign: { sm: "left", md: "center" },
           }}
         >
-          <Typography component="h2" variant="h4" className="text-orange-50">
+          <Typography component="h2" variant="h4">
             Our Services
           </Typography>
-          <Typography
-            variant="body1"
-            sx={{ color: "grey.400" }}
-            className="text-orange-50"
-          >
+          <Typography variant="body1" sx={{ color: "grey.400" }}>
             Discover what makes our platform exceptional: scalability,
             robustness, user-friendliness, advanced analytics, precision tools,
             and unmatched support.
@@ -134,18 +130,12 @@ const OurServices = () => {
                       background: "transparent",
                     }}
                   >
-                    <Box sx={{ opacity: "50%" }} className="text-orange-50">
-                      {item.icon}
-                    </Box>
+                    <Box sx={{ opacity: "50%" }}>{item.icon}</Box>
                     <div className="grid">
-                      <Typography
-                        fontWeight="medium"
-                        gutterBottom
-                        className="text-orange-50"
-                      >
+                      <Typography fontWeight="medium" gutterBottom>
                         {item.title}
                       </Typography>
-                      <Typography variant="body2" className="text-black">
+                      <Typography variant="body2">
                         {item.description}
                       </Typography>
                     </div>
