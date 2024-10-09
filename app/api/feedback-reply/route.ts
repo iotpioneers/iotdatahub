@@ -32,6 +32,14 @@ export async function POST(request: NextRequest) {
 
   const { message, feedbackId } = validation.data;
 
+  const feedback = await prisma.feedback.findUnique({
+    where: { id: feedbackId },
+  });
+
+  if (!feedback) {
+    return NextResponse.json({ error: "Feedback not found" }, { status: 404 });
+  }
+
   try {
     const newFeedbackReply = await prisma.feedbackReply.create({
       data: {
@@ -40,6 +48,13 @@ export async function POST(request: NextRequest) {
         userId: user.id,
       },
       include: { user: true, feedback: true },
+    });
+
+    await prisma.feedback.update({
+      where: { id: feedbackId },
+      data: {
+        status: "IN_PROGRESS",
+      },
     });
 
     return NextResponse.json(newFeedbackReply, { status: 201 });

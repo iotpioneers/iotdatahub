@@ -19,7 +19,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [mode, setMode] = useState<PaletteMode>("light");
+  const [mode, setMode] = useState<PaletteMode>("dark");
   const LPtheme = createTheme(getLPTheme(mode));
 
   const toggleColorMode = () => {

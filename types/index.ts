@@ -213,3 +213,35 @@ export type AddDocumentBtnProps = {
 export type DeleteModalProps = { channelId: string };
 
 export type ThreadWrapperProps = { thread: ThreadData<BaseMetadata> };
+
+export enum FeedbackStatus {
+  PENDING = "PENDING",
+  IN_PROGRESS = "IN_PROGRESS",
+  RESOLVED = "RESOLVED",
+  CLOSED = "CLOSED",
+}
+
+export interface FeedbackReply {
+  id: string;
+  message: string;
+  createdAt: string;
+  updatedAt: string;
+  user: User;
+}
+
+export interface Feedback {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  status: FeedbackStatus;
+  organizationId?: string;
+  replies: FeedbackReply[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ReplyFormValues {
+  message: string;
+}

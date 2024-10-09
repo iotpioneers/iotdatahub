@@ -60,63 +60,10 @@ const FAQ = () => {
               gutterBottom
               sx={{ maxWidth: { sm: "100%", md: "70%" } }}
             >
-              You can reach our customer support team by emailing
-              <Link> support@email.com </Link>
-              or calling our toll-free number. We're here to assist you promptly
-              with any issues related to the platform, including IoT device
-              management, data analytics, or account-related queries.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-        <Accordion
-          expanded={expanded === "panel2"}
-          onChange={handleChange("panel2")}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel2d-content"
-            id="panel2d-header"
-          >
-            <Typography component="h3" variant="subtitle2">
-              Can I integrate third-party applications with the platform?
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography
-              variant="body2"
-              gutterBottom
-              sx={{ maxWidth: { sm: "100%", md: "70%" } }}
-            >
-              Absolutely! Our platform supports seamless API integration,
-              allowing you to connect third-party applications and extend the
-              functionality of your IoT ecosystem. This enables more customized
-              and powerful solutions tailored to your specific needs.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-        <Accordion
-          expanded={expanded === "panel3"}
-          onChange={handleChange("panel3")}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel3d-content"
-            id="panel3d-header"
-          >
-            <Typography component="h3" variant="subtitle2">
-              What makes your platform stand out from others in the market?
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography
-              variant="body2"
-              gutterBottom
-              sx={{ maxWidth: { sm: "100%", md: "70%" } }}
-            >
-              Our platform stands out due to its scalability, comprehensive data
-              analytics, real-time monitoring, and robust security features. We
-              provide a user-friendly interface and advanced tools that empower
-              businesses to optimize their IoT operations effectively.
+              You can reach our customer support via WhatsApp or emailing us.
+              We're here to assist you promptly with any issues related to the
+              platform, including IoT device management, data analytics, or
+              account-related queries.
             </Typography>
           </AccordionDetails>
         </Accordion>
@@ -140,10 +87,17 @@ const FAQ = () => {
               sx={{ maxWidth: { sm: "100%", md: "70%" } }}
             >
               Getting started is simple. You can follow our comprehensive setup
-              guides available in the documentation section, or contact our tech
-              support team for personalized assistance. Our platform supports a
-              wide range of devices and protocols, making the setup process
-              smooth and efficient.
+              guides available on youtube{" "}
+              <Link
+                href="https://www.youtube.com/watch?v=X9JlxcwT24k"
+                className="text-orange-50"
+              >
+                here, showing you how to set up your IoT devices.
+              </Link>
+              . You can also check in the documentation sections, or contact our
+              tech support team for personalized assistance. Our platform
+              supports a wide range of devices and protocols, making the setup
+              process smooth and efficient.
             </Typography>
           </AccordionDetails>
         </Accordion>

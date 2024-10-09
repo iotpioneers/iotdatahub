@@ -54,6 +54,7 @@
     "clsx": "^2.1.1",
     "dayjs": "1.11.11",
     "easymde": "^2.18.0",
+    "emoji-picker-react": "^4.12.0",
     "formik": "^2.4.6",
     "framer-motion": "^7.6.2",
     "leaflet": "^1.9.4",
