@@ -152,10 +152,10 @@ const EmailVerificationComponent = () => {
               <Button
                 fullWidth
                 variant="contained"
-                onClick={() => router.push("/login")}
+                onClick={() => router.push("/feature-creation")}
                 sx={{ mt: 2 }}
               >
-                Go to Login
+                Continue
               </Button>
             </>
           )}

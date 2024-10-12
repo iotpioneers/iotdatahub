@@ -124,7 +124,7 @@ const AuthRegister = ({ ...others }) => {
     setIsGoogleSign(true);
     try {
       const result = await signIn("google", {
-        callbackUrl: "/dashboard",
+        callbackUrl: "/feature-creation",
         redirect: false,
       });
       if (result && result.error) {
