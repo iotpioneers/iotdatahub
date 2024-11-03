@@ -139,6 +139,33 @@ export const organizationSchema = z.object({
     .min(1, "At least one area of interest is required"),
 });
 
+// The schema for the enterprise data
+export const enterpriseSchema = z.object({
+  // Organization Details
+  organizationName: z
+    .string()
+    .min(1, "Organization name is required")
+    .max(255, "Organization name must be 255 characters or less"),
+  industry: z.enum(["manufacturing", "healthcare", "agriculture", "energy"]),
+  employeeCount: z.enum(["<10", "10-50", "50-100", ">100"]),
+
+  // Contact Information
+  contactName: z
+    .string()
+    .min(1, "Contact name is required")
+    .max(255, "Contact name must be 255 characters or less"),
+  jobTitle: z
+    .string()
+    .min(1, "Job title is required")
+    .max(255, "Job title must be 255 characters or less"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().min(1, "Phone number is required"),
+  country: z.string().min(1, "Country is required"),
+
+  // Technical Requirements
+  deviceCount: z.string().min(1, "Device count is required"),
+});
+
 // The schema for the pricing data
 export const pricingPlanSchema = z.object({
   name: z
@@ -172,6 +199,41 @@ export const memberSchema = z.object({
   access: z.enum(["VIEWER", "COMMENTER", "EDITOR"], {
     message: "Invalid member access",
   }),
+});
+
+// Payment validation schema
+export const paymentSchema = z.object({
+  amount: z.number().positive(),
+  currency: z.string().default("RWF"),
+  type: z.enum(["CREDIT_CARD", "MOBILE_MONEY"]),
+  description: z.string().optional(),
+
+  // Credit card fields
+  cardLastFour: z.string().length(4).optional(),
+  cardExpiryMonth: z.string().length(2).optional(),
+  cardExpiryYear: z.string().length(2).optional(),
+  cardHolderName: z.string().optional(),
+
+  // Mobile money fields
+  phoneNumber: z
+    .string()
+    .regex(/^\+?[0-9]{10,12}$/)
+    .optional(),
+  provider: z.enum(["MTN", "AIRTEL"]).optional(),
+
+  // Organization ID is optional since some users might not belong to an organization
+  organizationId: z.string().optional(),
+});
+
+export const contactSalesSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  workEmail: z.string().email("Invalid email address"),
+  jobTitle: z.string().min(1, "Job title is required"),
+  phoneNumber: z.string().min(1, "Phone number is required"),
+  expectedUsers: z.string().min(1, "Expected number of users is required"),
+  message: z.string(),
+  organizationId: z.string().optional(),
 });
 
 export const feedbackSchema = z.object({

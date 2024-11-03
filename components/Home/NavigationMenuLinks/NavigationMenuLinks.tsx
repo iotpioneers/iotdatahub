@@ -35,6 +35,26 @@ const NavigationMenuLinks = () => {
         <NavigationMenu.List className="NavigationMenuList">
           <NavigationMenu.Item>
             <NavigationMenu.Trigger className="NavigationMenuTrigger text-orange-50">
+              Company{" "}
+              <CaretDownIcon className="CaretDown text-orange-50" aria-hidden />
+            </NavigationMenu.Trigger>
+            <NavigationMenu.Content className="NavigationMenuContent">
+              <ul className="List one">
+                <ListItem title="About Us" href="#">
+                  Learn more about our company.
+                </ListItem>
+                <ListItem title="Blogs" href="/blogs">
+                  Read our latest blogs and updates.
+                </ListItem>
+                <ListItem title="Contact Us" href="/contact">
+                  Get in touch with us.
+                </ListItem>
+              </ul>
+            </NavigationMenu.Content>
+          </NavigationMenu.Item>
+
+          <NavigationMenu.Item>
+            <NavigationMenu.Trigger className="NavigationMenuTrigger text-orange-50">
               Developers{" "}
               <CaretDownIcon className="CaretDown text-orange-50" aria-hidden />
             </NavigationMenu.Trigger>
@@ -105,26 +125,6 @@ const NavigationMenuLinks = () => {
                 </ListItem>
                 <ListItem title="Analytics" href="#">
                   Perform analytics on IoT data points.
-                </ListItem>
-              </ul>
-            </NavigationMenu.Content>
-          </NavigationMenu.Item>
-
-          <NavigationMenu.Item>
-            <NavigationMenu.Trigger className="NavigationMenuTrigger text-orange-50">
-              Company{" "}
-              <CaretDownIcon className="CaretDown text-orange-50" aria-hidden />
-            </NavigationMenu.Trigger>
-            <NavigationMenu.Content className="NavigationMenuContent">
-              <ul className="List one">
-                <ListItem title="About Us" href="#">
-                  Learn more about our company.
-                </ListItem>
-                <ListItem title="Blogs" href="/blogs">
-                  Read our latest blogs and updates.
-                </ListItem>
-                <ListItem title="Contact Us" href="/contact">
-                  Get in touch with us.
                 </ListItem>
               </ul>
             </NavigationMenu.Content>

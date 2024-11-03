@@ -14,6 +14,8 @@ import {
   StepLabel,
   Button,
   FormHelperText,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { MuiOtpInput } from "mui-one-time-password-input";
 import useSWR from "swr";
@@ -37,6 +39,10 @@ const EmailVerificationComponent = () => {
   const [otp, setOtp] = React.useState("");
   const [activeStep, setActiveStep] = React.useState(1);
   const [error, setError] = React.useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = React.useState<string | null>(
+    null
+  );
+  const [isResending, setIsResending] = React.useState(false);
   const router = useRouter();
 
   const fetcher = async (url: string, otp: string) => {
@@ -91,6 +97,41 @@ const EmailVerificationComponent = () => {
     mutate();
   };
 
+  const handleResendEmail = async () => {
+    setIsResending(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    try {
+      // Get user email and full name from localStorage
+      const userEmail = localStorage.getItem("userEmail");
+      const userFullName = localStorage.getItem("userFullName");
+
+      if (!userEmail) {
+        throw new Error("Email not found. Please try logging in again.");
+      }
+
+      const response = await fetch("/api/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userFullName, userEmail }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to resend verification email");
+      }
+
+      setSuccessMessage("Verification email resent successfully!");
+      setOtp("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to resend email");
+    } finally {
+      setIsResending(false);
+    }
+  };
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <CssBaseline />
@@ -120,29 +161,57 @@ const EmailVerificationComponent = () => {
             </Step>
           </Stepper>
           {activeStep === 1 && (
-            <form onSubmit={handleOtpVerify}>
-              <MuiOtpInput
-                value={otp}
-                onChange={handleOtpChange}
-                length={6}
-                validateChar={(char: string) => char.match(/[0-9]/) !== null}
-                sx={{ mb: 2 }}
-              />
-              {error && (
-                <FormHelperText error sx={{ mb: 2 }}>
-                  {error}
-                </FormHelperText>
-              )}
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                disabled={isValidating}
-                sx={{ mt: 2 }}
-              >
-                {isValidating ? "Verifying..." : "Verify OTP"}
-              </Button>
-            </form>
+            <>
+              <Typography variant="body2" align="center" sx={{ mb: 2 }}>
+                Protecting your account is our priority. Please confirm your
+                identity by providing the code sent to your email
+              </Typography>
+              <form onSubmit={handleOtpVerify}>
+                <MuiOtpInput
+                  value={otp}
+                  onChange={handleOtpChange}
+                  length={6}
+                  validateChar={(char: string) => char.match(/[0-9]/) !== null}
+                  sx={{ mb: 2 }}
+                />
+                {error && (
+                  <FormHelperText error sx={{ mb: 2 }}>
+                    {error}
+                  </FormHelperText>
+                )}
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  disabled={isValidating}
+                  sx={{ mt: 2 }}
+                >
+                  {isValidating ? "Verifying..." : "Verify OTP"}
+                </Button>
+                <Typography
+                  variant="body2"
+                  align="center"
+                  sx={{ mt: 2 }}
+                  color="textSecondary"
+                >
+                  It may take a minute to receive verification message. Haven't
+                  received it yet?{" "}
+                  <Link
+                    component="button"
+                    variant="body2"
+                    onClick={handleResendEmail}
+                    disabled={isResending}
+                    sx={{
+                      textDecoration: "none",
+                      "&:hover": { textDecoration: "underline" },
+                      cursor: "pointer",
+                    }}
+                  >
+                    {isResending ? "Resending..." : "Resend"}
+                  </Link>
+                </Typography>
+              </form>
+            </>
           )}
           {activeStep === 2 && (
             <>
@@ -152,7 +221,7 @@ const EmailVerificationComponent = () => {
               <Button
                 fullWidth
                 variant="contained"
-                onClick={() => router.push("/feature-creation")}
+                onClick={() => router.push("/login")}
                 sx={{ mt: 2 }}
               >
                 Continue
@@ -164,6 +233,21 @@ const EmailVerificationComponent = () => {
           <Copyright />
         </Box>
       </Box>
+
+      <Snackbar
+        open={!!successMessage}
+        autoHideDuration={6000}
+        onClose={() => setSuccessMessage(null)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={() => setSuccessMessage(null)}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {successMessage}
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 };

@@ -27,15 +27,6 @@ const Pricing = () => {
           <LeftLine />
           <RightLine />
         </div>
-
-        <div className="flex justify-center mt-10">
-          <a
-            className="text-xs font-code font-bold tracking-wider uppercase border-b"
-            href="/dashboard/subscription"
-          >
-            Get Started
-          </a>
-        </div>
       </div>
     </Section>
   );

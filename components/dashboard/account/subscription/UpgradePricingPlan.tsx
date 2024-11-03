@@ -3,15 +3,18 @@
 import React from "react";
 import { Button } from "@radix-ui/themes";
 import axios from "axios";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import { PricingPlanType } from "@/types";
+import { Loader2 } from "lucide-react";
 
 const UpgradePricingPlan = () => {
+  const router = useRouter();
   const [subscriptions, setSubscriptions] = React.useState<PricingPlanType[]>(
     []
   );
-  const [IsLoading, setIsLoading] = React.useState<boolean>(false);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [loadingPlanId, setLoadingPlanId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const fetchSubscriptions = async () => {
@@ -20,7 +23,6 @@ const UpgradePricingPlan = () => {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`
         );
-
         setSubscriptions(response.data);
       } catch (error) {
         console.error("Error fetching subscriptions:", error);
@@ -31,9 +33,25 @@ const UpgradePricingPlan = () => {
 
     fetchSubscriptions();
   }, []);
+
+  const handleNavigation = async (item: PricingPlanType) => {
+    setLoadingPlanId(item.id!);
+
+    let path = "/register";
+    if (item.price !== 0) {
+      path = item.name.includes("Enterprise")
+        ? "/dashboard/organization/contactsales"
+        : `/dashboard/subscription/${item.id}`;
+    }
+
+    // Simulate a small delay to show loading state
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    router.push(path);
+  };
+
   return (
-    <div className="flex gap-[1rem] max-lg:flex-wrap">
-      {IsLoading && <LoadingProgressBar />}
+    <div className="flex gap-[1rem] max-lg:flex-wrap mt-5">
+      {isLoading && <LoadingProgressBar />}
 
       {subscriptions.map((item) => (
         <div
@@ -46,44 +64,42 @@ const UpgradePricingPlan = () => {
             {item.description}
           </p>
 
-          <div className="flex items-center text-teal-50 h-[5.5rem] mb-6">
-            {item.price && (
-              <>
-                <div className="h3">{item.price > 0 ? "Rwf" : ""}</div>
-                <div className="text-[5.5rem] leading-none font-bold">
-                  <div className="flex">{item.price > 0 ? item.price : ""}</div>
-                </div>
-              </>
-            )}
-          </div>
+          {item.price && item.price > 0 && item.name.includes("Premium") && (
+            <div className="flex items-center text-teal-50 h-[5.5rem] mb-6">
+              <div className="h3">Rwf</div>
+              <div className="text-[5.5rem] leading-none font-bold">
+                <div className="flex">{item.price}</div>
+              </div>
+            </div>
+          )}
 
-          <Link
-            href={
-              item.price === 0
-                ? "#"
-                : item.name === "Enterprise"
-                ? "#"
-                : "https://buy.stripe.com/test_9AQ5nNdR2653a5OcMN"
-            }
-            className={`w-full mb-6 inline-flex items-center justify-center h-11 transition-colors mt-4 rounded-md ${
-              !item.activation
-                ? "bg-none text-gray-500"
-                : "bg-blue-500 text-white"
-            } `}
-          >
+          <div className="w-full mb-6">
             <Button
-              disabled={!item.activation || item.price === 0}
-              className="w-full"
+              disabled={!item.activation || loadingPlanId === item.id}
+              onClick={() => handleNavigation(item)}
+              className={`w-full inline-flex items-center justify-center h-11 transition-colors mt-4 rounded-md ${
+                !item.activation
+                  ? "bg-none text-gray-500"
+                  : "bg-blue-500 text-white"
+              }`}
             >
-              {item.activation && item.name === "Enterprise"
-                ? "Contact us"
-                : item.price === 0
-                ? "Demo"
-                : item.name.includes("Enterprise")
-                ? "Contact us"
-                : "Get started"}
+              {loadingPlanId === item.id ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                item.activation &&
+                (item.name === "Enterprise"
+                  ? "Contact us"
+                  : item.price === 0
+                  ? "Sign Up free"
+                  : item.name.includes("Enterprise")
+                  ? "Contact sales"
+                  : "Try Premium")
+              )}
             </Button>
-          </Link>
+          </div>
 
           <ul>
             {item.features.map((feature, index) => (

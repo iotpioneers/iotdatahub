@@ -29,7 +29,11 @@ const fetcher = async (url: string) => {
   return res.json();
 };
 
-const ChannelDetails = ({ channelID }: { channelID: string }) => {
+interface ChannelDetailsProps {
+  channelID: string;
+}
+
+const ChannelDetails: React.FC<ChannelDetailsProps> = ({ channelID }) => {
   const { data: session } = useSession();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string>("");

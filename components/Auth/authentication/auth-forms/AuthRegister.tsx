@@ -45,6 +45,8 @@ import LoadingProgressBar from "@/components/LoadingProgressBar";
 // assets
 import CountryList from "./CountryList";
 import CountryPhoneModal from "./CountryPhoneModal";
+import { Stack } from "@mui/material";
+import AuthCardWrapper from "../../AuthCardWrapper";
 
 const store = configureStore({ reducer });
 
@@ -243,6 +245,13 @@ const AuthRegister = ({ ...others }) => {
         userEmail: data.email,
       });
 
+      // Store user data in local storage for later use valid for 1 day
+      localStorage.setItem(
+        "userFullName",
+        data.firstname + " " + data.lastname
+      );
+      localStorage.setItem("userEmail", data.email);
+
       if (response.status !== 200) {
         setError("Failed to send verification email");
         setOpen(true);
@@ -260,442 +269,502 @@ const AuthRegister = ({ ...others }) => {
 
   return (
     <>
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        open={open}
-        autoHideDuration={12000}
-        onClose={handleCloseResult}
-      >
-        <Alert
-          onClose={handleCloseResult}
-          severity="error"
-          variant="standard"
-          sx={{ width: "100%" }}
-        >
-          {error && error}
-        </Alert>
-      </Snackbar>
-
-      <Grid container direction="column" justifyContent="center" spacing={2}>
-        <Grid item xs={12}>
-          <AnimateButton>
-            <Button
-              type="button"
-              disableElevation
-              fullWidth
-              onClick={googleHandler}
-              size="large"
-              variant="outlined"
-              sx={{
-                color: "grey.700",
-                backgroundColor: theme.palette.grey[50],
-                borderColor: theme.palette.grey[100],
-              }}
+      <AuthCardWrapper>
+        <Grid container spacing={2} alignItems="center" justifyContent="center">
+          <Grid item xs={12}>
+            <Snackbar
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+              open={open}
+              autoHideDuration={12000}
+              onClose={handleCloseResult}
             >
-              <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
-                <img
-                  src="/socials/social-google.svg"
-                  alt="google"
-                  width={16}
-                  height={16}
-                  style={{ marginRight: matchDownSM ? 8 : 16 }}
-                />
-              </Box>
-              Sign up with Google
-            </Button>
-          </AnimateButton>
-          {isGoogleSign && <LoadingProgressBar />}
-        </Grid>
-        <Grid item xs={12}>
-          <Box sx={{ alignItems: "center", display: "flex" }}>
-            <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
-            <Button
-              variant="outlined"
-              sx={{
-                cursor: "unset",
-                m: 2,
-                py: 0.5,
-                px: 7,
-                borderColor: `${theme.palette.grey[100]} !important`,
-                color: `${theme.palette.grey[900]}!important`,
-                fontWeight: 500,
-                borderRadius: `${customization.borderRadius}px`,
-              }}
-              disableRipple
-              disabled
-            >
-              OR
-            </Button>
-            <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
-          </Box>
-        </Grid>
-        <Grid
-          item
-          xs={12}
-          container
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle1">
-              Sign up with Email address
-            </Typography>
-          </Box>
-        </Grid>
-      </Grid>
+              <Alert
+                onClose={handleCloseResult}
+                severity="error"
+                variant="standard"
+                sx={{ width: "100%" }}
+              >
+                {error && error}
+              </Alert>
+            </Snackbar>
 
-      <Formik
-        initialValues={{
-          firstname: "",
-          lastname: "",
-          email: "",
-          country: "",
-          phonecode: "",
-          phonenumber: 0,
-          password: "",
-          confirmPassword: "",
-          submit: null,
-        }}
-        validationSchema={schema}
-        onSubmit={(values, actions) => {
-          registerUser(values);
-          actions.setSubmitting(false);
-        }}
-      >
-        {({
-          errors,
-          handleBlur,
-          handleChange,
-          handleSubmit,
-          isSubmitting,
-          touched,
-          values,
-        }) => (
-          <form noValidate onSubmit={handleSubmit} {...others}>
-            <Grid container spacing={matchDownSM ? 0 : 2}>
-              <Grid item xs={12} sm={6}>
-                <FormControl
-                  fullWidth
-                  error={Boolean(touched.firstname && errors.firstname)}
-                  sx={{ ...theme.typography.customInput }}
-                >
-                  <InputLabel htmlFor="outlined-adornment-firstname-register">
-                    First Name
-                  </InputLabel>
-                  <OutlinedInput
-                    id="outlined-adornment-firstname-register"
-                    type="text"
-                    value={values.firstname}
-                    name="firstname"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    inputProps={{}}
-                  />
-                  {touched.firstname && errors.firstname && (
-                    <FormHelperText
-                      error
-                      id="standard-weight-helper-text--register"
-                    >
-                      {errors.firstname}
-                    </FormHelperText>
-                  )}
-                </FormControl>
+            <Stack alignItems="center" justifyContent="center" spacing={1}>
+              <Typography
+                color="secondary.main"
+                gutterBottom
+                variant="h3"
+                mb={2}
+              >
+                Enter your credentials to continue
+              </Typography>
+            </Stack>
+
+            <Grid item xs={12} py={3}>
+              <Divider />
+            </Grid>
+
+            <Grid
+              container
+              direction="column"
+              justifyContent="center"
+              spacing={2}
+            >
+              <Grid item xs={12}>
+                <AnimateButton>
+                  <Button
+                    type="button"
+                    disableElevation
+                    fullWidth
+                    onClick={googleHandler}
+                    size="large"
+                    variant="outlined"
+                    sx={{
+                      color: "grey.700",
+                      backgroundColor: theme.palette.grey[50],
+                      borderColor: theme.palette.grey[100],
+                    }}
+                  >
+                    <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
+                      <img
+                        src="/socials/social-google.svg"
+                        alt="google"
+                        width={16}
+                        height={16}
+                        style={{ marginRight: matchDownSM ? 8 : 16 }}
+                      />
+                    </Box>
+                    Sign up with Google
+                  </Button>
+                </AnimateButton>
+                {isGoogleSign && <LoadingProgressBar />}
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl
-                  fullWidth
-                  error={Boolean(touched.lastname && errors.lastname)}
-                  sx={{ ...theme.typography.customInput }}
-                >
-                  <InputLabel htmlFor="outlined-adornment-lastname-register">
-                    Last Name
-                  </InputLabel>
-                  <OutlinedInput
-                    id="outlined-adornment-lastname-register"
-                    type="text"
-                    value={values.lastname}
-                    name="lastname"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    inputProps={{}}
-                  />
-                  {touched.lastname && errors.lastname && (
-                    <FormHelperText
-                      error
-                      id="standard-weight-helper-text--register"
-                    >
-                      {errors.lastname}
-                    </FormHelperText>
-                  )}
-                </FormControl>
+              <Grid item xs={12}>
+                <Box sx={{ alignItems: "center", display: "flex" }}>
+                  <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      cursor: "unset",
+                      m: 2,
+                      py: 0.5,
+                      px: 7,
+                      borderColor: `${theme.palette.grey[100]} !important`,
+                      color: `${theme.palette.grey[900]}!important`,
+                      fontWeight: 500,
+                      borderRadius: `${customization.borderRadius}px`,
+                    }}
+                    disableRipple
+                    disabled
+                  >
+                    OR
+                  </Button>
+                  <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
+                </Box>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                container
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="subtitle1">
+                    Sign up with Email address
+                  </Typography>
+                </Box>
               </Grid>
             </Grid>
-            <FormControl
-              fullWidth
-              error={Boolean(touched.email && errors.email)}
-              sx={{ ...theme.typography.customInput }}
-            >
-              <InputLabel htmlFor="outlined-adornment-email-register">
-                Email Address
-              </InputLabel>
-              <OutlinedInput
-                id="outlined-adornment-email-register"
-                type="email"
-                value={values.email}
-                name="email"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                inputProps={{}}
-              />
-              {touched.email && errors.email && (
-                <FormHelperText
-                  error
-                  id="standard-weight-helper-text--register"
-                >
-                  {errors.email}
-                </FormHelperText>
-              )}
-            </FormControl>
-            <FormControl
-              fullWidth
-              error={Boolean(touched.country && errors.country)}
-              sx={{ ...theme.typography.customInput }}
-            >
-              <CountryList
-                selectedCountry={selectedCountry}
-                setSelectedCountry={(country) => {
-                  setSelectedCountry(country);
-                  handleChange({
-                    target: {
-                      name: "country",
-                      value: selectedCountry?.label,
-                    },
-                  });
-                }}
-              />
 
-              {touched.country && errors.country && (
-                <FormHelperText
-                  error
-                  id="standard-weight-helper-text--register"
-                >
-                  {errors.country}
-                </FormHelperText>
-              )}
-            </FormControl>
-            {selectedCountry && selectedCountry !== null && (
-              <Grid container spacing={matchDownSM ? 0 : 2}>
-                {selectedCountry?.phone && (
-                  <Grid item xs={12} sm={3}>
-                    <FormControl
-                      fullWidth
-                      sx={{ ...theme.typography.customInput }}
-                    >
-                      <InputLabel
-                        htmlFor="outlined-adornment-phonecode-register"
-                        className="flex justify-between items-center gap-2"
+            <Formik
+              initialValues={{
+                firstname: "",
+                lastname: "",
+                email: "",
+                country: "",
+                phonecode: "",
+                phonenumber: 0,
+                password: "",
+                confirmPassword: "",
+                submit: null,
+              }}
+              validationSchema={schema}
+              onSubmit={(values, actions) => {
+                registerUser(values);
+                actions.setSubmitting(false);
+              }}
+            >
+              {({
+                errors,
+                handleBlur,
+                handleChange,
+                handleSubmit,
+                isSubmitting,
+                touched,
+                values,
+              }) => (
+                <form noValidate onSubmit={handleSubmit} {...others}>
+                  <Grid container spacing={matchDownSM ? 0 : 2}>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl
+                        fullWidth
+                        error={Boolean(touched.firstname && errors.firstname)}
+                        sx={{ ...theme.typography.customInput }}
                       >
-                        Code
-                        <img
-                          loading="lazy"
-                          width="20"
-                          srcSet={`https://flagcdn.com/w40/${selectedCountry?.code.toLowerCase()}.png 2x`}
-                          src={`https://flagcdn.com/w20/${selectedCountry?.code.toLowerCase()}.png`}
-                          alt=""
-                          style={{ marginRight: "8px" }}
+                        <InputLabel htmlFor="outlined-adornment-firstname-register">
+                          First Name
+                        </InputLabel>
+                        <OutlinedInput
+                          id="outlined-adornment-firstname-register"
+                          type="text"
+                          value={values.firstname}
+                          name="firstname"
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          inputProps={{}}
                         />
-                      </InputLabel>
-                      <OutlinedInput
-                        id="outlined-adornment-phonecode"
-                        type="text"
-                        value={`+ ${selectedCountry?.phone}`}
-                        name="phonecode"
-                      />
-                    </FormControl>
+                        {touched.firstname && errors.firstname && (
+                          <FormHelperText
+                            error
+                            id="standard-weight-helper-text--register"
+                          >
+                            {errors.firstname}
+                          </FormHelperText>
+                        )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl
+                        fullWidth
+                        error={Boolean(touched.lastname && errors.lastname)}
+                        sx={{ ...theme.typography.customInput }}
+                      >
+                        <InputLabel htmlFor="outlined-adornment-lastname-register">
+                          Last Name
+                        </InputLabel>
+                        <OutlinedInput
+                          id="outlined-adornment-lastname-register"
+                          type="text"
+                          value={values.lastname}
+                          name="lastname"
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          inputProps={{}}
+                        />
+                        {touched.lastname && errors.lastname && (
+                          <FormHelperText
+                            error
+                            id="standard-weight-helper-text--register"
+                          >
+                            {errors.lastname}
+                          </FormHelperText>
+                        )}
+                      </FormControl>
+                    </Grid>
                   </Grid>
-                )}
-                <Grid item xs={12} sm={selectedCountry?.phone ? 9 : 12}>
                   <FormControl
                     fullWidth
-                    error={Boolean(touched.phonenumber && errors.phonenumber)}
+                    error={Boolean(touched.email && errors.email)}
                     sx={{ ...theme.typography.customInput }}
                   >
-                    <InputLabel htmlFor="outlined-adornment-phonenumber-register">
-                      Phone Number
+                    <InputLabel htmlFor="outlined-adornment-email-register">
+                      Email Address
                     </InputLabel>
                     <OutlinedInput
-                      id="outlined-adornment-phonenumber-register"
-                      type="number"
-                      value={values.phonenumber}
-                      name="phonenumber"
+                      id="outlined-adornment-email-register"
+                      type="email"
+                      value={values.email}
+                      name="email"
                       onBlur={handleBlur}
                       onChange={handleChange}
                       inputProps={{}}
                     />
-                    {touched.phonenumber && errors.phonenumber && (
+                    {touched.email && errors.email && (
                       <FormHelperText
                         error
                         id="standard-weight-helper-text--register"
                       >
-                        {errors.phonenumber}
+                        {errors.email}
                       </FormHelperText>
                     )}
                   </FormControl>
-                </Grid>
-              </Grid>
-            )}
-            <FormControl
-              fullWidth
-              error={Boolean(touched.password && errors.password)}
-              sx={{ ...theme.typography.customInput }}
-            >
-              <InputLabel htmlFor="outlined-adornment-password-register">
-                Password
-              </InputLabel>
-              <OutlinedInput
-                id="outlined-adornment-password-register"
-                type={showPassword ? "text" : "password"}
-                value={values.password}
-                name="password"
-                label="Password"
-                autoComplete="off"
-                onBlur={handleBlur}
-                onChange={(e) => {
-                  handleChange(e);
-                  changePassword(e.target.value);
-                }}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                      size="large"
-                    >
-                      {showPassword ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-                inputProps={{}}
-              />
-              {touched.password && errors.password && (
-                <FormHelperText
-                  error
-                  id="standard-weight-helper-text-password-register"
-                >
-                  {errors.password}
-                </FormHelperText>
-              )}
-            </FormControl>
+                  <FormControl
+                    fullWidth
+                    error={Boolean(touched.country && errors.country)}
+                    sx={{ ...theme.typography.customInput }}
+                  >
+                    <CountryList
+                      selectedCountry={selectedCountry}
+                      setSelectedCountry={(country) => {
+                        setSelectedCountry(country);
+                        handleChange({
+                          target: {
+                            name: "country",
+                            value: selectedCountry?.label,
+                          },
+                        });
+                      }}
+                    />
 
-            {strength !== 0 && level && (
-              <FormControl fullWidth>
-                <Box sx={{ mb: 2 }}>
-                  <Grid container spacing={2} alignItems="center">
-                    <Grid item>
-                      <Box
-                        style={{ backgroundColor: level?.color }}
-                        sx={{ width: 85, height: 8, borderRadius: "7px" }}
-                      ></Box>
+                    {touched.country && errors.country && (
+                      <FormHelperText
+                        error
+                        id="standard-weight-helper-text--register"
+                      >
+                        {errors.country}
+                      </FormHelperText>
+                    )}
+                  </FormControl>
+                  {selectedCountry && selectedCountry !== null && (
+                    <Grid container spacing={matchDownSM ? 0 : 2}>
+                      {selectedCountry?.phone && (
+                        <Grid item xs={12} sm={3}>
+                          <FormControl
+                            fullWidth
+                            sx={{ ...theme.typography.customInput }}
+                          >
+                            <InputLabel
+                              htmlFor="outlined-adornment-phonecode-register"
+                              className="flex justify-between items-center gap-2"
+                            >
+                              Code
+                              <img
+                                loading="lazy"
+                                width="20"
+                                srcSet={`https://flagcdn.com/w40/${selectedCountry?.code.toLowerCase()}.png 2x`}
+                                src={`https://flagcdn.com/w20/${selectedCountry?.code.toLowerCase()}.png`}
+                                alt=""
+                                style={{ marginRight: "8px" }}
+                              />
+                            </InputLabel>
+                            <OutlinedInput
+                              id="outlined-adornment-phonecode"
+                              type="text"
+                              value={`+ ${selectedCountry?.phone}`}
+                              name="phonecode"
+                            />
+                          </FormControl>
+                        </Grid>
+                      )}
+                      <Grid item xs={12} sm={selectedCountry?.phone ? 9 : 12}>
+                        <FormControl
+                          fullWidth
+                          error={Boolean(
+                            touched.phonenumber && errors.phonenumber
+                          )}
+                          sx={{ ...theme.typography.customInput }}
+                        >
+                          <InputLabel htmlFor="outlined-adornment-phonenumber-register">
+                            Phone Number
+                          </InputLabel>
+                          <OutlinedInput
+                            id="outlined-adornment-phonenumber-register"
+                            type="number"
+                            value={values.phonenumber}
+                            name="phonenumber"
+                            onBlur={handleBlur}
+                            onChange={handleChange}
+                            inputProps={{}}
+                          />
+                          {touched.phonenumber && errors.phonenumber && (
+                            <FormHelperText
+                              error
+                              id="standard-weight-helper-text--register"
+                            >
+                              {errors.phonenumber}
+                            </FormHelperText>
+                          )}
+                        </FormControl>
+                      </Grid>
                     </Grid>
+                  )}
+                  <FormControl
+                    fullWidth
+                    error={Boolean(touched.password && errors.password)}
+                    sx={{ ...theme.typography.customInput }}
+                  >
+                    <InputLabel htmlFor="outlined-adornment-password-register">
+                      Password
+                    </InputLabel>
+                    <OutlinedInput
+                      id="outlined-adornment-password-register"
+                      type={showPassword ? "text" : "password"}
+                      value={values.password}
+                      name="password"
+                      label="Password"
+                      autoComplete="off"
+                      onBlur={handleBlur}
+                      onChange={(e) => {
+                        handleChange(e);
+                        changePassword(e.target.value);
+                      }}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                            size="large"
+                          >
+                            {showPassword ? <Visibility /> : <VisibilityOff />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                      inputProps={{}}
+                    />
+                    {touched.password && errors.password && (
+                      <FormHelperText
+                        error
+                        id="standard-weight-helper-text-password-register"
+                      >
+                        {errors.password}
+                      </FormHelperText>
+                    )}
+                  </FormControl>
+
+                  {strength !== 0 && level && (
+                    <FormControl fullWidth>
+                      <Box sx={{ mb: 2 }}>
+                        <Grid container spacing={2} alignItems="center">
+                          <Grid item>
+                            <Box
+                              style={{ backgroundColor: level?.color }}
+                              sx={{ width: 85, height: 8, borderRadius: "7px" }}
+                            ></Box>
+                          </Grid>
+                          <Grid item>
+                            <Typography variant="subtitle1" fontSize="0.75rem">
+                              {level.label}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </FormControl>
+                  )}
+                  {level && level.label === "Strong" && (
+                    <FormControl
+                      fullWidth
+                      error={Boolean(
+                        touched.confirmPassword && errors.confirmPassword
+                      )}
+                      sx={{ ...theme.typography.customInput }}
+                    >
+                      <InputLabel htmlFor="outlined-adornment-confirmPassword-register">
+                        Confirm Password
+                      </InputLabel>
+                      <OutlinedInput
+                        id="outlined-adornment-confirmPassword-register"
+                        type="password"
+                        autoComplete="off"
+                        value={values.confirmPassword}
+                        name="confirmPassword"
+                        label="Confirm Password"
+                        onBlur={handleBlur}
+                        onChange={(e) => {
+                          handleChange(e);
+                        }}
+                        inputProps={{}}
+                      />
+                      {touched.confirmPassword && errors.confirmPassword && (
+                        <FormHelperText
+                          error
+                          id="standard-weight-helper-text-confirmPassword-register"
+                        >
+                          {errors.confirmPassword}
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  )}
+                  <Grid
+                    container
+                    alignItems="center"
+                    justifyContent="space-between"
+                  >
                     <Grid item>
-                      <Typography variant="subtitle1" fontSize="0.75rem">
-                        {level.label}
-                      </Typography>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={checked}
+                            onChange={(event) =>
+                              setChecked(event.target.checked)
+                            }
+                            name="checked"
+                            color="primary"
+                          />
+                        }
+                        label={
+                          <Link href="#">
+                            <Typography variant="subtitle1">
+                              Agree with Terms & Conditions
+                            </Typography>
+                          </Link>
+                        }
+                      />
                     </Grid>
                   </Grid>
-                </Box>
-              </FormControl>
-            )}
-            {level && level.label === "Strong" && (
-              <FormControl
-                fullWidth
-                error={Boolean(
-                  touched.confirmPassword && errors.confirmPassword
-                )}
-                sx={{ ...theme.typography.customInput }}
-              >
-                <InputLabel htmlFor="outlined-adornment-confirmPassword-register">
-                  Confirm Password
-                </InputLabel>
-                <OutlinedInput
-                  id="outlined-adornment-confirmPassword-register"
-                  type="password"
-                  autoComplete="off"
-                  value={values.confirmPassword}
-                  name="confirmPassword"
-                  label="Confirm Password"
-                  onBlur={handleBlur}
-                  onChange={(e) => {
-                    handleChange(e);
-                  }}
-                  inputProps={{}}
-                />
-                {touched.confirmPassword && errors.confirmPassword && (
-                  <FormHelperText
-                    error
-                    id="standard-weight-helper-text-confirmPassword-register"
-                  >
-                    {errors.confirmPassword}
-                  </FormHelperText>
-                )}
-              </FormControl>
-            )}
-            <Grid container alignItems="center" justifyContent="space-between">
-              <Grid item>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={checked}
-                      onChange={(event) => setChecked(event.target.checked)}
-                      name="checked"
-                      color="primary"
-                    />
-                  }
-                  label={
-                    <Link href="#">
-                      <Typography variant="subtitle1">
-                        Agree with Terms & Conditions
-                      </Typography>
-                    </Link>
-                  }
-                />
-              </Grid>
+
+                  {errors.submit && (
+                    <Box sx={{ mt: 3 }}>
+                      <FormHelperText error>{errors.submit}</FormHelperText>
+                    </Box>
+                  )}
+
+                  <Box sx={{ mt: 2 }}>
+                    <AnimateButton>
+                      <Button
+                        disableElevation
+                        disabled={!checked || isSubmitting}
+                        fullWidth
+                        size="large"
+                        type="submit"
+                        variant="contained"
+                        color="secondary"
+                      >
+                        {isSubmitting || loading
+                          ? "Registering you in please wait..."
+                          : "Sign up"}
+                      </Button>
+                      {loading && <LoadingProgressBar />}
+                    </AnimateButton>
+                  </Box>
+                </form>
+              )}
+            </Formik>
+            <CountryPhoneModal
+              open={showCountryPhoneModal}
+              onClose={() => setShowCountryPhoneModal(false)}
+              onSubmit={handleCountryPhoneSubmit}
+            />
+
+            <Grid item xs={12} py={3}>
+              <Divider />
             </Grid>
 
-            {errors.submit && (
-              <Box sx={{ mt: 3 }}>
-                <FormHelperText error>{errors.submit}</FormHelperText>
-              </Box>
-            )}
-
-            <Box sx={{ mt: 2 }}>
-              <AnimateButton>
-                <Button
-                  disableElevation
-                  disabled={!checked || isSubmitting}
-                  fullWidth
-                  size="large"
-                  type="submit"
-                  variant="contained"
-                  color="secondary"
+            <Grid item xs={12}>
+              <Grid
+                item
+                container
+                direction="column"
+                alignItems="center"
+                xs={12}
+              >
+                <Link
+                  href="/login"
+                  className="underline hover:text-emerald-600 hover:bg-slate-700 hover:p-2 hover:rounded-2xl "
                 >
-                  {isSubmitting || loading
-                    ? "Registering you in please wait..."
-                    : "Sign up"}
-                </Button>
-                {loading && <LoadingProgressBar />}
-              </AnimateButton>
-            </Box>
-          </form>
-        )}
-      </Formik>
-      <CountryPhoneModal
-        open={showCountryPhoneModal}
-        onClose={() => setShowCountryPhoneModal(false)}
-        onSubmit={handleCountryPhoneSubmit}
-      />
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ textDecoration: "none" }}
+                  >
+                    Already have an account?
+                  </Typography>
+                </Link>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </AuthCardWrapper>
     </>
   );
 };
