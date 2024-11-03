@@ -214,17 +214,6 @@ export type DeleteModalProps = { channelId: string };
 
 export type ThreadWrapperProps = { thread: ThreadData<BaseMetadata> };
 
-export interface ContactSalesFormData {
-  firstName: string;
-  lastName: string;
-  workEmail: string;
-  jobTitle: string;
-  phoneNumber: string;
-  expectedUsers: string;
-  message: string;
-  organizationId?: string;
-}
-
 export enum FeedbackStatus {
   PENDING = "PENDING",
   IN_PROGRESS = "IN_PROGRESS",
