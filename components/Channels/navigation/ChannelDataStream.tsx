@@ -27,6 +27,8 @@ const ChannelDataStream = ({ channel, fields, dataPoint }: Props) => {
     Object.fromEntries(fields.map((field) => [field.id, "lineChart"]))
   );
 
+  console.log("Data Points", dataPoint);
+
   const renderChart = (chartData: DataPoint[], widgetType: string) => {
     switch (widgetType) {
       case "lineChart":

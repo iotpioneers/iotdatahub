@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/client";
-import { feedbackSchema } from "@/validations/schema.validation";
 import { ObjectId } from "mongodb";
 
 export async function GET(

@@ -1,14 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  Typography,
-  Container,
-  Grid,
-  Card,
-  CardContent,
-  Box,
-} from "@mui/material";
+import { Box } from "@mui/material";
 
 // Project imports
 import HomeHeroSection from "./LandingPage/HomeHeroSection";
@@ -16,9 +9,8 @@ import FAQ from "./LandingPage/FAQ";
 import Footer from "./components/Footer";
 import OurServices from "./LandingPage/OurServices";
 import AnimatedMovingFeaturesComponent from "./LandingPage/HomeAnimatedMovingFeaturesComponent";
+import AnimatedMovingFeaturesComponent from "./LandingPage/HomeAnimatedMovingFeaturesComponent";
 import PopUpButton from "@/components/Home/components/design/PopUpButton/PopUpButton";
-import Benefits from "./LandingPage/Benefits";
-import Link from "next/link";
 
 // Hero Component
 const Hero: React.FC = () => (
@@ -44,7 +36,6 @@ const HomePage: React.FC = () => {
       <Box sx={{ bgcolor: "background.default" }}>
         <OurServices />
         <AnimatedMovingFeaturesComponent />
-        <Benefits />
         <FAQ />
         <Footer />
       </Box>

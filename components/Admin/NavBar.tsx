@@ -14,7 +14,6 @@ import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import ToggleColorMode from "./components/ToggleColorMode";
 import getDashboardTheme from "./theme/getDashboardTheme";
 import { HomeIcon } from "lucide-react";
-import Logo from "../Home/Logo";
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   position: "fixed",
@@ -58,7 +57,53 @@ export default function NavBar({
             disableGutters
             sx={{ display: "flex", justifyContent: "space-between" }}
           >
-            <Logo />
+            <Button
+              variant="text"
+              size="small"
+              aria-label="IoT Data Hub"
+              startIcon={
+                <img
+                  src="/IOT_DATA_HUB.png"
+                  alt="IoT Data Hub Logo"
+                  height={24}
+                />
+              }
+              component="a"
+              href="/"
+              sx={{ display: { xs: "none", sm: "flex" } }}
+              className="text-orange-50"
+            >
+              IoTDataHub
+            </Button>
+            <IconButton
+              size="small"
+              aria-label="Back to home"
+              component="a"
+              href="/"
+              sx={{ display: { xs: "auto", sm: "none" } }}
+            >
+              <ArrowBackRoundedIcon />
+            </IconButton>
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <FormControl variant="outlined" sx={{ minWidth: 180 }}>
+                <Select
+                  size="small"
+                  labelId="theme-select-label"
+                  id="theme-select"
+                  value={showCustomTheme ? "custom" : "material"}
+                  onChange={handleChange}
+                  label="Design Language"
+                >
+                  <MenuItem value="custom">Custom</MenuItem>
+                  <MenuItem value="material">Default</MenuItem>
+                </Select>
+              </FormControl>
+              <ToggleColorMode
+                data-screenshot="toggle-mode"
+                mode={mode}
+                toggleColorMode={toggleColorMode}
+              />
+            </Box>
           </Toolbar>
         </Container>
       </StyledAppBar>

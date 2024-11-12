@@ -15,12 +15,19 @@ import AngledButton from "./design/AngledButton";
 import axios from "axios";
 import { PricingPlanType } from "@/types";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { useSession } from "next-auth/react";
 
-const PricingList = () => {
+interface PricingListProps {
+  onSelect?: (subscription: PricingPlanType) => void;
+}
+
+const PricingList: React.FC<PricingListProps> = ({ onSelect }) => {
   const [subscriptions, setSubscriptions] = React.useState<PricingPlanType[]>(
     []
   );
   const [IsLoading, setIsLoading] = React.useState<boolean>(false);
+
+  const { status, data: session } = useSession();
 
   React.useEffect(() => {
     const fetchSubscriptions = async () => {
@@ -40,6 +47,7 @@ const PricingList = () => {
 
     fetchSubscriptions();
   }, []);
+
   return (
     <Grid container spacing={3} alignItems="center" justifyContent="center">
       {IsLoading && <LoadingSpinner />}
@@ -96,16 +104,15 @@ const PricingList = () => {
                 color: item.name === "Premium" ? "grey.50" : undefined,
               }}
             >
-              <Typography
-                component="h4"
-                variant="h5"
-                className="text-[2.5rem] leading-none font-bold"
-              >
-                Rwf{item.price}
-              </Typography>
-              <Typography component="h6" variant="h6">
-                &nbsp; per month
-              </Typography>
+              {item.name.includes("Premium") && (
+                <Typography
+                  component="h4"
+                  variant="h5"
+                  className="text-[2.5rem] leading-none font-bold"
+                >
+                  Rwf{item.price}
+                </Typography>
+              )}
             </Box>
 
             <Divider
@@ -122,14 +129,18 @@ const PricingList = () => {
                 href={
                   item.price === 0
                     ? "/signup"
-                    : item.name === "Enterprise"
-                    ? "#"
-                    : "https://buy.stripe.com/test_9AQ5nNdR2653a5OcMN"
+                    : item.name.includes("Enterprise")
+                    ? "/contactsales"
+                    : item.name.includes("Premium") &&
+                      status !== "loading" &&
+                      status !== "unauthenticated"
+                    ? "/dashboard/subscription/" + item.id
+                    : "/login"
                 }
                 white={!!item.price}
               >
-                {item.activation && item.name === "Enterprise"
-                  ? "Contact us"
+                {item.name.includes("Enterprise")
+                  ? "Contact Sales"
                   : item.price === 0
                   ? "Try for free"
                   : "Get started"}

@@ -1,3 +1,5 @@
+// C:\Users\emash\IoTDataHub\app\api\auth\authOptions.ts
+
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaClient, Role } from "@prisma/client";

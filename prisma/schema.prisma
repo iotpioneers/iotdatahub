@@ -1,3 +1,5 @@
+// C:\Users\emash\IoTDataHub\prisma\schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -81,6 +83,7 @@ model User {
   devices         Device[]
   channels        Channel[]
   apiKeys         ApiKey[]
+  payments        Payment[]
   feedbackReplies FeedbackReply[]
   subscriptionId  String?         @db.ObjectId
   organizationId  String?         @db.ObjectId
@@ -97,10 +100,19 @@ model Organization {
   name           String
   address        String?
   type           OrganizationType @default(PERSONAL)
+  industry       String?
+  employeeCount  String?
+  contactName    String?
+  email          String?
+  jobTitle       String?
+  phoneNumber    String?
+  country        String?
+  deviceCount    String?
   areaOfInterest String[]
-  userId         String           @db.ObjectId
+  userId         String?          @db.ObjectId
   users          User[]
   members        Member[]
+  payments       Payment[]
   feedbacks      Feedback[]
 
   createdAt    DateTime       @default(now())
@@ -112,6 +124,7 @@ model Organization {
   ApiKey       ApiKey[]
   SampleCodes  SampleCodes[]
   Subscription Subscription[]
+  ContactSales ContactSales[]
 
   @@index([userId])
 }
@@ -303,6 +316,46 @@ model Subscription {
   Invoice   Invoice[]
 }
 
+model Payment {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  amount      Float
+  currency    String           @default("RWF")
+  status      PaymentStatus    @default(PENDING)
+  type        PaymentType
+  provider    PaymentProvider?
+  description String?
+
+  // Credit card specific fields
+  cardLastFour    String?
+  cardExpiryMonth String?
+  cardExpiryYear  String?
+  cardHolderName  String?
+
+  // Mobile money specific fields
+  phoneNumber   String?
+  transactionId String? @unique
+
+  // Common metadata
+  metadata     Json?
+  errorMessage String?
+
+  // Relations
+  userId         String        @db.ObjectId
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId String?       @db.ObjectId
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  invoiceId      String?       @db.ObjectId
+  invoice        Invoice?      @relation(fields: [invoiceId], references: [id])
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([invoiceId])
+}
+
 model Invoice {
   id                 String            @id @default(auto()) @map("_id") @db.ObjectId
   userId             String            @db.ObjectId
@@ -317,9 +370,29 @@ model Invoice {
   lastFourCardDigits String?
   expiryDate         DateTime?
   paidAt             DateTime?
+  payments           Payment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
+}
+
+model ContactSales {
+  id             String             @id @default(auto()) @map("_id") @db.ObjectId
+  firstName      String
+  lastName       String
+  workEmail      String
+  jobTitle       String
+  phoneNumber    String
+  expectedUsers  String
+  message        String?
+  status         ContactSalesStatus @default(PENDING)
+  organizationId String?            @db.ObjectId
+  organization   Organization?      @relation(fields: [organizationId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  @@index([organizationId])
 }
 
 model Feedback {
@@ -352,13 +425,6 @@ model FeedbackReply {
 
   @@index([feedbackId])
   @@index([userId])
-}
-
-enum PaymentStatus {
-  PENDING
-  SUCCEEDED
-  FAILED
-  CANCELED
 }
 
 enum SubscriptionStatus {
@@ -423,6 +489,32 @@ enum SubscriptionType {
   FREE
   PREMIUM
   ENTERPRISE
+}
+
+enum PaymentType {
+  CREDIT_CARD
+  MOBILE_MONEY
+}
+
+enum PaymentProvider {
+  MTN
+  AIRTEL
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum ContactSalesStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
 }
 
 enum FeedbackStatus {
