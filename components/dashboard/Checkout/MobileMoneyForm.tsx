@@ -17,7 +17,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Image from "next/image";
 
-interface Props {
+interface MobileMoneyPropsData {
   subscriptionId: string;
 }
 
@@ -38,7 +38,7 @@ const fetcher = async (
   url: string,
   {
     arg,
-  }: { arg: { pricingId: string; phoneNumber: string; provider: Provider } }
+  }: { arg: { pricingId: string; phoneNumber: string; provider: Provider } },
 ) => {
   const response = await fetch(url, {
     method: "POST",
@@ -56,7 +56,7 @@ const fetcher = async (
   return response.json();
 };
 
-const MobileMoneyForm = ({ subscriptionId }: Props) => {
+const MobileMoneyForm = ({ subscriptionId }: MobileMoneyPropsData) => {
   const [phoneNumber, setPhoneNumber] = React.useState("");
   const [provider, setProvider] = React.useState<Provider>("mtn");
   const [isProcessing, setIsProcessing] = React.useState(false);
@@ -77,12 +77,12 @@ const MobileMoneyForm = ({ subscriptionId }: Props) => {
     {
       revalidateOnFocus: false,
       shouldRetryOnError: false,
-    }
+    },
   );
 
   const handleProviderChange = (
     event: React.MouseEvent<HTMLElement>,
-    newProvider: Provider | null
+    newProvider: Provider | null,
   ) => {
     if (newProvider !== null) {
       setProvider(newProvider);
@@ -93,7 +93,7 @@ const MobileMoneyForm = ({ subscriptionId }: Props) => {
 
   const handleSnackbarClose = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;
@@ -103,7 +103,7 @@ const MobileMoneyForm = ({ subscriptionId }: Props) => {
 
   const showNotification = (
     message: string,
-    severity: SnackbarState["severity"]
+    severity: SnackbarState["severity"],
   ) => {
     setSnackbar({
       open: true,
@@ -127,7 +127,7 @@ const MobileMoneyForm = ({ subscriptionId }: Props) => {
   };
 
   const handlePhoneNumberChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = event.target.value.replace(/\D/g, "");
     if (value.length <= 10) {
@@ -159,11 +159,11 @@ const MobileMoneyForm = ({ subscriptionId }: Props) => {
               phoneNumber: phoneNumber,
               provider: provider,
             },
-          }
+          },
         ),
         {
           revalidate: false,
-        }
+        },
       );
 
       if (result?.error) {
@@ -174,12 +174,8 @@ const MobileMoneyForm = ({ subscriptionId }: Props) => {
       setPhoneNumber("");
       setFormError("");
     } catch (err) {
-      const errorMessage =
-        err instanceof Error
-          ? err.message
-          : "Payment processing failed. Please try again.";
-      setFormError(errorMessage);
-      showNotification(errorMessage, "error");
+      setFormError("Payment processing failed. Please try again.");
+      showNotification("Payment processing failed. Please try again.", "error");
     } finally {
       setIsProcessing(false);
     }

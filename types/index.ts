@@ -245,3 +245,14 @@ export interface Feedback {
 export interface ReplyFormValues {
   message: string;
 }
+
+export interface ContactSalesFormData {
+  firstName: string;
+  lastName: string;
+  workEmail: string;
+  jobTitle: string;
+  phoneNumber: string;
+  expectedUsers: string;
+  message: string;
+  organizationId?: string;
+}

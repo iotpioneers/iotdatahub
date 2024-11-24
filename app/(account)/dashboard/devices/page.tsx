@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import DeviceTable from "./_components/DevicesTable";
 import { Metadata } from "next";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 const DeviceListingsPage = async () => {

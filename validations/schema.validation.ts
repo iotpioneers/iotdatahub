@@ -95,18 +95,79 @@ export const fieldSchema = z.object({
 });
 
 // The schema for the device data
-export const deviceSchema = z.object({
+const deviceBaseSchema = {
   name: z
     .string()
     .min(1, "Name is required")
     .max(255, { message: "Name must be 255 characters or less" }),
-
-  description: z
+  description: z.string().nullable().default(null),
+  deviceType: z.enum(["SENSOR", "ACTUATOR", "GATEWAY", "CONTROLLER", "OTHER"]),
+  model: z.string().optional(),
+  firmware: z.string().optional(),
+  config: z.record(z.any()).optional(),
+  metadata: z.record(z.any()).optional(),
+  ipAddress: z
     .string()
-    .min(1, "Description is required")
-    .max(65535, { message: "Description must be 65535 characters or less" }),
+    .regex(
+      /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+      "Invalid IP address"
+    )
+    .optional(),
+  macAddress: z
+    .string()
+    .regex(/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/, "Invalid MAC address")
+    .optional(),
+  location: z
+    .object({
+      latitude: z.number(),
+      longitude: z.number(),
+      altitude: z.number().optional(),
+    })
+    .optional(),
+};
 
+// Schema for creating a new device
+export const deviceCreateSchema = z.object({
+  ...deviceBaseSchema,
   channelId: z.string().min(1, "Channel is required"),
+});
+
+// Schema for updating a device
+export const deviceUpdateSchema = z
+  .object({
+    ...deviceBaseSchema,
+    status: z
+      .enum(["ONLINE", "OFFLINE", "MAINTENANCE", "ERROR", "DISABLED"])
+      .optional(),
+    batteryLevel: z.number().min(0).max(100).optional(),
+    signal: z.number().min(0).max(100).optional(),
+  })
+  .partial();
+
+// Schema for device automation
+export const automationSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().optional(),
+  type: z.enum(["SCHEDULED", "CONDITIONAL", "TRIGGER", "SEQUENCE"]),
+  condition: z.record(z.any()),
+  action: z.record(z.any()),
+  schedule: z.string().optional(), // Cron expression
+  priority: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]).default("MEDIUM"),
+});
+
+// Schema for device commands
+export const commandSchema = z.object({
+  type: z.enum(["POWER", "RESET", "UPDATE", "CONFIGURE", "CUSTOM"]),
+  payload: z.record(z.any()),
+});
+
+// Schema for maintenance logs
+export const maintenanceSchema = z.object({
+  type: z.enum(["ROUTINE", "REPAIR", "UPDATE", "INSPECTION", "EMERGENCY"]),
+  description: z.string().min(1, "Description is required"),
+  performedBy: z.string().optional(),
+  scheduledFor: z.string().datetime().optional(),
+  notes: z.string().optional(),
 });
 
 // The schema for the api keys data

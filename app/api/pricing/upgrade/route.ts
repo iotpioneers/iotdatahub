@@ -113,7 +113,7 @@ async function createOrUpdateInvoice(
       subscriptionId,
       amount: amount / 100,
       paymentMethod: paymentMethod as string,
-      stripeChargeId: chargeId, // Add this field to your Invoice model
+      stripeChargeId: chargeId,
     },
   });
 

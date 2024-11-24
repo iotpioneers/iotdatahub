@@ -112,8 +112,7 @@ const UpgradePlanCardAlert = () => {
       if (status !== "loading" && status === "authenticated") {
         try {
           const res = await axios.get(
-            process.env.NEXT_PUBLIC_BASE_URL +
-              `/api/pricing/current/${session.user.subscriptionId}`
+            process.env.NEXT_PUBLIC_BASE_URL + `/api/pricing/current`
           );
           setSubscription(res.data);
         } catch (error) {
@@ -156,7 +155,88 @@ const UpgradePlanCardAlert = () => {
   }
 
   if (!subscription) {
-    return null;
+    return (
+      <Card
+        sx={{
+          bgcolor: "primary.light",
+          mb: 2.75,
+          overflow: "hidden",
+          position: "relative",
+          "&:after": {
+            content: '""',
+            position: "absolute",
+            width: 157,
+            height: 157,
+            bgcolor: "primary.200",
+            borderRadius: "50%",
+            top: -105,
+            right: -96,
+          },
+        }}
+      >
+        <Box sx={{ p: 2 }}>
+          <List disablePadding sx={{ m: 0 }}>
+            <ListItem alignItems="flex-start" disableGutters disablePadding>
+              <ListItemAvatar sx={{ mt: 0 }}>
+                <Avatar
+                  variant="rounded"
+                  sx={{
+                    ...theme.typography.commonAvatar,
+                    ...theme.typography.largeAvatar,
+                    color: "primary.main",
+                    border: "none",
+                    borderColor: "primary.main",
+                    bgcolor: "background.paper",
+                  }}
+                >
+                  <AutoAwesomeRoundedIcon fontSize="small" />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                sx={{ mt: 0 }}
+                primary={
+                  <Typography variant="h5" sx={{ color: "primary.800" }}>
+                    Free Plan
+                  </Typography>
+                }
+                secondary={
+                  <Typography variant="h6" sx={{ color: "secondary.800" }}>
+                    Your current plan
+                  </Typography>
+                }
+              />
+            </ListItem>
+          </List>
+          <Grid
+            container
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{ mt: 2 }}
+          >
+            <Stack direction="row">
+              <Link
+                sx={{ textDecoration: "none" }}
+                href="/dashboard/subscription"
+              >
+                <AnimateButton>
+                  <Button
+                    variant="contained"
+                    color={
+                      remainingDays !== null && remainingDays <= 10
+                        ? "warning"
+                        : "primary"
+                    }
+                    sx={{ boxShadow: "none" }}
+                  >
+                    Upgrade
+                  </Button>
+                </AnimateButton>
+              </Link>
+            </Stack>
+          </Grid>
+        </Box>
+      </Card>
+    );
   }
 
   return (
@@ -231,7 +311,9 @@ const UpgradePlanCardAlert = () => {
                   }
                   sx={{ boxShadow: "none" }}
                 >
-                  {subscription.type === "Free"
+                  {subscription.type === "Free" ||
+                  subscription.type === "" ||
+                  subscription.type === "null"
                     ? "Upgrade"
                     : remainingDays !== null && remainingDays <= 10
                     ? "Renew"

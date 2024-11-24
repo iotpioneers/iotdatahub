@@ -24,7 +24,9 @@ const login = async (credentials: Credentials) => {
   });
 
   if (!user) {
-    throw new Error("User not found");
+    throw new Error(
+      "The email or password you entered is incorrect. Please try again.",
+    );
   }
 
   if (user.emailVerified === null) {
@@ -33,11 +35,13 @@ const login = async (credentials: Credentials) => {
 
   const passwordMatch = await bcrypt.compare(
     credentials.password,
-    user.password!
+    user.password!,
   );
 
   if (!passwordMatch) {
-    throw new Error("Incorrect password");
+    throw new Error(
+      "The email or password you entered is incorrect. Please try again.",
+    );
   }
 
   return user;

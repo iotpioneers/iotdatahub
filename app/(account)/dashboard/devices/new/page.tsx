@@ -1,9 +1,8 @@
-import DeviceForm from "@/components/Forms/DeviceForm";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
+import AddDeviceFormComponent from "@/components/Forms/AddDeviceForm";
 import { Metadata } from "next";
 
 export default function Newdevice() {
-  return <DeviceForm />;
+  return <AddDeviceFormComponent />;
 }
 
 export const dynamic = "force-dynamic";

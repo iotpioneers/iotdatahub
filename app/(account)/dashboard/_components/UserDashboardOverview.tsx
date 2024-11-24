@@ -37,12 +37,13 @@ const fetcher = async (url: string): Promise<ApiResponse> => {
 
 const UserDashboardOverview = () => {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const { data, error } = useSWR<ApiResponse, Error>(
     "/api/organizations/status",
     fetcher,
-    { refreshInterval: 5000 }
+    { refreshInterval: 5000 },
   );
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {

@@ -4,7 +4,6 @@ import * as React from "react";
 import NotificationSection from "./Header/NotificationSection";
 import ProfileSection from "./Header/ProfileSection";
 
-import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 

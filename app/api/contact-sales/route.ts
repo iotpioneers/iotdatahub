@@ -78,8 +78,8 @@ async function sendNotificationEmail(contactData: ContactSalesFormData) {
           <p>A new sales contact request has been received:</p>
           <div class="details">
             <p><strong>Name:</strong> ${contactData.firstName} ${
-      contactData.lastName
-    }</p>
+              contactData.lastName
+            }</p>
             <p><strong>Email:</strong> ${contactData.workEmail}</p>
             <p><strong>Job Title:</strong> ${contactData.jobTitle}</p>
             <p><strong>Phone:</strong> ${contactData.phoneNumber}</p>
@@ -218,7 +218,7 @@ export async function POST(request: NextRequest) {
     console.error("Error in contact sales:", error);
     return NextResponse.json(
       { error: "Error processing contact request" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

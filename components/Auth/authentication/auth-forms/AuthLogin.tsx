@@ -38,6 +38,7 @@ import LoadingProgressBar from "@/components/LoadingProgressBar";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 // ============================|| IoTDataHub - LOGIN ||============================ //
 
@@ -69,19 +70,21 @@ const AuthLogin = ({ ...others }) => {
   const [checked, setChecked] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const router = useRouter();
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
   const handleMouseDownPassword = (
-    event: React.MouseEvent<HTMLButtonElement>
+    event: React.MouseEvent<HTMLButtonElement>,
   ) => {
     event.preventDefault();
   };
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;
@@ -102,17 +105,20 @@ const AuthLogin = ({ ...others }) => {
       const response = await signIn("credentials", {
         email: data.email,
         password: data.password,
-        redirect: true,
-        callbackUrl: "/dashboard",
+        redirect: false,
       });
 
       if (response?.error) {
-        setError(response.error);
+        setError(
+          response.error || "Login failed. Please check your credentials.",
+        );
         setOpen(true);
         return;
       }
+
+      router.push("/dashboard");
     } catch (error) {
-      setError("Failed to login");
+      setError("An unexpected error occurred. Please try again.");
       setOpen(true);
     } finally {
       setLoading(false);
@@ -124,7 +130,7 @@ const AuthLogin = ({ ...others }) => {
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
-        autoHideDuration={20000}
+        autoHideDuration={10000}
         onClose={handleCloseResult}
       >
         <Alert
