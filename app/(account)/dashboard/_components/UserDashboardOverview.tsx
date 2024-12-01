@@ -4,14 +4,8 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
-import {
-  Channel,
-  DataPoint,
-  Device,
-  Field,
-  Member,
-  Organization,
-} from "@/types";
+import { Channel, DataPoint, Device, Field, Organization } from "@/types";
+import { EmployeeMember } from "@/types/employees-member";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { DashboardOverview } from "@/components/dashboard";
 import { useSession } from "next-auth/react";
@@ -20,7 +14,7 @@ import SubscriptionModal from "@/components/dashboard/Checkout/SubscriptionModal
 interface ApiResponse {
   hasOrganization: boolean;
   organization: Organization | null;
-  members: Member[];
+  members: EmployeeMember[];
   devices: Device[];
   channels: Channel[];
   fields: Field[];

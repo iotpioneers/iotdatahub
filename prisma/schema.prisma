@@ -132,8 +132,8 @@ model Member {
   name           String
   email          String
   phone          String?
-  country        String?
   avatar         String?
+  address        Json?
   access         MemberAccess @default(VIEWER)
   organizationId String       @db.ObjectId
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -148,7 +148,7 @@ model Device {
   id             String       @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   description    String?
-  deviceType     DeviceType
+  deviceType     DeviceType?
   model          String?
   firmware       String?
   config         Json?
@@ -243,7 +243,7 @@ model MaintenanceLog {
   device       Device            @relation(fields: [deviceId], references: [id], onDelete: Cascade)
   type         MaintenanceType
   status       MaintenanceStatus @default(PENDING)
-  description  String
+  description  String?
   performedBy  String?
   scheduledFor DateTime?
   completedAt  DateTime?
@@ -436,6 +436,7 @@ model Payment {
   cardExpiryMonth String?
   cardExpiryYear  String?
   cardHolderName  String?
+  description     String?
 
   // Mobile money specific fields
   phoneNumber   String?

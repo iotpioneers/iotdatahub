@@ -14,7 +14,7 @@ const passwordValidation = z
       const hasNumber = /\d/.test(password);
       // Check for at least one special character
       const hasSpecialChar = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(
-        password
+        password,
       );
 
       return hasUppercase && hasLowercase && hasNumber && hasSpecialChar;
@@ -22,7 +22,7 @@ const passwordValidation = z
     {
       message:
         "Password must include uppercase and lowercase letter, number, and a special character",
-    }
+    },
   );
 
 // The schema for the user data
@@ -110,7 +110,7 @@ const deviceBaseSchema = {
     .string()
     .regex(
       /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
-      "Invalid IP address"
+      "Invalid IP address",
     )
     .optional(),
   macAddress: z
@@ -213,8 +213,8 @@ export const enterpriseSchema = z.object({
   // Contact Information
   contactName: z
     .string()
-    .min(1, "Contact name is required")
-    .max(255, "Contact name must be 255 characters or less"),
+    .min(1, "Full name is required")
+    .max(255, "Full name must be 255 characters or less"),
   jobTitle: z
     .string()
     .min(1, "Job title is required")
@@ -249,17 +249,24 @@ export const pricingPlanSchema = z.object({
   activation: z.boolean().optional(),
 });
 
+export const AddressSchema = z.object({
+  city: z.string(),
+  country: z.string(),
+  state: z.string(),
+  street: z.string(),
+});
+
 export const memberSchema = z.object({
-  name: z.string().min(1, "Name is required").max(255, {
-    message: "Name must be 255 characters or less",
-  }),
-  email: z.string().min(1, "Email is required").email("Invalid email format"),
+  id: z.string(),
+  name: z.string(),
+  email: z.string().email(),
   phone: z.string().optional(),
-  country: z.string().optional(),
-  avatar: z.string().url("Invalid URL format").optional(),
-  access: z.enum(["VIEWER", "COMMENTER", "EDITOR"], {
-    message: "Invalid member access",
-  }),
+  avatar: z.string().optional(),
+  address: AddressSchema.optional(),
+  access: z.enum(["VIEWER", "COMMENTER", "EDITOR"]),
+  organizationId: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
 });
 
 // Payment validation schema
@@ -282,7 +289,7 @@ export const paymentSchema = z.object({
     .optional(),
   provider: z.enum(["MTN", "AIRTEL"]).optional(),
 
-  // Organization ID is optional since some users might not belong to an organization
+  pricingTierId: z.string(),
   organizationId: z.string().optional(),
 });
 

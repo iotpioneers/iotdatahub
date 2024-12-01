@@ -80,6 +80,7 @@
     "lucide-react": "^0.395.0",
     "material-ui-popup-state": "^5.1.2",
     "mongodb": "^6.8.0",
+    "mongoose": "^8.8.3",
     "mui-one-time-password-input": "^2.0.3",
     "nanoid": "^5.0.7",
     "next": "^14.2.15",

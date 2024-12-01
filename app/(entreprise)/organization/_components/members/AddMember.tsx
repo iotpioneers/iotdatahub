@@ -20,7 +20,8 @@ import Grid from "@mui/material/Grid";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import { Callout } from "@radix-ui/themes";
-import { Member, AddMemberProps } from "@/types";
+import { AddMemberProps } from "@/types";
+import { EmployeeMember } from "@/types/employees-member";
 import ErrorMessage from "@/components/ErrorMessage";
 import UploadImage from "@/components/dashboard/account/UploadImage";
 
@@ -61,18 +62,17 @@ const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
   const [error, setError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [access, setAccess] = useState<"VIEWER" | "COMMENTER" | "EDITOR">(
-    "VIEWER"
+    "VIEWER",
   );
   const [showResult, setShowResult] = React.useState(false);
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;
     }
-
     setShowResult(false);
   };
 
@@ -97,6 +97,12 @@ const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
       const memberData = {
         ...data,
         image: avatarUrl || "",
+        address: {
+          street: data.address?.street || "",
+          city: data.address?.city || "",
+          state: data.address?.state || "",
+          country: data.address?.country || "",
+        },
       };
 
       const response = await fetch("/api/organizations/members/new", {
@@ -114,7 +120,7 @@ const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
         throw new Error(errorData.error);
       }
 
-      const result: Member = await response.json();
+      const result: EmployeeMember = await response.json();
 
       if (result) {
         onNewMember(result);
@@ -210,15 +216,6 @@ const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
                   <TextField
                     fullWidth
                     margin="normal"
-                    label="Country"
-                    {...register("country")}
-                  />
-                  <ErrorMessage>{errors.country?.message}</ErrorMessage>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    margin="normal"
                     select
                     label="Access"
                     value={access}
@@ -229,7 +226,7 @@ const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
                         | "COMMENTER"
                         | "EDITOR";
                       setAccess(selectedAccess);
-                      setValue("access", selectedAccess); // Update form value
+                      setValue("access", selectedAccess);
                     }}
                     required
                   >
@@ -241,6 +238,52 @@ const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
                     ))}
                   </TextField>
                 </Grid>
+
+                {/* Address Fields */}
+                <Grid item xs={12}>
+                  <Typography variant="h6" gutterBottom>
+                    Address Information
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    margin="normal"
+                    label="Street Address"
+                    {...register("address.street")}
+                  />
+                  <ErrorMessage>{errors.address?.street?.message}</ErrorMessage>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    fullWidth
+                    margin="normal"
+                    label="City"
+                    {...register("address.city")}
+                  />
+                  <ErrorMessage>{errors.address?.city?.message}</ErrorMessage>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    fullWidth
+                    margin="normal"
+                    label="State"
+                    {...register("address.state")}
+                  />
+                  <ErrorMessage>{errors.address?.state?.message}</ErrorMessage>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    fullWidth
+                    margin="normal"
+                    label="Country"
+                    {...register("address.country")}
+                  />
+                  <ErrorMessage>
+                    {errors.address?.country?.message}
+                  </ErrorMessage>
+                </Grid>
+
                 <Grid item xs={12} sm={6}>
                   <Typography variant="body1" gutterBottom>
                     Image

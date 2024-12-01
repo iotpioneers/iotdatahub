@@ -1,7 +1,6 @@
-// C:\Users\emash\IoTDataHub\app\api\auth\authOptions.ts
-
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import GitHubProvider from "next-auth/providers/github";
 import { PrismaClient, Role } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { AuthOptions } from "next-auth";
@@ -54,6 +53,10 @@ const authOptions: AuthOptions = {
     signIn: "/login",
   },
   providers: [
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID!,
+      clientSecret: process.env.GITHUB_SECRET!,
+    }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
@@ -84,15 +87,16 @@ const authOptions: AuthOptions = {
       async authorize(credentials): Promise<any> {
         try {
           if (!credentials) {
-            throw new Error("Please provide credentials.");
-          }
-          const user = await login(credentials);
-          if (!user) {
             return null;
           }
+          const user = await login(credentials);
+
+          console.log("User ", user);
+
           return user;
         } catch (error) {
-          throw error;
+          console.error("Login error:", error);
+          return null;
         }
       },
     }),

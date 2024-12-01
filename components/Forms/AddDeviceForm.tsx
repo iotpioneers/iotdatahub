@@ -43,7 +43,7 @@ const deviceSchema = Yup.object().shape({
   deviceType: Yup.string()
     .oneOf(
       deviceTypes.map((type) => type.value),
-      "Invalid device type"
+      "Invalid device type",
     )
     .required("Device type is required"),
   channelId: Yup.string().required("Channel selection is required"),
@@ -56,7 +56,7 @@ const deviceSchema = Yup.object().shape({
       test: (value) => {
         if (!value) return true;
         return /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
-          value
+          value,
         );
       },
       message: "Please enter a valid IPv4 address",
@@ -106,7 +106,7 @@ const AddDeviceFormComponent: React.FC = () => {
 
   const { data: channels, error: channelsError } = useSWR<Channel[], Error>(
     "/api/channels",
-    fetcher
+    fetcher,
   );
 
   const initialValues = {
@@ -129,7 +129,7 @@ const AddDeviceFormComponent: React.FC = () => {
 
   const handleSubmit = async (
     values: typeof initialValues,
-    { setSubmitting, setFieldError }: any
+    { setSubmitting, setFieldError }: any,
   ) => {
     setLoading(true);
     try {
@@ -151,10 +151,10 @@ const AddDeviceFormComponent: React.FC = () => {
         throw new Error(data.error || "Failed to create device");
       }
 
-      router.push("/dashboard/devices");
+      router.push("/organization/dashboard");
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "An unknown error occurred"
+        err instanceof Error ? err.message : "An unknown error occurred",
       );
     } finally {
       setLoading(false);
@@ -376,7 +376,7 @@ const AddDeviceFormComponent: React.FC = () => {
                             fullWidth
                             error={Boolean(
                               touched.location?.latitude &&
-                                errors.location?.latitude
+                                errors.location?.latitude,
                             )}
                           >
                             <InputLabel htmlFor="location.latitude">
@@ -405,7 +405,7 @@ const AddDeviceFormComponent: React.FC = () => {
                             fullWidth
                             error={Boolean(
                               touched.location?.longitude &&
-                                errors.location?.longitude
+                                errors.location?.longitude,
                             )}
                           >
                             <InputLabel htmlFor="location.longitude">
@@ -434,7 +434,7 @@ const AddDeviceFormComponent: React.FC = () => {
                             fullWidth
                             error={Boolean(
                               touched.location?.altitude &&
-                                errors.location?.altitude
+                                errors.location?.altitude,
                             )}
                           >
                             <InputLabel htmlFor="location.altitude">

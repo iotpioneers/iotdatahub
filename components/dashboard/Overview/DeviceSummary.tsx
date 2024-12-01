@@ -8,19 +8,20 @@ import Typography from "@mui/material/Typography";
 import { ArrowDown as ArrowDownIcon } from "@phosphor-icons/react/dist/ssr/ArrowDown";
 import { ArrowUp as ArrowUpIcon } from "@phosphor-icons/react/dist/ssr/ArrowUp";
 import { MdOutlinePermDeviceInformation } from "react-icons/md";
+import { Device } from "@/types";
 
 export interface BudgetProps {
   diff?: number;
   trend: "up" | "down";
   sx?: SxProps;
-  value: string;
+  devices: Device[] | [];
 }
 
 export function DeviceSummary({
   diff,
   trend,
   sx,
-  value,
+  devices,
 }: BudgetProps): React.JSX.Element {
   const TrendIcon = trend === "up" ? ArrowUpIcon : ArrowDownIcon;
   const trendColor =
@@ -41,7 +42,7 @@ export function DeviceSummary({
               <Typography color="text.secondary" variant="overline">
                 Device Summary
               </Typography>
-              <Typography variant="h4">{value}</Typography>
+              <Typography variant="h4">{devices.length}</Typography>
             </Stack>
             <Avatar
               sx={{

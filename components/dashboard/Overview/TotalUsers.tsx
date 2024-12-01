@@ -8,19 +8,20 @@ import Typography from "@mui/material/Typography";
 import { ArrowDown as ArrowDownIcon } from "@phosphor-icons/react/dist/ssr/ArrowDown";
 import { ArrowUp as ArrowUpIcon } from "@phosphor-icons/react/dist/ssr/ArrowUp";
 import { Users as UsersIcon } from "@phosphor-icons/react/dist/ssr/Users";
+import { EmployeeMember } from "@/types/employees-member";
 
 export interface TotalCustomersProps {
   diff?: number;
   trend: "up" | "down";
   sx?: SxProps;
-  value: string;
+  members: EmployeeMember[] | [];
 }
 
 export function TotalUsers({
   diff,
   trend,
   sx,
-  value,
+  members,
 }: TotalCustomersProps): React.JSX.Element {
   const TrendIcon = trend === "up" ? ArrowUpIcon : ArrowDownIcon;
   const trendColor =
@@ -41,7 +42,7 @@ export function TotalUsers({
               <Typography color="text.secondary" variant="overline">
                 Total Users
               </Typography>
-              <Typography variant="h4">{value}</Typography>
+              <Typography variant="h4">{members.length}</Typography>
             </Stack>
             <Avatar
               sx={{

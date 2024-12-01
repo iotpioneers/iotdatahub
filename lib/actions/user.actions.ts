@@ -4,14 +4,17 @@ import { parseStringify } from "../utils";
 import { liveblocks } from "../liveblocks";
 import { UserData } from "@/types/user";
 import axios from "axios";
+import { connectToDB } from "../mongoose";
 
 export const getUsers = async ({ userIds }: { userIds: string[] }) => {
   try {
+    connectToDB();
+
     const response = await axios.post(
       process.env.NEXT_PUBLIC_BASE_URL + "/api/users/emails",
       {
         userIds,
-      }
+      },
     );
 
     if (response.status !== 200) {
@@ -30,7 +33,7 @@ export const getUsers = async ({ userIds }: { userIds: string[] }) => {
     }));
 
     const sortedUsers = userIds.map((email) =>
-      users.find((user: UserData) => user.email === email)
+      users.find((user: UserData) => user.email === email),
     );
 
     return parseStringify(sortedUsers);
@@ -49,17 +52,19 @@ export const getChannelRoomUsers = async ({
   text: string;
 }) => {
   try {
+    connectToDB();
+
     const room = await liveblocks.getRoom(roomId);
 
     const users = Object.keys(room.usersAccesses).filter(
-      (email) => email !== userEmail
+      (email) => email !== userEmail,
     );
 
     if (text.length) {
       const lowerCaseText = text.toLowerCase();
 
       const filteredUsers = users.filter((email: string) =>
-        email.toLowerCase().includes(lowerCaseText)
+        email.toLowerCase().includes(lowerCaseText),
       );
 
       return parseStringify(filteredUsers);

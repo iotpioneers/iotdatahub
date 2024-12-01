@@ -1,5 +1,3 @@
-// C:\Users\emash\IoTDataHub\app\api\register\route.ts
-
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
@@ -17,7 +15,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     if (!validation.success) {
       return NextResponse.json(
         validation.error.errors.map((err) => err.message),
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -38,7 +36,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     if (exist) {
       return NextResponse.json(
         { message: "Email already in use" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -58,7 +56,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     return NextResponse.json(
       { message: "Registration successful", user },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     if (error instanceof Error) {

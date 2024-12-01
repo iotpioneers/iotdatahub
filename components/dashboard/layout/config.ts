@@ -10,7 +10,7 @@ export const navItems = [
   {
     key: "user-management",
     title: "User Management",
-    href: "/organization/dashboard/customers",
+    href: "/organization/dashboard/users",
     icon: "users",
   },
   {

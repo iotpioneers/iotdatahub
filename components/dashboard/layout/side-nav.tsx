@@ -52,20 +52,6 @@ export function SideNav(): React.JSX.Element {
       }}
     >
       <Stack spacing={2} sx={{ p: 3 }}>
-        <Box component={RouterLink} href="/" sx={{ display: "inline-flex" }}>
-          <Link
-            href="/"
-            className="grid py-2 justify-center items-center text-orange-50 px-2"
-          >
-            <Image
-              src="/IOT_DATA_HUB.png"
-              alt="logo"
-              width={96}
-              height={96}
-              className="cursor-pointer"
-            />
-          </Link>
-        </Box>
         <Box
           sx={{
             alignItems: "center",
@@ -77,15 +63,18 @@ export function SideNav(): React.JSX.Element {
             p: "4px 12px",
           }}
         >
-          <Box sx={{ flex: "1 1 auto" }}>
-            <Typography color="var(--mui-palette-neutral-400)" variant="body2">
-              Workspace
-            </Typography>
-            <Typography color="inherit" variant="subtitle1">
+          <Link href="/" className="flex py-2 justify-center items-center px-2">
+            <Image
+              src="/IOT_DATA_HUB.png"
+              alt="logo"
+              width={48}
+              height={48}
+              className="cursor-pointer"
+            />
+            <Typography variant="subtitle1" color={"orange"}>
               IoT Data Hub
             </Typography>
-          </Box>
-          <CaretUpDownIcon />
+          </Link>
         </Box>
       </Stack>
       <Divider sx={{ borderColor: "var(--mui-palette-neutral-700)" }} />

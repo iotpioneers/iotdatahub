@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import React, { useState } from "react";
-import { configureStore } from "@reduxjs/toolkit";
+import { getSession, signIn, useSession } from "next-auth/react";
 import { useSelector } from "react-redux";
-import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { configureStore } from "@reduxjs/toolkit";
 
 // material-ui
 import { useTheme } from "@mui/material/styles";
@@ -37,8 +39,7 @@ import LoadingProgressBar from "@/components/LoadingProgressBar";
 // assets
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import axios from "axios";
 
 // ============================|| IoTDataHub - LOGIN ||============================ //
 
@@ -65,12 +66,17 @@ const AuthLogin = ({ ...others }) => {
   const customization = useSelector((state: RootState) => state.customization);
   const [loading, setLoading] = useState(false);
   const [isGoogleSign, setIsGoogleSign] = useState(false);
+  const [isGithubSign, setIsGithubSign] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
+
+  const { data } = useSession();
+
+  console.log("User session data", data);
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -99,6 +105,57 @@ const AuthLogin = ({ ...others }) => {
     });
   };
 
+  const githubHandler = async () => {
+    setIsGithubSign(true);
+    try {
+      const result = await signIn("github", {
+        callbackUrl: "/verify-account",
+        redirect: false,
+      });
+      if (result && result.error) {
+        if (result?.error === "OAuthAccountNotLinked") {
+          setError(
+            "This email is already associated with another account. Please sign in using your original method.",
+          );
+          setOpen(true);
+          return;
+        }
+        setError(result.error);
+        setOpen(true);
+      } else if (result && result.ok) {
+        // Get the session to access user data
+        const session = await getSession();
+
+        if (!session?.user) {
+          setError("Failed to get user session");
+          setOpen(true);
+        }
+
+        // Send verification email
+        const emailResponse = await axios.post("/api/email/send", {
+          userFullName: session?.user.name || "User",
+          userEmail: session?.user.email,
+        });
+
+        if (emailResponse.status === 200) {
+          // Store user data in localStorage
+          localStorage.setItem("userFullName", session?.user.name || "User");
+          localStorage.setItem("userEmail", session?.user.email || "");
+
+          router.push("/verify-account");
+        } else {
+          setError("Failed to send verification email");
+          setOpen(true);
+        }
+      }
+    } catch (error) {
+      setError("Failed to sign in with GitHub");
+      setOpen(true);
+    } finally {
+      setIsGithubSign(false);
+    }
+  };
+
   const loginUser = async (data: FormData) => {
     setLoading(true);
     try {
@@ -109,14 +166,11 @@ const AuthLogin = ({ ...others }) => {
       });
 
       if (response?.error) {
-        setError(
-          response.error || "Login failed. Please check your credentials.",
-        );
+        setError(response.error);
         setOpen(true);
-        return;
+      } else if (response?.ok) {
+        router.push("/dashboard");
       }
-
-      router.push("/dashboard");
     } catch (error) {
       setError("An unexpected error occurred. Please try again.");
       setOpen(true);
@@ -168,11 +222,42 @@ const AuthLogin = ({ ...others }) => {
                   style={{ marginRight: matchDownSM ? 8 : 16 }}
                 />
               </Box>
-              Sign in with Google
+              Google
             </Button>
           </AnimateButton>
           {isGoogleSign && <LoadingProgressBar />}
         </Grid>
+
+        <Grid item xs={12}>
+          <AnimateButton>
+            <Button
+              type="button"
+              disableElevation
+              fullWidth
+              onClick={githubHandler}
+              size="large"
+              variant="outlined"
+              sx={{
+                color: "grey.700",
+                backgroundColor: theme.palette.grey[50],
+                borderColor: theme.palette.grey[100],
+              }}
+            >
+              <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
+                <img
+                  src="/socials/github.svg"
+                  alt="github"
+                  width={16}
+                  height={16}
+                  style={{ marginRight: matchDownSM ? 8 : 16 }}
+                />
+              </Box>
+              GitHub
+            </Button>
+          </AnimateButton>
+          {isGithubSign && <LoadingProgressBar />}
+        </Grid>
+
         <Grid item xs={12}>
           <Box
             sx={{

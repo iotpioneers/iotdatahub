@@ -21,13 +21,7 @@ import { navigation } from "@/constants";
 import AngledButton from "./components/design/AngledButton";
 import MenuSvg from "./components/design/svg/MenuSvg";
 import LoadingProgressBar from "../LoadingProgressBar";
-import Logo from "./Logo";
-
-const logoStyle = {
-  width: "140px",
-  height: "auto",
-  cursor: "pointer",
-};
+import { Logo } from "./Logo";
 
 interface AppAppBarProps {
   mode: PaletteMode;

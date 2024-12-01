@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 
-// material-ui
+// Material UI
 import {
   Card,
   CardContent,
@@ -14,6 +14,7 @@ import {
   Divider,
   Snackbar,
   Alert,
+  PaletteMode,
 } from "@mui/material";
 
 // assets
@@ -43,7 +44,7 @@ const RegistrationFlowComponent: React.FC = () => {
 
   const handleCloseSnackbar = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;

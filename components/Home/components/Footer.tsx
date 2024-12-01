@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { Email, WhatsApp } from "@mui/icons-material";
 import { socials } from "@/constants";
-import Logo from "../Logo";
+import { Logo } from "../Logo";
 
 const Footer = () => {
   const theme = useTheme();

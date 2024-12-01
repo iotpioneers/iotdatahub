@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   if (!userFound) {
     return NextResponse.json(
       { error: "Your session has expired, please sign in again" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       userId: user.info.email,
       groupIds: [],
     },
-    { userInfo: user.info }
+    { userInfo: user.info },
   );
 
   return new Response(body, { status });

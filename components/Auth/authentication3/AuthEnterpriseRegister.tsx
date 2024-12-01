@@ -57,15 +57,15 @@ const schema = Yup.object().shape({
   industry: Yup.string()
     .oneOf(
       ["manufacturing", "healthcare", "agriculture", "energy"],
-      "Invalid industry"
+      "Invalid industry",
     )
     .required("Industry is required"),
   employeeCount: Yup.string()
     .oneOf(["<10", "10-50", "50-100", ">100"], "Invalid employee count")
     .required("Number of employees is required"),
   contactName: Yup.string()
-    .max(255, "Contact name must be at most 255 characters")
-    .required("Contact Name is required"),
+    .max(255, "Full name must be at most 255 characters")
+    .required("Full Name is required"),
   jobTitle: Yup.string()
     .max(255, "Job title must be at most 255 characters")
     .required("Job title is required"),
@@ -86,13 +86,13 @@ const AuthEnterpriseRegister: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<CountryType | null>(
-    null
+    null,
   );
   const router = useRouter();
 
   const postEnterprise = async (
     url: string,
-    enterpriseData: EnterpriseData
+    enterpriseData: EnterpriseData,
   ) => {
     const response = await fetch(url, {
       method: "POST",
@@ -101,6 +101,8 @@ const AuthEnterpriseRegister: React.FC = () => {
       },
       body: JSON.stringify(enterpriseData),
     });
+
+    console.log("response", response);
 
     if (!response.ok) {
       const error = await response.json();
@@ -117,7 +119,7 @@ const AuthEnterpriseRegister: React.FC = () => {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       shouldRetryOnError: false,
-    }
+    },
   );
 
   const steps = [
@@ -136,7 +138,7 @@ const AuthEnterpriseRegister: React.FC = () => {
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;
@@ -156,19 +158,19 @@ const AuthEnterpriseRegister: React.FC = () => {
           ...data,
           phone: phoneNumber,
           country: selectedCountry?.label || "",
-        })
+        }),
       );
-      router.push("/pricing");
+      router.push("/organization/dashboard");
     } catch (error) {
       console.error(
         error instanceof Error
           ? error.message
-          : "Failed to create enterprise account"
+          : "Failed to create enterprise account",
       );
       setError(
         error instanceof Error
           ? error.message
-          : "Failed to create enterprise account"
+          : "Failed to create enterprise account",
       );
       setOpen(true);
     } finally {
@@ -235,7 +237,7 @@ const AuthEnterpriseRegister: React.FC = () => {
                   <FormControl
                     fullWidth
                     error={Boolean(
-                      touched.organizationName && errors.organizationName
+                      touched.organizationName && errors.organizationName,
                     )}
                     sx={{ ...theme.typography.customInput }}
                   >
@@ -287,7 +289,7 @@ const AuthEnterpriseRegister: React.FC = () => {
                   <FormControl
                     fullWidth
                     error={Boolean(
-                      touched.employeeCount && errors.employeeCount
+                      touched.employeeCount && errors.employeeCount,
                     )}
                     sx={{ ...theme.typography.customInput }}
                   >
@@ -323,7 +325,7 @@ const AuthEnterpriseRegister: React.FC = () => {
                     sx={{ ...theme.typography.customInput }}
                   >
                     <InputLabel htmlFor="outlined-adornment-contact-name">
-                      Contact Name
+                      Full Name
                     </InputLabel>
                     <OutlinedInput
                       id="outlined-adornment-contact-name"
@@ -534,8 +536,8 @@ const AuthEnterpriseRegister: React.FC = () => {
                   {isSubmitting
                     ? "Submitting..."
                     : activeStep === steps.length - 1
-                    ? "Submit"
-                    : "Next"}
+                      ? "Submit"
+                      : "Next"}
                 </Button>
               </AnimateButton>
             </Box>

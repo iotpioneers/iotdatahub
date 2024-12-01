@@ -15,6 +15,7 @@ import { User as UserIcon } from "@phosphor-icons/react/dist/ssr/User";
 import { authClient } from "@/lib/auth/client";
 import { logger } from "@/lib/default-logger";
 import { useUser } from "@/hooks/use-user";
+import { useSession } from "next-auth/react";
 
 export interface UserPopoverProps {
   anchorEl: Element | null;
@@ -27,6 +28,8 @@ export function UserPopover({
   onClose,
   open,
 }: UserPopoverProps): React.JSX.Element {
+  const { data } = useSession();
+
   const { checkSession } = useUser();
 
   const router = useRouter();
@@ -60,9 +63,9 @@ export function UserPopover({
       slotProps={{ paper: { sx: { width: "240px" } } }}
     >
       <Box sx={{ p: "16px 20px " }}>
-        <Typography variant="subtitle1">Sofia Rivers</Typography>
+        <Typography variant="subtitle1">{data?.user.name}</Typography>
         <Typography color="text.secondary" variant="body2">
-          sofia.rivers@devias.io
+          {data?.user.email}
         </Typography>
       </Box>
       <Divider />

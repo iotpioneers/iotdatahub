@@ -1,5 +1,6 @@
 import { BaseMetadata } from "@liveblocks/client";
 import { ThreadData } from "@liveblocks/node";
+import { EmployeeMember } from "./employees-member";
 
 export interface ApiKey {
   id: string;
@@ -64,19 +65,13 @@ export interface Organization {
   type: string;
   updatedAt: Date;
   userId: string;
-}
-
-export interface Member {
-  country: string;
-  avatar?: string;
-  access: string;
-  createdAt: Date;
-  id: string;
-  name: string;
-  email: string;
-  updatedAt: Date;
-  userId: string;
-  organizationId: string;
+  users: EmployeeMember[] | [];
+  channels: Channel[] | [];
+  dataPoint: DataPoint[] | [];
+  field: Field[] | [];
+  Device: Device[] | [];
+  subscription: [] | [];
+  apiKey: ApiKey[] | [];
 }
 
 export interface PricingPlanType {
@@ -107,7 +102,7 @@ export interface UserSubscriptionData {
 }
 
 export interface AddMemberProps {
-  onNewMember: (newMember: Member) => void;
+  onNewMember: (newMember: EmployeeMember) => void;
 }
 
 /* eslint-disable no-unused-vars */

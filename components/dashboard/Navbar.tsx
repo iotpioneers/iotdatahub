@@ -16,7 +16,7 @@ import Tooltip from "@mui/material/Tooltip";
 
 // assets
 import { IconMenu2 } from "@tabler/icons-react";
-import Logo from "../Home/Logo";
+import { Logo } from "../Home/Logo";
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 

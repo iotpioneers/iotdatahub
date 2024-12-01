@@ -14,6 +14,7 @@ import {
 } from "@/types";
 import axios from "axios";
 import prisma from "@/prisma/client";
+import { connectToDB } from "../mongoose";
 
 export const createChannelRoom = async ({
   roomId,
@@ -22,6 +23,8 @@ export const createChannelRoom = async ({
   title,
 }: CreateChannelRoomParams) => {
   try {
+    connectToDB();
+
     const metadata = {
       creatorId: userId,
       email,
@@ -63,6 +66,8 @@ export const getRoomAccess = async ({
   userEmail: string;
 }) => {
   try {
+    connectToDB();
+
     const room = await liveblocks.getRoom(roomId);
 
     return parseStringify(room);
@@ -74,12 +79,14 @@ export const getRoomAccess = async ({
 
 export const updateChannelRoomData = async (
   channelId: string,
-  title: string
+  title: string,
 ) => {
   try {
+    connectToDB();
+
     const response = await axios.patch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/${channelId}`,
-      { name: title }
+      { name: title },
     );
 
     if (response.status !== 200) {
@@ -108,7 +115,7 @@ export const updateChannelRoomData = async (
     });
 
     revalidatePath(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/channels/${channelId}`
+      `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/channels/${channelId}`,
     );
 
     return parseStringify(updateChannelRoom);
@@ -126,10 +133,12 @@ export const updateChannelAccess = async ({
   updatedBy,
 }: ShareChannelParams) => {
   try {
+    connectToDB();
+
     const usersAccesses: RoomAccesses = {};
     collaborators.forEach((collaborator) => {
       usersAccesses[collaborator.email] = getAccessType(
-        collaborator.userType
+        collaborator.userType,
       ) as ChannelAccessType;
     });
 
@@ -232,7 +241,7 @@ export const updateChannelAccess = async ({
     }
 
     revalidatePath(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/channels/${roomId}`
+      `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/channels/${roomId}`,
     );
     return parseStringify(room);
   } catch (error) {
@@ -248,6 +257,8 @@ export const removeCollaborator = async ({
   email: string;
 }) => {
   try {
+    connectToDB();
+
     const room = await liveblocks.getRoom(roomId);
 
     if (room.metadata.email === email) {
@@ -290,7 +301,7 @@ export const removeCollaborator = async ({
     });
 
     revalidatePath(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/channels/${roomId}`
+      `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/channels/${roomId}`,
     );
     return parseStringify(updatedRoom);
   } catch (error) {
@@ -300,10 +311,12 @@ export const removeCollaborator = async ({
 
 export const deleteChannel = async (channelId: string) => {
   try {
+    connectToDB();
+
     const room = await liveblocks.getRoom(channelId);
 
     const response = await axios.delete(
-      process.env.NEXT_PUBLIC_BASE_URL + `/api/channels/${channelId}`
+      process.env.NEXT_PUBLIC_BASE_URL + `/api/channels/${channelId}`,
     );
 
     if (response.status !== 200) {
@@ -337,9 +350,11 @@ export const deleteChannel = async (channelId: string) => {
 
 export const updateRoomDefaultAccess = async (
   roomId: string,
-  defaultAccesses: RoomPermission
+  defaultAccesses: RoomPermission,
 ) => {
   try {
+    connectToDB();
+
     const room = await liveblocks.getRoom(roomId);
 
     const updatedRoom = await liveblocks.updateRoom(roomId, {

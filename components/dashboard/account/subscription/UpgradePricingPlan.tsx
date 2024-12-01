@@ -11,7 +11,7 @@ import { Loader2 } from "lucide-react";
 const UpgradePricingPlan = () => {
   const router = useRouter();
   const [subscriptions, setSubscriptions] = React.useState<PricingPlanType[]>(
-    []
+    [],
   );
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [loadingPlanId, setLoadingPlanId] = React.useState<string | null>(null);
@@ -21,7 +21,7 @@ const UpgradePricingPlan = () => {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`,
         );
         setSubscriptions(response.data);
       } catch (error) {
@@ -40,7 +40,7 @@ const UpgradePricingPlan = () => {
     let path = "/register";
     if (item.price !== 0) {
       path = item.name.includes("Enterprise")
-        ? "/dashboard/organization/contactsales"
+        ? "/organization/dashboard/contactsales"
         : `/dashboard/subscription/${item.id}`;
     }
 
@@ -85,7 +85,7 @@ const UpgradePricingPlan = () => {
             >
               {loadingPlanId === item.id ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 justify-center items-center animate-spin" />
                   Loading...
                 </>
               ) : (
@@ -93,10 +93,10 @@ const UpgradePricingPlan = () => {
                 (item.name === "Enterprise"
                   ? "Contact us"
                   : item.price === 0
-                  ? "Sign Up free"
-                  : item.name.includes("Enterprise")
-                  ? "Contact sales"
-                  : "Try Premium")
+                    ? "Sign Up free"
+                    : item.name.includes("Enterprise")
+                      ? "Contact sales"
+                      : "Try Premium")
               )}
             </Button>
           </div>

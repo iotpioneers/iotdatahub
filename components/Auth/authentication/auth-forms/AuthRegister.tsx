@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { configureStore } from "@reduxjs/toolkit";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -53,6 +53,8 @@ const store = configureStore({ reducer });
 export type AppStore = typeof store;
 export type RootState = ReturnType<AppStore["getState"]>;
 
+const steps = ["Basic Information", "Contact Details", "Security"];
+
 type LevelType =
   | {
       label: string;
@@ -87,7 +89,7 @@ const schema = Yup.object().shape({
   password: Yup.string()
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-      "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
+      "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character",
     )
     .min(8)
     .max(255)
@@ -104,6 +106,7 @@ const AuthRegister = ({ ...others }) => {
   const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
   const customization = useSelector((state: RootState) => state.customization);
 
+  const [isGithubSign, setIsGithubSign] = useState(false);
   const [isGoogleSign, setIsGoogleSign] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -113,14 +116,65 @@ const AuthRegister = ({ ...others }) => {
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = React.useState(false);
   const [selectedCountry, setSelectedCountry] = useState<CountryType | null>(
-    null
+    null,
   );
   const [showCountryPhoneModal, setShowCountryPhoneModal] = useState(false);
   const [googleUserData, setGoogleUserData] = useState<GoogleUserData | null>(
-    null
+    null,
   );
 
   const router = useRouter();
+
+  const githubHandler = async () => {
+    setIsGithubSign(true);
+    try {
+      const result = await signIn("github", {
+        callbackUrl: "/verify-account",
+        redirect: false,
+      });
+      if (result && result.error) {
+        if (result?.error === "OAuthAccountNotLinked") {
+          setError(
+            "This email is already associated with another account. Please sign in using your original method.",
+          );
+          setOpen(true);
+          return;
+        }
+        setError(result.error);
+        setOpen(true);
+      } else if (result && result.ok) {
+        // Get the session to access user data
+        const session = await getSession();
+
+        if (!session?.user) {
+          setError("Failed to get user session");
+          setOpen(true);
+        }
+
+        // Send verification email
+        const emailResponse = await axios.post("/api/email/send", {
+          userFullName: session?.user.name || "User",
+          userEmail: session?.user.email,
+        });
+
+        if (emailResponse.status === 200) {
+          // Store user data in localStorage
+          localStorage.setItem("userFullName", session?.user.name || "User");
+          localStorage.setItem("userEmail", session?.user.email || "");
+
+          router.push("/verify-account");
+        } else {
+          setError("Failed to send verification email");
+          setOpen(true);
+        }
+      }
+    } catch (error) {
+      setError("Failed to sign in with GitHub");
+      setOpen(true);
+    } finally {
+      setIsGithubSign(false);
+    }
+  };
 
   const googleHandler = async () => {
     setIsGoogleSign(true);
@@ -188,7 +242,7 @@ const AuthRegister = ({ ...others }) => {
   };
 
   const handleMouseDownPassword = (
-    event: React.MouseEvent<HTMLButtonElement>
+    event: React.MouseEvent<HTMLButtonElement>,
   ) => {
     event.preventDefault();
   };
@@ -205,7 +259,7 @@ const AuthRegister = ({ ...others }) => {
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;
@@ -248,7 +302,7 @@ const AuthRegister = ({ ...others }) => {
       // Store user data in local storage for later use valid for 1 day
       localStorage.setItem(
         "userFullName",
-        data.firstname + " " + data.lastname
+        data.firstname + " " + data.lastname,
       );
       localStorage.setItem("userEmail", data.email);
 
@@ -295,7 +349,7 @@ const AuthRegister = ({ ...others }) => {
                 variant="h3"
                 mb={2}
               >
-                Enter your credentials to continue
+                Create an account
               </Typography>
             </Stack>
 
@@ -333,11 +387,42 @@ const AuthRegister = ({ ...others }) => {
                         style={{ marginRight: matchDownSM ? 8 : 16 }}
                       />
                     </Box>
-                    Sign up with Google
+                    Google
                   </Button>
                 </AnimateButton>
                 {isGoogleSign && <LoadingProgressBar />}
               </Grid>
+
+              <Grid item xs={12}>
+                <AnimateButton>
+                  <Button
+                    type="button"
+                    disableElevation
+                    fullWidth
+                    onClick={githubHandler}
+                    size="large"
+                    variant="outlined"
+                    sx={{
+                      color: "grey.700",
+                      backgroundColor: theme.palette.grey[50],
+                      borderColor: theme.palette.grey[100],
+                    }}
+                  >
+                    <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
+                      <img
+                        src="/socials/github.svg"
+                        alt="github"
+                        width={16}
+                        height={16}
+                        style={{ marginRight: matchDownSM ? 8 : 16 }}
+                      />
+                    </Box>
+                    GitHub
+                  </Button>
+                </AnimateButton>
+                {isGithubSign && <LoadingProgressBar />}
+              </Grid>
+
               <Grid item xs={12}>
                 <Box sx={{ alignItems: "center", display: "flex" }}>
                   <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
@@ -550,7 +635,7 @@ const AuthRegister = ({ ...others }) => {
                         <FormControl
                           fullWidth
                           error={Boolean(
-                            touched.phonenumber && errors.phonenumber
+                            touched.phonenumber && errors.phonenumber,
                           )}
                           sx={{ ...theme.typography.customInput }}
                         >
@@ -646,7 +731,7 @@ const AuthRegister = ({ ...others }) => {
                     <FormControl
                       fullWidth
                       error={Boolean(
-                        touched.confirmPassword && errors.confirmPassword
+                        touched.confirmPassword && errors.confirmPassword,
                       )}
                       sx={{ ...theme.typography.customInput }}
                     >
