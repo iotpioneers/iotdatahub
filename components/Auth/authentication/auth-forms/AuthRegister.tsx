@@ -47,13 +47,12 @@ import CountryList from "./CountryList";
 import CountryPhoneModal from "./CountryPhoneModal";
 import { Stack } from "@mui/material";
 import AuthCardWrapper from "../../AuthCardWrapper";
+import PasswordValidationPopup from "./PasswordValidationPopup";
 
 const store = configureStore({ reducer });
 
 export type AppStore = typeof store;
 export type RootState = ReturnType<AppStore["getState"]>;
-
-const steps = ["Basic Information", "Contact Details", "Security"];
 
 type LevelType =
   | {
@@ -122,6 +121,8 @@ const AuthRegister = ({ ...others }) => {
   const [googleUserData, setGoogleUserData] = useState<GoogleUserData | null>(
     null,
   );
+  const [showPasswordValidationPopup, setShowPasswordValidationPopup] =
+    useState(false);
 
   const router = useRouter();
 
@@ -251,6 +252,9 @@ const AuthRegister = ({ ...others }) => {
     const temp = strengthIndicator(value);
     setStrength(temp);
     setLevel(strengthColor(temp));
+    if (temp > 0 && temp < 5) {
+      setShowPasswordValidationPopup(true);
+    }
   };
 
   useEffect(() => {
@@ -266,6 +270,8 @@ const AuthRegister = ({ ...others }) => {
     }
     setOpen(false);
   };
+
+  console.log("level", level);
 
   const registerUser = async (data: FormData) => {
     const phoneCode = selectedCountry?.phone || "";
@@ -674,7 +680,7 @@ const AuthRegister = ({ ...others }) => {
                       label="Password"
                       autoComplete="off"
                       onBlur={handleBlur}
-                      onChange={(e) => {
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         handleChange(e);
                         changePassword(e.target.value);
                       }}
@@ -816,7 +822,7 @@ const AuthRegister = ({ ...others }) => {
               onClose={() => setShowCountryPhoneModal(false)}
               onSubmit={handleCountryPhoneSubmit}
             />
-
+            {showPasswordValidationPopup && <PasswordValidationPopup />}
             <Grid item xs={12} py={3}>
               <Divider />
             </Grid>
