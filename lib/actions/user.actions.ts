@@ -4,11 +4,9 @@ import { parseStringify } from "../utils";
 import { liveblocks } from "../liveblocks";
 import { UserData } from "@/types/user";
 import axios from "axios";
-import { connectToDB } from "../mongoose";
 
 export const getUsers = async ({ userIds }: { userIds: string[] }) => {
   try {
-    connectToDB();
 
     const response = await axios.post(
       process.env.NEXT_PUBLIC_BASE_URL + "/api/users/emails",
@@ -52,7 +50,6 @@ export const getChannelRoomUsers = async ({
   text: string;
 }) => {
   try {
-    connectToDB();
 
     const room = await liveblocks.getRoom(roomId);
 

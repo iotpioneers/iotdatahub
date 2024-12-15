@@ -76,11 +76,12 @@ export const channelSchema = z.object({
     .min(1, "Name is required")
     .max(255, { message: "Name must be 255 characters or less" }),
 
-  description: z
-    .string()
-    .min(1, "Description is required")
-    .max(65535, { message: "Description must be 65535 characters or less" }),
+  description: z.string().optional(),
   fields: z.array(z.string()).min(1, "At least one field is required"),
+  hardware: z
+    .enum(["ESP32", "ESP8266", "Arduino", "Raspberry Pi", "Other"])
+    .optional(),
+  connectionType: z.enum(["WiFi", "Ethernet", "Satellite", "GSM"]).optional(),
   access: z.string().optional(),
 });
 
@@ -128,8 +129,13 @@ const deviceBaseSchema = {
 
 // Schema for creating a new device
 export const deviceCreateSchema = z.object({
-  ...deviceBaseSchema,
   channelId: z.string().min(1, "Channel is required"),
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(255, { message: "Name must be 255 characters or less" }),
+  description: z.string().optional().nullable().default(null),
+  deviceType: z.enum(["SENSOR", "ACTUATOR", "GATEWAY", "CONTROLLER", "OTHER"]),
 });
 
 // Schema for updating a device

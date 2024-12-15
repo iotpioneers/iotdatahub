@@ -168,13 +168,13 @@ async function findOrCreateUser(
   throw new Error("User not found");
 }
 
-async function getPricingTier(tierName: string) {
+export async function getPricingTier(tierName: string) {
   return await prisma.pricingTier.findFirst({
     where: { name: tierName },
   });
 }
 
-async function updateOrCreateSubscription(user: any, pricingTier: any) {
+export async function updateOrCreateSubscription(user: any, pricingTier: any) {
   const currentDate = new Date();
   const subscriptionEndDate = getSubscriptionEndDate(
     currentDate,

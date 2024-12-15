@@ -86,7 +86,7 @@ const UpgradePricingPlan = () => {
               {loadingPlanId === item.id ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 justify-center items-center animate-spin" />
-                  Loading...
+                  Connecting
                 </>
               ) : (
                 item.activation &&

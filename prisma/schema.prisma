@@ -277,6 +277,8 @@ model Channel {
   id              String          @id @default(auto()) @map("_id") @db.ObjectId
   name            String
   description     String?
+  connectionType  String?
+  hardware        String?
   access          Access          @default(PRIVATE)
   fields          Field[]
   dataPoints      DataPoint[]

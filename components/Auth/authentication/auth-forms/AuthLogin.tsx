@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React, { useState } from "react";
-import { getSession, signIn, useSession } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { configureStore } from "@reduxjs/toolkit";
@@ -74,10 +74,6 @@ const AuthLogin = ({ ...others }) => {
 
   const router = useRouter();
 
-  const { data } = useSession();
-
-  console.log("User session data", data);
-
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -131,21 +127,23 @@ const AuthLogin = ({ ...others }) => {
           setOpen(true);
         }
 
-        // Send verification email
-        const emailResponse = await axios.post("/api/email/send", {
-          userFullName: session?.user.name || "User",
-          userEmail: session?.user.email,
-        });
+        if (!session?.user.emailVerified) {
+          // Send verification email
+          const emailResponse = await axios.post("/api/email/send", {
+            userFullName: session?.user.name || "User",
+            userEmail: session?.user.email,
+          });
 
-        if (emailResponse.status === 200) {
-          // Store user data in localStorage
-          localStorage.setItem("userFullName", session?.user.name || "User");
-          localStorage.setItem("userEmail", session?.user.email || "");
+          if (emailResponse.status === 200) {
+            // Store user data in localStorage
+            localStorage.setItem("userFullName", session?.user.name || "User");
+            localStorage.setItem("userEmail", session?.user.email || "");
 
-          router.push("/verify-account");
-        } else {
-          setError("Failed to send verification email");
-          setOpen(true);
+            router.push("/verify-account");
+          } else {
+            setError("Failed to send verification email");
+            setOpen(true);
+          }
         }
       }
     } catch (error) {
@@ -197,65 +195,73 @@ const AuthLogin = ({ ...others }) => {
         </Alert>
       </Snackbar>
 
-      <Grid container direction="column" justifyContent="center" spacing={2}>
-        <Grid item xs={12}>
-          <AnimateButton>
-            <Button
-              type="button"
-              disableElevation
-              fullWidth
-              onClick={googleHandler}
-              size="large"
-              variant="outlined"
-              sx={{
-                color: "grey.700",
-                backgroundColor: theme.palette.grey[50],
-                borderColor: theme.palette.grey[100],
-              }}
-            >
-              <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
-                <img
-                  src="/socials/social-google.svg"
-                  alt="google"
-                  width={16}
-                  height={16}
-                  style={{ marginRight: matchDownSM ? 8 : 16 }}
-                />
-              </Box>
-              Google
-            </Button>
-          </AnimateButton>
-          {isGoogleSign && <LoadingProgressBar />}
-        </Grid>
+      <Grid
+        container
+        direction="column"
+        justifyContent="center"
+        spacing={2}
+        sx={{ mt: 2 }}
+      >
+        <Grid container direction="row" spacing="5">
+          <Grid item xs={6}>
+            <AnimateButton>
+              <Button
+                type="button"
+                disableElevation
+                fullWidth
+                onClick={googleHandler}
+                size="large"
+                variant="outlined"
+                sx={{
+                  color: "grey.700",
+                  backgroundColor: theme.palette.grey[50],
+                  borderColor: theme.palette.grey[100],
+                }}
+              >
+                <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
+                  <img
+                    src="/socials/social-google.svg"
+                    alt="google"
+                    width={16}
+                    height={16}
+                    style={{ marginRight: matchDownSM ? 8 : 16 }}
+                  />
+                </Box>
+                Google
+              </Button>
+            </AnimateButton>
+            {isGoogleSign && <LoadingProgressBar />}
+          </Grid>
 
-        <Grid item xs={12}>
-          <AnimateButton>
-            <Button
-              type="button"
-              disableElevation
-              fullWidth
-              onClick={githubHandler}
-              size="large"
-              variant="outlined"
-              sx={{
-                color: "grey.700",
-                backgroundColor: theme.palette.grey[50],
-                borderColor: theme.palette.grey[100],
-              }}
-            >
-              <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
-                <img
-                  src="/socials/github.svg"
-                  alt="github"
-                  width={16}
-                  height={16}
-                  style={{ marginRight: matchDownSM ? 8 : 16 }}
-                />
-              </Box>
-              GitHub
-            </Button>
-          </AnimateButton>
-          {isGithubSign && <LoadingProgressBar />}
+          <Grid item xs={6}>
+            <AnimateButton>
+              <Button
+                type="button"
+                disableElevation
+                fullWidth
+                onClick={githubHandler}
+                size="large"
+                variant="outlined"
+                sx={{
+                  color: "grey.700",
+                  backgroundColor: theme.palette.grey[50],
+                  borderColor: theme.palette.grey[100],
+                }}
+              >
+                <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
+                  <img
+                    src="/socials/github.svg"
+                    alt="github"
+                    width={16}
+                    height={16}
+                    style={{ marginRight: matchDownSM ? 8 : 16 }}
+                  />
+                </Box>
+                GitHub
+              </Button>
+            </AnimateButton>
+            {isGithubSign && <LoadingProgressBar />}
+          </Grid>
         </Grid>
 
         <Grid item xs={12}>

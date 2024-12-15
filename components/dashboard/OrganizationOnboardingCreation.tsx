@@ -31,6 +31,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { organizationSchema } from "@/validations/schema.validation";
 import { useGlobalState } from "@/context";
 import LoadingSpinner from "../LoadingSpinner";
+import { CenterFocusStrong } from "@mui/icons-material";
 
 // Define the enum AreaOfInterest
 enum AreaOfInterest {
@@ -57,17 +58,6 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
 }));
 
-const ImageButton = styled(Button)(({ theme }) => ({
-  width: "100%",
-  height: "200px",
-  backgroundSize: "cover",
-  backgroundPosition: "center",
-  color: theme.palette.common.white,
-  textShadow: "1px 1px 2px black",
-  "&:hover": {
-    opacity: 0.8,
-  },
-}));
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -121,8 +111,9 @@ function ColorlibStepIcon(props: StepIconProps) {
 
   const icons: { [index: string]: React.ReactElement } = {
     1: <SettingsIcon />,
-    2: <GroupAddIcon />,
-    3: <CheckCircleIcon />,
+    2: <CenterFocusStrong />,
+    3: <GroupAddIcon />,
+    4: <CheckCircleIcon />,
   };
 
   return (
@@ -136,7 +127,8 @@ function ColorlibStepIcon(props: StepIconProps) {
 }
 
 const steps = [
-  "Select organization type",
+  "Choose account",
+  "Select type",
   "Choose preferences",
   "Create organization",
 ];
@@ -181,13 +173,21 @@ const OrganizationOnboardingCreation: React.FC = () => {
     setOpen(false);
   };
 
+  const proceedToTypeSelection = () => {
+    if (!organizationName.trim()) {
+      setError("Please enter an organization name");
+      return;
+    }
+    setActiveStep(1);
+  };
+
   const selectOrganizationType = (type: "PERSONAL" | "ENTREPRISE") => {
     if (!organizationName) {
       setError("Please enter an organization name");
       return;
     }
     setOrganizationType(type);
-    setActiveStep(1);
+    setActiveStep(2);
   };
 
   const handleOrganizationNameChange = (
@@ -324,14 +324,12 @@ const OrganizationOnboardingCreation: React.FC = () => {
         {activeStep === 0 && (
           <Box>
             <Typography
-              variant="h5"
+              variant="h1"
               align="center"
               gutterBottom
-              sx={{ mt: 4, color: "orange" }}
+              sx={{ mt: 4}}
             >
-              Organizing your work and collaborating with others is easier with
-              an organization. Choose a name and type that best suits your
-              needs.
+              Let's start by giving your organization a name
             </Typography>
             <TextField
               fullWidth
@@ -341,47 +339,84 @@ const OrganizationOnboardingCreation: React.FC = () => {
               margin="normal"
               required
             />
-            <Typography
-              variant="h4"
-              align="center"
-              gutterBottom
-              sx={{ mt: 4 }}
-              className="text-orange-400"
+            <Box
+              sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}
             >
-              Choose your organization type
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <ImageButton
-                  fullWidth
-                  onClick={() => selectOrganizationType("PERSONAL")}
-                  style={{
-                    backgroundImage: "url('/makers.jpg')",
-                  }}
-                >
-                  <Typography variant="h6" className="text-orange-400">
-                    For makers
-                  </Typography>
-                </ImageButton>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <ImageButton
-                  fullWidth
-                  onClick={() => selectOrganizationType("ENTREPRISE")}
-                  style={{
-                    backgroundImage: "url('/businesses.jpg')",
-                  }}
-                >
-                  <Typography variant="h6" color={"orange"}>
-                    For businesses
-                  </Typography>
-                </ImageButton>
-              </Grid>
-            </Grid>
+              <Button
+                variant="contained"
+                onClick={proceedToTypeSelection}
+                disabled={!organizationName.trim()}
+              >
+                Next
+              </Button>
+            </Box>
           </Box>
         )}
 
         {activeStep === 1 && (
+          <Box sx={{ mt: 4 }}>
+            <Typography variant="h1" align="center" gutterBottom>
+              Which features do you need more?
+            </Typography>
+
+           <Grid container spacing={4}>
+            <Grid item xs={12} md={6} onClick={() => selectOrganizationType("PERSONAL")}>
+              <Paper elevation={3} sx={{ padding: 3 }}>
+                <Typography variant="h5" align="center" gutterBottom>
+                  For makers
+                </Typography>
+                <Box
+                  component="img"
+                  src="/makers.jpg"
+                  alt="For makers"
+                  sx={{
+                    width: '100%',
+                    height: 200,
+                    objectFit: 'cover',
+                    borderRadius: 1,
+                  }}
+                />
+              </Paper>
+            </Grid>
+
+  <Grid item xs={12} md={6} onClick={() => selectOrganizationType("ENTREPRISE")}>
+    <Paper elevation={3} sx={{ padding: 3 }}>
+      <Typography variant="h5" align="center" gutterBottom>
+        For businesses
+      </Typography>
+      <Box
+        component="img"
+        src="/businesses.jpg"
+        alt="For businesses"
+        sx={{
+          width: '100%',
+          height: 200,
+          objectFit: 'cover',
+          borderRadius: 1,
+        }}
+      />
+    </Paper>
+  </Grid>
+</Grid>
+            
+            <Box
+              sx={{ mt: 4, display: "flex", justifyContent: "space-between" }}
+            >
+              <Button variant="outlined" onClick={handleBack}>
+                Back
+              </Button>
+              <Button
+                variant="contained"
+                onClick={handleNext}
+                disabled={selectedAreasOfInterest.length === 0}
+              >
+                Next
+              </Button>
+            </Box>
+          </Box>
+        )}
+
+        {activeStep === 2 && (
           <Box>
             <Typography
               variant="h4"
@@ -435,14 +470,8 @@ const OrganizationOnboardingCreation: React.FC = () => {
           </Box>
         )}
 
-        {activeStep === 2 && (
+        {activeStep === 3 && (
           <Box sx={{ mt: 4 }}>
-            <Typography variant="h4" align="center" gutterBottom>
-              Create Your Organization
-            </Typography>
-            <Typography variant="body1" align="center" paragraph>
-              Please review your information before creating your organization:
-            </Typography>
             <Typography variant="body1">
               <strong>Name:</strong> {organizationName}
             </Typography>

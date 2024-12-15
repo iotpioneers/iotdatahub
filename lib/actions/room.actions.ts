@@ -14,7 +14,6 @@ import {
 } from "@/types";
 import axios from "axios";
 import prisma from "@/prisma/client";
-import { connectToDB } from "../mongoose";
 
 export const createChannelRoom = async ({
   roomId,
@@ -22,19 +21,17 @@ export const createChannelRoom = async ({
   email,
   title,
 }: CreateChannelRoomParams) => {
-  try {
-    connectToDB();
-
+  try {    
     const metadata = {
       creatorId: userId,
       email,
       title,
     };
-
+    
     const usersAccesses: RoomAccesses = {
       [email]: ["room:write"],
     };
-
+    
     const room = await liveblocks.createRoom(roomId, {
       metadata,
       usersAccesses,
@@ -45,15 +42,10 @@ export const createChannelRoom = async ({
       return { error: "Failed to create channel room" };
     }
 
-    if (!room) {
-      return { error: "Failed to create channel room" };
-    }
-
     revalidatePath("/dashboard/channels");
 
     return parseStringify(room);
   } catch (error) {
-    return { error: "Failed to create channel room" };
     return { error: "Failed to create channel room" };
   }
 };
@@ -66,7 +58,6 @@ export const getRoomAccess = async ({
   userEmail: string;
 }) => {
   try {
-    connectToDB();
 
     const room = await liveblocks.getRoom(roomId);
 
@@ -82,7 +73,6 @@ export const updateChannelRoomData = async (
   title: string,
 ) => {
   try {
-    connectToDB();
 
     const response = await axios.patch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/${channelId}`,
@@ -133,7 +123,6 @@ export const updateChannelAccess = async ({
   updatedBy,
 }: ShareChannelParams) => {
   try {
-    connectToDB();
 
     const usersAccesses: RoomAccesses = {};
     collaborators.forEach((collaborator) => {
@@ -257,7 +246,6 @@ export const removeCollaborator = async ({
   email: string;
 }) => {
   try {
-    connectToDB();
 
     const room = await liveblocks.getRoom(roomId);
 
@@ -311,7 +299,6 @@ export const removeCollaborator = async ({
 
 export const deleteChannel = async (channelId: string) => {
   try {
-    connectToDB();
 
     const room = await liveblocks.getRoom(channelId);
 
@@ -353,7 +340,6 @@ export const updateRoomDefaultAccess = async (
   defaultAccesses: RoomPermission,
 ) => {
   try {
-    connectToDB();
 
     const room = await liveblocks.getRoom(roomId);
 

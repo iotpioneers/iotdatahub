@@ -131,7 +131,7 @@ export default function ChannelActivityOverview({
   }, [aggregatedData]);
 
   if (isLoading) {
-    return <Typography>Loading...</Typography>;
+    return <Typography>Connecting</Typography>;
   }
 
   if (!aggregatedData) {

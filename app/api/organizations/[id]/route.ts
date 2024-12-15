@@ -20,8 +20,6 @@ export async function GET(
       },
     });
 
-    console.log("Organization", organization);
-
     if (!organization) {
       return NextResponse.json(
         { error: "Organization not found" },

@@ -82,7 +82,7 @@ const schema = Yup.object().shape({
     .required("Email is required"),
   country: Yup.string().optional(),
   phonecode: Yup.string().optional(),
-  phonenumber: Yup.number()
+  phonenumber: Yup.string()
     .typeError("Must be a valid phone number")
     .required("Phone is required"),
 
@@ -270,34 +270,28 @@ const AuthRegister = ({ ...others }) => {
   const registerUser = async (data: FormData) => {
     const phoneCode = selectedCountry?.phone || "";
     const phoneNumber = data.phonenumber
-      ? `${phoneCode} ${data.phonenumber}`
+      ? `${phoneCode}${data.phonenumber}`
       : data.phonenumber;
 
     setLoading(true);
-
-    const response = await fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...data,
-        name: data.firstname + " " + data.lastname,
-        country: selectedCountry?.label || "",
-        phonenumber: phoneNumber,
-      }),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      setError(result.message);
-      setOpen(true);
-    }
-
     try {
-      const response = await axios.post("/api/email/send", {
-        userFullName: data.firstname + " " + data.lastname,
-        userEmail: data.email,
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          name: data.firstname + " " + data.lastname,
+          country: selectedCountry?.label || "",
+          phonenumber: phoneNumber,
+        }),
       });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.message);
+        setOpen(true);
+      }
 
       // Store user data in local storage for later use valid for 1 day
       localStorage.setItem(
@@ -317,7 +311,6 @@ const AuthRegister = ({ ...others }) => {
       setOpen(true);
     } finally {
       setLoading(false);
-      setError(null);
     }
   };
 
@@ -363,64 +356,66 @@ const AuthRegister = ({ ...others }) => {
               justifyContent="center"
               spacing={2}
             >
-              <Grid item xs={12}>
-                <AnimateButton>
-                  <Button
-                    type="button"
-                    disableElevation
-                    fullWidth
-                    onClick={googleHandler}
-                    size="large"
-                    variant="outlined"
-                    sx={{
-                      color: "grey.700",
-                      backgroundColor: theme.palette.grey[50],
-                      borderColor: theme.palette.grey[100],
-                    }}
-                  >
-                    <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
-                      <img
-                        src="/socials/social-google.svg"
-                        alt="google"
-                        width={16}
-                        height={16}
-                        style={{ marginRight: matchDownSM ? 8 : 16 }}
-                      />
-                    </Box>
-                    Google
-                  </Button>
-                </AnimateButton>
-                {isGoogleSign && <LoadingProgressBar />}
-              </Grid>
+              <Grid container direction="row" spacing="5">
+                <Grid item xs={6}>
+                  <AnimateButton>
+                    <Button
+                      type="button"
+                      disableElevation
+                      fullWidth
+                      onClick={googleHandler}
+                      size="large"
+                      variant="outlined"
+                      sx={{
+                        color: "grey.700",
+                        backgroundColor: theme.palette.grey[50],
+                        borderColor: theme.palette.grey[100],
+                      }}
+                    >
+                      <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
+                        <img
+                          src="/socials/social-google.svg"
+                          alt="google"
+                          width={16}
+                          height={16}
+                          style={{ marginRight: matchDownSM ? 8 : 16 }}
+                        />
+                      </Box>
+                      Google
+                    </Button>
+                  </AnimateButton>
+                  {isGoogleSign && <LoadingProgressBar />}
+                </Grid>
 
-              <Grid item xs={12}>
-                <AnimateButton>
-                  <Button
-                    type="button"
-                    disableElevation
-                    fullWidth
-                    onClick={githubHandler}
-                    size="large"
-                    variant="outlined"
-                    sx={{
-                      color: "grey.700",
-                      backgroundColor: theme.palette.grey[50],
-                      borderColor: theme.palette.grey[100],
-                    }}
-                  >
-                    <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
-                      <img
-                        src="/socials/github.svg"
-                        alt="github"
-                        width={16}
-                        height={16}
-                        style={{ marginRight: matchDownSM ? 8 : 16 }}
-                      />
-                    </Box>
-                    GitHub
-                  </Button>
-                </AnimateButton>
-                {isGithubSign && <LoadingProgressBar />}
+                <Grid item xs={6}>
+                  <AnimateButton>
+                    <Button
+                      type="button"
+                      disableElevation
+                      fullWidth
+                      onClick={githubHandler}
+                      size="large"
+                      variant="outlined"
+                      sx={{
+                        color: "grey.700",
+                        backgroundColor: theme.palette.grey[50],
+                        borderColor: theme.palette.grey[100],
+                      }}
+                    >
+                      <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
+                        <img
+                          src="/socials/github.svg"
+                          alt="github"
+                          width={16}
+                          height={16}
+                          style={{ marginRight: matchDownSM ? 8 : 16 }}
+                        />
+                      </Box>
+                      GitHub
+                    </Button>
+                  </AnimateButton>
+                  {isGithubSign && <LoadingProgressBar />}
+                </Grid>
               </Grid>
 
               <Grid item xs={12}>
@@ -468,7 +463,7 @@ const AuthRegister = ({ ...others }) => {
                 email: "",
                 country: "",
                 phonecode: "",
-                phonenumber: 0,
+                phonenumber: "",
                 password: "",
                 confirmPassword: "",
                 submit: null,

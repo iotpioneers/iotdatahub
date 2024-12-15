@@ -1,6 +1,6 @@
 import { Suspense } from "react";
-import DeviceDetails from "../_components/DeviceDetails";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import DeviceDetails from "../_components/DeviceDetails";
 
 interface Props {
   params: { id: string };

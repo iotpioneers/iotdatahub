@@ -8,6 +8,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Button, Box as RadixUIBox } from "@radix-ui/themes";
 import Link from "next/link";
+import NewDeviceModal from "./NewDeviceModal";
 
 interface Device {
   id: number;
@@ -17,14 +18,14 @@ interface Device {
   createdAt: Date;
 }
 
-const DeviceTable: React.FC = () => {
+const DeviceListingComponent: React.FC = () => {
   const [devices, setDevices] = useState<Device[]>([]);
 
   useEffect(() => {
     const fetchDevices = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/devices`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/devices`,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch devices");
@@ -99,9 +100,7 @@ const DeviceTable: React.FC = () => {
 
   return (
     <Box m="20px">
-      <Button className="button bg-orange-50 p-3 rounded-md text-white">
-        <Link href="/dashboard/devices/new">New Device</Link>
-      </Button>
+      <NewDeviceModal />
 
       <Box m="40px 0 0 0" height="75vh">
         {devices.length > 0 && (
@@ -126,4 +125,4 @@ const DeviceTable: React.FC = () => {
   );
 };
 
-export default DeviceTable;
+export default DeviceListingComponent;

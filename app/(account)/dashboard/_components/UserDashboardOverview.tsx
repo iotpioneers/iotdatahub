@@ -31,7 +31,11 @@ const fetcher = async (url: string): Promise<ApiResponse> => {
 
 const UserDashboardOverview = () => {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { status,data: session } = useSession();
+
+  console.log("UserDashboardOverview", session);
+  
+
   const { data, error } = useSWR<ApiResponse, Error>(
     "/api/organizations/status",
     fetcher,
@@ -48,7 +52,7 @@ const UserDashboardOverview = () => {
 
   useEffect(() => {
     if (
-      session?.user &&
+      status=== "authenticated" && session?.user && 
       (session.user.subscriptionId === null || !session?.user.subscriptionId)
     ) {
       setIsModalOpen(true);

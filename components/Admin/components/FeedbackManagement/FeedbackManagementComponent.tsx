@@ -271,7 +271,7 @@ const FeedbackManagementComponent: React.FC = () => {
   ];
 
   if (isLoading) {
-    return <Typography>Loading...</Typography>;
+    return <Typography>Connecting</Typography>;
   }
 
   return (

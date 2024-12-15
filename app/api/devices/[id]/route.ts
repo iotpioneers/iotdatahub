@@ -4,8 +4,10 @@ import { deviceUpdateSchema } from "@/validations/schema.validation";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
+  console.log("Fetching device with ID:", params.id);
+
   try {
     const device = await prisma.device.findUnique({
       where: { id: params.id },
@@ -23,6 +25,8 @@ export async function GET(
       },
     });
 
+    console.log("Fetched device:", device);
+
     if (!device) {
       return NextResponse.json({ error: "Device not found" }, { status: 404 });
     }
@@ -32,14 +36,14 @@ export async function GET(
     console.error("Error fetching device:", error);
     return NextResponse.json(
       { error: "Error fetching device" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const body = await request.json();
   const validation = deviceUpdateSchema.safeParse(body);
@@ -47,7 +51,7 @@ export async function PUT(
   if (!validation.success) {
     return NextResponse.json(
       { error: "Validation failed", details: validation.error.errors },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -78,14 +82,14 @@ export async function PUT(
     console.error("Error updating device:", error);
     return NextResponse.json(
       { error: "Error updating device" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const device = await prisma.device.delete({
@@ -100,7 +104,7 @@ export async function DELETE(
     console.error("Error deleting device:", error);
     return NextResponse.json(
       { error: "Error deleting device" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

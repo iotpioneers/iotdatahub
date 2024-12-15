@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
   // Validate the request body against the schema
   const validation = channelSchema.safeParse(body);
 
+
   if (!validation.success) {
     return NextResponse.json(validation.error.errors, { status: 400 });
   }
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
         organization: { connect: { id: organizationId } },
       })
     );
-
+    
     // Create a new channel
     const newChannel = await prisma.channel.create({
       data: {
@@ -122,6 +123,7 @@ export async function POST(request: NextRequest) {
     // Return the new channel and sample codes
     return NextResponse.json({ newChannel }, { status: 201 });
   } catch (error) {
+    console.log("error", error);
     return NextResponse.json(
       { error: "Error creating channel" },
       { status: 500 }

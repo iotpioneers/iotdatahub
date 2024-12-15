@@ -124,19 +124,19 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           </div>
           {activeLink === "/dashboard" && isLoading && <LoadingProgressBar />}
         </Link>
-        <Link href="/organization/dashboard">
+        <Link href="/dashboard/devices">
           <div
             className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
-              activeLink === "/organization/dashboard"
+              activeLink === "/dashboard/devices"
                 ? "bg-gray-300 text-white"
                 : "hover:bg-gray-200 text-black"
             }`}
-            onClick={() => handleSetActiveLink("/organization/dashboard")}
+            onClick={() => handleSetActiveLink("/dashboard/devices")}
           >
             <MdOutlineDevices className="text-2xl text-black" />
             <h3 className="text-base font-semibold text-black">Devices</h3>
           </div>
-          {activeLink === "/organization/dashboard" && isLoading && (
+          {activeLink === "/dashboard/devices" && isLoading && (
             <LoadingProgressBar />
           )}
         </Link>
@@ -177,19 +177,19 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             {activeLink === "/admin" && isLoading && <LoadingProgressBar />}
           </Link>
         )}
-        <Link href="/organization/dashboard">
+        <Link href="/dashboard/devices">
           <div
             className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
-              activeLink === "/organization/dashboard"
+              activeLink === "/dashboard/devices"
                 ? "bg-gray-300 text-white"
                 : "hover:bg-gray-200 text-black"
             }`}
-            onClick={() => handleSetActiveLink("/organization/dashboard")}
+            onClick={() => handleSetActiveLink("/dashboard/devices")}
           >
             <GiOrganigram className="text-2xl text-black" />
             <h3 className="text-base font-semibold text-black">Organization</h3>
           </div>
-          {activeLink === "/organization/dashboard" && isLoading && (
+          {activeLink === "/dashboard/devices" && isLoading && (
             <LoadingProgressBar />
           )}
         </Link>
