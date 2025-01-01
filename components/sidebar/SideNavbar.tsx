@@ -177,19 +177,19 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             {activeLink === "/admin" && isLoading && <LoadingProgressBar />}
           </Link>
         )}
-        <Link href="/dashboard/devices">
+        <Link href="/organization/dashboard">
           <div
             className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
-              activeLink === "/dashboard/devices"
+              activeLink === "/organization/dashboard"
                 ? "bg-gray-300 text-white"
                 : "hover:bg-gray-200 text-black"
             }`}
-            onClick={() => handleSetActiveLink("/dashboard/devices")}
+            onClick={() => handleSetActiveLink("/organization/dashboard")}
           >
             <GiOrganigram className="text-2xl text-black" />
             <h3 className="text-base font-semibold text-black">Organization</h3>
           </div>
-          {activeLink === "/dashboard/devices" && isLoading && (
+          {activeLink === "/organization/dashboard" && isLoading && (
             <LoadingProgressBar />
           )}
         </Link>

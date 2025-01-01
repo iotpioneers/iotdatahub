@@ -5,7 +5,7 @@ import { config } from "@/config";
 import DeviceOrganization from "@/components/dashboard/Overview/DeviceOrganization";
 
 export const metadata = {
-  title: `Overview | Dashboard | ${config.site.name}`,
+  title: `Organization | Dashboard | ${config.site.name}`,
 } satisfies Metadata;
 
 export default function Page(): React.JSX.Element {

@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import { ApiKey, Channel, Device } from "@/types";
 import { LinearLoading } from "@/components/LinearLoading";
 import { HiStatusOffline, HiStatusOnline } from "react-icons/hi";
+import Link from "next/link";
 
 interface Props {
   params: { id: string };
@@ -81,7 +82,7 @@ const DeviceDashboard = ({ params }: Props) => {
   ];
 
   return (
-    <div className="min-h-screen p-4">
+    <div className="min-h-screen px-4">
       {/* Main Dashboard Container */}
       <div className="bg-white rounded-lg shadow-sm p-6 mb-4">
         {/* Header */}
@@ -179,9 +180,14 @@ const DeviceDashboard = ({ params }: Props) => {
             <p className="mt-1 text-sm text-gray-500">
               Edit the dashboard to add widgets
             </p>
-            <button className="mt-4 px-4 py-2 bg-orange-50 text-white rounded-lg hover:bg-green-600">
-              Edit Dashboard
-            </button>
+            <Link
+              href={`/dashboard/devices/${params.id}/edit`}
+              className="mt-4 px-4 py-2 bg-orange-50 text-white rounded-lg hover:bg-green-600"
+            >
+              <button className="mt-4 px-4 py-2 bg-orange-50 text-white rounded-lg hover:bg-green-600">
+                Edit Dashboard
+              </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -191,7 +197,6 @@ const DeviceDashboard = ({ params }: Props) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-black text-white rounded-lg p-6 w-full max-w-lg">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">New Device Created!</h2>
               <button
                 onClick={() => setShowModal(false)}
                 className="text-gray-400 hover:text-white"

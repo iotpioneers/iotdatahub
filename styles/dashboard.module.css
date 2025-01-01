@@ -1,0 +1,50 @@
+.widgetBox {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  min-width: 280px;
+}
+
+.widgetCategory {
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 16px 0 12px;
+}
+
+.widgetItem {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 8px;
+  border: 1px solid #eaeaea;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.widgetItem:hover {
+  background: #f8f8f8;
+}
+
+.timelineControls {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.timeButton {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #eaeaea;
+  background: white;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.timeButtonActive {
+  background: #00c853;
+  color: white;
+  border-color: #00c853;
+}
