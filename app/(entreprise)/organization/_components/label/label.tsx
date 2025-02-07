@@ -1,5 +1,4 @@
 import { forwardRef, ReactNode } from "react";
-import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
 import { SxProps, Theme } from "@mui/system";
@@ -35,7 +34,7 @@ const Label = forwardRef<HTMLSpanElement, LabelProps>(
       sx,
       ...other
     },
-    ref
+    ref,
   ) => {
     const theme = useTheme();
 
@@ -64,25 +63,7 @@ const Label = forwardRef<HTMLSpanElement, LabelProps>(
         {endIcon && <Box sx={{ ml: 0.75, ...iconStyles }}>{endIcon}</Box>}
       </StyledLabel>
     );
-  }
+  },
 );
-
-// Define prop types using PropTypes for runtime validation
-Label.propTypes = {
-  children: PropTypes.node.isRequired,
-  color: PropTypes.oneOf([
-    "default",
-    "primary",
-    "secondary",
-    "info",
-    "success",
-    "warning",
-    "error",
-  ]),
-  variant: PropTypes.oneOf(["filled", "outlined", "ghost", "soft"]),
-  startIcon: PropTypes.node,
-  endIcon: PropTypes.node,
-  sx: PropTypes.object,
-};
 
 export default Label;

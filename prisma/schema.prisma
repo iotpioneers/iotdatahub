@@ -1,3 +1,5 @@
+// C:\Users\emash\IoTDataHub\prisma\schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -173,6 +175,7 @@ model Device {
   commands    DeviceCommand[]
   maintenance MaintenanceLog[]
   schedules   Schedule[]
+  widgets     Widget[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
@@ -280,6 +283,7 @@ model Channel {
   connectionType  String?
   hardware        String?
   access          Access          @default(PRIVATE)
+  widgets         Widget[]
   fields          Field[]
   dataPoints      DataPoint[]
   channelAccesses ChannelAccess[]
@@ -310,6 +314,25 @@ model ChannelAccess {
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
 
+  @@index([channelId])
+}
+
+model Widget {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  name       String?
+  definition Json?
+  position   Json?
+  settings   Json?
+  color      String?
+  deviceId   String  @db.ObjectId
+  device     Device  @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  channelId  String  @db.ObjectId
+  channel    Channel @relation(fields: [channelId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  @@index([deviceId])
   @@index([channelId])
 }
 

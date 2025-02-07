@@ -6,17 +6,9 @@ import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Button, Box as RadixUIBox } from "@radix-ui/themes";
 import Link from "next/link";
 import NewDeviceModal from "./NewDeviceModal";
-
-interface Device {
-  id: number;
-  name: string;
-  description: string;
-  status: string;
-  createdAt: Date;
-}
+import { Device } from "@/types";
 
 const DeviceListingComponent: React.FC = () => {
   const [devices, setDevices] = useState<Device[]>([]);

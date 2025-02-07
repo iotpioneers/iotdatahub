@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import Tooltip from "@mui/material/Tooltip";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -69,10 +68,3 @@ export default function UserTableToolbar({
     </Toolbar>
   );
 }
-
-// Define prop types using PropTypes for runtime validation
-UserTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-  filterName: PropTypes.string.isRequired,
-  onFilterName: PropTypes.func.isRequired,
-};

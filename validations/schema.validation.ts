@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { WidgetType, WidgetCategory } from "@/types/widgets";
 
 // Password validation function
 const passwordValidation = z
@@ -174,6 +175,73 @@ export const maintenanceSchema = z.object({
   performedBy: z.string().optional(),
   scheduledFor: z.string().datetime().optional(),
   notes: z.string().optional(),
+});
+
+// Schema for widget data
+export const widgetSchema = z.object({
+  name: z.string().optional(),
+  definition: z
+    .object({
+      type: z
+        .enum([
+          "switch",
+          "slider",
+          "numberInput",
+          "imageButton",
+          "webPageImage",
+          "led",
+          "label",
+          "gauge",
+          "radialGauge",
+          "alarmSound",
+          "chart",
+          "map",
+          "imageGallery",
+          "customChart",
+          "heatmapChart",
+          "video",
+          "textInput",
+          "terminal",
+          "segmentedSwitch",
+          "menu",
+          "modules",
+        ])
+        .transform((val) => val as WidgetType),
+
+      label: z.string(),
+      icon: z.string(),
+      defaultSize: z
+        .object({
+          w: z.number(),
+          h: z.number(),
+        })
+        .transform((val) => JSON.stringify(val)),
+      maxSize: z
+        .object({
+          w: z.number(),
+          h: z.number(),
+        })
+        .optional()
+        .transform((val) => (val ? JSON.stringify(val) : undefined)),
+      category: z
+        .enum(["control", "display", "input", "chart", "media", "misc"])
+        .transform((val) => val as WidgetCategory),
+    })
+    .transform((val) => JSON.stringify(val))
+    .optional(),
+  position: z
+    .object({
+      x: z.number(),
+      y: z.number(),
+      width: z.number(),
+      height: z.number(),
+    })
+    .transform((val) => JSON.stringify(val))
+    .optional(),
+  settings: z
+    .record(z.any())
+    .transform((val) => JSON.stringify(val))
+    .optional(),
 });
 
 // The schema for the api keys data

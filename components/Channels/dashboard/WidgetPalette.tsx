@@ -43,10 +43,15 @@ const WidgetPalette: React.FC<Props> = ({ onWidgetSelect }) => {
                       cursor: "move",
                       "&:hover": { bgcolor: "action.hover" },
                     }}
-                    onDoubleClick={() => onWidgetSelect(widget.type)}
+                    onDoubleClick={() =>
+                      onWidgetSelect(widget.type as WidgetType)
+                    }
                     draggable
                     onDragStart={(e) => {
-                      e.dataTransfer.setData("widgetType", widget.type);
+                      e.dataTransfer.setData(
+                        "application/json",
+                        JSON.stringify(widget),
+                      );
                     }}
                   >
                     <CardContent sx={{ p: 1, "&:last-child": { pb: 1 } }}>

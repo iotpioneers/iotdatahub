@@ -23,12 +23,12 @@ const GridLayout: React.FC<Props> = ({
   const [breakpoint, setBreakpoint] = useState<string>("lg");
 
   const layouts = {
-    lg: widgets.map((widget) => ({
+    lg: widgets.map((widget: Widget) => ({
       i: widget.id,
-      x: widget.position.x,
-      y: widget.position.y,
-      w: widget.position.width,
-      h: widget.position.height,
+      x: widget.position?.x ?? 0,
+      y: widget.position?.y ?? 0,
+      w: widget.position?.width ?? 2,
+      h: widget.position?.height ?? 2,
       minW: 2,
       minH: 2,
     })),
@@ -45,14 +45,14 @@ const GridLayout: React.FC<Props> = ({
       onLayoutChange={(layout, layouts) => onLayoutChange(layouts)}
       draggableHandle=".widget-drag-handle"
     >
-      {widgets.map((widget) => (
+      {widgets.map((widget: Widget) => (
         <div key={widget.id} className="bg-white rounded-lg">
           <WidgetRenderer
             widget={widget}
             onSettingsChange={(settings) =>
-              onWidgetSettingsChange(widget.id, settings)
+              onWidgetSettingsChange(widget.id as string, settings)
             }
-            onDelete={() => onDeleteWidget(widget.id)}
+            onDelete={() => onDeleteWidget(widget.id as string)}
           />
         </div>
       ))}

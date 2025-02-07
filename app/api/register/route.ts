@@ -4,18 +4,15 @@ import nodemailer from "nodemailer";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import { userSchema } from "@/validations/schema.validation";
-import { getPricingTier, updateOrCreateSubscription } from "../pricing/upgrade/route";
+import { getPricingTier, updateOrCreateSubscription } from "@/lib/pricing";
 
 const prisma = new PrismaClient();
 interface UserData {
   userFullName: string;
   userEmail: string;
-
 }
 
-async function sendNewAccountNotificationEmails(
-  userData: UserData
-) {
+async function sendNewAccountNotificationEmails(userData: UserData) {
   try {
     const { userFullName, userEmail } = userData;
 
@@ -191,19 +188,19 @@ export async function POST(req: NextRequest, res: NextResponse) {
         emailVerified: emailVerified ? new Date() : null,
       },
     });
-    
+
     // Send new aacount verification email
     const userData: UserData = {
       userFullName: name,
-      userEmail: email
-    }
+      userEmail: email,
+    };
 
-    await sendNewAccountNotificationEmails(userData)
+    await sendNewAccountNotificationEmails(userData);
 
     // Assign a free subscription to the user
     //1. Find a free subscription
     const pricingTier = await getPricingTier("Free Plan");
-  
+
     if (!pricingTier) {
       throw new Error("Pricing tier not found");
     }
@@ -218,7 +215,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       });
     }
 
-    
     return NextResponse.json(
       { message: "Registration successful", user },
       { status: 201 },

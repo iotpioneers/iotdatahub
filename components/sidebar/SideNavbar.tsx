@@ -15,7 +15,6 @@ import Drawer from "@mui/material/Drawer";
 import { AdminPanelSettingsOutlined } from "@mui/icons-material";
 
 import LoadingProgressBar from "../LoadingProgressBar";
-import UpgradePlanCardAlert from "./UpgradePlanCardAlert";
 import { Logo } from "../Home/Logo";
 
 interface SidebarContentProps {
@@ -193,11 +192,6 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             <LoadingProgressBar />
           )}
         </Link>
-      </div>
-
-      {/* Upgrade Plan Card */}
-      <div className="my-2">
-        <UpgradePlanCardAlert />
       </div>
     </div>
   );

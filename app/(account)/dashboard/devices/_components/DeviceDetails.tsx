@@ -8,6 +8,10 @@ import { useSession } from "next-auth/react";
 import { ApiKey, Channel, Device } from "@/types";
 import { LinearLoading } from "@/components/LinearLoading";
 import { HiStatusOffline, HiStatusOnline } from "react-icons/hi";
+import DeviceDashboard from "./DeviceDashboard";
+import { DroppableArea } from "@/components/Channels/dashboard/widgets/DroppableArea";
+import { Widget } from "@/types/widgets";
+import useAdd from "@/hooks/useAdd";
 import Link from "next/link";
 
 interface Props {
@@ -22,7 +26,7 @@ interface Organization {
   ApiKey: ApiKey[];
 }
 
-const DeviceDashboard = ({ params }: Props) => {
+const DeviceDetails = ({ params }: Props) => {
   const [DeviceDetails, setShowModal] = useState(true);
   const [selectedDuration, setSelectedDuration] = useState<string>("1mo");
   const [organization, setOrganization] = useState<Organization | null>(null);
@@ -44,6 +48,8 @@ const DeviceDashboard = ({ params }: Props) => {
     `/api/organizations/${session.user.organizationId}`,
   );
 
+  const { data: widgetData } = useFetch(`/api/devices/${params.id}/widgets`);
+
   useEffect(() => {
     if (deviceData) setDevice(deviceData);
     if (organizationData) setOrganization(organizationData);
@@ -55,7 +61,11 @@ const DeviceDashboard = ({ params }: Props) => {
 
   if (error) {
     console.error("Error fetching device:", error);
-    return <Box className="text-red-500">{error || "Device not found"}</Box>;
+    return (
+      <Box className="text-red-500">
+        {error || "There was an error while fetching the device"}
+      </Box>
+    );
   }
 
   const channel = organization?.Channel?.find(
@@ -135,7 +145,9 @@ const DeviceDashboard = ({ params }: Props) => {
             </div>
           </div>
           <button className="px-4 py-2 bg-orange-50 text-white rounded-lg hover:bg-green-600 font-medium">
-            Edit
+            <Link href={`/dashboard/devices/${params.id}/edit`}>
+              {isLoading || !deviceData ? <LinearLoading /> : "Edit"}
+            </Link>
           </button>
         </div>
 
@@ -155,43 +167,38 @@ const DeviceDashboard = ({ params }: Props) => {
             </button>
           ))}
         </div>
-
-        {/* Dashboard Content Area */}
-        <div className="flex items-center justify-center h-96 border-2 border-dashed border-gray-200 rounded-lg">
-          <div className="text-center">
-            <div className="mb-4">
-              <svg
-                className="mx-auto h-12 w-12 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                />
-              </svg>
+        <DroppableArea id={deviceData.id}>
+          {!widgetData || widgetData.length === 0 ? (
+            <div className="flex items-center justify-center h-96 border-2 border-dashed border-gray-200 rounded-lg">
+              <div className="text-center">
+                <div className="mb-4">
+                  <svg
+                    className="mx-auto h-12 w-12 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-orange-50">
+                  No Dashboard widgets
+                </h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  Double click the widget on the left or drag it to the area{" "}
+                </p>
+              </div>
             </div>
-            <h3 className="text-lg font-medium text-orange-50">
-              No Dashboard widgets
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              Edit the dashboard to add widgets
-            </p>
-            <Link
-              href={`/dashboard/devices/${params.id}/edit`}
-              className="mt-4 px-4 py-2 bg-orange-50 text-white rounded-lg hover:bg-green-600"
-            >
-              <button className="mt-4 px-4 py-2 bg-orange-50 text-white rounded-lg hover:bg-green-600">
-                Edit Dashboard
-              </button>
-            </Link>
-          </div>
-        </div>
+          ) : (
+            <DeviceDashboard deviceId={params.id} widgetData={widgetData} />
+          )}
+        </DroppableArea>
       </div>
-
       {/* Modal */}
       {DeviceDetails && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -218,11 +225,6 @@ const DeviceDashboard = ({ params }: Props) => {
                 <div className="text-orange-50">"{apiKey?.apiKey}"</div>
               </div>
             </div>
-            <div className="flex justify-end space-x-4">
-              <button className="px-4 py-2 bg-green-100 text-orange-50 rounded hover:bg-green-200">
-                Copy to clipboard
-              </button>
-            </div>
           </div>
         </div>
       )}
@@ -230,4 +232,4 @@ const DeviceDashboard = ({ params }: Props) => {
   );
 };
 
-export default DeviceDashboard;
+export default DeviceDetails;

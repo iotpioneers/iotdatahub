@@ -8,7 +8,7 @@ interface Props {
   onChange: (settings: WidgetSettings) => void;
 }
 
-export const Switch: React.FC<Props> = ({ settings, onChange }) => {
+const Switch: React.FC<Props> = ({ settings, onChange }) => {
   return (
     <div className="flex items-center justify-between">
       <label className="text-sm font-medium">
@@ -21,3 +21,5 @@ export const Switch: React.FC<Props> = ({ settings, onChange }) => {
     </div>
   );
 };
+
+export default Switch;

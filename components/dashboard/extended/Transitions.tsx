@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import React from "react";
 
 // material-ui
@@ -108,27 +107,7 @@ const Transitions: React.FC<TransitionProps> = React.forwardRef(
         )}
       </Box>
     );
-  }
+  },
 );
-
-Transitions.propTypes = {
-  children: PropTypes.node,
-  type: PropTypes.oneOf(["grow", "fade", "collapse", "slide", "zoom"]),
-  position: PropTypes.oneOf([
-    "top-left",
-    "top-right",
-    "top",
-    "bottom-left",
-    "bottom-right",
-    "bottom",
-  ]),
-  direction: PropTypes.oneOf(["up", "down", "left", "right"]),
-};
-
-Transitions.defaultProps = {
-  type: "grow",
-  position: "top-left",
-  direction: "up",
-};
 
 export default Transitions;

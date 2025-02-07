@@ -1,13 +1,18 @@
 export interface Widget {
   id: string;
-  type: WidgetType;
-  position: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
-  settings: any;
+  name?: string | null;
+  definition?: WidgetDefinition | null;
+  position?: {
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+  } | null;
+  settings?: WidgetSettings | null;
+  deviceId?: string | null;
+  channelId?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export type WidgetType =
@@ -34,12 +39,12 @@ export type WidgetType =
   | "modules";
 
 export interface WidgetDefinition {
-  type: WidgetType;
-  label: string;
-  icon: string;
-  defaultSize: { w: number; h: number };
-  maxSize?: { w: number; h: number };
-  category: "control" | "display" | "input" | "chart" | "media" | "misc";
+  type?: WidgetType;
+  label?: string;
+  icon?: JSX.Element;
+  defaultSize?: { w?: number; h?: number };
+  maxSize?: { w?: number; h?: number };
+  category?: "control" | "display" | "input" | "chart" | "media" | "misc";
 }
 
 export interface WidgetSettings {
@@ -53,3 +58,11 @@ export interface WidgetSettings {
   data?: any;
   [key: string]: any;
 }
+
+export type WidgetCategory =
+  | "control"
+  | "display"
+  | "input"
+  | "chart"
+  | "media"
+  | "misc";

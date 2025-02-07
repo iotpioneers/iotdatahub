@@ -1,5 +1,3 @@
-import PropTypes from "prop-types";
-
 // material-ui
 import { alpha, useTheme } from "@mui/material/styles";
 import MuiChip from "@mui/material/Chip";
@@ -187,13 +185,6 @@ const Chip = ({
   }
   SX = { ...SX, ...sx };
   return <MuiChip {...others} sx={SX} />;
-};
-
-Chip.propTypes = {
-  sx: PropTypes.object,
-  chipcolor: PropTypes.string,
-  variant: PropTypes.string,
-  disabled: PropTypes.bool,
 };
 
 export default Chip;

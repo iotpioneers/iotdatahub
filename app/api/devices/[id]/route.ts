@@ -6,8 +6,6 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
-  console.log("Fetching device with ID:", params.id);
-
   try {
     const device = await prisma.device.findUnique({
       where: { id: params.id },
@@ -24,8 +22,6 @@ export async function GET(
         },
       },
     });
-
-    console.log("Fetched device:", device);
 
     if (!device) {
       return NextResponse.json({ error: "Device not found" }, { status: 404 });

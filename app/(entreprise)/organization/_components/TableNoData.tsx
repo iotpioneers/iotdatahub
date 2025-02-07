@@ -1,5 +1,3 @@
-import PropTypes from "prop-types";
-
 import Paper from "@mui/material/Paper";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
@@ -34,7 +32,3 @@ export default function TableNoData({ query }: TableNoDataProps) {
     </TableRow>
   );
 }
-
-TableNoData.propTypes = {
-  query: PropTypes.string,
-};

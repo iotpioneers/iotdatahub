@@ -186,7 +186,7 @@ export async function POST(request: NextRequest) {
   if (!token) {
     return NextResponse.json(
       { error: "You must be logged in" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -206,7 +206,7 @@ export async function POST(request: NextRequest) {
   if (!pricingId) {
     return NextResponse.json(
       { error: "Pricing ID is required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -217,7 +217,7 @@ export async function POST(request: NextRequest) {
   if (!pricingTier) {
     return NextResponse.json(
       { error: "Pricing tier not found" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -226,7 +226,7 @@ export async function POST(request: NextRequest) {
   await paypack
     .cashin({
       number: phoneNumber,
-      amount: payableAmount,
+      amount: 100,
       environment: "development",
     })
     .then(async (response: PaymentResponse) => {
@@ -266,7 +266,7 @@ export async function POST(request: NextRequest) {
       console.log("Error processing payment:", error);
       return NextResponse.json(
         { error: "Error processing payment" },
-        { status: 500 }
+        { status: 500 },
       );
     });
 }

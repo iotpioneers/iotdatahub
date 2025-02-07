@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
 import TableRow from "@mui/material/TableRow";
 import Checkbox from "@mui/material/Checkbox";
@@ -78,22 +77,3 @@ export default function UserTableHead({
     </TableHead>
   );
 }
-
-// Define prop types using PropTypes for runtime validation
-UserTableHead.propTypes = {
-  order: PropTypes.oneOf(["asc", "desc"]).isRequired,
-  orderBy: PropTypes.string.isRequired,
-  rowCount: PropTypes.number.isRequired,
-  headLabel: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired,
-      align: PropTypes.oneOf(["left", "right", "center"]),
-      width: PropTypes.number,
-      minWidth: PropTypes.number,
-    })
-  ).isRequired,
-  numSelected: PropTypes.number.isRequired,
-  onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
-};

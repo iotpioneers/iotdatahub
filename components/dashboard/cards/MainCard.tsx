@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import React from "react";
 
 // material-ui
@@ -48,7 +47,7 @@ const MainCard = React.forwardRef<HTMLDivElement, MainCardProps>(
       elevation,
       ...others
     },
-    ref
+    ref,
   ) => {
     return (
       <Card
@@ -60,8 +59,8 @@ const MainCard = React.forwardRef<HTMLDivElement, MainCardProps>(
           boxShadow: elevation
             ? `${elevation}px ${elevation}px ${elevation * 2}px rgba(0,0,0,0.1)`
             : boxShadow
-            ? shadow || "0 2px 14px 0 rgb(32 40 45 / 8%)"
-            : "inherit",
+              ? shadow || "0 2px 14px 0 rgb(32 40 45 / 8%)"
+              : "inherit",
 
           ":hover": {
             boxShadow: boxShadow
@@ -95,21 +94,7 @@ const MainCard = React.forwardRef<HTMLDivElement, MainCardProps>(
         {!content && children}
       </Card>
     );
-  }
+  },
 );
-
-MainCard.propTypes = {
-  border: PropTypes.bool,
-  boxShadow: PropTypes.bool,
-  children: PropTypes.node,
-  content: PropTypes.bool,
-  contentClass: PropTypes.string,
-  contentSX: PropTypes.object,
-  darkTitle: PropTypes.bool,
-  secondary: PropTypes.node,
-  shadow: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  sx: PropTypes.object,
-  title: PropTypes.node,
-};
 
 export default MainCard;
