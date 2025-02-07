@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
@@ -9,8 +8,6 @@ import { Channel, DataPoint, Device, Field, Organization } from "@/types";
 import { EmployeeMember } from "@/types/employees-member";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { DashboardOverview } from "@/components/dashboard";
-import { useSession } from "next-auth/react";
-import SubscriptionModal from "@/components/dashboard/Checkout/SubscriptionModal";
 import { useSession } from "next-auth/react";
 import SubscriptionModal from "@/components/dashboard/Checkout/SubscriptionModal";
 
