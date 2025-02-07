@@ -34,7 +34,7 @@ const login = async (credentials: Credentials) => {
 
     const passwordMatch = await bcrypt.compare(
       credentials.password,
-      user.password!
+      user.password!,
     );
 
     if (!passwordMatch) {
@@ -63,8 +63,8 @@ const authOptions: AuthOptions = {
         params: {
           prompt: "consent",
           access_type: "offline",
-          response_type: "code"
-        }
+          response_type: "code",
+        },
       },
       httpOptions: {
         timeout: Number(process.env.GOOGLE_TIMEOUT || 98766673),
@@ -125,7 +125,7 @@ const authOptions: AuthOptions = {
       },
     }),
   ],
-  debug: process.env.NEXTAUTH_DEBUG === 'true',
+  debug: process.env.NEXTAUTH_DEBUG === "true",
   session: {
     strategy: "jwt",
     maxAge: Number(process.env.NEXT_AUTH_TIMEOUT || 3600),
@@ -172,7 +172,7 @@ const authOptions: AuthOptions = {
       // Allows callback URLs on the same origin
       if (new URL(url).origin === baseUrl) return url;
       return baseUrl;
-    }
+    },
   },
   logger: {
     error(code, metadata) {
@@ -183,18 +183,18 @@ const authOptions: AuthOptions = {
     },
     debug(code, metadata) {
       console.debug(`NextAuth Debug: ${code}`, metadata);
-    }
+    },
   },
   events: {
     async signIn(message) {
-      console.log('Sign in event');
+      console.log("Sign in event");
     },
     async signOut(message) {
-      console.log('Sign out event');
+      console.log("Sign out event");
     },
     async createUser(message) {
-      console.log('User created');
-    }
+      console.log("User created");
+    },
   },
 };
 

@@ -67,11 +67,11 @@ const SubscriptionModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
       >
         <Typography
           id="subscription-modal-title"
-          variant="h1"
+          variant="h4"
           component="h2"
           gutterBottom
         >
-          Choose a Subscription Plan 
+          Choose a Subscription Plan
         </Typography>
         <Grid container spacing={3} alignItems="center" justifyContent="center">
           {isLoading && <LoadingSpinner />}
@@ -130,25 +130,16 @@ const SubscriptionModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
                 </Typography>
 
                 <Box sx={{ display: "flex", alignItems: "baseline" }}>
-
-                  {item.price === 0 ? (
-                    <Typography
-                      variant="h4"
-                      component="span"
-                      sx={{ fontWeight: "bold" }}
-                    >
-                      Free
-                    </Typography>
-                  ):(
-                    
                   <Typography
                     variant="h4"
                     component="span"
                     sx={{ fontWeight: "bold" }}
                   >
-                    Rwf{item.price} &nbsp; per month
+                    Rwf{item.price}
                   </Typography>
-                  )}
+                  <Typography variant="h6" component="span">
+                    &nbsp; per month
+                  </Typography>
                 </Box>
 
                 <Divider sx={{ my: 2, opacity: 0.2 }} />

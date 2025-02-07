@@ -16,6 +16,8 @@ import {
   FormHelperText,
   Snackbar,
   Alert,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { MuiOtpInput } from "mui-one-time-password-input";
 import useSWR from "swr";
@@ -27,7 +29,11 @@ const EmailVerificationComponent = () => {
   const [activeStep, setActiveStep] = React.useState(1);
   const [error, setError] = React.useState<string | null>(null);
   const [successMessage, setSuccessMessage] = React.useState<string | null>(
-    null
+    null,
+  );
+  const [isResending, setIsResending] = React.useState(false);
+  const [successMessage, setSuccessMessage] = React.useState<string | null>(
+    null,
   );
   const [isResending, setIsResending] = React.useState(false);
   const router = useRouter();
@@ -58,7 +64,7 @@ const EmailVerificationComponent = () => {
     {
       revalidateOnFocus: false,
       shouldRetryOnError: false,
-    }
+    },
   );
 
   React.useEffect(() => {
@@ -150,8 +156,8 @@ const EmailVerificationComponent = () => {
           {activeStep === 1 && (
             <>
               <Typography variant="body2" align="center" sx={{ mb: 2 }}>
-                Check your inbox for an email from <b>IoT DATA HUB</b>. Please confirm your
-                identity by providing the code sent to your email
+                Check your inbox for an email from <b>IoT DATA HUB</b>. Please
+                confirm your identity by providing the code sent to your email
               </Typography>
               <form onSubmit={handleOtpVerify}>
                 <MuiOtpInput
@@ -181,8 +187,8 @@ const EmailVerificationComponent = () => {
                   sx={{ mt: 2 }}
                   color="textSecondary"
                 >
-                  Search SPAM folder for an email from <b>IoT DATA HUB</b>.
-                  Also add it to your address book.{" "}
+                  Search SPAM folder for an email from <b>IoT DATA HUB</b>. Also
+                  add it to your address book.{" "}
                 </Typography>
                 <Typography
                   variant="body2"
@@ -220,12 +226,27 @@ const EmailVerificationComponent = () => {
                 onClick={() => router.push("/login")}
                 sx={{ mt: 2 }}
               >
-                Continue
+                Continue Continue
               </Button>
             </>
           )}
         </Container>
       </Box>
+
+      <Snackbar
+        open={!!successMessage}
+        autoHideDuration={6000}
+        onClose={() => setSuccessMessage(null)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={() => setSuccessMessage(null)}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {successMessage}
+        </Alert>
+      </Snackbar>
 
       <Snackbar
         open={!!successMessage}

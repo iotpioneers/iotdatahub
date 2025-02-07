@@ -4,15 +4,20 @@ import React from "react";
 import { Button } from "@radix-ui/themes";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import { PricingPlanType } from "@/types";
+import { Loader2 } from "lucide-react";
 import { Loader2 } from "lucide-react";
 
 const UpgradePricingPlan = () => {
   const router = useRouter();
+  const router = useRouter();
   const [subscriptions, setSubscriptions] = React.useState<PricingPlanType[]>(
     [],
   );
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [loadingPlanId, setLoadingPlanId] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [loadingPlanId, setLoadingPlanId] = React.useState<string | null>(null);
 
@@ -50,6 +55,8 @@ const UpgradePricingPlan = () => {
   };
 
   return (
+    <div className="flex gap-[1rem] max-lg:flex-wrap mt-5">
+      {isLoading && <LoadingProgressBar />}
     <div className="flex gap-[1rem] max-lg:flex-wrap mt-5">
       {isLoading && <LoadingProgressBar />}
 
@@ -99,6 +106,7 @@ const UpgradePricingPlan = () => {
                       : "Try Premium")
               )}
             </Button>
+          </div>
           </div>
 
           <ul>

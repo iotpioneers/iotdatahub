@@ -182,6 +182,7 @@ const AuthRegister = ({ ...others }) => {
     try {
       const result = await signIn("google", {
         callbackUrl: "/feature-creation",
+        callbackUrl: "/feature-creation",
         redirect: false,
       });
       if (result && result.error) {
@@ -322,6 +323,24 @@ const AuthRegister = ({ ...others }) => {
 
   return (
     <>
+      <AuthCardWrapper>
+        <Grid container spacing={2} alignItems="center" justifyContent="center">
+          <Grid item xs={12}>
+            <Snackbar
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+              open={open}
+              autoHideDuration={12000}
+              onClose={handleCloseResult}
+            >
+              <Alert
+                onClose={handleCloseResult}
+                severity="error"
+                variant="standard"
+                sx={{ width: "100%" }}
+              >
+                {error && error}
+              </Alert>
+            </Snackbar>
       <AuthCardWrapper>
         <Grid container spacing={2} alignItems="center" justifyContent="center">
           <Grid item xs={12}>
@@ -790,6 +809,11 @@ const AuthRegister = ({ ...others }) => {
                     </Grid>
                   </Grid>
 
+                  {errors.submit && (
+                    <Box sx={{ mt: 3 }}>
+                      <FormHelperText error>{errors.submit}</FormHelperText>
+                    </Box>
+                  )}
                   {errors.submit && (
                     <Box sx={{ mt: 3 }}>
                       <FormHelperText error>{errors.submit}</FormHelperText>

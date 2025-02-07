@@ -13,6 +13,9 @@ export async function POST(req: NextRequest) {
     const body: User = await req.json();
     const { userFullName, userEmail } = body;
 
+    console.log("Email:", userEmail);
+    console.log("userFullName:", userFullName);
+
     // Generate verification token
     const token = crypto.randomInt(100000, 999999).toString();
     const expiryTime = new Date();

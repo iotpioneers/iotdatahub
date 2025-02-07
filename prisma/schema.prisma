@@ -1,5 +1,7 @@
 // C:\Users\emash\IoTDataHub\prisma\schema.prisma
 
+// C:\Users\emash\IoTDataHub\prisma\schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -84,6 +86,7 @@ model User {
   channels        Channel[]
   apiKeys         ApiKey[]
   payments        Payment[]
+  payments        Payment[]
   feedbackReplies FeedbackReply[]
   subscriptionId  String?         @db.ObjectId
   organizationId  String?         @db.ObjectId
@@ -108,10 +111,20 @@ model Organization {
   phoneNumber    String?
   country        String?
   deviceCount    String?
+  industry       String?
+  employeeCount  String?
+  contactName    String?
+  email          String?
+  jobTitle       String?
+  phoneNumber    String?
+  country        String?
+  deviceCount    String?
   areaOfInterest String[]
+  userId         String?          @db.ObjectId
   userId         String?          @db.ObjectId
   users          User[]
   members        Member[]
+  payments       Payment[]
   payments       Payment[]
   feedbacks      Feedback[]
 
@@ -124,6 +137,7 @@ model Organization {
   ApiKey       ApiKey[]
   SampleCodes  SampleCodes[]
   Subscription Subscription[]
+  ContactSales ContactSales[]
   ContactSales ContactSales[]
 
   @@index([userId])
@@ -506,9 +520,29 @@ model Invoice {
   expiryDate         DateTime?
   paidAt             DateTime?
   payments           Payment[]
+  payments           Payment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
+}
+
+model ContactSales {
+  id             String             @id @default(auto()) @map("_id") @db.ObjectId
+  firstName      String
+  lastName       String
+  workEmail      String
+  jobTitle       String
+  phoneNumber    String
+  expectedUsers  String
+  message        String?
+  status         ContactSalesStatus @default(PENDING)
+  organizationId String?            @db.ObjectId
+  organization   Organization?      @relation(fields: [organizationId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  @@index([organizationId])
 }
 
 model ContactSales {
@@ -714,6 +748,32 @@ enum SubscriptionType {
   FREE
   PREMIUM
   ENTERPRISE
+}
+
+enum PaymentType {
+  CREDIT_CARD
+  MOBILE_MONEY
+}
+
+enum PaymentProvider {
+  MTN
+  AIRTEL
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum ContactSalesStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
 }
 
 enum PaymentType {

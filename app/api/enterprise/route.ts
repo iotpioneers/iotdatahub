@@ -16,7 +16,7 @@ interface EnterpriseData {
 }
 
 async function sendEnterpriseNotificationEmails(
-  enterpriseData: EnterpriseData
+  enterpriseData: EnterpriseData,
 ) {
   const config = {
     service: "gmail",
@@ -265,7 +265,7 @@ export async function POST(request: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         { error: validation.error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -287,7 +287,7 @@ export async function POST(request: NextRequest) {
         name: organizationName,
         type: "ENTREPRISE",
         industry,
-      employeeCount,
+        employeeCount,
         contactName,
         jobTitle,
         email,
@@ -305,7 +305,7 @@ export async function POST(request: NextRequest) {
     console.error("Enterprise registration error:", error);
     return NextResponse.json(
       { error: "Error creating enterprise account" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -322,7 +322,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching enterprise accounts:", error);
     return NextResponse.json(
       { error: "Error fetching enterprise accounts" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

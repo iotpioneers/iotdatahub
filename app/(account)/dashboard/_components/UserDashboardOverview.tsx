@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
@@ -8,6 +9,8 @@ import { Channel, DataPoint, Device, Field, Organization } from "@/types";
 import { EmployeeMember } from "@/types/employees-member";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { DashboardOverview } from "@/components/dashboard";
+import { useSession } from "next-auth/react";
+import SubscriptionModal from "@/components/dashboard/Checkout/SubscriptionModal";
 import { useSession } from "next-auth/react";
 import SubscriptionModal from "@/components/dashboard/Checkout/SubscriptionModal";
 
@@ -31,10 +34,9 @@ const fetcher = async (url: string): Promise<ApiResponse> => {
 
 const UserDashboardOverview = () => {
   const router = useRouter();
-  const { status,data: session } = useSession();
+  const { status, data: session } = useSession();
 
   console.log("UserDashboardOverview", session);
-  
 
   const { data, error } = useSWR<ApiResponse, Error>(
     "/api/organizations/status",
@@ -52,7 +54,8 @@ const UserDashboardOverview = () => {
 
   useEffect(() => {
     if (
-      status=== "authenticated" && session?.user && 
+      status === "authenticated" &&
+      session?.user &&
       (session.user.subscriptionId === null || !session?.user.subscriptionId)
     ) {
       setIsModalOpen(true);
@@ -75,6 +78,10 @@ const UserDashboardOverview = () => {
         channels={channels}
         fields={fields}
         datapoints={datapoints}
+      />
+      <SubscriptionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
       />
       <SubscriptionModal
         isOpen={isModalOpen}
