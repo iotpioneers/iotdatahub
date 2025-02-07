@@ -9,7 +9,6 @@ import FAQ from "./LandingPage/FAQ";
 import Footer from "./components/Footer";
 import OurServices from "./LandingPage/OurServices";
 import AnimatedMovingFeaturesComponent from "./LandingPage/HomeAnimatedMovingFeaturesComponent";
-import AnimatedMovingFeaturesComponent from "./LandingPage/HomeAnimatedMovingFeaturesComponent";
 import PopUpButton from "@/components/Home/components/design/PopUpButton/PopUpButton";
 
 // Hero Component

@@ -14,10 +14,8 @@ import {
   StepLabel,
   Button,
   FormHelperText,
-  Snackbar,
   Alert,
   Snackbar,
-  Alert,
 } from "@mui/material";
 import { MuiOtpInput } from "mui-one-time-password-input";
 import useSWR from "swr";
@@ -32,10 +30,7 @@ const EmailVerificationComponent = () => {
     null,
   );
   const [isResending, setIsResending] = React.useState(false);
-  const [successMessage, setSuccessMessage] = React.useState<string | null>(
-    null,
-  );
-  const [isResending, setIsResending] = React.useState(false);
+
   const router = useRouter();
 
   const fetcher = async (url: string, otp: string) => {
