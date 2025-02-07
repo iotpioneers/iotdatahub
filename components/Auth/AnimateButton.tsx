@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import React, { ForwardedRef } from "react";
 import { motion, useCycle } from "framer-motion";
 
@@ -25,7 +24,7 @@ const AnimateButton = React.forwardRef<HTMLDivElement, AnimateButtonProps>(
         tap: 0.9,
       },
     },
-    ref: ForwardedRef<HTMLDivElement>
+    ref: ForwardedRef<HTMLDivElement>,
   ) => {
     let offset1: number;
     let offset2: number;
@@ -102,21 +101,7 @@ const AnimateButton = React.forwardRef<HTMLDivElement, AnimateButtonProps>(
           </motion.div>
         );
     }
-  }
+  },
 );
-
-AnimateButton.propTypes = {
-  children: PropTypes.node.isRequired,
-  offset: PropTypes.number,
-  type: PropTypes.oneOf(["slide", "scale", "rotate"]),
-  direction: PropTypes.oneOf(["up", "down", "left", "right"]),
-  scale: PropTypes.oneOfType([
-    PropTypes.number,
-    PropTypes.shape({
-      hover: PropTypes.number.isRequired,
-      tap: PropTypes.number.isRequired,
-    }),
-  ]),
-};
 
 export default AnimateButton;

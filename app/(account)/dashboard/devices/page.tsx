@@ -1,13 +1,12 @@
 import { Suspense } from "react";
-import DeviceTable from "./_components/DevicesTable";
+import DeviceListingComponent from "./_components/DeviceListingComponent";
 import { Metadata } from "next";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 const DeviceListingsPage = async () => {
   return (
     <Suspense fallback={<LoadingSpinner />}>
-      <DeviceTable />
+      <DeviceListingComponent />
     </Suspense>
   );
 };

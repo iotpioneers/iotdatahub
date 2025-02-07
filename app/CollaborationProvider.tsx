@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import {
   ClientSideSuspense,
   LiveblocksProvider,
@@ -10,6 +10,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { getUsers, getChannelRoomUsers } from "@/lib/actions/user.actions";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import SessionModal from "@/components/Actions/SessionModal";
 
 const CollaborationProvider = ({ children }: { children: ReactNode }) => {
   const { status, data: session } = useSession();
@@ -23,6 +24,7 @@ const CollaborationProvider = ({ children }: { children: ReactNode }) => {
   const [alertSeverity, setAlertSeverity] = useState<
     "success" | "error" | "warning" | "info"
   >("info");
+  const [showSessionModal, setShowSessionModal] = useState(false);
 
   // Snackbar and Alert management
   const handleSnackbarClose = () => setSnackbarOpen(false);
@@ -33,10 +35,12 @@ const CollaborationProvider = ({ children }: { children: ReactNode }) => {
 
   if (status === "unauthenticated" || !session?.user) {
     return (
-      <p>
-        Failed to load resources, you can check your internet connection. If the
-        problem persists, please try to login again or contact support.{" "}
-      </p>
+      <SessionModal
+        open={true}
+        type="session"
+        onRefresh={() => window.location.reload()}
+        onLogin={() => signIn()}
+      />
     );
   }
 

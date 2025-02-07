@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     if (!token) {
       return NextResponse.json(
         { error: "User not authenticated" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         {
           error: "User not found",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
         {
           error: "A member with this email already exists in the organization",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -74,7 +74,6 @@ export async function POST(request: NextRequest) {
         access: "EDITOR",
         organizationId: newOrganization.id,
         phone: user.phonenumber || "N/A",
-        country: user.country || "N/A",
       },
     });
 
@@ -98,7 +97,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       console.log("Error creating organization:", error),
       // { error: "Error creating organization" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -109,7 +108,7 @@ export async function GET(request: NextRequest) {
     if (!token) {
       return NextResponse.json(
         { error: "You must be logged in" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -137,7 +136,7 @@ export async function GET(request: NextRequest) {
     if (!organizations || organizations.length === 0) {
       return NextResponse.json(
         { error: "There are no organizations" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -146,7 +145,7 @@ export async function GET(request: NextRequest) {
     console.error("Error retrieving organizations:", error);
     return NextResponse.json(
       { error: "Error retrieving organizations" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

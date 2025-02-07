@@ -15,8 +15,7 @@ import Drawer from "@mui/material/Drawer";
 import { AdminPanelSettingsOutlined } from "@mui/icons-material";
 
 import LoadingProgressBar from "../LoadingProgressBar";
-import UpgradePlanCardAlert from "./UpgradePlanCardAlert";
-import Logo from "../Home/Logo";
+import { Logo } from "../Home/Logo";
 
 interface SidebarContentProps {
   isLoading: boolean;
@@ -177,27 +176,22 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             {activeLink === "/admin" && isLoading && <LoadingProgressBar />}
           </Link>
         )}
-        <Link href="/dashboard/organization">
+        <Link href="/organization/dashboard">
           <div
             className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
-              activeLink === "/dashboard/organization"
+              activeLink === "/organization/dashboard"
                 ? "bg-gray-300 text-white"
                 : "hover:bg-gray-200 text-black"
             }`}
-            onClick={() => handleSetActiveLink("/dashboard/organization")}
+            onClick={() => handleSetActiveLink("/organization/dashboard")}
           >
             <GiOrganigram className="text-2xl text-black" />
             <h3 className="text-base font-semibold text-black">Organization</h3>
           </div>
-          {activeLink === "/dashboard/organization" && isLoading && (
+          {activeLink === "/organization/dashboard" && isLoading && (
             <LoadingProgressBar />
           )}
         </Link>
-      </div>
-
-      {/* Upgrade Plan Card */}
-      <div className="my-2">
-        <UpgradePlanCardAlert />
       </div>
     </div>
   );

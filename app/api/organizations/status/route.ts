@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     if (!token) {
       return NextResponse.json(
         { error: "User not authenticated" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     if (!userOrganization) {
       return NextResponse.json(
         { hasOrganization: false, organization: null },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -42,6 +42,17 @@ export async function GET(request: NextRequest) {
 
     const devices = await prisma.device.findMany({
       where: { organizationId: userOrganization.id },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        channelId: true,
+        organizationId: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        userId: true,
+      },
     });
 
     const channels = await prisma.channel.findMany({
@@ -58,7 +69,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       {
-        hasOrganization: !!userOrganization,
+        hasOrganization: true,
         organization: userOrganization,
         members,
         devices,
@@ -66,12 +77,13 @@ export async function GET(request: NextRequest) {
         fields,
         datapoints,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
+    console.error("Error occurred while fetching organization status", error);
     return NextResponse.json(
       { error: "Error fetching organization status" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

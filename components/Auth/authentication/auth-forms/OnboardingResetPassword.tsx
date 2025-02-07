@@ -61,7 +61,8 @@ const OnboardingResetPassword: React.FC = () => {
         process.env.NEXT_PUBLIC_BASE_URL + "/api/email/forgot-password",
         {
           userEmail: email,
-        }
+          userFullName: "User",
+        },
       );
 
       if (response.status !== 200) {
@@ -87,7 +88,7 @@ const OnboardingResetPassword: React.FC = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ otp }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -116,7 +117,7 @@ const OnboardingResetPassword: React.FC = () => {
         .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
         .matches(
           /[!@#$%^&*(),.?":{}|<>]/,
-          "Password must contain at least one special character"
+          "Password must contain at least one special character",
         )
         .matches(/\d/, "Password must contain at least one number")
         .required("Password is required"),
@@ -136,7 +137,7 @@ const OnboardingResetPassword: React.FC = () => {
               email: email,
               password: values.password,
             }),
-          }
+          },
         );
         const data: PasswordResetResponse = await response.json();
         if (!data.success) {
@@ -155,7 +156,7 @@ const OnboardingResetPassword: React.FC = () => {
   };
 
   const handleMouseDownPassword = (
-    event: React.MouseEvent<HTMLButtonElement>
+    event: React.MouseEvent<HTMLButtonElement>,
   ) => {
     event.preventDefault();
   };
@@ -220,7 +221,7 @@ const OnboardingResetPassword: React.FC = () => {
               margin="normal"
               error={Boolean(
                 passwordFormik.touched.password &&
-                  passwordFormik.errors.password
+                  passwordFormik.errors.password,
               )}
             >
               <InputLabel htmlFor="password">New Password</InputLabel>
@@ -256,7 +257,7 @@ const OnboardingResetPassword: React.FC = () => {
               margin="normal"
               error={Boolean(
                 passwordFormik.touched.confirmPassword &&
-                  passwordFormik.errors.confirmPassword
+                  passwordFormik.errors.confirmPassword,
               )}
             >
               <InputLabel htmlFor="confirmPassword">

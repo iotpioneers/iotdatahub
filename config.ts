@@ -9,7 +9,8 @@ export interface Config {
 export const config: Config = {
   site: {
     name: "IoTDataHub",
-    description: "",
+    description:
+      "Scalable IoT data aggregation platform for enterprise-level device management and real-time monitoring",
     themeColor: "#090a0b",
     url: getSiteURL(),
   },

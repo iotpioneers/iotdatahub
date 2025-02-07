@@ -7,6 +7,7 @@ import axios from "axios";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { a } from "react-spring";
 
 interface Props {
   params: { token: string };
@@ -51,8 +52,8 @@ const VerifyEmail = ({ params }: Props) => {
         setMessage(response.data.message);
         setOpen(true);
         router.push("/feature-creation");
-      } catch (err) {
-        setError("An error occurred while verifying your email.");
+      } catch (err: any) {
+        setError(err.message as string);
         setOpen(true);
       } finally {
         setLoading(false);

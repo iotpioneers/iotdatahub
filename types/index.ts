@@ -1,5 +1,7 @@
 import { BaseMetadata } from "@liveblocks/client";
 import { ThreadData } from "@liveblocks/node";
+import { EmployeeMember } from "./employees-member";
+import { Widget } from "./widgets";
 
 export interface ApiKey {
   id: string;
@@ -16,6 +18,7 @@ export interface Device {
   channelId: string | null;
   organizationId: string;
   status: "ONLINE" | "OFFLINE" | "DISCONNECTED";
+  widgets: Widget[];
   createdAt: Date;
   updatedAt: Date;
   userId: string;
@@ -64,19 +67,13 @@ export interface Organization {
   type: string;
   updatedAt: Date;
   userId: string;
-}
-
-export interface Member {
-  country: string;
-  avatar?: string;
-  access: string;
-  createdAt: Date;
-  id: string;
-  name: string;
-  email: string;
-  updatedAt: Date;
-  userId: string;
-  organizationId: string;
+  users: EmployeeMember[] | [];
+  channels: Channel[] | [];
+  dataPoint: DataPoint[] | [];
+  field: Field[] | [];
+  Device: Device[] | [];
+  subscription: [] | [];
+  apiKey: ApiKey[] | [];
 }
 
 export interface PricingPlanType {
@@ -107,7 +104,7 @@ export interface UserSubscriptionData {
 }
 
 export interface AddMemberProps {
-  onNewMember: (newMember: Member) => void;
+  onNewMember: (newMember: EmployeeMember) => void;
 }
 
 /* eslint-disable no-unused-vars */
@@ -244,4 +241,15 @@ export interface Feedback {
 
 export interface ReplyFormValues {
   message: string;
+}
+
+export interface ContactSalesFormData {
+  firstName: string;
+  lastName: string;
+  workEmail: string;
+  jobTitle: string;
+  phoneNumber: string;
+  expectedUsers: string;
+  message: string;
+  organizationId?: string;
 }

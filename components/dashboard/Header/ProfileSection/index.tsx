@@ -42,6 +42,7 @@ import {
 } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import UpgradePlanCardAlert from "@/components/sidebar/UpgradePlanCardAlert";
 
 // ==============================|| PROFILE MENU ||============================== //
 
@@ -95,7 +96,7 @@ const ProfileSection = () => {
   const handleListItemClick = (
     event: React.MouseEvent,
     index: number,
-    route = ""
+    route = "",
   ) => {
     setSelectedIndex(index);
     handleClose(event as unknown as MouseEvent | TouchEvent);
@@ -206,29 +207,10 @@ const ProfileSection = () => {
                       </Stack>
                       <Typography variant="subtitle2">{userEmail}</Typography>
                     </Stack>
-                    <OutlinedInput
-                      sx={{ width: "100%", pr: 1, pl: 2, my: 2 }}
-                      id="input-search-profile"
-                      value={value}
-                      onChange={(e) => setValue(e.target.value)}
-                      placeholder="Search profile options"
-                      startAdornment={
-                        <InputAdornment position="start">
-                          <IconSearch
-                            stroke={1.5}
-                            size="1rem"
-                            color={theme.palette.grey[500]}
-                          />
-                        </InputAdornment>
-                      }
-                      aria-describedby="search-helper-text"
-                      inputProps={{
-                        "aria-label": "weight",
-                      }}
-                    />
                     <Divider />
                   </Box>
 
+                  {/* Make the box scrollable so that the bottom element is not hidden*/}
                   <Box
                     sx={{
                       height: "100%",
@@ -238,49 +220,13 @@ const ProfileSection = () => {
                       pt: 0,
                     }}
                   >
-                    <Card
-                      sx={{
-                        bgcolor: theme.palette.primary.light,
-                        my: 2,
-                      }}
-                    >
-                      <CardContent>
-                        <Grid container spacing={3} direction="column">
-                          <Grid item>
-                            <Grid
-                              item
-                              container
-                              alignItems="center"
-                              justifyContent="space-between"
-                            >
-                              <Grid item>
-                                <Typography variant="subtitle1">
-                                  Allow Notifications
-                                </Typography>
-                              </Grid>
-                              <Grid item>
-                                <Switch
-                                  checked={notification}
-                                  onChange={(e) =>
-                                    setNotification(e.target.checked)
-                                  }
-                                  name="sdm"
-                                  size="small"
-                                />
-                              </Grid>
-                            </Grid>
-                          </Grid>
-                        </Grid>
-                      </CardContent>
-                    </Card>
-                    <Divider />
                     <List
                       component="nav"
                       sx={{
                         width: "100%",
                         maxWidth: 350,
                         minWidth: 300,
-                        backgroundColor: theme.palette.background.paper,
+                        backgroundColor: theme.palette.primary.light,
                         borderRadius: "10px",
                         [theme.breakpoints.down("md")]: {
                           minWidth: "100%",
@@ -290,66 +236,95 @@ const ProfileSection = () => {
                         },
                       }}
                     >
-                      <ListItemButton
+                      {/* Upgrade Plan Card */}
+                      <Card
                         sx={{
-                          borderRadius: `${customization.borderRadius}px`,
+                          bgcolor: theme.palette.primary.light,
+                          my: 2,
                         }}
-                        selected={selectedIndex === 0}
-                        onClick={(event) =>
-                          handleListItemClick(event, 0, "/dashboard/settings")
-                        }
                       >
-                        <ListItemIcon>
-                          <IconSettings stroke={1.5} size="1.3rem" />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <Typography variant="body2">Settings</Typography>
+                        <UpgradePlanCardAlert />
+                      </Card>
+                      <Divider />
+                      <List
+                        component="nav"
+                        sx={{
+                          width: "100%",
+                          maxWidth: 350,
+                          minWidth: 300,
+                          backgroundColor: theme.palette.background.paper,
+                          borderRadius: "10px",
+                          [theme.breakpoints.down("md")]: {
+                            minWidth: "100%",
+                          },
+                          "& .MuiListItemButton-root": {
+                            mt: 0.5,
+                          },
+                        }}
+                      >
+                        <ListItemButton
+                          sx={{
+                            borderRadius: `${customization.borderRadius}px`,
+                          }}
+                          selected={selectedIndex === 0}
+                          onClick={(event) =>
+                            handleListItemClick(event, 0, "/dashboard/settings")
                           }
-                        />
-                      </ListItemButton>
-                      <ListItemButton
-                        sx={{
-                          borderRadius: `${customization.borderRadius}px`,
-                        }}
-                        selected={selectedIndex === 1}
-                        onClick={(event) =>
-                          handleListItemClick(event, 1, "/dashboard/account")
-                        }
-                      >
-                        <ListItemIcon>
-                          <IconUser stroke={1.5} size="1.3rem" />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <Grid
-                              container
-                              spacing={1}
-                              justifyContent="space-between"
-                            >
-                              <Grid item>
-                                <Typography variant="body2">Account</Typography>
+                        >
+                          <ListItemIcon>
+                            <IconSettings stroke={1.5} size="1.3rem" />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <Typography variant="body2">Settings</Typography>
+                            }
+                          />
+                        </ListItemButton>
+                        <ListItemButton
+                          sx={{
+                            borderRadius: `${customization.borderRadius}px`,
+                          }}
+                          selected={selectedIndex === 1}
+                          onClick={(event) =>
+                            handleListItemClick(event, 1, "/dashboard/account")
+                          }
+                        >
+                          <ListItemIcon>
+                            <IconUser stroke={1.5} size="1.3rem" />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <Grid
+                                container
+                                spacing={1}
+                                justifyContent="space-between"
+                              >
+                                <Grid item>
+                                  <Typography variant="body2">
+                                    Account
+                                  </Typography>
+                                </Grid>
                               </Grid>
-                            </Grid>
-                          }
-                        />
-                      </ListItemButton>
-                      <ListItemButton
-                        sx={{
-                          borderRadius: `${customization.borderRadius}px`,
-                        }}
-                        selected={selectedIndex === 4}
-                        onClick={handleLogout}
-                      >
-                        <ListItemIcon>
-                          <IconLogout stroke={1.5} size="1.3rem" />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <Typography variant="body2">Logout</Typography>
-                          }
-                        />
-                      </ListItemButton>
+                            }
+                          />
+                        </ListItemButton>
+                        <ListItemButton
+                          sx={{
+                            borderRadius: `${customization.borderRadius}px`,
+                          }}
+                          selected={selectedIndex === 4}
+                          onClick={handleLogout}
+                        >
+                          <ListItemIcon>
+                            <IconLogout stroke={1.5} size="1.3rem" />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <Typography variant="body2">Logout</Typography>
+                            }
+                          />
+                        </ListItemButton>
+                      </List>
                     </List>
                   </Box>
                 </MainCard>

@@ -11,7 +11,7 @@ const LoadingSpinner = () => {
         priority
         className="animate-spin"
       />
-      Loading...
+      Connecting
     </div>
   );
 };

@@ -1,5 +1,3 @@
-// C:\Users\emash\IoTDataHub\prisma\schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -114,7 +112,6 @@ model Organization {
   members        Member[]
   payments       Payment[]
   feedbacks      Feedback[]
-
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt()
   Channel      Channel[]
@@ -134,8 +131,8 @@ model Member {
   name           String
   email          String
   phone          String?
-  country        String?
   avatar         String?
+  address        Json?
   access         MemberAccess @default(VIEWER)
   organizationId String       @db.ObjectId
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -150,6 +147,17 @@ model Device {
   id             String       @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   description    String?
+  deviceType     DeviceType?
+  model          String?
+  firmware       String?
+  config         Json?
+  metadata       Json?
+  ipAddress      String?
+  macAddress     String?
+  lastPing       DateTime?
+  batteryLevel   Float?
+  signal         Float?
+  location       Json?
   userId         String       @db.ObjectId
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   channelId      String       @db.ObjectId
@@ -157,6 +165,14 @@ model Device {
   organizationId String       @db.ObjectId
   organization   Organization @relation(fields: [organizationId], references: [id])
   status         DeviceStatus @default(OFFLINE)
+
+  // New relations
+  automations DeviceAutomation[]
+  alerts      DeviceAlert[]
+  commands    DeviceCommand[]
+  maintenance MaintenanceLog[]
+  schedules   Schedule[]
+  widgets     Widget[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
@@ -166,11 +182,105 @@ model Device {
   @@index([userId])
 }
 
+model DeviceAutomation {
+  id          String             @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  deviceId    String             @db.ObjectId
+  device      Device             @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  type        AutomationType
+  condition   Json // Trigger conditions
+  action      Json // Actions to perform
+  status      AutomationStatus   @default(ACTIVE)
+  schedule    String? // Cron expression for scheduled automations
+  priority    AutomationPriority @default(MEDIUM)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt()
+  lastRun   DateTime?
+  nextRun   DateTime?
+
+  @@index([deviceId])
+}
+
+model DeviceAlert {
+  id         String        @id @default(auto()) @map("_id") @db.ObjectId
+  deviceId   String        @db.ObjectId
+  device     Device        @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  type       AlertType
+  severity   AlertSeverity
+  message    String
+  status     AlertStatus   @default(ACTIVE)
+  metadata   Json?
+  resolvedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  @@index([deviceId])
+}
+
+model DeviceCommand {
+  id         String        @id @default(auto()) @map("_id") @db.ObjectId
+  deviceId   String        @db.ObjectId
+  device     Device        @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  type       CommandType
+  payload    Json
+  status     CommandStatus @default(PENDING)
+  response   Json?
+  executedAt DateTime?
+  error      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  @@index([deviceId])
+}
+
+model MaintenanceLog {
+  id           String            @id @default(auto()) @map("_id") @db.ObjectId
+  deviceId     String            @db.ObjectId
+  device       Device            @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  type         MaintenanceType
+  status       MaintenanceStatus @default(PENDING)
+  description  String?
+  performedBy  String?
+  scheduledFor DateTime?
+  completedAt  DateTime?
+  notes        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  @@index([deviceId])
+}
+
+model Schedule {
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  deviceId       String         @db.ObjectId
+  device         Device         @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?
+  cronExpression String // For recurring schedules
+  action         Json
+  status         ScheduleStatus @default(ACTIVE)
+  lastRun        DateTime?
+  nextRun        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  @@index([deviceId])
+}
+
 model Channel {
   id              String          @id @default(auto()) @map("_id") @db.ObjectId
   name            String
   description     String?
+  connectionType  String?
+  hardware        String?
   access          Access          @default(PRIVATE)
+  widgets         Widget[]
   fields          Field[]
   dataPoints      DataPoint[]
   channelAccesses ChannelAccess[]
@@ -201,6 +311,25 @@ model ChannelAccess {
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
 
+  @@index([channelId])
+}
+
+model Widget {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  name       String?
+  definition Json?
+  position   Json?
+  settings   Json?
+  color      String?
+  deviceId   String  @db.ObjectId
+  device     Device  @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  channelId  String  @db.ObjectId
+  channel    Channel @relation(fields: [channelId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  @@index([deviceId])
   @@index([channelId])
 }
 
@@ -291,8 +420,9 @@ model PricingTier {
   subscriptions      Subscription[]
   activation         Boolean          @default(false)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt()
+  Payment   Payment[]
 }
 
 model Subscription {
@@ -317,23 +447,23 @@ model Subscription {
 }
 
 model Payment {
-  id          String           @id @default(auto()) @map("_id") @db.ObjectId
-  amount      Float
-  currency    String           @default("RWF")
-  status      PaymentStatus    @default(PENDING)
-  type        PaymentType
-  provider    PaymentProvider?
-  description String?
+  id       String        @id @default(auto()) @map("_id") @db.ObjectId
+  amount   Float
+  currency String        @default("RWF")
+  status   PaymentStatus @default(PENDING)
+  type     PaymentType
 
   // Credit card specific fields
   cardLastFour    String?
   cardExpiryMonth String?
   cardExpiryYear  String?
   cardHolderName  String?
+  description     String?
 
   // Mobile money specific fields
   phoneNumber   String?
-  transactionId String? @unique
+  provider      PaymentProvider?
+  transactionId String?          @unique
 
   // Common metadata
   metadata     Json?
@@ -344,6 +474,8 @@ model Payment {
   user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   organizationId String?       @db.ObjectId
   organization   Organization? @relation(fields: [organizationId], references: [id])
+  pricingTierId  String        @db.ObjectId
+  pricingTier    PricingTier   @relation(fields: [pricingTierId], references: [id])
   invoiceId      String?       @db.ObjectId
   invoice        Invoice?      @relation(fields: [invoiceId], references: [id])
 
@@ -364,14 +496,13 @@ model Invoice {
   subscription       Subscription      @relation(fields: [subscriptionId], references: [id])
   amount             Float
   status             InvoiceStatus
-  stripeChargeId     String
+  stripeChargeId     String?
   paymentMethod      String
   paymentType        PaymentMethodType
   lastFourCardDigits String?
   expiryDate         DateTime?
   paidAt             DateTime?
   payments           Payment[]
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
 }
@@ -427,6 +558,102 @@ model FeedbackReply {
   @@index([userId])
 }
 
+enum DeviceType {
+  SENSOR
+  ACTUATOR
+  GATEWAY
+  CONTROLLER
+  OTHER
+}
+
+enum DeviceStatus {
+  ONLINE
+  OFFLINE
+  MAINTENANCE
+  ERROR
+  DISABLED
+}
+
+enum AutomationType {
+  SCHEDULED
+  CONDITIONAL
+  TRIGGER
+  SEQUENCE
+}
+
+enum AutomationStatus {
+  ACTIVE
+  PAUSED
+  DISABLED
+}
+
+enum AutomationPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum AlertType {
+  SYSTEM
+  SECURITY
+  PERFORMANCE
+  CONNECTIVITY
+  CUSTOM
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+enum AlertStatus {
+  ACTIVE
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+enum CommandType {
+  POWER
+  RESET
+  UPDATE
+  CONFIGURE
+  CUSTOM
+}
+
+enum CommandStatus {
+  PENDING
+  SENT
+  DELIVERED
+  EXECUTED
+  FAILED
+  TIMEOUT
+}
+
+enum MaintenanceType {
+  ROUTINE
+  REPAIR
+  UPDATE
+  INSPECTION
+  EMERGENCY
+}
+
+enum MaintenanceStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ScheduleStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
 enum SubscriptionStatus {
   ACTIVE
   CANCELED
@@ -472,12 +699,6 @@ enum ChannelAccessType {
   EDITOR
 
   @@map("AccessType")
-}
-
-enum DeviceStatus {
-  ONLINE
-  OFFLINE
-  DISCONNECTED
 }
 
 enum OrganizationType {

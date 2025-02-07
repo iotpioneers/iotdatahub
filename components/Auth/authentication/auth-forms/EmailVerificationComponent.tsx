@@ -14,24 +14,11 @@ import {
   StepLabel,
   Button,
   FormHelperText,
-  Snackbar,
   Alert,
+  Snackbar,
 } from "@mui/material";
 import { MuiOtpInput } from "mui-one-time-password-input";
 import useSWR from "swr";
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="/" sx={{ marginRight: 1 }}>
-        IoT Data Hub
-      </Link>
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
 
 const defaultTheme = createTheme();
 
@@ -40,9 +27,10 @@ const EmailVerificationComponent = () => {
   const [activeStep, setActiveStep] = React.useState(1);
   const [error, setError] = React.useState<string | null>(null);
   const [successMessage, setSuccessMessage] = React.useState<string | null>(
-    null
+    null,
   );
   const [isResending, setIsResending] = React.useState(false);
+
   const router = useRouter();
 
   const fetcher = async (url: string, otp: string) => {
@@ -71,7 +59,7 @@ const EmailVerificationComponent = () => {
     {
       revalidateOnFocus: false,
       shouldRetryOnError: false,
-    }
+    },
   );
 
   React.useEffect(() => {
@@ -123,7 +111,7 @@ const EmailVerificationComponent = () => {
         throw new Error(data.error || "Failed to resend verification email");
       }
 
-      setSuccessMessage("Verification email resent successfully!");
+      setSuccessMessage("Verification email has been resent successfully!");
       setOtp("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to resend email");
@@ -144,13 +132,13 @@ const EmailVerificationComponent = () => {
       >
         <Container component="main" sx={{ mt: 16 }} maxWidth="sm">
           <Typography
-            variant="h3"
+            variant="h2"
             component="h1"
             gutterBottom
             align="center"
-            sx={{ mb: 4 }}
+            sx={{ mb: 4, fontWeight: 700 }}
           >
-            Verify Your Email
+            Confirm Your Email Now
           </Typography>
           <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
             <Step>
@@ -163,8 +151,8 @@ const EmailVerificationComponent = () => {
           {activeStep === 1 && (
             <>
               <Typography variant="body2" align="center" sx={{ mb: 2 }}>
-                Protecting your account is our priority. Please confirm your
-                identity by providing the code sent to your email
+                Check your inbox for an email from <b>IoT DATA HUB</b>. Please
+                confirm your identity by providing the code sent to your email
               </Typography>
               <form onSubmit={handleOtpVerify}>
                 <MuiOtpInput
@@ -188,6 +176,15 @@ const EmailVerificationComponent = () => {
                 >
                   {isValidating ? "Verifying..." : "Verify OTP"}
                 </Button>
+                <Typography
+                  variant="body2"
+                  align="center"
+                  sx={{ mt: 2 }}
+                  color="textSecondary"
+                >
+                  Search SPAM folder for an email from <b>IoT DATA HUB</b>. Also
+                  add it to your address book.{" "}
+                </Typography>
                 <Typography
                   variant="body2"
                   align="center"
@@ -224,15 +221,27 @@ const EmailVerificationComponent = () => {
                 onClick={() => router.push("/login")}
                 sx={{ mt: 2 }}
               >
-                Continue
+                Continue Continue
               </Button>
             </>
           )}
         </Container>
-        <Box sx={{ mt: "auto", py: 3 }}>
-          <Copyright />
-        </Box>
       </Box>
+
+      <Snackbar
+        open={!!successMessage}
+        autoHideDuration={6000}
+        onClose={() => setSuccessMessage(null)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={() => setSuccessMessage(null)}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {successMessage}
+        </Alert>
+      </Snackbar>
 
       <Snackbar
         open={!!successMessage}

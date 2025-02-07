@@ -52,20 +52,15 @@ const Login = () => {
                           spacing={1}
                         >
                           <Typography
-                            color="secondary.main"
                             gutterBottom
                             variant={downMD ? "h3" : "h2"}
                           >
-                            Hi, Welcome Back
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            fontSize="16px"
-                            textAlign={{ xs: "center", md: "inherit" }}
-                          >
-                            Enter your credentials to continue
+                            Login to IoT DATA HUB
                           </Typography>
                         </Stack>
+                      </Grid>
+                      <Grid item xs={12} py={3}>
+                        <Divider />
                       </Grid>
                     </Grid>
                   </Grid>

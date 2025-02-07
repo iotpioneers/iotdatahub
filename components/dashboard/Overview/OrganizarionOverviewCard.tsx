@@ -16,7 +16,8 @@ import SkeletonTotalDatGeneratedLightCard from "../cards/Skeleton/SkeletonTotalD
 
 // assets
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
-import { Member, Organization } from "@/types";
+import { Organization } from "@/types";
+import { EmployeeMember } from "@/types/employees-member";
 
 // styles
 const CardWrapper = styled(MainCard)(({ theme }) => ({
@@ -51,7 +52,7 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 interface OrganizarionOverviewProps {
   isLoading: boolean;
   organization: Organization | null;
-  members: Member[] | null;
+  members: EmployeeMember[] | null;
 }
 
 const OrganizarionOverviewCard: React.FC<OrganizarionOverviewProps> = ({

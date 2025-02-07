@@ -8,7 +8,6 @@ import Grid from "@mui/material/Grid";
 import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
 
 // project imports
-import UserActivityOverviewCard from "@/components/dashboard/Overview/UserActivityOverviewCard";
 import OrganizarionOverviewCard from "@/components/dashboard/Overview/OrganizarionOverviewCard";
 import TotalDataGeneratedCard from "@/components/dashboard/Overview/TotalDataGeneratedCard";
 import ChannelActivityOverview from "@/components/dashboard/Overview/DeviceActivityOverview";
@@ -17,21 +16,15 @@ import TotalDevicesCard from "@/components/dashboard/Overview/TotalDevicesCard";
 import { gridSpacing } from "@/app/store/constant";
 
 // assets
-import {
-  Channel,
-  DataPoint,
-  Field,
-  Device,
-  Member,
-  Organization,
-} from "@/types";
+import { Channel, DataPoint, Field, Device, Organization } from "@/types";
+import { EmployeeMember } from "@/types/employees-member";
 import WelcomeContentCard from "./Overview/WelcomeContentCard";
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
 interface DashboardOverviewProps {
   organization: Organization | null;
-  members: Member[] | null;
+  members: EmployeeMember[] | null;
   devices: Device[] | null;
   channels: Channel[] | null;
   fields: Field[] | null;
@@ -71,7 +64,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           <Grid item lg={4} md={12} sm={12} xs={12}>
             <Grid container spacing={gridSpacing}>
               <Grid item sm={6} xs={12} md={6} lg={12}>
-                <div onClick={() => handleRedirect("/dashboard/organizations")}>
+                <div onClick={() => handleRedirect("/organization/dashboard")}>
                   <OrganizarionOverviewCard
                     isLoading={isLoading || isRedirecting}
                     organization={organization}
@@ -102,7 +95,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             </div>
           </Grid>
           <Grid item lg={6} md={6} sm={6} xs={12}>
-            <div onClick={() => handleRedirect("/dashboard/devices")}>
+            <div onClick={() => handleRedirect("/organization/dashboard")}>
               <TotalDevicesCard isLoading={isLoading} devices={devices} />
             </div>
           </Grid>

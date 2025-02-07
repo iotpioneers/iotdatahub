@@ -1,0 +1,130 @@
+import { WidgetDefinition } from "@/types/widgets";
+
+export const widgetDefinitions: WidgetDefinition[] = [
+  {
+    type: "switch",
+    label: "Switch",
+    defaultSize: { w: 2, h: 1 },
+    category: "control",
+  },
+  {
+    type: "slider",
+    label: "Slider",
+    defaultSize: { w: 3, h: 1 },
+    category: "control",
+  },
+  {
+    type: "numberInput",
+    label: "Number Input",
+    defaultSize: { w: 2, h: 1 },
+    category: "input",
+  },
+  {
+    type: "imageButton",
+    label: "Image Button",
+    defaultSize: { w: 2, h: 2 },
+    category: "control",
+  },
+  {
+    type: "webPageImage",
+    label: "Web Page Image",
+    defaultSize: { w: 4, h: 3 },
+    category: "media",
+  },
+  {
+    type: "led",
+    label: "LED",
+    defaultSize: { w: 1, h: 1 },
+    category: "display",
+  },
+  {
+    type: "label",
+    label: "Label",
+    defaultSize: { w: 2, h: 1 },
+    category: "display",
+  },
+  {
+    type: "gauge",
+    label: "Gauge",
+    defaultSize: { w: 2, h: 2 },
+    category: "display",
+  },
+  {
+    type: "radialGauge",
+    label: "Radial Gauge",
+    defaultSize: { w: 2, h: 2 },
+    category: "display",
+  },
+  {
+    type: "alarmSound",
+    label: "Alarm Sound",
+    defaultSize: { w: 2, h: 1 },
+    category: "control",
+  },
+  {
+    type: "chart",
+    label: "Chart",
+    defaultSize: { w: 4, h: 3 },
+    category: "chart",
+  },
+  {
+    type: "map",
+    label: "Map",
+    defaultSize: { w: 4, h: 3 },
+    category: "media",
+  },
+  {
+    type: "imageGallery",
+    label: "Image Gallery",
+    defaultSize: { w: 4, h: 3 },
+    category: "media",
+  },
+  {
+    type: "customChart",
+    label: "Custom Chart",
+    defaultSize: { w: 4, h: 3 },
+    category: "chart",
+  },
+  {
+    type: "heatmapChart",
+    label: "Heatmap Chart",
+    defaultSize: { w: 4, h: 3 },
+    category: "chart",
+  },
+  {
+    type: "video",
+    label: "Video",
+    defaultSize: { w: 4, h: 3 },
+    category: "media",
+  },
+  {
+    type: "textInput",
+    label: "Text Input",
+    defaultSize: { w: 2, h: 1 },
+    category: "input",
+  },
+  {
+    type: "terminal",
+    label: "Terminal",
+    defaultSize: { w: 4, h: 3 },
+    category: "misc",
+  },
+  {
+    type: "segmentedSwitch",
+    label: "Segmented Switch",
+    defaultSize: { w: 3, h: 1 },
+    category: "control",
+  },
+  {
+    type: "menu",
+    label: "Menu",
+    defaultSize: { w: 2, h: 2 },
+    category: "control",
+  },
+  {
+    type: "modules",
+    label: "Modules",
+    defaultSize: { w: 3, h: 3 },
+    category: "misc",
+  },
+];

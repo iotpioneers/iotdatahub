@@ -3,32 +3,44 @@ import prisma from "@/prisma/client";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const organization = await prisma.organization.findUnique({
       where: { id: params.id },
+      include: {
+        users: true,
+        Device: true,
+        Channel: true,
+        DataPoint: true,
+        Field: true,
+        ApiKey: true,
+        feedbacks: true,
+        Subscription: true,
+      },
     });
 
     if (!organization) {
       return NextResponse.json(
         { error: "Organization not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     return NextResponse.json(organization);
   } catch (error) {
+    console.log("Error", error);
+
     return NextResponse.json(
       { error: "Error retrieving organization" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const body = await request.json();
 
@@ -46,14 +58,14 @@ export async function PUT(
   } catch (error) {
     return NextResponse.json(
       { error: "Error updating organization" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const deletedOrganization = await prisma.organization.delete({
@@ -64,7 +76,7 @@ export async function DELETE(
   } catch (error) {
     return NextResponse.json(
       { error: "Error deleting organization" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

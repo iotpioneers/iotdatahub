@@ -55,7 +55,7 @@ const ITEMS: TreeViewBaseItem<ExtendedTreeItemProps>[] = [
         id: "1.4",
         label: "Organization Management",
         color: "green",
-        href: "/dashboard/organization",
+        href: "/organization/dashboard",
       },
       {
         id: "1.5",
@@ -185,7 +185,7 @@ interface CustomTreeItemProps
 
 const CustomTreeItem = React.forwardRef(function CustomTreeItem(
   props: CustomTreeItemProps,
-  ref: React.Ref<HTMLLIElement>
+  ref: React.Ref<HTMLLIElement>,
 ) {
   const { id, itemId, label, disabled, children, ...other } = props;
 

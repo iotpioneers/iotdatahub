@@ -10,12 +10,13 @@ import {
 import Link from "next/link";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
-import { Chip, Avatar, Typography } from "@mui/material";
+import { Chip, Avatar, Typography, Button } from "@mui/material";
 import { Channel } from "@/types";
 import axios from "axios";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import { ActionModal } from "@/components/dashboard/ActionModal";
 import { useSession } from "next-auth/react";
+import { deleteChannel } from "@/lib/actions/room.actions";
 
 const formatDate = (date: Date) =>
   new Intl.DateTimeFormat("en", {
@@ -51,7 +52,7 @@ const ChannelListTable = ({
   const fetchChannels = useCallback(async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels`,
       );
       if (response.status === 200) {
         setChannels(response.data);
@@ -72,7 +73,7 @@ const ChannelListTable = ({
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/${channelId}`,
         {
           access: newAccess,
-        }
+        },
       );
 
       if (response.status !== 200) {
@@ -145,13 +146,16 @@ const ChannelListTable = ({
       headerName: "Channel",
       width: 150,
       renderCell: (params: GridRenderCellParams) => (
-        <Link
-          href={`/dashboard/channels/${params.row.id}`}
-          className="text-blue-500 hover:underline"
-          onClick={handleLinkClick}
-        >
-          {params.value}
-        </Link>
+        <div className="flex items-center mt-1 gap-1">
+          <img src="/icons/justify.svg" alt="channel" className="w-6 h-6"></img>
+          <Link
+            href={`/dashboard/channels/${params.row.id}`}
+            className="text-blue-500 hover:underline"
+            onClick={handleLinkClick}
+          >
+            {params.value}
+          </Link>
+        </div>
       ),
     },
     {
@@ -178,16 +182,6 @@ const ChannelListTable = ({
       renderCell: renderAccessBadge,
     },
     {
-      field: "description",
-      headerName: "Description",
-      width: 180,
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant="body2" sx={{ color: "text.secondary", mt: 2 }}>
-          {params.row.description}
-        </Typography>
-      ),
-    },
-    {
       field: "createdAt",
       headerName: "Created",
       width: 280,
@@ -197,11 +191,30 @@ const ChannelListTable = ({
         </Typography>
       ),
     },
+    {
+      field: "Action Button",
+      headerName: "",
+      width: 100,
+      renderCell: (params: GridRenderCellParams) => (
+        <ActionModal
+          triggerComponent={
+            <Button variant="contained" size="small" color="error">
+              Delete
+            </Button>
+          }
+          title="Delete Channel"
+          description={`Are you sure you want to delete the channel "${params.row.name}"?`}
+          confirmButtonText="Delete"
+          onConfirm={() => deleteChannel(params.row.id)}
+          iconSrc="/icons/delete.svg"
+        />
+      ),
+    },
   ];
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;

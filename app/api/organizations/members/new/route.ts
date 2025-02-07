@@ -5,7 +5,7 @@ import { getToken } from "next-auth/jwt";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const body = await request.json();
@@ -15,7 +15,7 @@ export async function POST(
     if (!token) {
       return NextResponse.json(
         { error: "User not authenticated" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -38,7 +38,7 @@ export async function POST(
     if (!organization) {
       return NextResponse.json(
         { error: "Organization not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -48,7 +48,7 @@ export async function POST(
       return NextResponse.json(validation.error.errors, { status: 400 });
     }
 
-    const { name, email, phone, country, avatar, access } = body;
+    const { name, email, phone, avatar, access, address } = body;
 
     const existingMember = await prisma.member.findFirst({
       where: {
@@ -62,7 +62,7 @@ export async function POST(
         {
           error: "A member with this email already exists in the organization",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -71,8 +71,8 @@ export async function POST(
         name,
         email,
         phone,
-        country,
         avatar,
+        address,
         access: access || "VIEWER",
         organizationId: organization.id,
       },
@@ -82,14 +82,14 @@ export async function POST(
   } catch (error) {
     return NextResponse.json(
       { error: "Error creating member of the organization" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const organizationId = params.id;
@@ -107,7 +107,7 @@ export async function GET(
   } catch (error) {
     return NextResponse.json(
       { error: "Error retrieving organizations" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

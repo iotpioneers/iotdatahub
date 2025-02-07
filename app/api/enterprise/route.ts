@@ -16,7 +16,7 @@ interface EnterpriseData {
 }
 
 async function sendEnterpriseNotificationEmails(
-  enterpriseData: EnterpriseData
+  enterpriseData: EnterpriseData,
 ) {
   const config = {
     service: "gmail",
@@ -140,13 +140,13 @@ async function sendEnterpriseNotificationEmails(
   const enterpriseWelcomeEmail = {
     from: process.env.GOOGLE_EMAIL,
     to: enterpriseData.email,
-    subject: "Welcome to IoT Data Hub Enterprise",
+    subject: "Welcome to IoT Data Hub",
     html: `<!DOCTYPE html>
     <html lang="en">
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Welcome to IoT Data Hub Enterprise</title>
+      <title>Welcome to IoT Data Hub</title>
       <style>
         body {
           font-family: Arial, sans-serif;
@@ -210,12 +210,12 @@ async function sendEnterpriseNotificationEmails(
     <body>
       <div class="container">
         <div class="header">
-          <h1>Welcome to IoT Data Hub Enterprise</h1>
+          <h1>Welcome to IoT Data Hub</h1>
         </div>
         <div class="content">
           <p>Dear ${enterpriseData.contactName},</p>
           
-          <p>Thank you for choosing IoT Data Hub Enterprise for ${enterpriseData.organizationName}. We're excited to help you harness the power of IoT data at scale.</p>
+          <p>Thank you for choosing IoT Data Hub for ${enterpriseData.organizationName}. We're excited to help you harness the power of IoT data at scale.</p>
           
           <div class="next-steps">
             <h2>Next Steps</h2>
@@ -223,22 +223,22 @@ async function sendEnterpriseNotificationEmails(
             <ul>
               <li>Schedule your onboarding consultation</li>
               <li>Discuss your specific requirements</li>
-              <li>Set up your enterprise workspace</li>
+              <li>Set up your workspace</li>
               <li>Configure your security and compliance settings</li>
             </ul>
             
             <p>2. In the meantime, you can:</p>
             <ul>
-              <li>Review our enterprise documentation</li>
+              <li>Review our documentation</li>
               <li>Prepare your team list for access management</li>
               <li>Gather your device inventory details</li>
             </ul>
           </div>
 
           <p>For immediate access to our resources:</p>
-          <a href="${process.env.NEXT_PUBLIC_BASE_URL}/docs/enterprise" class="button">View Enterprise Documentation</a>
+          <a href="${process.env.NEXT_PUBLIC_BASE_URL}/docs/enterprise" class="button bg-orange-50 text-white">GET STARTED</a>
           
-          <p>If you have any questions before our team reaches out, please contact enterprise-support@iotdatahub.com</p>
+          <p>If you have any questions before our team reaches out, please reply to this email.</p>
         </div>
         <div class="footer">
           <p>Best regards,</p>
@@ -265,7 +265,7 @@ export async function POST(request: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         { error: validation.error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -305,7 +305,7 @@ export async function POST(request: NextRequest) {
     console.error("Enterprise registration error:", error);
     return NextResponse.json(
       { error: "Error creating enterprise account" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -322,7 +322,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching enterprise accounts:", error);
     return NextResponse.json(
       { error: "Error fetching enterprise accounts" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import React, { useState } from "react";
-import { configureStore } from "@reduxjs/toolkit";
+import { getSession, signIn } from "next-auth/react";
 import { useSelector } from "react-redux";
-import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { configureStore } from "@reduxjs/toolkit";
 
 // material-ui
 import { useTheme } from "@mui/material/styles";
@@ -37,7 +39,7 @@ import LoadingProgressBar from "@/components/LoadingProgressBar";
 // assets
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import Link from "next/link";
+import axios from "axios";
 
 // ============================|| IoTDataHub - LOGIN ||============================ //
 
@@ -64,24 +66,27 @@ const AuthLogin = ({ ...others }) => {
   const customization = useSelector((state: RootState) => state.customization);
   const [loading, setLoading] = useState(false);
   const [isGoogleSign, setIsGoogleSign] = useState(false);
+  const [isGithubSign, setIsGithubSign] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const router = useRouter();
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
   const handleMouseDownPassword = (
-    event: React.MouseEvent<HTMLButtonElement>
+    event: React.MouseEvent<HTMLButtonElement>,
   ) => {
     event.preventDefault();
   };
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;
@@ -96,23 +101,76 @@ const AuthLogin = ({ ...others }) => {
     });
   };
 
+  const githubHandler = async () => {
+    setIsGithubSign(true);
+    try {
+      const result = await signIn("github", {
+        callbackUrl: "/verify-account",
+        redirect: false,
+      });
+      if (result && result.error) {
+        if (result?.error === "OAuthAccountNotLinked") {
+          setError(
+            "This email is already associated with another account. Please sign in using your original method.",
+          );
+          setOpen(true);
+          return;
+        }
+        setError(result.error);
+        setOpen(true);
+      } else if (result && result.ok) {
+        // Get the session to access user data
+        const session = await getSession();
+
+        if (!session?.user) {
+          setError("Failed to get user session");
+          setOpen(true);
+        }
+
+        if (!session?.user.emailVerified) {
+          // Send verification email
+          const emailResponse = await axios.post("/api/email/send", {
+            userFullName: session?.user.name || "User",
+            userEmail: session?.user.email,
+          });
+
+          if (emailResponse.status === 200) {
+            // Store user data in localStorage
+            localStorage.setItem("userFullName", session?.user.name || "User");
+            localStorage.setItem("userEmail", session?.user.email || "");
+
+            router.push("/verify-account");
+          } else {
+            setError("Failed to send verification email");
+            setOpen(true);
+          }
+        }
+      }
+    } catch (error) {
+      setError("Failed to sign in with GitHub");
+      setOpen(true);
+    } finally {
+      setIsGithubSign(false);
+    }
+  };
+
   const loginUser = async (data: FormData) => {
     setLoading(true);
     try {
       const response = await signIn("credentials", {
         email: data.email,
         password: data.password,
-        redirect: true,
-        callbackUrl: "/dashboard",
+        redirect: false,
       });
 
       if (response?.error) {
         setError(response.error);
         setOpen(true);
-        return;
+      } else if (response?.ok) {
+        router.push("/dashboard");
       }
     } catch (error) {
-      setError("Failed to login");
+      setError("An unexpected error occurred. Please try again.");
       setOpen(true);
     } finally {
       setLoading(false);
@@ -124,7 +182,7 @@ const AuthLogin = ({ ...others }) => {
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
-        autoHideDuration={20000}
+        autoHideDuration={10000}
         onClose={handleCloseResult}
       >
         <Alert
@@ -137,36 +195,75 @@ const AuthLogin = ({ ...others }) => {
         </Alert>
       </Snackbar>
 
-      <Grid container direction="column" justifyContent="center" spacing={2}>
-        <Grid item xs={12}>
-          <AnimateButton>
-            <Button
-              type="button"
-              disableElevation
-              fullWidth
-              onClick={googleHandler}
-              size="large"
-              variant="outlined"
-              sx={{
-                color: "grey.700",
-                backgroundColor: theme.palette.grey[50],
-                borderColor: theme.palette.grey[100],
-              }}
-            >
-              <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
-                <img
-                  src="/socials/social-google.svg"
-                  alt="google"
-                  width={16}
-                  height={16}
-                  style={{ marginRight: matchDownSM ? 8 : 16 }}
-                />
-              </Box>
-              Sign in with Google
-            </Button>
-          </AnimateButton>
-          {isGoogleSign && <LoadingProgressBar />}
+      <Grid
+        container
+        direction="column"
+        justifyContent="center"
+        spacing={2}
+        sx={{ mt: 2 }}
+      >
+        <Grid container direction="row" spacing="5">
+          <Grid item xs={6}>
+            <AnimateButton>
+              <Button
+                type="button"
+                disableElevation
+                fullWidth
+                onClick={googleHandler}
+                size="large"
+                variant="outlined"
+                sx={{
+                  color: "grey.700",
+                  backgroundColor: theme.palette.grey[50],
+                  borderColor: theme.palette.grey[100],
+                }}
+              >
+                <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
+                  <img
+                    src="/socials/social-google.svg"
+                    alt="google"
+                    width={16}
+                    height={16}
+                    style={{ marginRight: matchDownSM ? 8 : 16 }}
+                  />
+                </Box>
+                Google
+              </Button>
+            </AnimateButton>
+            {isGoogleSign && <LoadingProgressBar />}
+          </Grid>
+
+          <Grid item xs={6}>
+            <AnimateButton>
+              <Button
+                type="button"
+                disableElevation
+                fullWidth
+                onClick={githubHandler}
+                size="large"
+                variant="outlined"
+                sx={{
+                  color: "grey.700",
+                  backgroundColor: theme.palette.grey[50],
+                  borderColor: theme.palette.grey[100],
+                }}
+              >
+                <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
+                  <img
+                    src="/socials/github.svg"
+                    alt="github"
+                    width={16}
+                    height={16}
+                    style={{ marginRight: matchDownSM ? 8 : 16 }}
+                  />
+                </Box>
+                GitHub
+              </Button>
+            </AnimateButton>
+            {isGithubSign && <LoadingProgressBar />}
+          </Grid>
         </Grid>
+
         <Grid item xs={12}>
           <Box
             sx={{

@@ -1,7 +1,5 @@
 "use client";
 
-import PropTypes from "prop-types";
-
 import {
   InboxNotification,
   InboxNotificationList,
@@ -36,17 +34,13 @@ const ListItemWrapper: React.FC<ListItemWrapperProps> = ({ children }) => {
   );
 };
 
-ListItemWrapper.propTypes = {
-  children: PropTypes.node,
-};
-
 const NotificationList = () => {
   const theme = useTheme();
 
   const { inboxNotifications } = useInboxNotifications();
 
   const unreadNotifications = inboxNotifications.filter(
-    (notification) => !notification.readAt
+    (notification) => !notification.readAt,
   );
 
   return (

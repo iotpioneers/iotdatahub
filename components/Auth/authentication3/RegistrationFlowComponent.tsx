@@ -43,7 +43,7 @@ const RegistrationFlowComponent: React.FC = () => {
 
   const handleCloseSnackbar = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;

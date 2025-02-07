@@ -30,6 +30,7 @@ yarn-error.log*
 .env*.local
 .env
 
+
 # vercel
 .vercel
 
@@ -39,3 +40,8 @@ next-env.d.ts
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
