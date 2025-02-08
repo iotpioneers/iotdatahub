@@ -101,8 +101,35 @@ export async function GET(request: NextRequest) {
       include: {
         user: true,
         channel: true,
-        automations: true,
+        widgets: {
+          orderBy: { createdAt: "desc" },
+        },
         alerts: {
+          where: {
+            status: "ACTIVE",
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
+        automations: {
+          where: {
+            status: "ACTIVE",
+          },
+        },
+        commands: {
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 5,
+        },
+        maintenance: {
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 5,
+        },
+        schedules: {
           where: {
             status: "ACTIVE",
           },

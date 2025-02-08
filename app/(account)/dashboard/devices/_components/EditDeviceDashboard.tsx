@@ -9,6 +9,9 @@ import { ApiKey, Channel, Device } from "@/types";
 import { LinearLoading } from "@/components/LinearLoading";
 import { HiStatusOffline, HiStatusOnline } from "react-icons/hi";
 import DeviceDashboard from "./DeviceDashboard";
+import { DroppableArea } from "@/components/Channels/dashboard/widgets/DroppableArea";
+import { Widget } from "@/types/widgets";
+import useAdd from "@/hooks/useAdd";
 import Link from "next/link";
 
 interface Props {
@@ -23,7 +26,7 @@ interface Organization {
   ApiKey: ApiKey[];
 }
 
-const DeviceDetails = ({ params }: Props) => {
+const EditDeviceDashboard = ({ params }: Props) => {
   const [DeviceDetails, setShowModal] = useState(true);
   const [selectedDuration, setSelectedDuration] = useState<string>("1mo");
   const [organization, setOrganization] = useState<Organization | null>(null);
@@ -141,11 +144,6 @@ const DeviceDetails = ({ params }: Props) => {
               </div>
             </div>
           </div>
-          <button className="px-4 py-2 bg-orange-50 text-white rounded-lg hover:bg-green-600 font-medium">
-            <Link href={`/dashboard/devices/${params.id}/edit`}>
-              {isLoading || !deviceData ? <LinearLoading /> : "Edit"}
-            </Link>
-          </button>
         </div>
 
         {/* Timeline Controls */}
@@ -164,64 +162,40 @@ const DeviceDetails = ({ params }: Props) => {
             </button>
           ))}
         </div>
-        {!widgetData || widgetData.length === 0 ? (
-          <div className="flex items-center justify-center h-96 border-2 border-dashed border-gray-200 rounded-lg">
-            <div className="text-center">
-              <div className="mb-4">
-                <svg
-                  className="mx-auto h-12 w-12 text-gray-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                  />
-                </svg>
+        <DroppableArea id={deviceData.id}>
+          {!widgetData || widgetData.length === 0 ? (
+            <div className="flex items-center justify-center h-96 border-2 border-dashed border-gray-200 rounded-lg">
+              <div className="text-center">
+                <div className="mb-4">
+                  <svg
+                    className="mx-auto h-12 w-12 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-orange-50">
+                  No Dashboard widgets
+                </h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  Double click the widget on the left or drag it to the area{" "}
+                </p>
               </div>
-              <h3 className="text-lg font-medium text-orange-50">
-                No Dashboard widgets
-              </h3>
             </div>
-          </div>
-        ) : (
-          <DeviceDashboard deviceId={params.id} widgetData={widgetData} />
-        )}
+          ) : (
+            <DeviceDashboard deviceId={params.id} widgetData={widgetData} />
+          )}
+        </DroppableArea>
       </div>
-      {/* Modal */}
-      {DeviceDetails && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-black text-white rounded-lg p-6 w-full max-w-lg">
-            <div className="flex justify-between items-center mb-6">
-              <button
-                onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-white"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="space-y-4 mb-6 font-mono text-sm">
-              <div>
-                <div className="text-gray-400">CHANNEL_ID</div>
-                <div className="text-orange-50">"{channel?.id}"</div>
-              </div>
-              <div>
-                <div className="text-gray-400">CHANNEL_NAME</div>
-                <div className="text-orange-50">"{channel?.name}"</div>
-              </div>
-              <div>
-                <div className="text-gray-400">CHANNEL_API_KEY</div>
-                <div className="text-orange-50">"{apiKey?.apiKey}"</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
 
-export default DeviceDetails;
+export default EditDeviceDashboard;
