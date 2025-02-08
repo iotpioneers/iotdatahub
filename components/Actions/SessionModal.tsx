@@ -100,14 +100,14 @@ const SessionModal: React.FC<SessionModalProps> = ({
           {/* Title */}
           <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
             {isSession
-              ? "Whoops! Your session has expired"
+              ? "Whoops! Something went wrong"
               : "Sorry, there's no internet connection"}
           </Typography>
 
           {/* Message */}
           <Typography color="text.secondary" sx={{ mb: 4, maxWidth: 300 }}>
             {isSession
-              ? "Your session has expired. Please log in again to continue."
+              ? "Your session may have expired. Please log in again to continue."
               : "Please check your connection and try again. If the problem persists, contact support."}
           </Typography>
 
