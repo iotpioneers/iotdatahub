@@ -1,201 +1,117 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { X } from "lucide-react";
-import { Box } from "@mui/material";
+import React, {
+  useEffect,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import useFetch from "@/hooks/useFetch";
 import { useSession } from "next-auth/react";
-import { ApiKey, Channel, Device } from "@/types";
-import { LinearLoading } from "@/components/LinearLoading";
-import { HiStatusOffline, HiStatusOnline } from "react-icons/hi";
-import DeviceDashboard from "./DeviceDashboard";
-import { DroppableArea } from "@/components/Channels/dashboard/widgets/DroppableArea";
 import { Widget } from "@/types/widgets";
-import useAdd from "@/hooks/useAdd";
-import Link from "next/link";
+import { LinearLoading } from "@/components/LinearLoading";
+import EditDeviceDashboardComponent from "./EditDeviceDashboardComponent";
+import { DroppableArea } from "@/components/Channels/dashboard/widgets/DroppableArea";
+import DeviceHeader from "./DeviceHeader";
 
 interface Props {
   params: { id: string };
 }
 
-interface Organization {
-  id: string;
-  name: string;
-  areaOfInterest: string[];
-  Channel: Channel[];
-  ApiKey: ApiKey[];
-}
-
-const EditDeviceDashboard = ({ params }: Props) => {
-  const [DeviceDetails, setShowModal] = useState(true);
+const EditDeviceDashboard = forwardRef<
+  {
+    saveChanges: () => Promise<void>;
+    cancelChanges: () => void;
+  },
+  Props
+>(({ params }, ref) => {
   const [selectedDuration, setSelectedDuration] = useState<string>("1mo");
-  const [organization, setOrganization] = useState<Organization | null>(null);
-  const [device, setDevice] = useState<Device | null>(null);
+  const [widgets, setWidgets] = useState<Widget[]>([]);
+  const [pendingChanges, setPendingChanges] = useState<{
+    [key: string]: any;
+  }>({});
+  const [deletedWidgets, setDeletedWidgets] = useState<string[]>([]);
+  const deviceDashboardRef = React.useRef<{
+    saveChanges: () => Promise<void>;
+    cancelChanges: () => void;
+  } | null>(null);
 
   const { data: session, status } = useSession();
-
-  if (status === "loading" || status === "unauthenticated" || !session) {
-    return <LinearLoading />;
-  }
-
-  const {
-    data: deviceData,
-    isLoading,
-    error,
-  } = useFetch(`/api/devices/${params.id}`);
-
-  const { data: organizationData } = useFetch(
-    `/api/organizations/${session.user.organizationId}`,
+  const { data: widgetData, isLoading } = useFetch(
+    `/api/devices/${params.id}/widgets`,
   );
 
-  const { data: widgetData } = useFetch(`/api/devices/${params.id}/widgets`);
+  const { data: deviceData, isLoading: isDeviceLoading } = useFetch(
+    `/api/devices/${params.id}`,
+  );
 
   useEffect(() => {
-    if (deviceData) setDevice(deviceData);
-    if (organizationData) setOrganization(organizationData);
-  }, [deviceData, organizationData]);
+    if (widgetData) {
+      setWidgets(widgetData);
+    }
+  }, [widgetData]);
 
-  if (isLoading || !deviceData) {
+  useImperativeHandle(ref, () => ({
+    async saveChanges() {
+      if (deviceDashboardRef.current) {
+        await deviceDashboardRef.current.saveChanges();
+      }
+    },
+    cancelChanges() {
+      if (deviceDashboardRef.current) {
+        deviceDashboardRef.current.cancelChanges();
+      }
+    },
+  }));
+
+  const handleDurationChange = (duration: string) => {
+    setSelectedDuration(duration);
+  };
+
+  if (
+    status === "loading" ||
+    status === "unauthenticated" ||
+    !session ||
+    isLoading ||
+    isDeviceLoading
+  ) {
     return <LinearLoading />;
   }
-
-  if (error) {
-    console.error("Error fetching device:", error);
-    return (
-      <Box className="text-red-500">
-        {error || "There was an error while fetching the device"}
-      </Box>
-    );
-  }
-
-  const channel = organization?.Channel?.find(
-    (channel: Channel) => channel.id === device?.channelId,
-  );
-  const apiKey = organization?.ApiKey?.find(
-    (key: ApiKey) => key.channelId === channel?.id,
-  );
-
-  if (!device || !organization || !channel || !apiKey) {
-    return <LinearLoading />;
-  }
-
-  const timelineOptions = [
-    "Live",
-    "1h",
-    "6h",
-    "1d",
-    "1w",
-    "1mo",
-    "3mo",
-    "6mo",
-    "1y",
-  ];
 
   return (
-    <div className="min-h-screen px-4">
-      {/* Main Dashboard Container */}
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-4">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <svg
-                className="w-8 h-8 text-orange-50"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-              >
-                <rect
-                  x="4"
-                  y="4"
-                  width="16"
-                  height="16"
-                  rx="2"
-                  strokeWidth="2"
-                />
-              </svg>
-            </div>
-            <div>
-              <div className="flex items-center space-x-4">
-                <h1 className="text-2xl font-semibold text-orange-50">
-                  {deviceData.name}
-                </h1>
-                <span className="flex items-center">
-                  {deviceData.status === "OFFLINE" ? (
-                    <HiStatusOffline className="text-red-500 mr-2" />
-                  ) : (
-                    <HiStatusOnline className="text-green-500 mr-2" />
-                  )}
-                  <strong className="font-bold"> {deviceData.status}</strong>
-                </span>
-              </div>
-              <div className="flex items-center space-x-2 text-gray-500">
-                <span>
-                  Owner:{" "}
-                  <strong className="font-bold"> {session?.user?.name}</strong>
-                </span>
-                <span>•</span>
-                <span>
-                  Organization:{" "}
-                  <strong className="font-bold">
-                    {organizationData.name || ""}
-                  </strong>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="bg-white rounded-lg shadow-sm">
+      <DeviceHeader
+        device={deviceData}
+        selectedDuration={selectedDuration}
+        onDurationChange={handleDurationChange}
+      />
 
-        {/* Timeline Controls */}
-        <div className="flex space-x-2 mb-8">
-          {timelineOptions.map((option) => (
-            <button
-              key={option}
-              className={`px-4 py-2 rounded-lg ${
-                selectedDuration === option
-                  ? "bg-orange-50 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-              onClick={() => setSelectedDuration(option)}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-        <DroppableArea id={deviceData.id}>
-          {!widgetData || widgetData.length === 0 ? (
-            <div className="flex items-center justify-center h-96 border-2 border-dashed border-gray-200 rounded-lg">
+      <div className="overflow-auto max-h-[80vh]">
+        <DroppableArea id={params.id}>
+          {!widgets || widgets.length === 0 ? (
+            <div className="flex items-center justify-center h-[100vh] border-2 border-dashed border-gray-200 rounded-lg">
               <div className="text-center">
-                <div className="mb-4">
-                  <svg
-                    className="mx-auto h-12 w-12 text-gray-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-medium text-orange-50">
-                  No Dashboard widgets
+                <h3 className="text-lg font-medium text-gray-800">
+                  Add new widget
                 </h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  Double click the widget on the left or drag it to the area{" "}
+                  Double click the widget on the left or drag it to the canvas
                 </p>
               </div>
             </div>
           ) : (
-            <DeviceDashboard deviceId={params.id} widgetData={widgetData} />
+            <EditDeviceDashboardComponent
+              deviceId={params.id}
+              widgetData={widgets}
+              ref={deviceDashboardRef}
+            />
           )}
         </DroppableArea>
       </div>
     </div>
   );
-};
+});
+
+EditDeviceDashboard.displayName = "EditDeviceDashboard";
 
 export default EditDeviceDashboard;

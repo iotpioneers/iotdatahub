@@ -180,6 +180,15 @@ export const maintenanceSchema = z.object({
 // Schema for widget data
 export const widgetSchema = z.object({
   name: z.string().optional(),
+  dataSource: z
+    .object({
+      fieldId: z.string().min(1, "Field is required").optional(),
+      refreshInterval: z
+        .number()
+        .min(1, "Refresh interval is required")
+        .optional(),
+    })
+    .optional(),
   definition: z
     .object({
       type: z

@@ -60,7 +60,7 @@ interface GlobalStateContextType {
 
 // Create the context
 const GlobalStateContext = createContext<GlobalStateContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {

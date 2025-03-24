@@ -1,6 +1,10 @@
 export interface Widget {
   id: string;
   name?: string | null;
+  dataSource?: {
+    fieldId?: string;
+    refreshInterval?: number;
+  };
   definition?: WidgetDefinition | null;
   position?: {
     x?: number;
@@ -65,4 +69,5 @@ export type WidgetCategory =
   | "input"
   | "chart"
   | "media"
-  | "misc";
+  | "misc"
+  | "interface";

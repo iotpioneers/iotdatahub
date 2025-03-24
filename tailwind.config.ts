@@ -20,6 +20,13 @@ module.exports = {
         grotesk: "var(--font-grotesk)",
       },
       colors: {
+        textGray: "#71767b",
+        textGrayLight: "#e7e9ea",
+        borderGray: "#2f3336",
+        inputGray: "#202327",
+        iconBlue: "#1d9bf0",
+        iconGreen: "#00ba7c",
+        iconPink: "#f91880",
         green: {
           50: "#30AF5B",
           90: "#292C27",
@@ -119,6 +126,12 @@ module.exports = {
       },
       screens: {
         xs: "400px",
+        xsm: "500px",
+        sm: "600px",
+        md: "690px",
+        lg: "988px",
+        xl: "1078px",
+        xxl: "1265px",
         "3xl": "1680px",
         "4xl": "2200px",
       },

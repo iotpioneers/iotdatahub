@@ -20,12 +20,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="h-screen w-screen overflow-hidden">
         <ClientRootLayout>
           <CollaborationProvider>
             <DashboardNavigation />
-            <div className="flex flex-col flex-grow lg:ml-64 xs:mx-2 mt-24">
-              <Container>{children}</Container>
+            <div className="flex flex-col flex-grow lg:ml-44 xs:mx-2 mt-12 h-[calc(100vh-6rem)] overflow-hidden">
+              <Container className="h-full overflow-hidden">
+                <div className="h-full overflow-auto">{children}</div>
+              </Container>
             </div>
           </CollaborationProvider>
         </ClientRootLayout>

@@ -29,6 +29,7 @@ export interface Channel {
   name: string;
   description: string;
   fields?: Field[] | null;
+  apiKeys?: ApiKey[] | null;
   deviceId?: string | null;
   organizationId: string;
   access: "PUBLIC" | "PRIVATE";

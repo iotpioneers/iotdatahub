@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/client";
-import { getServerSession } from "next-auth";
 import { getToken } from "next-auth/jwt";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const token = await getToken({ req: request });
@@ -14,7 +13,7 @@ export async function POST(
     if (!token) {
       return NextResponse.json(
         { error: "You must be logged in" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -60,7 +59,7 @@ export async function POST(
     console.error("Error toggling device:", error);
     return NextResponse.json(
       { error: "Failed to toggle device" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

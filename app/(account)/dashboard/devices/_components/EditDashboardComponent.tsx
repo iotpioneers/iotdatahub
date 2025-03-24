@@ -1,58 +1,73 @@
 "use client";
 
-import React from "react";
-import styles from "@/styles/dashboard.module.css";
+import React, { useRef, useState, useEffect } from "react";
 import WidgetBox from "@/components/Channels/dashboard/WidgetBox";
-import DeviceDetails from "./DeviceDetails";
 import EditDeviceDashboard from "./EditDeviceDashboard";
-import { Button } from "@mui/material";
+import { useRouter } from "next/navigation";
+import DeviceSidebar from "./DeviceSidebar";
+import DeviceHeaderComponent from "./DeviceHeaderComponent";
 
 interface Props {
   params: { id: string };
 }
 
 const EditDashboardComponent = ({ params }: Props) => {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
+  const editDashboardRef = useRef<{
+    saveChanges: () => Promise<void>;
+    cancelChanges: () => void;
+  } | null>(null);
+
+  const handleSaveAndApply = async () => {
+    setIsLoading(true);
+    try {
+      if (editDashboardRef.current) {
+        await editDashboardRef.current.saveChanges();
+      }
+      router.push(`/dashboard/devices/${params.id}`);
+    } catch (error) {
+      console.error("Error saving dashboard changes:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsLoading(true);
+    try {
+      if (editDashboardRef.current) {
+        editDashboardRef.current.cancelChanges();
+      }
+      router.push(`/dashboard/devices/${params.id}`);
+    } catch (error) {
+      console.error("Error canceling dashboard changes:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen w-full">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-orange-50"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              <rect x="4" y="4" width="16" height="16" rx="2" strokeWidth="2" />
-            </svg>
-          </div>
-          <div>
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-semibold text-orange-50">
-                IoT DATA HUB
-              </h1>
-            </div>
-          </div>
-        </div>
-        <div className="flex">
-          <Button>Cancel</Button>
-          <Button>Save And Apply Changes</Button>
+    <div className="max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl xxl:max-w-screen-xxl flex justify-between bg-slate-100 rounded-lg shadow p-1 overflow-hidden">
+      <DeviceSidebar
+        deviceId={params.id}
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+      />
+      <div className="flex-1 lg:min-w-[700px] ml-1 md:ml-2 rounded-md">
+        <div className="grid gap-1">
+          <DeviceHeaderComponent
+            deviceId={params.id}
+            isLoading={isLoading}
+            onSave={handleSaveAndApply}
+            onCancel={handleCancel}
+          />
+          <EditDeviceDashboard params={params} ref={editDashboardRef} />
         </div>
       </div>
-
-      <div className="container p-4">
-        <h1 className="text-orange-50 text-lg">Web Dashboard</h1>
-        <div className="flex">
-          <div className={styles.widgetBox}>
-            <h2 className="text-xl font-normal mb-6">Widget Box</h2>
-            <WidgetBox deviceId={params.id} />
-          </div>
-
-          <div className="flex-1 ml-6">
-            <EditDeviceDashboard params={params} />
-          </div>
-        </div>
+      <div className="flex ml-1 md:ml-2 flex-1 rounded-md">
+        <WidgetBox deviceId={params.id} />
       </div>
     </div>
   );

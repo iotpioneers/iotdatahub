@@ -1,31 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/client";
-import { widgetSchema } from "@/validations/schema.validation";
+import { commandSchema, widgetSchema } from "@/validations/schema.validation";
 import { getToken } from "next-auth/jwt";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: { id: string; widgetId: string } },
 ) {
+  const body = await request.json();
+  const validation = commandSchema.safeParse(body);
+
+  if (!validation.success) {
+    return NextResponse.json(
+      { error: "Validation failed", details: validation.error.errors },
+      { status: 400 },
+    );
+  }
   try {
-    const device = await prisma.device.findUnique({
-      where: { id: params.id },
+    const widget = await prisma.widget.findUnique({
+      where: { id: params.widgetId },
+      include: { device: true },
     });
 
-    if (!device) {
-      return NextResponse.json({ error: "Device not found" }, { status: 404 });
-    }
+    if (!widget) throw new Error("Widget not found");
 
-    const widgets = await prisma.widget.findMany({
-      where: { deviceId: device.id },
-      orderBy: { createdAt: "desc" },
+    // Create a device command based on the widget action
+    await prisma.deviceCommand.create({
+      data: {
+        deviceId: widget.deviceId,
+        payload: validation.data.payload,
+        type: validation.data.type,
+      },
     });
 
-    if (!widgets || widgets.length === 0) {
-      return NextResponse.json({ error: "No widgets found" }, { status: 404 });
-    }
-
-    return NextResponse.json(widgets);
+    return NextResponse.json({
+      message: "Command created successfully",
+      command: validation.data,
+    });
   } catch (error) {
     console.error("Error fetching widgets:", error);
     return NextResponse.json(
@@ -37,7 +48,7 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: { id: string; widgetId: string } },
 ) {
   const body = await request.json();
 

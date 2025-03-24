@@ -19,7 +19,7 @@ export const DroppableArea = ({
 
   const { add } = useAdd(`/api/devices/${id}/widgets`);
 
-  const handleAddWidget = async (widget: any) => {
+  const handleAddWidget = async (widget: Widget) => {
     try {
       await add(widget);
     } catch (err) {
@@ -33,7 +33,6 @@ export const DroppableArea = ({
       const rawData = e.dataTransfer.getData("application/json");
       if (!rawData) return;
       const widget = JSON.parse(rawData);
-      console.log("Dropped widget:", widget);
       handleAddWidget(widget);
     } catch (error) {
       console.error("Error parsing dropped data:", error);
@@ -45,7 +44,7 @@ export const DroppableArea = ({
       ref={setNodeRef}
       onDrop={handleDrop}
       onDragOver={(e) => e.preventDefault()}
-      className="border-dashed border-2 border-gray-300 hover:border-primary-blue transition duration-300 p-5 min-h-24"
+      className="border-dashed border-2 border-gray-300 hover:border-primary-blue transition duration-300 min-h-36 overflow-y-auto"
     >
       {children}
     </div>

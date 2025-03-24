@@ -47,7 +47,7 @@ const SessionModal: React.FC<SessionModalProps> = ({
       router.push("/login");
     } finally {
       // In case of navigation failure
-      setTimeout(() => setIsLoginLoading(false), 3000);
+      setTimeout(() => setIsLoginLoading(false), 10000);
     }
   };
 

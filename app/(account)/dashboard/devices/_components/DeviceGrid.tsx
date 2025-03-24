@@ -8,7 +8,7 @@ import {
   Power,
 } from "lucide-react";
 
-export const DeviceGrid = () => {
+export const DeviceStatsDeviceGrid = () => {
   const getDeviceIcon = (type: string) => {
     switch (type.toLowerCase()) {
       case "tv":

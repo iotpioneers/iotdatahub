@@ -116,7 +116,7 @@ const NewDeviceModal = () => {
         variant="contained"
         color="primary"
         onClick={handleOpenModal}
-        className="bg-orange-50 p-3 rounded-md text-white"
+        className="bg-orange-50 px-3 rounded-md text-white"
       >
         New Device
       </Button>

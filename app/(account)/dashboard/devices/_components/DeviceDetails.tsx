@@ -8,8 +8,9 @@ import { useSession } from "next-auth/react";
 import { ApiKey, Channel, Device } from "@/types";
 import { LinearLoading } from "@/components/LinearLoading";
 import { HiStatusOffline, HiStatusOnline } from "react-icons/hi";
-import DeviceDashboard from "./DeviceDashboard";
+import EditDeviceDashboardComponent from "./EditDeviceDashboardComponent";
 import Link from "next/link";
+import DeviceDashboardComponent from "./DeviceDashboardComponent";
 
 interface Props {
   params: { id: string };
@@ -25,6 +26,7 @@ interface Organization {
 
 const DeviceDetails = ({ params }: Props) => {
   const [DeviceDetails, setShowModal] = useState(true);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [selectedDuration, setSelectedDuration] = useState<string>("1mo");
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [device, setDevice] = useState<Device | null>(null);
@@ -51,10 +53,6 @@ const DeviceDetails = ({ params }: Props) => {
     if (deviceData) setDevice(deviceData);
     if (organizationData) setOrganization(organizationData);
   }, [deviceData, organizationData]);
-
-  if (isLoading || !deviceData) {
-    return <LinearLoading />;
-  }
 
   if (error) {
     console.error("Error fetching device:", error);
@@ -90,6 +88,7 @@ const DeviceDetails = ({ params }: Props) => {
 
   return (
     <div className="min-h-screen px-4">
+      {(isLoading || !deviceData || isRedirecting) && <LinearLoading />}
       {/* Main Dashboard Container */}
       <div className="bg-white rounded-lg shadow-sm p-6 mb-4">
         {/* Header */}
@@ -141,9 +140,12 @@ const DeviceDetails = ({ params }: Props) => {
               </div>
             </div>
           </div>
-          <button className="px-4 py-2 bg-orange-50 text-white rounded-lg hover:bg-green-600 font-medium">
+          <button
+            className="px-4 py-2 bg-orange-50 text-white rounded-lg hover:bg-green-600 font-medium"
+            onClick={() => setIsRedirecting(true)}
+          >
             <Link href={`/dashboard/devices/${params.id}/edit`}>
-              {isLoading || !deviceData ? <LinearLoading /> : "Edit"}
+              {isRedirecting || !deviceData ? <LinearLoading /> : "Edit"}
             </Link>
           </button>
         </div>
@@ -188,7 +190,7 @@ const DeviceDetails = ({ params }: Props) => {
             </div>
           </div>
         ) : (
-          <DeviceDashboard deviceId={params.id} widgetData={widgetData} />
+          <DeviceDashboardComponent widgetData={widgetData} />
         )}
       </div>
       {/* Modal */}
