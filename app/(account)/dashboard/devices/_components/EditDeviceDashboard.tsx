@@ -86,8 +86,8 @@ const EditDeviceDashboard = forwardRef<
         onDurationChange={handleDurationChange}
       />
 
-      <div className="overflow-auto max-h-[80vh]">
-        <DroppableArea id={params.id}>
+      <DroppableArea id={params.id}>
+        <div className="overflow-auto max-h-[80vh]">
           {!widgets || widgets.length === 0 ? (
             <div className="flex items-center justify-center h-[100vh] border-2 border-dashed border-gray-200 rounded-lg">
               <div className="text-center">
@@ -95,7 +95,7 @@ const EditDeviceDashboard = forwardRef<
                   Add new widget
                 </h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  Double click the widget on the left or drag it to the canvas
+                  Double click the widget or drag it to the canvas
                 </p>
               </div>
             </div>
@@ -106,8 +106,8 @@ const EditDeviceDashboard = forwardRef<
               ref={deviceDashboardRef}
             />
           )}
-        </DroppableArea>
-      </div>
+        </div>
+      </DroppableArea>
     </div>
   );
 });

@@ -17,12 +17,18 @@ export async function GET(
     }
 
     const widgets = await prisma.widget.findMany({
-      where: { deviceId: device.id },
+      where: {
+        deviceId: device.id,
+        type: { not: null }, // Only fetch widgets with a type
+      },
       orderBy: { createdAt: "desc" },
+      include: {
+        pinConfig: true, // Include pin config in the response
+      },
     });
 
     if (!widgets || widgets.length === 0) {
-      return NextResponse.json({ error: "No widgets found" }, { status: 404 });
+      return NextResponse.json([], { status: 200 }); // Return empty array instead of error
     }
 
     return NextResponse.json(widgets);
@@ -40,8 +46,6 @@ export async function POST(
   { params }: { params: { id: string } },
 ) {
   const body = await request.json();
-
-  console.log("Received widget data:", body);
   const token = await getToken({ req: request });
 
   if (!token) {
@@ -68,22 +72,18 @@ export async function POST(
     return NextResponse.json({ error: "Device not found" }, { status: 404 });
   }
 
-  // const validation = widgetSchema.safeParse(body);
-
-  // console.log("Validation result for widget:", validation);
-
-  // if (!validation.success) {
-  //   return NextResponse.json(
-  //     { error: "Validation failed", details: validation.error.errors },
-  //     { status: 400 },
-  //   );
-  // }
-
   try {
     const { id, ...data } = body;
+
+    // Ensure type is set
+    if (!data.type && data.definition?.type) {
+      data.type = data.definition.type;
+    }
+
     const widget = await prisma.widget.create({
       data: {
         ...data,
+        type: data.type || "unknown", // Fallback type
         channelId: device.channelId,
         deviceId: params.id,
       },

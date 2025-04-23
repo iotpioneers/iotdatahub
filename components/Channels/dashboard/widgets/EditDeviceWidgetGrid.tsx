@@ -25,8 +25,6 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
   deviceId,
   onWidgetUpdate,
 }) => {
-  const [isResizing, setIsResizing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [selectedWidget, setSelectedWidget] = useState<Widget | null>(null);
 
   const generateLayout = () => ({
@@ -34,40 +32,31 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
       i: widget.id,
       x: widget.position?.x ?? 0,
       y: widget.position?.y ?? 0,
-      w: widget.position?.width ?? 2, // Reduced default width
-      h: widget.position?.height ?? 2, // Reduced default height
-      minW: 1, // Allow width down to 1 column
-      minH: 1, // Allow height down to 1 row
-      maxW: 12, // Maximum width
-      maxH: 6, // Maximum height
+      w: widget.position?.width ?? 2,
+      h: widget.position?.height ?? 3,
+      minW: 1,
+      minH: 2,
+      maxW: 12,
+      maxH: 6,
     })),
   });
 
   const handleLayoutChange = (currentLayout: any[]) => {
-    const changes = currentLayout.reduce((acc, item) => {
+    currentLayout.forEach((item) => {
       const widget = widgets.find((w) => w.id === item.i);
       if (widget) {
-        acc[widget.id] = {
+        onWidgetMove(widget, {
           x: item.x,
           y: item.y,
           width: item.w,
           height: item.h,
-        };
-      }
-      return acc;
-    }, {});
-
-    Object.entries(changes).forEach(([widgetId, newPosition]) => {
-      const widget = widgets.find((w) => w.id === widgetId);
-      if (widget) {
-        onWidgetMove(widget, newPosition as Widget["position"]);
+        });
       }
     });
   };
 
   const handleDuplicate = async (widget: Widget) => {
     try {
-      setIsSaving(true);
       const response = await fetch(`/api/devices/${deviceId}/widgets`, {
         method: "POST",
         headers: {
@@ -75,6 +64,7 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
         },
         body: JSON.stringify({
           ...widget,
+          id: `widget-${widget.definition?.type}-${Date.now()}`,
           position: {
             ...widget.position,
             x: (widget.position?.x || 0) + 1,
@@ -90,21 +80,11 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
       }
     } catch (error) {
       console.error("Error duplicating widget:", error);
-    } finally {
-      setIsSaving(false);
     }
   };
 
-  const handleSettingsClick = (widget: Widget) => {
-    setSelectedWidget(widget);
-  };
-
-  const handleCloseSettings = () => {
-    setSelectedWidget(null);
-  };
-
   return (
-    <div className="bg-gray-100 relative min-h-screen overflow-y-auto">
+    <>
       <ResponsiveGridLayout
         className="layout"
         layouts={generateLayout()}
@@ -114,17 +94,18 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
         margin={[10, 10]}
         containerPadding={[10, 10]}
         onLayoutChange={handleLayoutChange}
-        onResizeStart={() => setIsResizing(true)}
-        onResizeStop={() => setIsResizing(false)}
         isDraggable
         isResizable
         isDroppable
         resizeHandles={["se"]}
+        draggableCancel=".no-drag" // Add class to elements that shouldn't trigger drag
+        preventCollision
+        useCSSTransforms
       >
         {widgets.map((widget) => (
           <div
             key={widget.id}
-            className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            className="bg-transparent shadow rounded-md"
             data-grid={{
               x: widget.position?.x || 0,
               y: widget.position?.y || 0,
@@ -137,7 +118,7 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
             <WidgetDisplay
               widget={widget}
               onDuplicate={() => handleDuplicate(widget)}
-              onSettings={() => handleSettingsClick(widget)}
+              onSettings={() => setSelectedWidget(widget)}
               onDelete={() => onWidgetDelete?.(widget.id)}
             />
           </div>
@@ -147,11 +128,16 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
       {selectedWidget && (
         <DeviceSettingModal
           widget={selectedWidget}
-          onClose={handleCloseSettings}
-          onUpdate={onWidgetUpdate ?? (() => {})}
+          onClose={() => setSelectedWidget(null)}
+          onUpdate={(updatedWidget) => {
+            if (onWidgetUpdate) {
+              onWidgetUpdate(updatedWidget);
+            }
+            setSelectedWidget(null);
+          }}
         />
       )}
-    </div>
+    </>
   );
 };
 

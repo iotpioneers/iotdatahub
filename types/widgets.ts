@@ -1,3 +1,5 @@
+import { PinConfig } from "./pin-config";
+
 export interface Widget {
   id: string;
   name?: string | null;
@@ -13,6 +15,7 @@ export interface Widget {
     height?: number;
   } | null;
   settings?: WidgetSettings | null;
+  pinConfig?: PinConfig | null;
   deviceId?: string | null;
   channelId?: string | null;
   createdAt?: Date;
@@ -38,6 +41,7 @@ export type WidgetType =
   | "video"
   | "textInput"
   | "terminal"
+  | "toggle"
   | "segmentedSwitch"
   | "menu"
   | "modules";

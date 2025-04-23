@@ -30,32 +30,6 @@ const DeviceSidebar: React.FC<SidebarProps> = ({
   isSidebarOpen,
   setIsSidebarOpen,
 }) => {
-  const router = useRouter();
-
-  const [windowWidth, setWindowWidth] = useState<number>(
-    typeof window !== "undefined" ? window.innerWidth : 0,
-  );
-  const editDashboardRef = useRef<{
-    saveChanges: () => Promise<void>;
-    cancelChanges: () => void;
-  } | null>(null);
-
-  // Listen for window resize to adjust layout
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-
-    if (typeof window !== "undefined") {
-      window.addEventListener("resize", handleResize);
-      handleResize(); // Initial call
-
-      return () => {
-        window.removeEventListener("resize", handleResize);
-      };
-    }
-  }, []);
-
   const toggleSidebar = () => {
     if (setIsSidebarOpen) {
       setIsSidebarOpen(!isSidebarOpen);
@@ -117,7 +91,7 @@ const DeviceSidebar: React.FC<SidebarProps> = ({
     <aside
       className={`bg-white transition-all border-t duration-300 ${
         isSidebarOpen ? "w-48" : "w-16"
-      } h-screen z-10 rounded-md px-1`}
+      } h-full z-10 rounded-md px-1`}
     >
       <div className="border-b py-1 border-gray-200 flex items-center justify-between">
         <DeviceSidebarToggle

@@ -6,19 +6,33 @@ import { Responsive, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import WidgetComponent from "./WidgetComponent";
-import { LinearLoading } from "@/components/LinearLoading";
+import { useToast } from "@/hooks/useToast";
+import LoadingOverlay from "./LoadingOverlay";
+import { useRouter } from "next/navigation";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 interface WidgetGridProps {
   widgets: Widget[];
+  onWidgetUpdate: (widget: Widget) => Promise<void>;
+  onWidgetDelete: (widgetId: string) => Promise<void>;
+  onWidgetDuplicate: (widget: Widget) => Promise<void>;
+  deviceId: string;
 }
 
-export const WidgetGrid: React.FC<WidgetGridProps> = ({ widgets }) => {
-  const [isSaving, setIsSaving] = useState(false);
+export const WidgetGrid: React.FC<WidgetGridProps> = ({
+  widgets,
+  onWidgetUpdate,
+  onWidgetDelete,
+  onWidgetDuplicate,
+  deviceId,
+}) => {
   const [pendingChanges, setPendingChanges] = useState<{
     [key: string]: Widget["position"];
   }>({});
+  const [isSaving, setIsSaving] = useState(false);
+  const { showToast } = useToast();
+  const router = useRouter();
 
   const generateLayout = () => ({
     lg: widgets.map((widget) => ({
@@ -27,46 +41,108 @@ export const WidgetGrid: React.FC<WidgetGridProps> = ({ widgets }) => {
       y: pendingChanges[widget.id]?.y ?? widget.position?.y ?? 0,
       w: widget.position?.width ?? widget.definition?.defaultSize?.w ?? 4,
       h: widget.position?.height ?? widget.definition?.defaultSize?.h ?? 4,
-      static: true,
+      static: false,
+    })),
+    md: widgets.map((widget) => ({
+      i: widget.id,
+      x: pendingChanges[widget.id]?.x ?? widget.position?.x ?? 0,
+      y: pendingChanges[widget.id]?.y ?? widget.position?.y ?? 0,
+      w: widget.position?.width ?? widget.definition?.defaultSize?.w ?? 4,
+      h: widget.position?.height ?? widget.definition?.defaultSize?.h ?? 4,
+      static: false,
+    })),
+    sm: widgets.map((widget) => ({
+      i: widget.id,
+      x: pendingChanges[widget.id]?.x ?? widget.position?.x ?? 0,
+      y: pendingChanges[widget.id]?.y ?? widget.position?.y ?? 0,
+      w: widget.position?.width ?? widget.definition?.defaultSize?.w ?? 4,
+      h: widget.position?.height ?? widget.definition?.defaultSize?.h ?? 4,
+      static: false,
+    })),
+    xs: widgets.map((widget) => ({
+      i: widget.id,
+      x: pendingChanges[widget.id]?.x ?? widget.position?.x ?? 0,
+      y: pendingChanges[widget.id]?.y ?? widget.position?.y ?? 0,
+      w: widget.position?.width ?? widget.definition?.defaultSize?.w ?? 4,
+      h: widget.position?.height ?? widget.definition?.defaultSize?.h ?? 4,
+      static: false,
+    })),
+    xxs: widgets.map((widget) => ({
+      i: widget.id,
+      x: pendingChanges[widget.id]?.x ?? widget.position?.x ?? 0,
+      y: pendingChanges[widget.id]?.y ?? widget.position?.y ?? 0,
+      w: widget.position?.width ?? widget.definition?.defaultSize?.w ?? 4,
+      h: widget.position?.height ?? widget.definition?.defaultSize?.h ?? 4,
+      static: false,
     })),
   });
 
-  const handleLayoutChange = (currentLayout: any[]) => {
+  const handleLayoutChange = async (currentLayout: any[], allLayouts: any) => {
     const newChanges = { ...pendingChanges };
 
-    currentLayout.forEach((item) => {
+    for (const item of currentLayout) {
       const widget = widgets.find((w) => w.id === item.i);
       if (widget) {
         const newPosition: Widget["position"] = {
           x: item.x,
           y: item.y,
-          width:
-            widget.position?.width ?? widget.definition?.defaultSize?.w ?? 4,
-          height:
-            widget.position?.height ?? widget.definition?.defaultSize?.h ?? 4,
+          width: item.w,
+          height: item.h,
         };
 
         if (
           widget.position?.x !== newPosition.x ||
-          widget.position?.y !== newPosition.y
+          widget.position?.y !== newPosition.y ||
+          widget.position?.width !== newPosition.width ||
+          widget.position?.height !== newPosition.height
         ) {
           newChanges[widget.id] = newPosition;
+
+          try {
+            setIsSaving(true);
+            await onWidgetUpdate({
+              ...widget,
+              position: newPosition,
+            });
+            delete newChanges[widget.id];
+          } catch (error) {
+            showToast("Failed to save widget position", "error");
+          } finally {
+            setIsSaving(false);
+          }
         }
       }
-    });
+    }
+
     setPendingChanges(newChanges);
   };
 
+  const handleValueChange = async (widgetId: string, value: any) => {
+    const widget = widgets.find((w) => w.id === widgetId);
+    if (widget) {
+      await onWidgetUpdate({
+        ...widget,
+        settings: {
+          ...widget.settings,
+          value,
+        },
+      });
+    }
+  };
+
+  const handleConfigClick = (widgetId: string) => {
+    router.push(`/dashboard/devices/${deviceId}/widgets/${widgetId}/config`);
+  };
+
   const getWidgetStyle = (widget: Widget) => {
-    const baseStyles =
-      "rounded-lg overflow-hidden transition-shadow duration-200";
+    const baseStyles = "rounded-lg overflow-hidden transition-all duration-200";
     const settings = widget.settings || {};
 
     return {
       className: `${baseStyles} widget-${widget.definition?.type}`,
       style: {
         backgroundColor: settings.backgroundColor || "white",
-        border: "1px solid rgba(0, 0, 0, 0.1)",
+        border: `1px solid ${settings.color ? `${settings.color}30` : "rgba(0, 0, 0, 0.1)"}`,
         boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
         height: "100%",
         width: "100%",
@@ -75,32 +151,6 @@ export const WidgetGrid: React.FC<WidgetGridProps> = ({ widgets }) => {
         position: "relative" as const,
       },
     };
-  };
-
-  const handleDuplicate = async (widget: Widget) => {
-    try {
-      setIsSaving(true);
-      const response = await fetch(`/api/devices/${widget.deviceId}/widgets`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...widget,
-          position: {
-            ...widget.position,
-            x: (widget.position?.x || 0) + 1,
-            y: (widget.position?.y || 0) + 1,
-          },
-        }),
-      });
-
-      if (!response.ok) throw new Error("Failed to duplicate widget");
-    } catch (error) {
-      console.error("Error duplicating widget:", error);
-    } finally {
-      setIsSaving(false);
-    }
   };
 
   return (
@@ -114,22 +164,30 @@ export const WidgetGrid: React.FC<WidgetGridProps> = ({ widgets }) => {
         margin={[16, 16]}
         containerPadding={[16, 16]}
         onLayoutChange={handleLayoutChange}
-        isDraggable={false}
-        isResizable={false}
+        isDraggable={true}
+        isResizable={true}
         compactType="vertical"
+        draggableCancel=".widget-content"
       >
-        {isSaving && <LinearLoading />}
         {widgets.map((widget) => {
           const widgetStyles = getWidgetStyle(widget);
 
           return (
             <div key={widget.id} {...widgetStyles}>
-              {/* Widget Content */}
-              <WidgetComponent widget={widget} />
+              <WidgetComponent
+                widget={widget}
+                onEdit={() => handleConfigClick(widget.id)}
+                onDelete={onWidgetDelete}
+                onDuplicate={onWidgetDuplicate}
+                onConfig={() => handleConfigClick(widget.id)}
+                onValueChange={handleValueChange}
+              />
             </div>
           );
         })}
       </ResponsiveGridLayout>
+
+      <LoadingOverlay isLoading={isSaving} />
     </div>
   );
 };

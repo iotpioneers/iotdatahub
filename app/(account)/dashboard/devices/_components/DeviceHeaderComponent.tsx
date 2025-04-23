@@ -29,11 +29,11 @@ const DeviceHeaderComponent: React.FC<HeaderProps> = ({
         transition: "left 0.3s",
       }}
     >
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-start">
         <div className="flex items-center space-x-2">
           <Dropdown>
-            <MenuButton className="p-1 rounded-md hover:bg-gray-100">
-              <MoreHorizontal size={16} color="#10B981" />
+            <MenuButton className="p-1 rounded-md hover:bg-gray-100 shadow shadow-black">
+              <MoreHorizontal size={24} color="#10B981" />
             </MenuButton>
             <Menu className="bg-white shadow-lg rounded-md p-1 min-w-[180px] z-50">
               <MenuItem className="p-2 hover:bg-gray-100 rounded-md cursor-pointer flex items-center">

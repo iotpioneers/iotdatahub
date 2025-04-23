@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import { ChartBarIcon } from "@heroicons/react/20/solid";
 import {
   NumberCircleOne,
@@ -8,13 +9,12 @@ import {
   MapPin,
   Terminal,
   SlidersHorizontal,
-  Video,
   SpeakerHigh,
   TextT,
   ChartLine,
   ChartBar,
 } from "@phosphor-icons/react";
-import { SliderIcon, SwitchIcon } from "@radix-ui/react-icons";
+import { SwitchIcon } from "@radix-ui/react-icons";
 import {
   GaugeIcon,
   ImageIcon,
@@ -26,6 +26,11 @@ import { useDraggable } from "@dnd-kit/core";
 import useAdd from "@/hooks/useAdd";
 import { WidgetsOutlined } from "@mui/icons-material";
 import DeviceMap from "@/app/(account)/dashboard/devices/_components/DeviceMap";
+
+interface DraggableWidgetProps {
+  widget: Widget;
+  onDoubleClick?: () => void;
+}
 
 // Utility function to adjust the default size
 const adjustWidgetSize = (
@@ -239,6 +244,14 @@ const WidgetPreviews: Record<WidgetType, React.FC> = {
       </div>
     </div>
   ),
+  toggle: () => (
+    <div className="flex items-center space-x-2">
+      <div className="w-6 h-3 rounded-full bg-green-500 relative">
+        <div className="absolute right-0.5 top-0.5 w-2 h-2 rounded-full bg-white"></div>
+      </div>
+    </div>
+  ),
+
   imageButton: () => (
     <div className="flex justify-center items-center">
       <div className="w-6 h-6 border border-teal-500 rounded text-teal-500 flex items-center justify-center">
@@ -503,8 +516,9 @@ const WidgetPreviews: Record<WidgetType, React.FC> = {
 };
 
 const DraggableWidgetBox = ({ widget }: { widget: Widget }) => {
-  const { attributes, listeners, setNodeRef } = useDraggable({
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: widget.id as string,
+    data: { widget }, // Pass widget data directly to draggable
   });
 
   const WidgetPreviewComponent = widget?.definition?.type
@@ -516,9 +530,14 @@ const DraggableWidgetBox = ({ widget }: { widget: Widget }) => {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className="rounded-lg bg-white p-2 shadow-sm border border-gray-100 hover:shadow-md cursor-grab active:cursor-grabbing transition-shadow"
-      onDragStart={(e) => {
-        e.dataTransfer.setData("application/json", JSON.stringify(widget));
+      className={cn(
+        "rounded-lg bg-white p-2 border border-gray-100 shadow-md shadow-black hover:shadow-md transition-shadow",
+        isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab",
+      )}
+      style={{
+        transform: isDragging ? "scale(1.05)" : "none",
+        transition: "transform 0.2s ease, opacity 0.2s ease",
+        touchAction: "none", // Important for mobile drag
       }}
     >
       <div className="mb-1 font-medium">
@@ -528,7 +547,6 @@ const DraggableWidgetBox = ({ widget }: { widget: Widget }) => {
     </div>
   );
 };
-
 interface WidgetBoxProps {
   deviceId: string;
   onWidgetAdded?: (widgetId: string) => void;
@@ -568,7 +586,7 @@ const WidgetBox = ({ deviceId, onWidgetAdded }: WidgetBoxProps) => {
               {category}
             </h3>
             <div className="grid grid-cols-1 gap-1.5">
-              {definitions.map((definition) => {
+              {definitions.map((definition: WidgetDefinition) => {
                 const widget = createWidget(definition);
                 return (
                   <div
@@ -576,7 +594,7 @@ const WidgetBox = ({ deviceId, onWidgetAdded }: WidgetBoxProps) => {
                     onDoubleClick={() => handleAddWidget(widget)}
                     className="cursor-pointer"
                   >
-                    <DraggableWidgetBox widget={widget} />
+                    <DraggableWidgetBox widget={widget} key={widget.id} />
                   </div>
                 );
               })}

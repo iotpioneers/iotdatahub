@@ -89,14 +89,12 @@ const EditDeviceDashboardComponent = forwardRef<
   }));
 
   return (
-    <div className="relative min-h-screen">
-      <EditDeviceWidgetGrid
-        widgets={widgets}
-        onWidgetMove={handleWidgetMove}
-        onWidgetDelete={handleWidgetDelete}
-        deviceId={deviceId}
-      />
-    </div>
+    <EditDeviceWidgetGrid
+      widgets={widgets}
+      onWidgetMove={handleWidgetMove}
+      onWidgetDelete={handleWidgetDelete}
+      deviceId={deviceId}
+    />
   );
 });
 

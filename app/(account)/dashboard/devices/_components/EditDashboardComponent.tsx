@@ -14,7 +14,7 @@ interface Props {
 const EditDashboardComponent = ({ params }: Props) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const editDashboardRef = useRef<{
     saveChanges: () => Promise<void>;
     cancelChanges: () => void;
@@ -49,25 +49,24 @@ const EditDashboardComponent = ({ params }: Props) => {
   };
 
   return (
-    <div className="max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl xxl:max-w-screen-xxl flex justify-between bg-slate-100 rounded-lg shadow p-1 overflow-hidden">
+    <div className="max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl xxl:max-w-screen-xxl flex justify-between bg-slate-100 rounded-lg shadow p-2 overflow-hidden gap-1">
       <DeviceSidebar
         deviceId={params.id}
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
       />
-      <div className="flex-1 lg:min-w-[700px] ml-1 md:ml-2 rounded-md">
-        <div className="grid gap-1">
-          <DeviceHeaderComponent
-            deviceId={params.id}
-            isLoading={isLoading}
-            onSave={handleSaveAndApply}
-            onCancel={handleCancel}
-          />
-          <EditDeviceDashboard params={params} ref={editDashboardRef} />
-        </div>
-      </div>
-      <div className="flex ml-1 md:ml-2 flex-1 rounded-md">
+
+      <div className="flex flex-1 rounded-md">
         <WidgetBox deviceId={params.id} />
+      </div>
+      <div className="grid gap-1  lg:min-w-[700px] rounded-md">
+        <DeviceHeaderComponent
+          deviceId={params.id}
+          isLoading={isLoading}
+          onSave={handleSaveAndApply}
+          onCancel={handleCancel}
+        />
+        <EditDeviceDashboard params={params} ref={editDashboardRef} />
       </div>
     </div>
   );

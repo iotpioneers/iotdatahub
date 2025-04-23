@@ -51,10 +51,18 @@ const Navbar = ({
           },
           borderRadius: "8px",
           overflow: "hidden",
+          py: 2,
         }}
       >
-        <Box component="span" sx={{ display: "block", flexGrow: 1 }}>
-          <Link href="/" className="grid p-2 mt-12 text-orange-50">
+        <Box
+          component="span"
+          sx={{ display: "block", flexGrow: 1 }}
+          className=""
+        >
+          <Link
+            href="/"
+            className="flex md:grid p-2 mt-2 md:mt-12 text-orange-50"
+          >
             <Image
               src="/IOT_DATA_HUB.png"
               alt="logo"
