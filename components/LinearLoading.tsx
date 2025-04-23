@@ -9,10 +9,12 @@ export const LinearLoading = () => (
   </>
 );
 
-const DisabledBackground = styled(Box)({
+export const DisabledBackground = styled(Box)({
+  position: "absolute",
+  top: 0,
+  left: 0,
   width: "100%",
   height: "100%",
-  position: "fixed",
   background: "#ccc",
   opacity: 0.5,
   zIndex: 1,

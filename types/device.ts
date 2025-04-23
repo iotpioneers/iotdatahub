@@ -1,4 +1,6 @@
-// types/device.ts
+import { ReactNode } from "react";
+import { Channel, Organization, User } from "@/types";
+
 export interface DeviceData {
   id: string;
   name: string;
@@ -19,9 +21,14 @@ export interface DeviceData {
     unit: string;
     period: string;
   };
+  user?: User;
+  organization: Organization;
+  channel: Channel;
   widgets: Widget[];
   alerts: Alert[];
   automations: Automation[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Widget {
@@ -48,4 +55,17 @@ export interface Automation {
   name: string;
   status: "ACTIVE" | "PAUSED" | "DISABLED";
   type: "SCHEDULED" | "CONDITIONAL" | "TRIGGER" | "SEQUENCE";
+}
+
+export interface DeviceTypeConfig {
+  icon: ReactNode | string | undefined | any;
+  color: string;
+  label: string;
+}
+
+export interface StatusConfig {
+  color: string;
+  backgroundColor: string;
+  label: string;
+  icon: ReactNode | string | undefined | any;
 }

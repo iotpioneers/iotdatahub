@@ -15,7 +15,7 @@ import Drawer from "@mui/material/Drawer";
 import { AdminPanelSettingsOutlined } from "@mui/icons-material";
 
 import LoadingProgressBar from "../LoadingProgressBar";
-import { Logo } from "../Home/Logo";
+import Image from "next/image";
 
 interface SidebarContentProps {
   isLoading: boolean;
@@ -56,11 +56,10 @@ function SideNavbar({
         onClose={toggleSidebar}
         sx={{
           display: { xs: "block", lg: "none" },
-          "& .MuiDrawer-paper": { boxSizing: "border-box", width: 240 },
+          "& .MuiDrawer-paper": { boxSizing: "border-box", width: 200 },
         }}
       >
         <div className="flex justify-between items-center px-4 py-8">
-          <Logo />
           <IconButton
             aria-label="toggle drawer"
             edge="start"
@@ -69,6 +68,18 @@ function SideNavbar({
           >
             {isSidebarOpen ? <MenuOpenIcon /> : <MenuIcon />}
           </IconButton>
+          <Link href="/" className="grid md:flex p-1 text-orange-50">
+            <Image
+              src="/IOT_DATA_HUB.png"
+              alt="logo"
+              width={96}
+              height={96}
+              className="cursor-pointer"
+            />
+            <h1 className="flex text-lg text-center justify-center cursor-pointer font-bold">
+              <span>IoTDataHub</span>
+            </h1>
+          </Link>
         </div>
         <div className="px-2">
           <SidebarContent
@@ -80,7 +91,7 @@ function SideNavbar({
       </Drawer>
       <div className={`relative hidden lg:flex bg-white`}>
         <Disclosure as="nav">
-          <div className="p-6 w-1/2 h-screen bg-white z-20 fixed top-0 lg:left-0 lg:w-60 border-r border-gray-10 border-5 overflow-y-auto">
+          <div className="py-6 px-3 w-1/2 lg:w-44 h-screen overflow-y-auto bg-white fixed top-0 left-0 z-20">
             <SidebarContent
               isLoading={isLoading}
               activeLink={activeLink}

@@ -12,7 +12,7 @@ export const initialState = {
   isOpen: [], // for active default menu
   defaultId: "",
   fontFamily: `'Roboto', sans-serif`,
-  borderRadius: 12,
+  borderRadius: 1.5,
   opened: true,
   navType: "light" as "light" | "dark",
 };
@@ -21,7 +21,7 @@ export const initialState = {
 
 const customizationReducer = (
   state = initialState,
-  action: CustomizationActions
+  action: CustomizationActions,
 ) => {
   let id;
   switch (action.type) {

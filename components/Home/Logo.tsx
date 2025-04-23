@@ -4,10 +4,7 @@ import React from "react";
 
 export const Logo = () => {
   return (
-    <Link
-      href="/"
-      className="grid py-2 justify-center items-center text-orange-50 px-2"
-    >
+    <Link href="/" className="flex p-1 text-orange-50">
       <Image
         src="/IOT_DATA_HUB.png"
         alt="logo"

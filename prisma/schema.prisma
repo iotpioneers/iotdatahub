@@ -66,27 +66,28 @@ model Authenticator {
 }
 
 model User {
-  id              String          @id @default(auto()) @map("_id") @db.ObjectId
-  name            String
-  email           String          @unique
-  country         String?
-  phonenumber     String?
-  emailVerified   DateTime?
-  image           String?
-  password        String?
-  role            Role            @default(USER)
-  accounts        Account[]
-  sessions        Session[]
-  Authenticator   Authenticator[]
-  devices         Device[]
-  channels        Channel[]
-  apiKeys         ApiKey[]
-  payments        Payment[]
-  feedbackReplies FeedbackReply[]
-  subscriptionId  String?         @db.ObjectId
-  organizationId  String?         @db.ObjectId
-  subscription    Subscription?   @relation(fields: [subscriptionId], references: [id])
-  organization    Organization?   @relation(fields: [organizationId], references: [id])
+  id                      String          @id @default(auto()) @map("_id") @db.ObjectId
+  name                    String
+  email                   String          @unique
+  country                 String?
+  phonenumber             String?
+  emailVerified           DateTime?
+  image                   String?
+  password                String?
+  notificationPreferences Json? // e.g., { "email": true, "sms": false }
+  role                    Role            @default(USER)
+  accounts                Account[]
+  sessions                Session[]
+  Authenticator           Authenticator[]
+  devices                 Device[]
+  channels                Channel[]
+  apiKeys                 ApiKey[]
+  payments                Payment[]
+  feedbackReplies         FeedbackReply[]
+  subscriptionId          String?         @db.ObjectId
+  organizationId          String?         @db.ObjectId
+  subscription            Subscription?   @relation(fields: [subscriptionId], references: [id])
+  organization            Organization?   @relation(fields: [organizationId], references: [id])
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt()
@@ -112,16 +113,16 @@ model Organization {
   members        Member[]
   payments       Payment[]
   feedbacks      Feedback[]
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt()
-  Channel      Channel[]
-  Device       Device[]
-  Field        Field[]
-  DataPoint    DataPoint[]
-  ApiKey       ApiKey[]
-  SampleCodes  SampleCodes[]
-  Subscription Subscription[]
-  ContactSales ContactSales[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt()
+  Channel        Channel[]
+  Device         Device[]
+  Field          Field[]
+  DataPoint      DataPoint[]
+  ApiKey         ApiKey[]
+  SampleCodes    SampleCodes[]
+  Subscription   Subscription[]
+  ContactSales   ContactSales[]
 
   @@index([userId])
 }
@@ -148,6 +149,9 @@ model Device {
   name           String
   description    String?
   deviceType     DeviceType?
+  authToken      String?
+  virtualPins    Json? // Mappings for virtual pins (e.g., { "V1": "temperature", "V2": "humidity" })
+  connectionInfo Json?
   model          String?
   firmware       String?
   config         Json?
@@ -167,6 +171,7 @@ model Device {
   status         DeviceStatus @default(OFFLINE)
 
   // New relations
+  sensors     Sensor[]
   automations DeviceAutomation[]
   alerts      DeviceAlert[]
   commands    DeviceCommand[]
@@ -174,12 +179,44 @@ model Device {
   schedules   Schedule[]
   widgets     Widget[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt()
+  PinConfig PinConfig[]
 
   @@index([organizationId])
   @@index([channelId])
   @@index([userId])
+}
+
+model PinConfig {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  widgetId     String   @db.ObjectId
+  deviceId     String   @db.ObjectId
+  device       Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  pinType      String // "VIRTUAL", "DIGITAL", "ANALOG"
+  pinNumber    String
+  valueType    String? // "BOOLEAN", "NUMBER", "STRING"
+  defaultValue Json?
+  minValue     Float?
+  maxValue     Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  Widget       Widget[]
+
+  @@index([deviceId])
+}
+
+model Sensor {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  type         String
+  minThreshold Float? // Minimum threshold for alerts
+  maxThreshold Float? // Maximum threshold for alerts
+  value        Float    @default(0.0)
+  deviceId     String   @db.ObjectId
+  device       Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model DeviceAutomation {
@@ -279,6 +316,8 @@ model Channel {
   description     String?
   connectionType  String?
   hardware        String?
+  mqttBrokerUrl   String? // MQTT broker URL
+  mqttTopic       String? // MQTT topic for this channel
   access          Access          @default(PRIVATE)
   widgets         Widget[]
   fields          Field[]
@@ -315,19 +354,24 @@ model ChannelAccess {
 }
 
 model Widget {
-  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
   name       String?
+  type       String? // Changed to nullable
+  dataSource Json?
+  display    Json?
   definition Json?
   position   Json?
   settings   Json?
   color      String?
-  deviceId   String  @db.ObjectId
-  device     Device  @relation(fields: [deviceId], references: [id], onDelete: Cascade)
-  channelId  String  @db.ObjectId
-  channel    Channel @relation(fields: [channelId], references: [id])
+  deviceId   String     @db.ObjectId
+  device     Device     @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  channelId  String     @db.ObjectId
+  channel    Channel    @relation(fields: [channelId], references: [id])
+  pinConfig  PinConfig? @relation(fields: [pinConfigId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt()
+  pinConfigId String?  @db.ObjectId
 
   @@index([deviceId])
   @@index([channelId])
@@ -503,8 +547,8 @@ model Invoice {
   expiryDate         DateTime?
   paidAt             DateTime?
   payments           Payment[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt()
 }
 
 model ContactSales {

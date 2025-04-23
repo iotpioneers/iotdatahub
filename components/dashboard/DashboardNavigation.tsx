@@ -29,9 +29,10 @@ const DashboardNavigation = () => {
         elevation={0}
         sx={{
           bgcolor: theme.palette.background.default,
+          height: 40,
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{ minHeight: 40 }}>
           <Navbar
             isSidebarOpen={isSidebarOpen}
             setIsSidebarOpen={setIsSidebarOpen}

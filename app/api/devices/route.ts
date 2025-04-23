@@ -100,7 +100,12 @@ export async function GET(request: NextRequest) {
       },
       include: {
         user: true,
-        channel: true,
+        organization: true,
+        channel: {
+          include: {
+            apiKeys: true,
+          },
+        },
         widgets: {
           orderBy: { createdAt: "desc" },
         },

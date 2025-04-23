@@ -17,6 +17,8 @@ import Tooltip from "@mui/material/Tooltip";
 // assets
 import { IconMenu2 } from "@tabler/icons-react";
 import { Logo } from "../Home/Logo";
+import Image from "next/image";
+import Link from "next/link";
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
@@ -40,7 +42,6 @@ const Navbar = ({
       <Box
         sx={{
           width: 228,
-
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -48,10 +49,31 @@ const Navbar = ({
           [theme.breakpoints.down("md")]: {
             width: "auto",
           },
+          borderRadius: "8px",
+          overflow: "hidden",
+          py: 2,
         }}
       >
-        <Box component="span" sx={{ display: "block", mr: 2, flexGrow: 1 }}>
-          <Logo />
+        <Box
+          component="span"
+          sx={{ display: "block", flexGrow: 1 }}
+          className=""
+        >
+          <Link
+            href="/"
+            className="flex md:grid p-2 mt-2 md:mt-12 text-orange-50"
+          >
+            <Image
+              src="/IOT_DATA_HUB.png"
+              alt="logo"
+              width={72}
+              height={72}
+              className="cursor-pointer"
+            />
+            <h1 className="text-lg cursor-pointer font-bold">
+              <span>IoTDataHub</span>
+            </h1>
+          </Link>
         </Box>
         <ButtonBase
           sx={{
@@ -60,7 +82,7 @@ const Navbar = ({
             overflow: "hidden",
           }}
         >
-          <Tooltip title="Toggle Menu">
+          <Tooltip title="Toggle Menu" sx={{ fontSize: 14 }}>
             <Avatar
               variant="rounded"
               sx={{
