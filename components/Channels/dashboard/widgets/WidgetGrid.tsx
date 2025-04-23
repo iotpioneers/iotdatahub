@@ -14,9 +14,9 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 
 interface WidgetGridProps {
   widgets: Widget[];
-  onWidgetUpdate: (widget: Widget) => Promise<void>;
-  onWidgetDelete: (widgetId: string) => Promise<void>;
-  onWidgetDuplicate: (widget: Widget) => Promise<void>;
+  onWidgetUpdate?: (widget: Widget) => Promise<void>;
+  onWidgetDelete?: (widgetId: string) => Promise<void>;
+  onWidgetDuplicate?: (widget: Widget) => Promise<void>;
   deviceId: string;
 }
 
@@ -100,10 +100,12 @@ export const WidgetGrid: React.FC<WidgetGridProps> = ({
 
           try {
             setIsSaving(true);
-            await onWidgetUpdate({
-              ...widget,
-              position: newPosition,
-            });
+            if (onWidgetUpdate) {
+              await onWidgetUpdate({
+                ...widget,
+                position: newPosition,
+              });
+            }
             delete newChanges[widget.id];
           } catch (error) {
             showToast("Failed to save widget position", "error");
@@ -119,7 +121,7 @@ export const WidgetGrid: React.FC<WidgetGridProps> = ({
 
   const handleValueChange = async (widgetId: string, value: any) => {
     const widget = widgets.find((w) => w.id === widgetId);
-    if (widget) {
+    if (widget && onWidgetUpdate) {
       await onWidgetUpdate({
         ...widget,
         settings: {
