@@ -80,7 +80,7 @@ export const WidgetDisplay = ({
 
       {/* Action Buttons */}
       {(isHovered || isActive) && (
-        <div className="absolute top-0 right-0 flex gap-1 p-1 z-50">
+        <div className="absolute top-0 right-0 flex gap-1 p-1 z-50 action-button">
           <button
             onClick={(e) => {
               e.preventDefault();
@@ -129,7 +129,7 @@ export const WidgetDisplay = ({
       )}
 
       {/* Widget Content */}
-      <div className="h-[calc(100%-24px)] w-full flex items-center justify-center p-1 z-10">
+      <div className="h-[calc(100%-24px)] w-full flex items-center justify-center p-1 z-10 widget-content">
         <WidgetRegistry
           type={widget.definition?.type as WidgetType}
           value={widget.settings?.value}

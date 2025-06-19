@@ -1,6 +1,7 @@
 import prisma from "@/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import * as crypto from "crypto";
 import { deviceCreateSchema } from "@/validations/schema.validation";
 
 export async function POST(request: NextRequest) {
@@ -43,6 +44,17 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    let authToken = crypto.randomBytes(16).toString("hex");
+
+    // Check if authToken already exists in the database
+    const existingDevice = await prisma.device.findUnique({
+      where: { authToken },
+    });
+
+    if (existingDevice) {
+      authToken = crypto.randomBytes(16).toString("hex");
+    }
+
     const newDevice = await prisma.device.create({
       data: {
         ...deviceData,
@@ -50,6 +62,7 @@ export async function POST(request: NextRequest) {
         channelId: channel.id,
         organizationId: channel.organizationId,
         status: "OFFLINE",
+        authToken,
       },
       include: {
         user: true,

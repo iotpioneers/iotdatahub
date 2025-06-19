@@ -255,7 +255,7 @@ export async function POST(request: NextRequest) {
           features: pricingTier.features as string[],
         },
         user: {
-          name: user.name,
+          name: user.name ?? "",
           email: user.email,
         },
       });

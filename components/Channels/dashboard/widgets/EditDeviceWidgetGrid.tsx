@@ -96,16 +96,17 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
         onLayoutChange={handleLayoutChange}
         isDraggable
         isResizable
-        isDroppable
+        isDroppable={false}
+        draggableCancel=".widget-content, .action-button"
+        draggableHandle=".drag-handle"
         resizeHandles={["se"]}
-        draggableCancel=".no-drag" // Add class to elements that shouldn't trigger drag
         preventCollision
         useCSSTransforms
       >
         {widgets.map((widget) => (
           <div
             key={widget.id}
-            className="bg-transparent shadow rounded-md"
+            className="widget-content"
             data-grid={{
               x: widget.position?.x || 0,
               y: widget.position?.y || 0,
@@ -120,6 +121,7 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
               onDuplicate={() => handleDuplicate(widget)}
               onSettings={() => setSelectedWidget(widget)}
               onDelete={() => onWidgetDelete?.(widget.id)}
+              className="widget-content"
             />
           </div>
         ))}
