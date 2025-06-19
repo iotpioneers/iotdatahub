@@ -97,11 +97,14 @@ async function getActivityTrend(userId: string): Promise<number[]> {
   ];
 
   // Aggregate activities by day
-  const activityByDay = allActivities.reduce((acc, activity) => {
-    const day = activity.date.toISOString().split("T")[0];
-    acc[day] = (acc[day] || 0) + activity.count;
-    return acc;
-  }, {} as Record<string, number>);
+  const activityByDay = allActivities.reduce(
+    (acc, activity) => {
+      const day = activity.date.toISOString().split("T")[0];
+      acc[day] = (acc[day] || 0) + activity.count;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   // Create a 30-day trend array
   const trend: number[] = new Array(30).fill(0);
@@ -121,7 +124,7 @@ export async function GET(request: NextRequest) {
   if (!token) {
     return NextResponse.json(
       { error: "You must be logged in" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -179,7 +182,7 @@ export async function GET(request: NextRequest) {
 
       return {
         id: user.id,
-        name: user.name,
+        name: user.name ?? "",
         email: user.email,
         image: user.image,
         role: user.role,
@@ -189,7 +192,7 @@ export async function GET(request: NextRequest) {
         dataUploads,
         activityTrend,
       };
-    })
+    }),
   );
 
   return NextResponse.json(enhancedUsers);

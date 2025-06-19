@@ -8,9 +8,9 @@ import { useSession } from "next-auth/react";
 import { ApiKey, Channel, Device } from "@/types";
 import { LinearLoading } from "@/components/LinearLoading";
 import { HiStatusOffline, HiStatusOnline } from "react-icons/hi";
-import EditDeviceDashboardComponent from "./EditDeviceDashboardComponent";
 import Link from "next/link";
 import DeviceDashboardComponent from "./DeviceDashboardComponent";
+import { useIoTDataHub } from "@/hooks/useIoTDataHub";
 
 interface Props {
   params: { id: string };
@@ -32,6 +32,15 @@ const DeviceDetails = ({ params }: Props) => {
   const [device, setDevice] = useState<Device | null>(null);
 
   const { data: session, status } = useSession();
+
+  const {
+    data: RealTimeData,
+    connected,
+    deviceStatus,
+    virtualWrite,
+  } = useIoTDataHub({
+    deviceId: params.id,
+  });
 
   if (status === "loading" || status === "unauthenticated" || !session) {
     return <LinearLoading />;
@@ -221,6 +230,13 @@ const DeviceDetails = ({ params }: Props) => {
                 <div className="text-gray-400">CHANNEL_API_KEY</div>
                 <div className="text-orange-50">"{apiKey?.apiKey}"</div>
               </div>
+            </div>
+
+            <div>
+              <p>Status: {deviceStatus}</p>
+              <p>Data: {JSON.stringify(RealTimeData)}</p>
+              <p>Connected: {String(connected)}</p>
+              <button onClick={() => virtualWrite("V3", 1)}>Turn On LED</button>
             </div>
           </div>
         </div>

@@ -335,3 +335,19 @@ body {
 .lb-elevation {
   background: #b4c6ee;
 }
+
+.widget-content {
+  pointer-events: auto !important;
+}
+
+.react-grid-item {
+  z-index: 1;
+}
+
+.react-grid-item:hover {
+  z-index: 2;
+}
+
+.action-button {
+  pointer-events: auto;
+}

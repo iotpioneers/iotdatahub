@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     id,
     info: {
       id,
-      name,
+      name: name || "",
       email,
       avatar: image || "",
       color: getUserColor(id),

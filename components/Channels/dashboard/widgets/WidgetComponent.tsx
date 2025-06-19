@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { PencilIcon, TrashIcon, CopyIcon, SettingsIcon } from "lucide-react";
-import { Widget, WidgetSettings } from "@/types/widgets";
+import { Widget } from "@/types/widgets";
 import WidgetRegistry from "./WidgetComponents";
 import { useToast } from "@/hooks/useToast";
 import LoadingOverlay from "./LoadingOverlay";

@@ -67,7 +67,7 @@ model Authenticator {
 
 model User {
   id                      String          @id @default(auto()) @map("_id") @db.ObjectId
-  name                    String
+  name                    String?
   email                   String          @unique
   country                 String?
   phonenumber             String?
@@ -145,12 +145,11 @@ model Member {
 }
 
 model Device {
-  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  id             String      @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   description    String?
   deviceType     DeviceType?
-  authToken      String?
-  virtualPins    Json? // Mappings for virtual pins (e.g., { "V1": "temperature", "V2": "humidity" })
+  authToken      String      @unique // auth token
   connectionInfo Json?
   model          String?
   firmware       String?
@@ -162,6 +161,7 @@ model Device {
   batteryLevel   Float?
   signal         Float?
   location       Json?
+
   userId         String       @db.ObjectId
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   channelId      String       @db.ObjectId
@@ -170,7 +170,13 @@ model Device {
   organization   Organization @relation(fields: [organizationId], references: [id])
   status         DeviceStatus @default(OFFLINE)
 
-  // New relations
+  // Virtual pins data
+  virtualPins VirtualPin[]
+
+  // Events and logs
+  events      DeviceEvent[]
+  logs        DeviceLog[]
+  history     PinHistory[]
   sensors     Sensor[]
   automations DeviceAutomation[]
   alerts      DeviceAlert[]
@@ -179,13 +185,76 @@ model Device {
   schedules   Schedule[]
   widgets     Widget[]
 
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt()
-  PinConfig PinConfig[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt()
+  PinConfig        PinConfig[]
+  NotificationRule NotificationRule[]
 
   @@index([organizationId])
   @@index([channelId])
   @@index([userId])
+}
+
+model DeviceEvent {
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  eventCode String // "sensor_alert", "connection_lost", etc.
+  message   String
+  severity  EventSeverity @default(INFO)
+  data      Json? // Additional event data
+  processed Boolean       @default(false)
+
+  deviceId String @db.ObjectId
+  device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("device_events")
+}
+
+model DeviceLog {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  level   LogLevel @default(INFO)
+  message String
+  data    Json?
+
+  deviceId String @db.ObjectId
+  device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("device_logs")
+}
+
+model VirtualPin {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  pinNumber   Int // V0, V1, V2, etc. (store as 0, 1, 2)
+  value       String? // Store as string, convert as needed
+  dataType    PinDataType @default(STRING)
+  lastUpdated DateTime    @default(now())
+
+  deviceId String @db.ObjectId
+  device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  // Pin configuration
+  config Json? // Store widget config, min/max values, etc.
+
+  @@unique([deviceId, pinNumber])
+  @@map("virtual_pins")
+}
+
+model PinHistory {
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  deviceId  String      @db.ObjectId
+  device    Device      @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  pinNumber Int
+  value     String
+  dataType  PinDataType
+  timestamp DateTime    @default(now())
+
+  createdAt DateTime @default(now())
+
+  @@index([deviceId, pinNumber, createdAt])
+  @@map("pin_history")
 }
 
 model PinConfig {
@@ -368,6 +437,12 @@ model Widget {
   channelId  String     @db.ObjectId
   channel    Channel    @relation(fields: [channelId], references: [id])
   pinConfig  PinConfig? @relation(fields: [pinConfigId], references: [id])
+
+  widgetType String // "button", "slider", "gauge", "chart", etc.
+  pinNumber  Int
+  pinType    String // "virtual", "digital", "analog"
+  config     Json // Widget-specific configuration  
+  isActive   Boolean @default(true)
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt()
@@ -602,6 +677,24 @@ model FeedbackReply {
   @@index([userId])
 }
 
+model NotificationRule {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  deviceId String @db.ObjectId
+  device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  name      String
+  condition Json // {pin, operator, value, logic}
+  actions   Json // {email, sms, webhook, etc.}
+
+  isActive      Boolean   @default(true)
+  lastTriggered DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("notification_rules")
+}
+
 enum DeviceType {
   SENSOR
   ACTUATOR
@@ -616,6 +709,27 @@ enum DeviceStatus {
   MAINTENANCE
   ERROR
   DISABLED
+}
+
+enum PinDataType {
+  STRING
+  INTEGER
+  FLOAT
+  BOOLEAN
+}
+
+enum EventSeverity {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+enum LogLevel {
+  DEBUG
+  INFO
+  WARN
+  ERROR
 }
 
 enum AutomationType {

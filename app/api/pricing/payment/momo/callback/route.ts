@@ -223,7 +223,7 @@ export async function POST(request: NextRequest) {
         if (!pricingTier) {
           return NextResponse.json(
             { error: "Pricing tier not found" },
-            { status: 404 }
+            { status: 404 },
           );
         }
 
@@ -256,7 +256,7 @@ export async function POST(request: NextRequest) {
         await sendPaymentSuccessEmail({
           user: {
             email: user.email,
-            name: user.name,
+            name: user.name ?? "",
           },
           payment: {
             amount: payment.amount,
@@ -288,7 +288,7 @@ export async function POST(request: NextRequest) {
     console.error("Payment processing error:", error);
     return NextResponse.json(
       { error: "Failed to process payment" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
