@@ -7,7 +7,6 @@ async function startIoTDataHubServers() {
     console.log("IoTDataHub servers started successfully");
   } catch (error) {
     console.error("Failed to start IoTDataHub servers:", error);
-    process.exit(1);
   }
 }
 

@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Widget } from "@/types/widgets";
-import { Button, Modal, TextField, Select, MenuItem } from "@mui/material";
+import { Button, Modal, TextField } from "@mui/material";
 import PinConfigModal from "./PinConfigModal";
 import useFetch from "@/hooks/useFetch";
 

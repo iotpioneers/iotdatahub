@@ -1,6 +1,6 @@
 import { Widget } from "@/types/widgets";
 
-export type PinType = "VIRTUAL" | "DIGITAL" | "ANALOG";
+export type PinType = "VIRTUAL" | "GPIO" | "DIGITAL" | "ANALOG";
 export type ValueType = "BOOLEAN" | "NUMBER" | "STRING";
 export type AutomationType =
   | "POWER_SWITCH"
@@ -12,10 +12,11 @@ export type AutomationType =
   | "";
 
 export interface PinConfig {
-  id: string;
+  id?: string;
   widgetId: string;
   deviceId: string;
   pinType: PinType;
+  widgetType?: string; // Optional, can be used to specify the widget type
   pinNumber: string;
   valueType: ValueType;
   defaultValue: string | boolean | number;
@@ -25,8 +26,6 @@ export interface PinConfig {
   values?: string[] | number[] | boolean[] | null;
   unit?: string;
   options?: string[];
-  createdAt: Date;
-  updatedAt: Date;
   title: string;
   showLabels?: boolean;
   hideWidgetName?: boolean;
@@ -34,6 +33,10 @@ export interface PinConfig {
   offValue?: string;
   widgetColor?: string;
   automationType?: AutomationType;
+  datastreamName?: string;
+  datastreamAlias?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface PinConfigModalProps {
@@ -57,7 +60,7 @@ export interface DatastreamFormProps {
   widget: Widget;
   onConfigChange: (config: Partial<PinConfig>) => void;
   onCancel: () => void;
-  onSubmit: () => void;
+  onSubmit: (datastreamConfig: Partial<PinConfig>) => void;
 }
 
 export interface WidgetPreviewProps {

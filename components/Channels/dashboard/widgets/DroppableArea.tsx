@@ -1,66 +1,41 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React from "react";
 import { useDroppable } from "@dnd-kit/core";
-import { Widget } from "@/types/widgets";
-import useAdd from "@/hooks/useAdd";
 import { cn } from "@/lib/utils";
 
 interface DroppableAreaProps {
-  id: string;
+  id?: string;
   children: React.ReactNode;
-  onWidgetAdded?: (widget: Widget) => void;
 }
 
 export const DroppableArea = ({
-  id,
+  id = "dashboard-drop-area",
   children,
-  onWidgetAdded,
 }: DroppableAreaProps) => {
-  const { setNodeRef, isOver } = useDroppable({
+  const { setNodeRef, isOver, active } = useDroppable({
     id,
   });
-
-  const { add } = useAdd(`/api/devices/${id}/widgets`);
-
-  const handleDrop = useCallback(
-    async (e: React.DragEvent) => {
-      e.preventDefault();
-      try {
-        const widgetData = e.dataTransfer.getData("application/json");
-        if (!widgetData) return;
-
-        const widget = JSON.parse(widgetData) as Widget;
-        const result = await add(widget);
-
-        if (result && onWidgetAdded) {
-          onWidgetAdded(result);
-        }
-      } catch (error) {
-        console.error("Error handling drop:", error);
-      }
-    },
-    [add, onWidgetAdded],
-  );
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "copy";
-  };
 
   return (
     <div
       ref={setNodeRef}
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
       className={cn(
-        "min-h-[400px] w-full transition-colors duration-200",
+        "min-h-[400px] w-full transition-all duration-200 relative",
         isOver
-          ? "bg-blue-50 border-2 border-blue-300"
+          ? "bg-blue-50 border-2 border-dashed border-blue-300"
           : "bg-white border border-gray-200",
       )}
+      aria-label="Dashboard drop area"
     >
       {children}
+      {isOver && (
+        <div className="absolute inset-0 border-2 border-dashed border-blue-500 rounded-lg pointer-events-none flex items-center justify-center">
+          <div className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium">
+            Drop to add widget
+          </div>
+        </div>
+      )}
     </div>
   );
 };

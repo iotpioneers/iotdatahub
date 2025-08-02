@@ -8,8 +8,6 @@ import { Channel, DataPoint, Device, Field, Organization } from "@/types";
 import { EmployeeMember } from "@/types/employees-member";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { DashboardOverview } from "@/components/dashboard";
-import { useSession } from "next-auth/react";
-import SubscriptionModal from "@/components/dashboard/Checkout/SubscriptionModal";
 
 interface ApiResponse {
   hasOrganization: boolean;
@@ -31,9 +29,6 @@ const fetcher = async (url: string): Promise<ApiResponse> => {
 
 const UserDashboardOverview = () => {
   const router = useRouter();
-  const { status, data: session } = useSession();
-
-  console.log("UserDashboardOverview", session);
 
   const { data, error } = useSWR<ApiResponse, Error>(
     "/api/organizations/status",
@@ -41,23 +36,11 @@ const UserDashboardOverview = () => {
     { refreshInterval: 5000 },
   );
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   useEffect(() => {
     if (data && !data.hasOrganization) {
       router.push("/feature-creation");
     }
   }, [data, router]);
-
-  useEffect(() => {
-    if (
-      status === "authenticated" &&
-      session?.user &&
-      (session.user.subscriptionId === null || !session?.user.subscriptionId)
-    ) {
-      setIsModalOpen(true);
-    }
-  }, [session]);
 
   if (error) return <div>Failed to load</div>;
   if (!data) return <LoadingProgressBar />;
@@ -75,14 +58,6 @@ const UserDashboardOverview = () => {
         channels={channels}
         fields={fields}
         datapoints={datapoints}
-      />
-      <SubscriptionModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
-      <SubscriptionModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
       />
     </Suspense>
   );

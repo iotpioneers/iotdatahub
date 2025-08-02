@@ -91,7 +91,7 @@ const DeviceSidebar: React.FC<SidebarProps> = ({
     <aside
       className={`bg-white transition-all border-t duration-300 ${
         isSidebarOpen ? "w-48" : "w-16"
-      } h-full z-10 rounded-md px-1`}
+      } h-full rounded-md px-1`}
     >
       <div className="border-b py-1 border-gray-200 flex items-center justify-between">
         <DeviceSidebarToggle

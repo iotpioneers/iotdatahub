@@ -47,8 +47,6 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { pinType, pinNumber, valueType, defaultValue, minValue, maxValue } =
-      body;
 
     // Check if pin config already exists
     const existingConfig = await prisma.pinConfig.findFirst({
@@ -58,33 +56,64 @@ export async function POST(
       },
     });
 
+    // Filter out relation fields and id from update data
+    const excludedFields = ["id", "deviceId", "widgetId", "createdAt"];
+    const updateData = Object.keys(body)
+      .filter((key) => !excludedFields.includes(key))
+      .reduce(
+        (acc, key) => {
+          acc[key] = body[key];
+          return acc;
+        },
+        {} as Record<string, any>,
+      );
+
     let pinConfig;
     if (existingConfig) {
       pinConfig = await prisma.pinConfig.update({
         where: { id: existingConfig.id },
-        data: {
-          pinType,
-          pinNumber,
-          valueType,
-          defaultValue,
-          minValue,
-          maxValue,
-        },
+        data: updateData,
       });
     } else {
+      // For create operation, we can include deviceId and widgetId
       pinConfig = await prisma.pinConfig.create({
         data: {
           widgetId: params.widgetId,
           deviceId: params.id,
-          pinType,
-          pinNumber,
-          valueType,
-          defaultValue,
-          minValue,
-          maxValue,
+          pinType: body.pinType || "VIRTUAL",
+          pinNumber: body.pinNumber?.replace("V", "") || "0",
+          ...updateData, // Use filtered data here too
         },
       });
     }
+
+    // Update widget
+    await prisma.widget.update({
+      where: { id: params.widgetId },
+      data: {
+        name: body.title || "Pin Widget",
+        type: body.pinType || "VIRTUAL",
+        color: body.widgetColor || "#10B981",
+        widgetType: body.widgetType || "BOOLEAN",
+        pinNumber: parseInt(body.pinNumber?.replace("V", "") || "0"),
+        pinType: body.pinType || "VIRTUAL",
+        definition: {
+          type: body.pinType || "VIRTUAL",
+          label: body.label || "",
+          category: body.automationType || "control",
+        },
+        settings: {
+          ...body,
+          title: body.title || "Pin Configuration",
+          color: body.widgetColor || "#10B981",
+          min: body.minValue || 0,
+          max: body.maxValue || 100,
+          value:
+            body.defaultValue || (body.valueType === "BOOLEAN" ? false : 0),
+        },
+        config: updateData, // Store the full config in the config field
+      },
+    });
 
     return NextResponse.json(pinConfig, { status: existingConfig ? 200 : 201 });
   } catch (error) {

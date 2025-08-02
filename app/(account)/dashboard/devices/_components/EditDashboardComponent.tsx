@@ -1,11 +1,16 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
-import WidgetBox from "@/components/Channels/dashboard/WidgetBox";
+import React, { useRef, useState } from "react";
+import WidgetBox, {
+  generateDefaultPosition,
+} from "@/components/Channels/dashboard/WidgetBox";
 import EditDeviceDashboard from "./EditDeviceDashboard";
 import { useRouter } from "next/navigation";
 import DeviceSidebar from "./DeviceSidebar";
 import DeviceHeaderComponent from "./DeviceHeaderComponent";
+import { DragDropProvider } from "@/components/Channels/dashboard/widgets/DragDropProvider";
+import { Widget } from "@/types/widgets";
+import useAdd from "@/hooks/useAdd";
 
 interface Props {
   params: { id: string };
@@ -19,6 +24,8 @@ const EditDashboardComponent = ({ params }: Props) => {
     saveChanges: () => Promise<void>;
     cancelChanges: () => void;
   } | null>(null);
+
+  const { add } = useAdd(`/api/devices/${params.id}/widgets`);
 
   const handleSaveAndApply = async () => {
     setIsLoading(true);
@@ -48,27 +55,44 @@ const EditDashboardComponent = ({ params }: Props) => {
     }
   };
 
-  return (
-    <div className="max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl xxl:max-w-screen-xxl flex justify-between bg-slate-100 rounded-lg shadow p-2 overflow-hidden gap-1">
-      <DeviceSidebar
-        deviceId={params.id}
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-      />
+  const handleDrop = async (widget: Widget) => {
+    try {
+      const result = await add({
+        ...widget,
+        position: generateDefaultPosition(),
+      });
+      if (result?.id) {
+        // Widget added successfully
+        console.log("Widget added successfully:", result);
+      }
+    } catch (error) {
+      console.error("Failed to add widget:", error);
+    }
+  };
 
-      <div className="flex flex-1 rounded-md">
-        <WidgetBox deviceId={params.id} />
-      </div>
-      <div className="grid gap-1  lg:min-w-[700px] rounded-md">
-        <DeviceHeaderComponent
+  return (
+    <DragDropProvider onDrop={handleDrop}>
+      <div className="max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl xxl:max-w-screen-xxl flex justify-between bg-slate-100 rounded-lg shadow p-2 overflow-hidden gap-1">
+        <DeviceSidebar
           deviceId={params.id}
-          isLoading={isLoading}
-          onSave={handleSaveAndApply}
-          onCancel={handleCancel}
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
         />
-        <EditDeviceDashboard params={params} ref={editDashboardRef} />
+
+        <div className="flex flex-1 min-w-[200px] h-full rounded-md">
+          <WidgetBox deviceId={params.id} />
+        </div>
+        <div className="grid gap-1 w-full rounded-md">
+          <DeviceHeaderComponent
+            deviceId={params.id}
+            isLoading={isLoading}
+            onSave={handleSaveAndApply}
+            onCancel={handleCancel}
+          />
+          <EditDeviceDashboard params={params} ref={editDashboardRef} />
+        </div>
       </div>
-    </div>
+    </DragDropProvider>
   );
 };
 

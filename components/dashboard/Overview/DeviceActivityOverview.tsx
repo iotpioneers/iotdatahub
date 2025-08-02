@@ -1,7 +1,15 @@
 import React, { useMemo } from "react";
-import { Card, CardContent, Chip, Typography, Stack } from "@mui/material";
-import { BarChart } from "@mui/x-charts/BarChart";
-import { useTheme } from "@mui/material/styles";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 import { Channel, DataPoint, Field } from "@/types";
 
 interface ChannelActivityOverviewProps {
@@ -17,11 +25,10 @@ export default function ChannelActivityOverview({
   fields,
   dataPoints,
 }: ChannelActivityOverviewProps) {
-  const theme = useTheme();
   const colorPalette = {
-    "Data Received": theme.palette.primary.main,
-    "Field Created": theme.palette.secondary.main,
-    "Channel Created": theme.palette.error.main,
+    "Data Received": "#3b82f6",
+    "Field Created": "#10b981",
+    "Channel Created": "#ef4444",
   };
 
   const last6Months = useMemo(() => {
@@ -51,7 +58,7 @@ export default function ChannelActivityOverview({
       const date = new Date(dp.timestamp);
       if (date >= sixMonthsAgo) {
         const monthIndex = monthlyData.findIndex(
-          (m) => m.month === date.toLocaleString("default", { month: "short" })
+          (m) => m.month === date.toLocaleString("default", { month: "short" }),
         );
         if (monthIndex !== -1) {
           monthlyData[monthIndex]["Data Received"] += 1;
@@ -63,7 +70,7 @@ export default function ChannelActivityOverview({
       const date = new Date(field.createdAt);
       if (date >= sixMonthsAgo) {
         const monthIndex = monthlyData.findIndex(
-          (m) => m.month === date.toLocaleString("default", { month: "short" })
+          (m) => m.month === date.toLocaleString("default", { month: "short" }),
         );
         if (monthIndex !== -1) {
           monthlyData[monthIndex]["Field Created"] += 1;
@@ -75,7 +82,7 @@ export default function ChannelActivityOverview({
       const date = new Date(channel.createdAt);
       if (date >= sixMonthsAgo) {
         const monthIndex = monthlyData.findIndex(
-          (m) => m.month === date.toLocaleString("default", { month: "short" })
+          (m) => m.month === date.toLocaleString("default", { month: "short" }),
         );
         if (monthIndex !== -1) {
           monthlyData[monthIndex]["Channel Created"] += 1;
@@ -95,7 +102,7 @@ export default function ChannelActivityOverview({
         month["Data Received"] +
         month["Field Created"] +
         month["Channel Created"],
-      0
+      0,
     );
 
     const lastThreeMonths = aggregatedData.slice(-3);
@@ -107,7 +114,7 @@ export default function ChannelActivityOverview({
         month["Data Received"] +
         month["Field Created"] +
         month["Channel Created"],
-      0
+      0,
     );
 
     const previousThreeMonthsTotal = previousThreeMonths.reduce(
@@ -116,7 +123,7 @@ export default function ChannelActivityOverview({
         month["Data Received"] +
         month["Field Created"] +
         month["Channel Created"],
-      0
+      0,
     );
 
     const change =
@@ -131,84 +138,82 @@ export default function ChannelActivityOverview({
   }, [aggregatedData]);
 
   if (isLoading) {
-    return <Typography>Connecting</Typography>;
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="text-center">Connecting...</div>
+        </CardContent>
+      </Card>
+    );
   }
 
   if (!aggregatedData) {
-    return <Typography>No data available</Typography>;
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="text-center">No data available</div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
-    <Card variant="outlined" sx={{ width: "100%" }}>
-      <CardContent>
-        <Typography component="h2" variant="subtitle2" gutterBottom>
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="text-lg font-medium">
           Channel Activity Overview
-        </Typography>
-        <Stack sx={{ justifyContent: "space-between" }}>
-          <Stack
-            direction="row"
-            sx={{
-              alignContent: { xs: "center", sm: "flex-start" },
-              alignItems: "center",
-              gap: 1,
-            }}
-          >
-            <Typography variant="h4" component="p">
+        </CardTitle>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h3 className="text-2xl font-bold">
               {totalInteractions.toLocaleString()}
-            </Typography>
-            <Chip
-              size="small"
-              color={percentageChange >= 0 ? "success" : "error"}
-              label={`${
-                percentageChange >= 0 ? "+" : ""
-              }${percentageChange.toFixed(1)}%`}
-            />
-          </Stack>
-          <Typography variant="caption" sx={{ color: "text.secondary" }}>
-            Total channels interactions in the last 6 months
-          </Typography>
-        </Stack>
-        <BarChart
-          borderRadius={8}
-          xAxis={
-            [
-              {
-                scaleType: "band",
-                categoryGapRatio: 0.5,
-                data: last6Months,
-              },
-            ] as any
-          }
-          series={[
-            {
-              id: "data-received",
-              label: "Data Received",
-              data: aggregatedData.map((d) => d["Data Received"]),
-              color: colorPalette["Data Received"],
-            },
-            {
-              id: "field-created",
-              label: "Field Created",
-              data: aggregatedData.map((d) => d["Field Created"]),
-              color: colorPalette["Field Created"],
-            },
-            {
-              id: "channel-created",
-              label: "Channel Created",
-              data: aggregatedData.map((d) => d["Channel Created"]),
-              color: colorPalette["Channel Created"],
-            },
-          ]}
-          height={250}
-          margin={{ left: 50, right: 0, top: 20, bottom: 20 }}
-          grid={{ horizontal: true }}
-          slotProps={{
-            legend: {
-              hidden: true,
-              position: { vertical: "top", horizontal: "right" },
-            },
-          }}
-        />
+            </h3>
+            <Badge
+              variant={percentageChange >= 0 ? "default" : "destructive"}
+              className={`${
+                percentageChange >= 0
+                  ? "bg-green-100 text-green-800 hover:bg-green-100"
+                  : "bg-red-100 text-red-800 hover:bg-red-100"
+              }`}
+            >
+              {percentageChange >= 0 ? "+" : ""}
+              {percentageChange.toFixed(1)}%
+            </Badge>
+          </div>
+        </div>
+        <p className="text-sm text-gray-500">
+          Total channels interactions in the last 6 months
+        </p>
+      </CardHeader>
+      <CardContent>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={aggregatedData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Legend />
+              <Bar
+                dataKey="Data Received"
+                fill={colorPalette["Data Received"]}
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar
+                dataKey="Field Created"
+                fill={colorPalette["Field Created"]}
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar
+                dataKey="Channel Created"
+                fill={colorPalette["Channel Created"]}
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );

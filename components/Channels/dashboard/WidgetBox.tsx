@@ -20,17 +20,13 @@ import {
   ImageIcon,
   PlaySquare,
   Menu as MenuIcon,
+  Volume2,
 } from "lucide-react";
-import { Widget, WidgetDefinition, WidgetType } from "@/types/widgets";
+import { Widget, WidgetDefinition } from "@/types/widgets";
 import { useDraggable } from "@dnd-kit/core";
-import useAdd from "@/hooks/useAdd";
 import { WidgetsOutlined } from "@mui/icons-material";
 import DeviceMap from "@/app/(account)/dashboard/devices/_components/DeviceMap";
-
-interface DraggableWidgetProps {
-  widget: Widget;
-  onDoubleClick?: () => void;
-}
+import useAdd from "@/hooks/useAdd";
 
 // Utility function to adjust the default size
 const adjustWidgetSize = (
@@ -41,19 +37,393 @@ const adjustWidgetSize = (
   h: size.h - reduction,
 });
 
-const generateDefaultPosition = (): {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-} => ({
-  x: 0,
-  y: 0,
-  width: 2,
-  height: 2,
-});
+// Enhanced Widget Preview Components
+const WidgetPreviewComponents = {
+  switch: () => {
+    return (
+      <div className="flex items-center justify-start h-8">
+        <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-green-500">
+          <span className="inline-block h-4 w-4 transform rounded-full bg-white translate-x-6" />
+        </div>
+      </div>
+    );
+  },
 
-// Comprehensive widget definitions based on the images
+  slider: () => {
+    return (
+      <div className="flex items-center justify-between h-8 px-2">
+        <span className="text-teal-500 text-sm">−</span>
+        <div className="flex-1 mx-2 relative">
+          <div className="h-1 bg-gray-200 rounded-full">
+            <div
+              className="h-1 bg-teal-500 rounded-full"
+              style={{ width: `50%` }}
+            />
+          </div>
+          <div
+            className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-teal-500 rounded-full"
+            style={{
+              left: `50%`,
+              transform: "translate(-50%, -50%)",
+            }}
+          />
+        </div>
+        <span className="text-teal-500 text-sm">+</span>
+        <span className="text-gray-600 text-sm ml-2">5</span>
+      </div>
+    );
+  },
+
+  numberInput: () => {
+    return (
+      <div className="flex items-center justify-between h-8 px-2">
+        <button className="text-teal-500 text-lg">−</button>
+        <span className="text-2xl font-light text-gray-700">0</span>
+        <button className="text-teal-500 text-lg">+</button>
+      </div>
+    );
+  },
+
+  imageButton: () => (
+    <div className="flex items-center justify-center h-16">
+      <div className="w-12 h-12 border-2 border-teal-400 rounded flex items-center justify-center">
+        <ImageIcon className="w-6 h-6 text-teal-400" />
+      </div>
+    </div>
+  ),
+
+  led: () => {
+    return (
+      <div className="flex items-center justify-center h-8">
+        <div className="w-8 h-8 rounded-full bg-green-500 shadow-lg shadow-green-500/50" />
+      </div>
+    );
+  },
+
+  label: () => {
+    return (
+      <div className="h-12 p-2">
+        <div className="w-1 h-full bg-blue-600 rounded-full mr-2 float-left" />
+        <div className="text-xl font-bold text-gray-800">167</div>
+      </div>
+    );
+  },
+
+  gauge: () => {
+    const value = 82;
+
+    // Calculate the arc parameters (reversed 180° anticlockwise)
+    const centerX = 50;
+    const centerY = 50;
+    const radius = 40;
+    const strokeWidth = 14;
+
+    // Convert degrees to radians (rotated 180° anticlockwise)
+    const startAngle = 135 * (Math.PI / 180); // 135° in radians (315° - 180°)
+    const endAngle = 45 * (Math.PI / 180); // 45° in radians (225° - 180°)
+
+    // Calculate start and end points for the background arc
+    const startX = centerX + radius * Math.cos(startAngle);
+    const startY = centerY + radius * Math.sin(startAngle);
+    const endX = centerX + radius * Math.cos(endAngle);
+    const endY = centerY + radius * Math.sin(endAngle);
+
+    // Create the background arc path (135° to 45°)
+    const backgroundPath = `
+    M ${startX} ${startY}
+    A ${radius} ${radius} 0 1 1 ${endX} ${endY}
+  `;
+
+    // Calculate the end point for the progress arc
+    const totalAngle = 270; // degrees (135° to 45° = 270°)
+    const progressAngle =
+      startAngle + (value / 100) * ((totalAngle * Math.PI) / 180);
+    const progressEndX = centerX + radius * Math.cos(progressAngle);
+    const progressEndY = centerY + radius * Math.sin(progressAngle);
+
+    // Determine if we need a large arc flag for the progress
+    const progressAngleSpan = (value / 100) * totalAngle;
+    const largeArcFlag = progressAngleSpan > 180 ? 1 : 0;
+
+    // Create the progress arc path
+    const progressPath = `
+    M ${startX} ${startY}
+    A ${radius} ${radius} 0 ${largeArcFlag} 1 ${progressEndX} ${progressEndY}
+  `;
+
+    return (
+      <div className="flex flex-col items-center justify-center h-20">
+        <div className="relative w-16 h-16">
+          <svg className="w-full h-full" viewBox="0 0 100 100">
+            {/* Background arc */}
+            <path
+              d={backgroundPath}
+              stroke="rgb(229, 231, 235)"
+              strokeWidth={strokeWidth}
+              fill="none"
+              strokeLinecap="round"
+            />
+            {/* Progress arc */}
+            <path
+              d={progressPath}
+              stroke="rgb(34, 197, 94)"
+              strokeWidth={strokeWidth}
+              fill="none"
+              strokeLinecap="round"
+            />
+          </svg>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-sm font-medium text-gray-700">{value}</span>
+          </div>
+        </div>
+        <div className="flex justify-center items-center w-full text-xs text-gray-500 mt-1 gap-4">
+          <span>0</span>
+          <span>100</span>
+        </div>
+      </div>
+    );
+  },
+
+  radialGauge: () => {
+    const value = 42;
+    const circumference = 2 * Math.PI * 35;
+    const strokeDashoffset = circumference - (value / 100) * circumference;
+    const strokeWidth = 10;
+
+    return (
+      <div className="flex flex-col items-center justify-center h-24">
+        <div className="relative w-16 h-16">
+          <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80">
+            <circle
+              cx="40"
+              cy="40"
+              r="35"
+              stroke="rgb(229, 231, 235)"
+              strokeWidth={strokeWidth}
+              fill="none"
+            />
+            <circle
+              cx="40"
+              cy="40"
+              r="35"
+              stroke="rgb(16, 185, 129)"
+              strokeWidth={strokeWidth}
+              fill="none"
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+              strokeLinecap="round"
+            />
+          </svg>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-base font-medium text-gray-700">{value}</span>
+          </div>
+        </div>
+      </div>
+    );
+  },
+
+  alarmSound: () => {
+    return (
+      <div className="flex items-center justify-center h-16">
+        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-green-100">
+          <Volume2 className="w-5 h-5 text-green-500" />
+        </div>
+      </div>
+    );
+  },
+
+  chart: () => {
+    const data = [4, 7, 3, 8, 2, 6, 4];
+    const maxValue = Math.max(...data);
+
+    return (
+      <div className="h-16 p-3">
+        <div className="flex items-end justify-between h-full">
+          {data.map((value, index) => (
+            <div
+              key={index}
+              className="bg-blue-500 rounded-sm"
+              style={{
+                height: `${(value / maxValue) * 100}%`,
+                width: "10px",
+              }}
+            />
+          ))}
+        </div>
+        <div className="flex justify-between text-xs text-gray-400 mt-1">
+          <span>8:26 AM</span>
+          <span>8:43 AM</span>
+        </div>
+      </div>
+    );
+  },
+
+  customChart: () => {
+    const data = [
+      { x: 0, y: 0 },
+      { x: 1, y: 45 },
+      { x: 2, y: 25 },
+      { x: 3, y: 55 },
+      { x: 4, y: 40 },
+      { x: 5, y: 100 },
+      { x: 6, y: 50 },
+    ];
+
+    const pathData = data
+      .map(
+        (point, index) =>
+          `${index === 0 ? "M" : "L"} ${(point.x / 6) * 100} ${100 - (point.y / 60) * 80}`,
+      )
+      .join(" ");
+
+    return (
+      <div className="h-16 p-2">
+        <svg className="w-full h-full" viewBox="0 0 100 100">
+          <defs>
+            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="rgb(34, 197, 94)" />
+              <stop offset="50%" stopColor="rgb(59, 130, 246)" />
+              <stop offset="100%" stopColor="rgb(168, 85, 247)" />
+            </linearGradient>
+          </defs>
+          <path
+            d={pathData}
+            stroke="url(#lineGradient)"
+            strokeWidth="2"
+            fill="none"
+          />
+        </svg>
+      </div>
+    );
+  },
+
+  heatmapChart: () => (
+    <div className="h-16 p-2">
+      <div className="text-xs font-medium text-gray-700 mb-1">Timeline</div>
+      <div className="flex items-center gap-1 mb-1">
+        <div className="w-8 h-2 bg-blue-400 rounded-sm" />
+        <div className="w-4 h-2 bg-gray-300 rounded-sm" />
+        <div className="w-12 h-2 bg-gray-200 rounded-sm" />
+      </div>
+      <div className="flex justify-between text-xs text-gray-400">
+        <span>08:26 AM</span>
+        <span>09:00 AM</span>
+      </div>
+    </div>
+  ),
+
+  textInput: () => (
+    <div className="flex items-center justify-center h-8 px-2">
+      <input
+        type="text"
+        placeholder="Zero"
+        className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+        readOnly
+      />
+    </div>
+  ),
+
+  terminal: () => {
+    return (
+      <div className="h-18 p-1">
+        <div className="bg-black text-white text-xs p-1 rounded mb-1 font-mono">
+          &lt; Power On Power Off Enabled
+        </div>
+        <div className="bg-black text-white text-xs p-1 rounded font-mono">
+          Type here
+        </div>
+      </div>
+    );
+  },
+
+  segmentedSwitch: () => {
+    return (
+      <div className="flex items-center justify-center h-16 px-2">
+        <div className="flex bg-gray-100 rounded overflow-hidden w-full">
+          <div className="flex-1 py-1 px-2 text-center text-sm bg-green-500 text-white">
+            Zero
+          </div>
+          <div className="flex-1 py-1 px-2 text-center text-sm text-gray-700">
+            One
+          </div>
+        </div>
+      </div>
+    );
+  },
+
+  menu: () => (
+    <div className="flex items-center justify-center h-16 px-2">
+      <select className="w-full px-2 py-1 border border-gray-300 rounded text-sm appearance-none bg-white">
+        <option>Zero</option>
+        <option>One</option>
+        <option>Two</option>
+      </select>
+    </div>
+  ),
+
+  modules: () => (
+    <div className="h-16 p-2 space-y-1">
+      <div className="text-xs text-gray-600">Module</div>
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-gray-700">Switch</span>
+        <div className="w-8 h-4 bg-green-500 rounded-full relative">
+          <div className="w-3 h-3 bg-white rounded-full absolute right-0.5 top-0.5" />
+        </div>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-gray-700">Label</span>
+        <span className="text-xs text-gray-600">String</span>
+      </div>
+    </div>
+  ),
+
+  map: () => (
+    <div className="flex flex-col items-center justify-center h-24">
+      <DeviceMap />
+    </div>
+  ),
+
+  imageGallery: () => (
+    <div className="flex items-center justify-center h-16">
+      <div className="relative">
+        <div className="w-10 h-8 border-2 border-teal-400 rounded flex items-center justify-center">
+          <ImageIcon className="w-4 h-4 text-teal-400" />
+        </div>
+        <div className="absolute -top-1 -right-1 w-8 h-6 border-2 border-teal-400 rounded bg-white flex items-center justify-center">
+          <ImageIcon className="w-3 h-3 text-teal-400" />
+        </div>
+      </div>
+    </div>
+  ),
+
+  video: () => (
+    <div className="flex items-center justify-center h-16">
+      <PlaySquare className="w-8 h-8 text-gray-600" />
+    </div>
+  ),
+};
+
+// Enhanced Widget Preview Component
+const WidgetPreview = ({ widget }: { widget: Widget }) => {
+  const PreviewComponent =
+    WidgetPreviewComponents[
+      widget.definition?.type as keyof typeof WidgetPreviewComponents
+    ];
+
+  if (!PreviewComponent) {
+    return (
+      <div className="flex items-center justify-center h-16 text-gray-400">
+        {widget.definition?.icon || (
+          <div className="w-6 h-6 bg-gray-200 rounded" />
+        )}
+      </div>
+    );
+  }
+
+  return <PreviewComponent />;
+};
+
+// Comprehensive widget definitions
 const widgetDefinitions: Record<string, WidgetDefinition[]> = {
   control: [
     {
@@ -118,13 +488,6 @@ const widgetDefinitions: Record<string, WidgetDefinition[]> = {
       type: "alarmSound",
       label: "Alarm and Sound",
       icon: <SpeakerHigh className="w-3 h-3" />,
-      defaultSize: adjustWidgetSize({ w: 25, h: 25 }, 5),
-      category: "display",
-    },
-    {
-      type: "webPageImage",
-      label: "Web Page Image Button",
-      icon: <ImageSquare className="w-3 h-3" />,
       defaultSize: adjustWidgetSize({ w: 25, h: 25 }, 5),
       category: "display",
     },
@@ -216,337 +579,44 @@ const widgetDefinitions: Record<string, WidgetDefinition[]> = {
   ],
 };
 
-// Mock widgets with visual representation components
-const WidgetPreviews: Record<WidgetType, React.FC> = {
-  switch: () => (
-    <div className="flex items-center space-x-2">
-      <div className="w-6 h-3 rounded-full bg-green-500 relative">
-        <div className="absolute right-0.5 top-0.5 w-2 h-2 rounded-full bg-white"></div>
-      </div>
-    </div>
-  ),
-  slider: () => (
-    <div className="w-full flex items-center space-x-2">
-      <span className="text-gray-400">−</span>
-      <div className="relative flex-1 h-0.5 bg-gray-200 rounded">
-        <div className="absolute top-1/2 left-1/3 transform -translate-y-1/2 w-2 h-2 bg-white border border-gray-500 rounded-full"></div>
-      </div>
-      <span className="text-gray-400">+</span>
-      <span className="text-gray-600 font-medium">8</span>
-    </div>
-  ),
-  numberInput: () => (
-    <div className="w-full">
-      <div className="flex items-center justify-between">
-        <button className="text-teal-500">−</button>
-        <div className="text-center text-sm">0</div>
-        <button className="text-teal-500">+</button>
-      </div>
-    </div>
-  ),
-  toggle: () => (
-    <div className="flex items-center space-x-2">
-      <div className="w-6 h-3 rounded-full bg-green-500 relative">
-        <div className="absolute right-0.5 top-0.5 w-2 h-2 rounded-full bg-white"></div>
-      </div>
-    </div>
-  ),
-
-  imageButton: () => (
-    <div className="flex justify-center items-center">
-      <div className="w-6 h-6 border border-teal-500 rounded text-teal-500 flex items-center justify-center">
-        <svg
-          className="w-3 h-3"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <circle cx="15" cy="9" r="2" />
-          <path d="M3 15l5-5 7 7" />
-        </svg>
-      </div>
-    </div>
-  ),
-  webPageImage: () => (
-    <div className="flex justify-center items-center">
-      <div className="w-6 h-6 border border-teal-500 rounded text-teal-500 flex items-center justify-center">
-        <svg
-          className="w-3 h-3"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <circle cx="15" cy="9" r="2" />
-          <path d="M3 15l5-5 7 7" />
-        </svg>
-      </div>
-    </div>
-  ),
-  led: () => (
-    <div className="flex justify-center items-center">
-      <div className="w-4 h-2 bg-green-500 rounded-t-full"></div>
-    </div>
-  ),
-  label: () => <div className="font-semibold text-lg text-gray-700">112</div>,
-  gauge: () => (
-    <div className="relative w-full">
-      <div className="flex justify-center mb-0.5">
-        <div className="w-12 h-6 rounded-t-full border-t-2 border-l-2 border-r-2 border-teal-500 relative">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-sm font-medium">42</span>
-          </div>
-        </div>
-      </div>
-      <div className="flex justify-between">
-        <span className="text-xs">0</span>
-        <span className="text-xs">100</span>
-      </div>
-    </div>
-  ),
-  radialGauge: () => (
-    <div className="flex justify-center items-center">
-      <div className="relative w-8 h-8">
-        <svg viewBox="0 0 36 36">
-          <path
-            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-            fill="none"
-            stroke="#E6E6E6"
-            strokeWidth="2"
-          />
-          <path
-            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-            fill="none"
-            stroke="#10B981"
-            strokeWidth="2"
-            strokeDasharray="42, 100"
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-sm font-medium">42</span>
-        </div>
-      </div>
-    </div>
-  ),
-  alarmSound: () => (
-    <div className="flex justify-center items-center">
-      <div className="w-3 h-3 bg-green-500 rounded-full flex items-center justify-center">
-        <svg
-          className="w-2 h-2 text-white"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      </div>
-    </div>
-  ),
-  chart: () => (
-    <div className="w-full h-8">
-      <div className="h-full grid grid-cols-5 gap-1">
-        <div className="flex items-end">
-          <div className="w-full bg-indigo-700 h-2"></div>
-        </div>
-        <div className="flex items-end">
-          <div className="w-full bg-indigo-700 h-4"></div>
-        </div>
-        <div className="flex items-end">
-          <div className="w-full bg-indigo-700 h-6"></div>
-        </div>
-        <div className="flex items-end">
-          <div className="w-full bg-indigo-700 h-3"></div>
-        </div>
-        <div className="flex items-end">
-          <div className="w-full bg-indigo-700 h-4"></div>
-        </div>
-      </div>
-      <div className="mt-0.5 grid grid-cols-5 gap-1 text-xs text-gray-500">
-        <div>2:30 PM</div>
-        <div>2:46 PM</div>
-        <div></div>
-        <div>3:03 PM</div>
-        <div></div>
-      </div>
-    </div>
-  ),
-  map: () => (
-    <div className="w-full h-8 bg-gray-100 rounded-md relative">
-      <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full text-white flex items-center justify-center">
-        <div className="text-xs">🔒</div>
-      </div>
-      <div className="w-full h-full bg-green-50 opacity-60">
-        <DeviceMap />
-      </div>
-    </div>
-  ),
-  imageGallery: () => (
-    <div className="flex justify-center items-center">
-      <div className="text-teal-500">
-        <svg
-          className="w-5 h-5"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <rect x="3" y="3" width="14" height="14" rx="2" />
-          <path d="M18 8h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-3" />
-        </svg>
-      </div>
-    </div>
-  ),
-  customChart: () => (
-    <div className="w-full h-6">
-      <svg viewBox="0 0 100 30" className="w-full h-full">
-        <polyline
-          points="0,20 20,15 40,25 60,10 80,20"
-          fill="none"
-          stroke="#10B981"
-          strokeWidth="2"
-        />
-        <polyline
-          points="0,15 20,25 40,15 60,20 80,10"
-          fill="none"
-          stroke="#6B7280"
-          strokeWidth="2"
-        />
-      </svg>
-    </div>
-  ),
-  heatmapChart: () => (
-    <div className="w-full">
-      <div className="font-semibold mb-0.5 text-xs">Timeline</div>
-      <div className="flex space-x-0.5">
-        <div className="w-3 h-2 bg-indigo-700"></div>
-        <div className="w-3 h-2 bg-indigo-300"></div>
-        <div className="w-3 h-2 bg-indigo-100"></div>
-      </div>
-      <div className="flex justify-between mt-0.5">
-        <div className="text-xs">02:13 PM</div>
-        <div className="text-xs">02:46 PM</div>
-      </div>
-    </div>
-  ),
-  video: () => (
-    <div className="w-full">
-      <div className="flex justify-end mb-0.5">
-        <div className="px-1 py-0.5 text-xs bg-teal-500 text-white rounded">
-          BETA
-        </div>
-      </div>
-      <div className="flex justify-center">
-        <div className="w-6 h-6 border border-teal-500 rounded flex items-center justify-center text-teal-500">
-          <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M8 5v14l11-7z" />
-          </svg>
-        </div>
-      </div>
-    </div>
-  ),
-  textInput: () => (
-    <div className="w-full">
-      <input
-        type="text"
-        placeholder="Zero"
-        readOnly
-        className="w-full px-1.5 py-1 border rounded-md text-gray-700"
-      />
-    </div>
-  ),
-  terminal: () => (
-    <div className="w-full">
-      <div className="bg-black text-white p-1 mb-0.5 text-xs font-mono rounded">
-        &lt; Power On Power Off Enabled
-      </div>
-      <div className="bg-black text-white p-1 text-xs font-mono rounded">
-        Type here
-      </div>
-    </div>
-  ),
-  segmentedSwitch: () => (
-    <div className="w-full">
-      <div className="flex border rounded-md overflow-hidden">
-        <div className="flex-1 bg-green-500 text-white py-1 text-center">
-          Zero
-        </div>
-        <div className="flex-1 bg-white text-gray-700 py-1 text-center">
-          One
-        </div>
-      </div>
-    </div>
-  ),
-  menu: () => (
-    <div className="w-full">
-      <div className="relative border rounded-md px-1.5 py-1 text-gray-700">
-        <div className="flex justify-between items-center">
-          <span>Zero</span>
-          <svg className="w-2 h-2" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              fillRule="evenodd"
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </div>
-      </div>
-    </div>
-  ),
-  modules: () => (
-    <div className="w-full">
-      <div className="border rounded-md p-1.5">
-        <div className="font-medium mb-1">Module</div>
-        <div className="flex items-center justify-between mb-1">
-          <span>Switch</span>
-          <div className="w-4 h-2 bg-green-500 rounded-full relative">
-            <div className="absolute right-0 top-0 w-2 h-2 rounded-full bg-white"></div>
-          </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <span>Label</span>
-          <span>String</span>
-        </div>
-      </div>
-    </div>
-  ),
-};
-
 const DraggableWidgetBox = ({ widget }: { widget: Widget }) => {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: widget.id as string,
-    data: { widget }, // Pass widget data directly to draggable
-  });
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: widget.id as string,
+      data: { widget },
+    });
 
-  const WidgetPreviewComponent = widget?.definition?.type
-    ? WidgetPreviews[widget.definition.type]
-    : null;
+  const style = {
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : undefined,
+    transition: isDragging ? "none" : "transform 0.2s ease",
+    zIndex: isDragging ? 999 : "auto",
+  };
 
   return (
     <div
       ref={setNodeRef}
+      style={style}
       {...listeners}
       {...attributes}
       className={cn(
-        "rounded-lg bg-white p-2 border border-gray-100 shadow-md shadow-black hover:shadow-md transition-shadow",
-        isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab",
+        "rounded-lg bg-white p-2 border border-gray-200 shadow-md hover:shadow-lg transition-all",
+        "bg-gradient-to-b from-white to-gray-100",
+        isDragging ? "cursor-grabbing shadow-lg" : "cursor-grab",
       )}
-      style={{
-        transform: isDragging ? "scale(1.05)" : "none",
-        transition: "transform 0.2s ease, opacity 0.2s ease",
-        touchAction: "none", // Important for mobile drag
-      }}
+      role="button"
+      tabIndex={0}
     >
-      <div className="mb-1 font-medium">
+      <div className="font-bold text-base">
+        {/* Increased font size */}
         {widget?.definition?.label || `Widget`}
       </div>
-      {WidgetPreviewComponent && <WidgetPreviewComponent />}
+      <WidgetPreview widget={widget} />
     </div>
   );
 };
+
 interface WidgetBoxProps {
   deviceId: string;
   onWidgetAdded?: (widgetId: string) => void;
@@ -556,13 +626,13 @@ const WidgetBox = ({ deviceId, onWidgetAdded }: WidgetBoxProps) => {
   const createWidget = (definition: WidgetDefinition): Widget => ({
     id: `${definition.type}-${Date.now()}`,
     definition,
-    position: generateDefaultPosition(),
     settings: {},
   });
 
   const { add } = useAdd(`/api/devices/${deviceId}/widgets`);
 
-  const handleAddWidget = async (widget: Widget) => {
+  const handleDoubleClick = async (definition: WidgetDefinition) => {
+    const widget = createWidget(definition);
     try {
       const result = await add(widget);
       if (onWidgetAdded && result?.id) {
@@ -574,25 +644,25 @@ const WidgetBox = ({ deviceId, onWidgetAdded }: WidgetBoxProps) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow">
-      <div className="p-2 flex items-center gap-2 border-b">
-        <WidgetsOutlined className="text-gray-700" />
-        <h2 className="text-xl font-medium text-gray-800">Widget Box</h2>
+    <div className="bg-white rounded-lg shadow-lg border border-gray-200">
+      <div className="p-3 flex items-center gap-2 border-b border-gray-200">
+        <WidgetsOutlined className="text-gray-700 text-xl" />
+        <h2 className="text-xl font-bold text-gray-800">Widget Box</h2>
       </div>
-      <div className="p-2 max-h-[calc(100vh-4rem)] overflow-y-auto">
+      <div className="p-3 max-h-[calc(80vh)] overflow-y-auto">
         {Object.entries(widgetDefinitions).map(([category, definitions]) => (
-          <div key={category} className="mb-3 last:mb-0">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase mb-1.5">
+          <div key={category} className="mb-4 last:mb-0">
+            <h3 className="text-sm font-semibold text-gray-600 uppercase mb-2">
               {category}
             </h3>
-            <div className="grid grid-cols-1 gap-1.5">
+            <div className="grid grid-cols-1 gap-2 mb-5">
               {definitions.map((definition: WidgetDefinition) => {
                 const widget = createWidget(definition);
                 return (
                   <div
                     key={definition.type}
-                    onDoubleClick={() => handleAddWidget(widget)}
-                    className="cursor-pointer"
+                    onDoubleClick={() => handleDoubleClick(definition)}
+                    className="cursor-pointer rounded transition-colors" /* Added hover effect */
                   >
                     <DraggableWidgetBox widget={widget} key={widget.id} />
                   </div>

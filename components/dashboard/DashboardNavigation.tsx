@@ -1,51 +1,32 @@
 "use client";
 
 import React, { useState } from "react";
-
-// material-ui
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import { CssBaseline, useTheme } from "@mui/material";
-
-// project imports
 import Navbar from "@/components/dashboard/Navbar";
 import SideNavbar from "@/components/sidebar/SideNavbar";
 
 // ==============================|| MAIN LAYOUT ||============================== //
 
 const DashboardNavigation = () => {
-  const theme = useTheme();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
+    <div className="flex">
       {/* header */}
-      <AppBar
-        enableColorOnDark
-        position="fixed"
-        color="inherit"
-        elevation={0}
-        sx={{
-          bgcolor: theme.palette.background.default,
-          height: 40,
-        }}
-      >
-        <Toolbar sx={{ minHeight: 40 }}>
+      <header className="fixed top-0 left-0 right-0 z-50 h-12 bg-background py-2 mb-2">
+        <div className="h-10 px-4 flex items-center">
           <Navbar
             isSidebarOpen={isSidebarOpen}
             setIsSidebarOpen={setIsSidebarOpen}
           />
-        </Toolbar>
-      </AppBar>
+        </div>
+      </header>
 
       {/* drawer */}
       <SideNavbar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
       />
-    </Box>
+    </div>
   );
 };
 

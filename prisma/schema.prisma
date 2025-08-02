@@ -258,19 +258,27 @@ model PinHistory {
 }
 
 model PinConfig {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  widgetId     String   @db.ObjectId
-  deviceId     String   @db.ObjectId
-  device       Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
-  pinType      String // "VIRTUAL", "DIGITAL", "ANALOG"
-  pinNumber    String
-  valueType    String? // "BOOLEAN", "NUMBER", "STRING"
-  defaultValue Json?
-  minValue     Float?
-  maxValue     Float?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  Widget       Widget[]
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  widgetId       String   @db.ObjectId
+  deviceId       String   @db.ObjectId
+  device         Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  title          String?
+  pinType        String?
+  widgetType     String? // "VIRTUAL", "DIGITAL", "ANALOG"
+  pinNumber      String
+  valueType      String? // "BOOLEAN", "NUMBER", "STRING"
+  defaultValue   Json?
+  minValue       Float?
+  maxValue       Float?
+  onValue        String? // Value when pin is "on"
+  offValue       String? // Value when pin is "off"
+  widgetColor    String?
+  automationType String?
+  showLabels     Boolean  @default(false)
+  hideWidgetName Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  Widget         Widget[]
 
   @@index([deviceId])
 }
@@ -425,7 +433,8 @@ model ChannelAccess {
 model Widget {
   id         String     @id @default(auto()) @map("_id") @db.ObjectId
   name       String?
-  type       String? // Changed to nullable
+  value      String?
+  type       String?
   dataSource Json?
   display    Json?
   definition Json?
@@ -438,10 +447,10 @@ model Widget {
   channel    Channel    @relation(fields: [channelId], references: [id])
   pinConfig  PinConfig? @relation(fields: [pinConfigId], references: [id])
 
-  widgetType String // "button", "slider", "gauge", "chart", etc.
-  pinNumber  Int
-  pinType    String // "virtual", "digital", "analog"
-  config     Json // Widget-specific configuration  
+  widgetType String? // "button", "slider", "gauge", "chart", etc.
+  pinNumber  Int?
+  pinType    String? // "virtual", "digital", "analog"
+  config     Json? // Widget-specific configuration  
   isActive   Boolean @default(true)
 
   createdAt   DateTime @default(now())

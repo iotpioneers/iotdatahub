@@ -100,6 +100,8 @@ export async function GET(request: NextRequest) {
     where: { email: userEmail },
   });
 
+  console.log("User found:", user);
+
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }

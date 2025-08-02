@@ -1,211 +1,181 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { GiOrganigram } from "react-icons/gi";
-import { Disclosure } from "@headlessui/react";
-import { MdOutlineDevices } from "react-icons/md";
+import { GiOrganigram, GiUpgrade } from "react-icons/gi";
+import { MdAccountTree, MdOutlineDevices } from "react-icons/md";
 import { BiNetworkChart } from "react-icons/bi";
-import Link from "next/link";
 import { HiViewGrid } from "react-icons/hi";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import MenuOpenIcon from "@mui/icons-material/MenuOpen";
-import Drawer from "@mui/material/Drawer";
 import { AdminPanelSettingsOutlined } from "@mui/icons-material";
-
-import LoadingProgressBar from "../LoadingProgressBar";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { Expand, ListCollapse, Settings } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import Image from "next/image";
 
-interface SidebarContentProps {
-  isLoading: boolean;
-  activeLink: string;
-  handleSetActiveLink: (link: string) => void;
+interface SidebarLink {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+  adminOnly?: boolean;
 }
 
-function SideNavbar({
-  isSidebarOpen,
-  setIsSidebarOpen,
-}: {
-  isSidebarOpen: boolean;
-  setIsSidebarOpen: (open: boolean) => void;
-}) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [activeLink, setActiveLink] = useState("");
+function SideNavbar() {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+  const { data: session, status } = useSession();
 
-  const handleSetActiveLink = (link: string) => {
-    try {
-      setActiveLink(link);
-      setIsLoading(true);
-    } catch (error) {
-    } finally {
-      setIsLoading(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/auth/login");
     }
-    setTimeout(() => {}, 5000);
-  };
+  }, [status, router]);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
-  return (
-    <>
-      <Drawer
-        anchor="left"
-        open={isSidebarOpen}
-        onClose={toggleSidebar}
-        sx={{
-          display: { xs: "block", lg: "none" },
-          "& .MuiDrawer-paper": { boxSizing: "border-box", width: 200 },
-        }}
-      >
-        <div className="flex justify-between items-center px-4 py-8">
-          <IconButton
-            aria-label="toggle drawer"
-            edge="start"
-            onClick={toggleSidebar}
-            className="text-black"
-          >
-            {isSidebarOpen ? <MenuOpenIcon /> : <MenuIcon />}
-          </IconButton>
-          <Link href="/" className="grid md:flex p-1 text-orange-50">
-            <Image
-              src="/IOT_DATA_HUB.png"
-              alt="logo"
-              width={96}
-              height={96}
-              className="cursor-pointer"
-            />
-            <h1 className="flex text-lg text-center justify-center cursor-pointer font-bold">
-              <span>IoTDataHub</span>
-            </h1>
-          </Link>
-        </div>
-        <div className="px-2">
-          <SidebarContent
-            isLoading={isLoading}
-            activeLink={activeLink}
-            handleSetActiveLink={handleSetActiveLink}
-          />
-        </div>
-      </Drawer>
-      <div className={`relative hidden lg:flex bg-white`}>
-        <Disclosure as="nav">
-          <div className="py-6 px-3 w-1/2 lg:w-44 h-screen overflow-y-auto bg-white fixed top-0 left-0 z-20">
-            <SidebarContent
-              isLoading={isLoading}
-              activeLink={activeLink}
-              handleSetActiveLink={handleSetActiveLink}
-            />
+  if (!isMounted || status === "loading") {
+    return (
+      <aside className="h-screen bg-white dark:bg-gray-800 shadow-md w-64">
+        <div className="flex flex-col h-full">
+          <div className="p-4">
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
           </div>
-        </Disclosure>
-      </div>
-    </>
-  );
-}
-
-const SidebarContent: React.FC<SidebarContentProps> = ({
-  isLoading,
-  activeLink,
-  handleSetActiveLink,
-}) => {
-  const { status, data: session } = useSession();
-
-  if (status !== "loading" && status === "unauthenticated") {
-    return null;
+          <nav className="flex-1 overflow-y-auto p-2 space-y-2">
+            {[...Array(5)].map((_, i) => (
+              <div
+                key={i}
+                className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"
+              />
+            ))}
+          </nav>
+        </div>
+      </aside>
+    );
   }
 
-  const userRole = session!.user!.role;
+  if (status === "unauthenticated") return null;
+
+  const userRole = session?.user?.role;
+
+  const links: SidebarLink[] = [
+    {
+      href: "/dashboard",
+      icon: <HiViewGrid className="text-xl" />,
+      label: "Overview",
+    },
+    {
+      href: "/dashboard/devices",
+      icon: <MdOutlineDevices className="text-xl" />,
+      label: "Devices",
+    },
+    {
+      href: "/dashboard/channels",
+      icon: <BiNetworkChart className="text-xl" />,
+      label: "Channels",
+    },
+    {
+      href: "/dashboard/subscription",
+      icon: <GiUpgrade className="text-xl" />,
+      label: "Subscriptions",
+    },
+    {
+      href: "/dashboard/account",
+      icon: <MdAccountTree className="text-xl" />,
+      label: "Account",
+    },
+    {
+      href: "/dashboard/settings",
+      icon: <Settings className="text-xl" />,
+      label: "Settings",
+    },
+    {
+      href: "/admin",
+      icon: <AdminPanelSettingsOutlined className="text-xl" />,
+      label: "Administration",
+      adminOnly: true,
+    },
+  ].filter((link) => !link.adminOnly || userRole === "ADMIN");
 
   return (
-    <div className="flex flex-col justify-start item-center mt-0 lg:mt-24">
-      <div className="border-b border-gray-100 pb-4">
-        <Link href="/dashboard">
-          <div
-            className={`flex mb-0 xs:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
-              activeLink === "/dashboard"
-                ? "bg-gray-300 text-white"
-                : "hover:bg-gray-200 text-black"
-            }`}
-            onClick={() => handleSetActiveLink("/dashboard")}
-          >
-            <HiViewGrid className="text-2xl text-black" />
-            <h3 className="text-base font-semibold text-black">Overview</h3>
-          </div>
-          {activeLink === "/dashboard" && isLoading && <LoadingProgressBar />}
-        </Link>
-        <Link href="/dashboard/devices">
-          <div
-            className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
-              activeLink === "/dashboard/devices"
-                ? "bg-gray-300 text-white"
-                : "hover:bg-gray-200 text-black"
-            }`}
-            onClick={() => handleSetActiveLink("/dashboard/devices")}
-          >
-            <MdOutlineDevices className="text-2xl text-black" />
-            <h3 className="text-base font-semibold text-black">Devices</h3>
-          </div>
-          {activeLink === "/dashboard/devices" && isLoading && (
-            <LoadingProgressBar />
+    <aside
+      className={`block h-screen bg-white dark:bg-gray-800 shadow-md transition-all duration-300 ease-in-out ${
+        isCollapsed ? "w-20" : "w-60"
+      }`}
+    >
+      <div className="flex flex-col h-full">
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="p-4 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        >
+          {isCollapsed ? (
+            <Expand className="w-6 h-6 mx-auto" />
+          ) : (
+            <span className="flex items-center justify-between">
+              <span className="flex items-center justify-center">
+                <Image
+                  src="/IOT_DATA_HUB.png"
+                  alt="logo"
+                  width={64}
+                  height={64}
+                  className="cursor-pointer"
+                />
+                <span className="text-lg font-semibold">IoTDataHub</span>
+              </span>
+              <ListCollapse className="w-6 h-6" />
+            </span>
           )}
-        </Link>
-        <Link href="/dashboard/channels">
-          <div
-            className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
-              activeLink === "/dashboard/channels"
-                ? "bg-gray-300 text-white"
-                : "hover:bg-gray-200 text-black"
-            }`}
-            onClick={() => handleSetActiveLink("/dashboard/channels")}
-          >
-            <BiNetworkChart className="text-2xl text-black" />
-            <h3 className="text-base font-semibold text-black">Channels</h3>
-          </div>
-          {activeLink === "/dashboard/channels" && isLoading && (
-            <LoadingProgressBar />
-          )}
-        </Link>
+        </button>
+
+        <ScrollArea className="flex-1">
+          <nav className="p-2">
+            <ul className="space-y-1">
+              {links.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href}>
+                    <motion.div
+                      whileHover={{ scale: isCollapsed ? 1.1 : 1.05 }}
+                      className={`flex items-center p-3 rounded-lg transition-colors ${
+                        pathname === link.href
+                          ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300"
+                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      }`}
+                    >
+                      <div
+                        className={`flex-shrink-0 ${
+                          isCollapsed ? "w-6 h-6 mx-auto" : "w-5 h-5"
+                        }`}
+                      >
+                        {link.icon}
+                      </div>
+                      <AnimatePresence>
+                        {!isCollapsed && (
+                          <motion.span
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.2 }}
+                            className="ml-3 text-lg font-bold"
+                          >
+                            {link.label}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </ScrollArea>
       </div>
-      {/* setting  */}
-      <div className=" border-b border-gray-100 pb-4">
-        {userRole === "ADMIN" && (
-          <Link href="/admin">
-            <div
-              className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
-                activeLink === "/admin"
-                  ? "bg-gray-300 text-white"
-                  : "hover:bg-gray-200 text-black"
-              }`}
-              onClick={() => handleSetActiveLink("/admin")}
-            >
-              <AdminPanelSettingsOutlined className="text-2xl text-black" />
-              <h3 className="text-base font-semibold text-black">
-                Administration
-              </h3>
-            </div>
-            {activeLink === "/admin" && isLoading && <LoadingProgressBar />}
-          </Link>
-        )}
-        <Link href="/organization/dashboard">
-          <div
-            className={`flex -mb-1 xs:mb-0 md:mb-1 lg:mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto ${
-              activeLink === "/organization/dashboard"
-                ? "bg-gray-300 text-white"
-                : "hover:bg-gray-200 text-black"
-            }`}
-            onClick={() => handleSetActiveLink("/organization/dashboard")}
-          >
-            <GiOrganigram className="text-2xl text-black" />
-            <h3 className="text-base font-semibold text-black">Organization</h3>
-          </div>
-          {activeLink === "/organization/dashboard" && isLoading && (
-            <LoadingProgressBar />
-          )}
-        </Link>
-      </div>
-    </div>
+    </aside>
   );
-};
+}
 
 export default SideNavbar;

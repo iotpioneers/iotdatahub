@@ -33,14 +33,12 @@ const DeviceDetails = ({ params }: Props) => {
 
   const { data: session, status } = useSession();
 
-  const {
-    data: RealTimeData,
-    connected,
-    deviceStatus,
-    virtualWrite,
-  } = useIoTDataHub({
+  const { data: RealTimeData, virtualWrite } = useIoTDataHub({
     deviceId: params.id,
   });
+
+  console.log("RealTimeData:", RealTimeData);
+  console.log("virtualWrite:", virtualWrite);
 
   if (status === "loading" || status === "unauthenticated" || !session) {
     return <LinearLoading />;
@@ -230,13 +228,6 @@ const DeviceDetails = ({ params }: Props) => {
                 <div className="text-gray-400">CHANNEL_API_KEY</div>
                 <div className="text-orange-50">"{apiKey?.apiKey}"</div>
               </div>
-            </div>
-
-            <div>
-              <p>Status: {deviceStatus}</p>
-              <p>Data: {JSON.stringify(RealTimeData)}</p>
-              <p>Connected: {String(connected)}</p>
-              <button onClick={() => virtualWrite("V3", 1)}>Turn On LED</button>
             </div>
           </div>
         </div>

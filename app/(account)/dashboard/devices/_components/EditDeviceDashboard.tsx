@@ -27,10 +27,6 @@ const EditDeviceDashboard = forwardRef<
 >(({ params }, ref) => {
   const [selectedDuration, setSelectedDuration] = useState<string>("1mo");
   const [widgets, setWidgets] = useState<Widget[]>([]);
-  const [pendingChanges, setPendingChanges] = useState<{
-    [key: string]: any;
-  }>({});
-  const [deletedWidgets, setDeletedWidgets] = useState<string[]>([]);
   const deviceDashboardRef = React.useRef<{
     saveChanges: () => Promise<void>;
     cancelChanges: () => void;
@@ -86,27 +82,25 @@ const EditDeviceDashboard = forwardRef<
         onDurationChange={handleDurationChange}
       />
 
-      <DroppableArea id={params.id}>
-        <div className="overflow-auto max-h-[80vh]">
-          {!widgets || widgets.length === 0 ? (
-            <div className="flex items-center justify-center h-[100vh] border-2 border-dashed border-gray-200 rounded-lg">
-              <div className="text-center">
-                <h3 className="text-lg font-medium text-gray-800">
-                  Add new widget
-                </h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  Double click the widget or drag it to the canvas
-                </p>
-              </div>
+      <DroppableArea id="dashboard-drop-area">
+        {!widgets || widgets.length === 0 ? (
+          <div className="flex items-center justify-center h-[100vh] border-2 border-dashed border-gray-200 rounded-lg">
+            <div className="text-center">
+              <h3 className="text-lg font-medium text-gray-800">
+                Add new widget
+              </h3>
+              <p className="mt-1 text-sm text-gray-500">
+                Double click the widget or drag it to the canvas
+              </p>
             </div>
-          ) : (
-            <EditDeviceDashboardComponent
-              deviceId={params.id}
-              widgetData={widgets}
-              ref={deviceDashboardRef}
-            />
-          )}
-        </div>
+          </div>
+        ) : (
+          <EditDeviceDashboardComponent
+            deviceId={params.id}
+            widgetData={widgets}
+            ref={deviceDashboardRef}
+          />
+        )}
       </DroppableArea>
     </div>
   );

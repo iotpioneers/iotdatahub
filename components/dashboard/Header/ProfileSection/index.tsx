@@ -1,112 +1,55 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-
-// material-ui
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Chip from "@mui/material/Chip";
-import ClickAwayListener from "@mui/material/ClickAwayListener";
-import Divider from "@mui/material/Divider";
-import Grid from "@mui/material/Grid";
-import InputAdornment from "@mui/material/InputAdornment";
-import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import Paper from "@mui/material/Paper";
-import Popper from "@mui/material/Popper";
-import Stack from "@mui/material/Stack";
-import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
-import { useTheme } from "@mui/material/styles";
-import Switch from "@mui/material/Switch";
-
-// project imports
-import { useGlobalState } from "@/context";
-import reducer from "@/app/store/reducer";
-import MainCard from "../../cards/MainCard";
-import Transitions from "../../extended/Transitions";
-
-// assets
-import { configureStore } from "@reduxjs/toolkit";
-import {
-  IconLogout,
-  IconSearch,
-  IconSettings,
-  IconUser,
-} from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useGlobalState } from "@/context";
+import { IconLogout, IconSettings, IconUser } from "@tabler/icons-react";
 import UpgradePlanCardAlert from "@/components/sidebar/UpgradePlanCardAlert";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 
-// ==============================|| PROFILE MENU ||============================== //
-
-const store = configureStore({ reducer });
-
-// Infer the type of store
-export type AppStore = typeof store;
-
-// Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<AppStore["getState"]>;
+// Redux store types (keep these as needed for your Redux setup)
+export type RootState = {
+  customization: {
+    borderRadius: number;
+  };
+};
 
 const ProfileSection = () => {
   const { state } = useGlobalState();
   const { status, data: session } = useSession();
   const router = useRouter();
-  const theme = useTheme();
   const customization = useSelector((state: RootState) => state.customization);
 
-  const [value, setValue] = useState("");
-  const [notification, setNotification] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
   const [open, setOpen] = useState(false);
-
-  /**
-   * anchorRef is used on different componets and specifying one type leads to other components throwing an error
-   * */
-
-  const anchorRef = useRef<HTMLDivElement>(null);
-  const prevOpen = useRef(open);
-
   const { currentUser } = state;
-
-  useEffect(() => {
-    if (prevOpen.current === true && open === false) {
-      anchorRef.current?.focus();
-    }
-    prevOpen.current = open;
-  }, [open]);
 
   const handleLogout = async () => {
     router.push("/api/auth/signout");
   };
 
-  const handleClose = (event: MouseEvent | TouchEvent) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target as Node)) {
-      return;
-    }
+  const handleNavigation = (route: string) => {
     setOpen(false);
-  };
-
-  const handleListItemClick = (
-    event: React.MouseEvent,
-    index: number,
-    route = "",
-  ) => {
-    setSelectedIndex(index);
-    handleClose(event as unknown as MouseEvent | TouchEvent);
     if (route && route !== "") {
       router.push(route);
     }
-  };
-
-  const handleToggle = () => {
-    setOpen((prevOpen) => !prevOpen);
   };
 
   useEffect(() => {
@@ -120,220 +63,105 @@ const ProfileSection = () => {
   const userImage = currentUser?.image || session?.user?.image;
 
   return (
-    <>
-      <Tooltip title="Account settings">
-        <Chip
-          sx={{
-            height: "40px",
-            alignItems: "center",
-            borderRadius: "27px",
-            transition: "all .2s ease-in-out",
-            borderColor: theme.palette.primary.light,
-            backgroundColor: theme.palette.primary.light,
-            '&[aria-controls="menu-list-grow"], &:hover': {
-              borderColor: theme.palette.primary.main,
-              background: `${theme.palette.primary.main}!important`,
-              color: theme.palette.primary.light,
-              "& svg": {
-                stroke: theme.palette.primary.light,
-              },
-            },
-            "& .MuiChip-label": {
-              lineHeight: 0,
-            },
-          }}
-          icon={
-            <Avatar
-              src={userImage || ""}
-              sx={{
-                ...theme.typography.mediumAvatar,
-                margin: "8px 0 8px 8px !important",
-                cursor: "pointer",
-              }}
-              ref={anchorRef}
-              aria-controls={open ? "menu-list-grow" : undefined}
-              aria-haspopup="true"
-              color="inherit"
-            />
-          }
-          label={
-            <IconSettings
-              stroke={1.5}
-              size="1.5rem"
-              color={theme.palette.primary.main}
-            />
-          }
-          variant="outlined"
-          ref={anchorRef}
-          aria-controls={open ? "menu-list-grow" : undefined}
-          aria-haspopup="true"
-          onClick={handleToggle}
-          color="primary"
-        />
-      </Tooltip>
-      <Popper
-        placement="bottom-end"
-        open={open}
-        anchorEl={anchorRef.current}
-        role={undefined}
-        transition
-        disablePortal
-        popperOptions={{
-          modifiers: [
-            {
-              name: "offset",
-              options: {
-                offset: [0, 14],
-              },
-            },
-          ],
-        }}
-      >
-        {({ TransitionProps }) => (
-          <Transitions in={open} {...TransitionProps}>
-            <Paper>
-              <ClickAwayListener onClickAway={handleClose}>
-                <MainCard
-                  border={false}
-                  content={false}
-                  elevation={16}
-                  boxShadow
-                  shadow={theme.shadows[16]}
-                >
-                  <Box sx={{ p: 2, pb: 0 }}>
-                    <Stack>
-                      <Stack direction="row" spacing={0.5} alignItems="center">
-                        <Typography variant="h4">{userName}</Typography>
-                      </Stack>
-                      <Typography variant="subtitle2">{userEmail}</Typography>
-                    </Stack>
-                    <Divider />
-                  </Box>
+    <TooltipProvider>
+      <Popover open={open} onOpenChange={setOpen}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="h-10 px-2 rounded-full border-primary/20 bg-primary/5 hover:bg-primary hover:text-primary-foreground transition-all duration-200"
+              >
+                <Avatar className="h-8 w-8 mr-2">
+                  <AvatarImage src={userImage || ""} alt={userName || ""} />
+                  <AvatarFallback className="bg-orange-50 text-primary-foreground font-bold">
+                    {(userName &&
+                      userName.charAt(0).toUpperCase() +
+                        userName.charAt(1).toUpperCase()) ||
+                      "U"}
+                  </AvatarFallback>
+                </Avatar>
+                <IconSettings className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Account settings</p>
+          </TooltipContent>
+        </Tooltip>
 
-                  {/* Make the box scrollable so that the bottom element is not hidden*/}
-                  <Box
-                    sx={{
-                      height: "100%",
-                      overflowY: "auto",
-                      padding: "16px",
-                      p: 2,
-                      pt: 0,
-                    }}
-                  >
-                    <List
-                      component="nav"
-                      sx={{
-                        width: "100%",
-                        maxWidth: 350,
-                        minWidth: 300,
-                        backgroundColor: theme.palette.primary.light,
-                        borderRadius: "10px",
-                        [theme.breakpoints.down("md")]: {
-                          minWidth: "100%",
-                        },
-                        "& .MuiListItemButton-root": {
-                          mt: 0.5,
-                        },
-                      }}
+        <PopoverContent
+          className="w-96 p-0 bg-white shadow-lg rounded-lg shadow-black"
+          align="end"
+          sideOffset={14}
+        >
+          <Card className="border-0 shadow-lg">
+            <CardContent className="p-4">
+              <div className="flex">
+                <Avatar className="h-12 w-12 mr-2">
+                  <AvatarImage src={userImage || ""} alt={userName || ""} />
+                  <AvatarFallback className="bg-orange-50 text-primary-foreground font-bold">
+                    {(userName &&
+                      userName.charAt(0).toUpperCase() +
+                        userName.charAt(1).toUpperCase()) ||
+                      "U"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="space-y-2 pb-4">
+                  <div className="flex items-center space-x-2">
+                    <h4 className="text-sm font-semibold">{userName}</h4>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{userEmail}</p>
+                </div>
+              </div>
+
+              <Separator />
+
+              <ScrollArea className="max-h-96 mt-4">
+                <div className="space-y-4">
+                  {/* Upgrade Plan Card */}
+                  <Card className="bg-primary/5">
+                    <UpgradePlanCardAlert />
+                  </Card>
+
+                  <Separator />
+
+                  {/* Navigation Menu */}
+                  <div className="space-y-1">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start h-auto p-3 text-left"
+                      onClick={() => handleNavigation("/dashboard/settings")}
                     >
-                      {/* Upgrade Plan Card */}
-                      <Card
-                        sx={{
-                          bgcolor: theme.palette.primary.light,
-                          my: 2,
-                        }}
-                      >
-                        <UpgradePlanCardAlert />
-                      </Card>
-                      <Divider />
-                      <List
-                        component="nav"
-                        sx={{
-                          width: "100%",
-                          maxWidth: 350,
-                          minWidth: 300,
-                          backgroundColor: theme.palette.background.paper,
-                          borderRadius: "10px",
-                          [theme.breakpoints.down("md")]: {
-                            minWidth: "100%",
-                          },
-                          "& .MuiListItemButton-root": {
-                            mt: 0.5,
-                          },
-                        }}
-                      >
-                        <ListItemButton
-                          sx={{
-                            borderRadius: `${customization.borderRadius}px`,
-                          }}
-                          selected={selectedIndex === 0}
-                          onClick={(event) =>
-                            handleListItemClick(event, 0, "/dashboard/settings")
-                          }
-                        >
-                          <ListItemIcon>
-                            <IconSettings stroke={1.5} size="1.3rem" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <Typography variant="body2">Settings</Typography>
-                            }
-                          />
-                        </ListItemButton>
-                        <ListItemButton
-                          sx={{
-                            borderRadius: `${customization.borderRadius}px`,
-                          }}
-                          selected={selectedIndex === 1}
-                          onClick={(event) =>
-                            handleListItemClick(event, 1, "/dashboard/account")
-                          }
-                        >
-                          <ListItemIcon>
-                            <IconUser stroke={1.5} size="1.3rem" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <Grid
-                                container
-                                spacing={1}
-                                justifyContent="space-between"
-                              >
-                                <Grid item>
-                                  <Typography variant="body2">
-                                    Account
-                                  </Typography>
-                                </Grid>
-                              </Grid>
-                            }
-                          />
-                        </ListItemButton>
-                        <ListItemButton
-                          sx={{
-                            borderRadius: `${customization.borderRadius}px`,
-                          }}
-                          selected={selectedIndex === 4}
-                          onClick={handleLogout}
-                        >
-                          <ListItemIcon>
-                            <IconLogout stroke={1.5} size="1.3rem" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <Typography variant="body2">Logout</Typography>
-                            }
-                          />
-                        </ListItemButton>
-                      </List>
-                    </List>
-                  </Box>
-                </MainCard>
-              </ClickAwayListener>
-            </Paper>
-          </Transitions>
-        )}
-      </Popper>
-    </>
+                      <IconSettings className="mr-3 h-4 w-4" />
+                      <span className="text-sm">Settings</span>
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start h-auto p-3 text-left"
+                      onClick={() => handleNavigation("/dashboard/account")}
+                    >
+                      <IconUser className="mr-3 h-4 w-4" />
+                      <span className="text-sm">Account</span>
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start h-auto p-3 text-left text-red-600 hover:text-red-600 hover:bg-red-50"
+                      onClick={handleLogout}
+                    >
+                      <IconLogout className="mr-3 h-4 w-4" />
+                      <span className="text-sm">Logout</span>
+                    </Button>
+                  </div>
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </PopoverContent>
+      </Popover>
+    </TooltipProvider>
   );
 };
 
