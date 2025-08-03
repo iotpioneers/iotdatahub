@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+} from "react";
 import WidgetBox from "@/components/Channels/dashboard/WidgetBox";
 import EditDeviceDashboard from "./EditDeviceDashboard";
 import { useRouter } from "next/navigation";
@@ -9,155 +15,206 @@ import DeviceHeaderComponent from "./DeviceHeaderComponent";
 import { DragDropProvider } from "@/components/Channels/dashboard/widgets/DragDropProvider";
 import { Widget } from "@/types/widgets";
 import useFetch from "@/hooks/useFetch";
-
-// Types for state management
-interface WidgetState {
-  widgets: Widget[];
-  pendingChanges: Record<string, Partial<Widget & { isNew?: boolean }>>;
-  deletedWidgets: string[];
-}
-
-interface WidgetHandlers {
-  onAdd: (widget: Widget) => void;
-  onUpdate: (id: string, changes: Partial<Widget>) => void;
-  onDelete: (id: string) => void;
-  onMove: (id: string, position: Widget["position"]) => void;
-}
+import { LinearLoading } from "@/components/LinearLoading";
+import { useToast } from "@/hooks/useToast";
+import { v4 as uuidv4 } from "uuid";
 
 interface Props {
   params: { id: string };
+}
+
+interface WidgetState {
+  widgets: Widget[];
+  pendingChanges: Record<string, Partial<Widget> & { isNew?: boolean }>;
+  deletedWidgets: string[];
+}
+
+interface WidgetWithIsNew extends Widget {
+  isNew?: boolean;
 }
 
 const EditDashboardComponent = ({ params }: Props) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-  const [isDirty, setIsDirty] = useState<boolean>(false);
-
-  // Core widget state
+  const { showToast } = useToast();
+  const initialWidgetsRef = useRef<Widget[]>([]);
   const [widgetState, setWidgetState] = useState<WidgetState>({
     widgets: [],
     pendingChanges: {},
     deletedWidgets: [],
   });
 
-  console.log("====================================");
-  console.log("EditDashboardComponent mounted with widgetState:", widgetState);
-  console.log("====================================");
-
   // Fetch initial widget data
-  const { data: initialWidgets, isLoading: isLoadingWidgets } = useFetch(
-    `/api/devices/${params.id}/widgets`,
-  );
+  const {
+    data: widgetData,
+    isLoading: isWidgetLoading,
+    error,
+  } = useFetch(`/api/devices/${params.id}/widgets`);
 
-  // Initialize widgets from API data
+  // Initialize state when data loads
   useEffect(() => {
-    if (initialWidgets) {
-      setWidgetState((prev) => ({
-        ...prev,
-        widgets: initialWidgets,
-      }));
+    if (widgetData) {
+      initialWidgetsRef.current = widgetData;
+      setWidgetState({
+        widgets: widgetData,
+        pendingChanges: {},
+        deletedWidgets: [],
+      });
     }
-  }, [initialWidgets]);
+  }, [widgetData]);
 
-  // Persist editing state to localStorage for recovery
-  const persistStateToStorage = useCallback(
-    (state: WidgetState) => {
-      try {
-        localStorage.setItem(
-          `dashboard_edit_${params.id}`,
-          JSON.stringify({
-            ...state,
-            timestamp: Date.now(),
-          }),
-        );
-      } catch (error) {
-        console.warn("Failed to persist editing state:", error);
-      }
-    },
-    [params.id],
-  );
+  // Calculate statistics
+  const stats = useMemo(() => {
+    const newWidgets = Object.values(widgetState.pendingChanges).filter(
+      (change) => !initialWidgetsRef.current.some((w) => w.id === change.id),
+    ).length;
+    const modifiedWidgets =
+      Object.keys(widgetState.pendingChanges).length - newWidgets;
 
-  // Recover editing state from localStorage
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(`dashboard_edit_${params.id}`);
-      if (stored) {
-        const { timestamp, ...state } = JSON.parse(stored);
-        // Only recover if less than 1 hour old
-        if (Date.now() - timestamp < 3600000) {
-          const hasChanges =
-            Object.keys(state.pendingChanges).length > 0 ||
-            state.deletedWidgets.length > 0;
+    return {
+      totalWidgets: widgetState.widgets.length,
+      newWidgets,
+      modifiedWidgets,
+      deletedWidgets: widgetState.deletedWidgets.length,
+      isDirty:
+        Object.keys(widgetState.pendingChanges).length > 0 ||
+        widgetState.deletedWidgets.length > 0,
+    };
+  }, [widgetState]);
 
-          if (hasChanges) {
-            const shouldRecover = window.confirm(
-              "Found unsaved changes from a previous editing session. Would you like to recover them?",
-            );
+  // Find next available position for new widgets
+  const findNextAvailablePosition = useCallback(
+    (widgetType?: string) => {
+      const getDefaultSize = (type?: string) => {
+        switch (type) {
+          case "gauge":
+          case "radialGauge":
+            return { w: 3, h: 3 };
+          case "chart":
+          case "customChart":
+            return { w: 6, h: 4 };
+          case "slider":
+            return { w: 4, h: 2 };
+          case "switch":
+          case "led":
+            return { w: 2, h: 2 };
+          default:
+            return { w: 2, h: 3 };
+        }
+      };
 
-            if (shouldRecover) {
-              setWidgetState((prev) => ({ ...prev, ...state }));
-              setIsDirty(true);
-            }
+      const defaultSize = getDefaultSize(widgetType);
+      const occupiedPositions = widgetState.widgets
+        .filter((w) => w.position)
+        .map((w) => ({
+          x: w.position!.x || 0,
+          y: w.position!.y || 0,
+          w: w.position!.width || defaultSize.w,
+          h: w.position!.height || defaultSize.h,
+        }));
+
+      // Find first available position
+      for (let y = 0; y < 100; y++) {
+        for (let x = 0; x <= 12 - defaultSize.w; x++) {
+          const proposed = { x, y, w: defaultSize.w, h: defaultSize.h };
+
+          const overlaps = occupiedPositions.some(
+            (existing) =>
+              proposed.x < existing.x + existing.w &&
+              proposed.x + proposed.w > existing.x &&
+              proposed.y < existing.y + existing.h &&
+              proposed.y + proposed.h > existing.y,
+          );
+
+          if (!overlaps) {
+            return {
+              x: proposed.x,
+              y: proposed.y,
+              width: proposed.w,
+              height: proposed.h,
+            };
           }
         }
       }
-    } catch (error) {
-      console.warn("Failed to recover editing state:", error);
-    }
-  }, [params.id]);
+
+      // Fallback: place at bottom
+      const maxY = Math.max(0, ...occupiedPositions.map((p) => p.y + p.h));
+      return {
+        x: 0,
+        y: maxY,
+        width: defaultSize.w,
+        height: defaultSize.h,
+      };
+    },
+    [widgetState.widgets],
+  );
 
   // Widget handlers
   const handleAddWidget = useCallback(
     (widget: Widget) => {
       const newWidget = {
         ...widget,
-        id: widget.id || `widget-${Date.now()}`,
+        id: `temp-${uuidv4()}`,
         deviceId: params.id,
+        position:
+          widget.position || findNextAvailablePosition(widget.definition?.type),
       };
 
-      setWidgetState((prev) => {
-        const newState = {
-          ...prev,
-          widgets: [...prev.widgets, newWidget],
-          pendingChanges: {
-            ...prev.pendingChanges,
-            [newWidget.id]: { ...newWidget, isNew: true },
-          },
-        };
-        persistStateToStorage(newState);
-        return newState;
-      });
-
-      setIsDirty(true);
+      setWidgetState((prev) => ({
+        ...prev,
+        widgets: [...prev.widgets, newWidget],
+        pendingChanges: {
+          ...prev.pendingChanges,
+          [newWidget.id]: { ...newWidget, isNew: true },
+        },
+      }));
     },
-    [params.id, persistStateToStorage],
+    [params.id, findNextAvailablePosition],
   );
 
   const handleUpdateWidget = useCallback(
-    (widgetId: string, updates: Partial<Widget>) => {
+    (widgetId: string, changes: Partial<Widget>) => {
       setWidgetState((prev) => {
-        const newState = {
+        const isNewWidget = !initialWidgetsRef.current.some(
+          (w) => w.id === widgetId,
+        );
+        const existingChanges = prev.pendingChanges[widgetId] || {};
+
+        return {
           ...prev,
           widgets: prev.widgets.map((w) =>
-            w.id === widgetId ? { ...w, ...updates } : w,
+            w.id === widgetId ? { ...w, ...changes } : w,
           ),
           pendingChanges: {
             ...prev.pendingChanges,
             [widgetId]: {
-              ...prev.pendingChanges[widgetId],
-              ...updates,
+              ...existingChanges,
+              ...changes,
+              isNew: isNewWidget,
             },
           },
         };
-        persistStateToStorage(newState);
-        return newState;
       });
-
-      setIsDirty(true);
     },
-    [persistStateToStorage],
+    [],
   );
+
+  const handleDeleteWidget = useCallback((widgetId: string) => {
+    setWidgetState((prev) => {
+      const isNewWidget = (prev.pendingChanges[widgetId] as WidgetWithIsNew)
+        ?.isNew;
+      return {
+        widgets: prev.widgets.filter((w) => w.id !== widgetId),
+        deletedWidgets: isNewWidget
+          ? prev.deletedWidgets
+          : [...prev.deletedWidgets, widgetId],
+        pendingChanges: Object.fromEntries(
+          Object.entries(prev.pendingChanges).filter(([id]) => id !== widgetId),
+        ),
+      };
+    });
+  }, []);
 
   const handleMoveWidget = useCallback(
     (widgetId: string, position: Widget["position"]) => {
@@ -166,202 +223,150 @@ const EditDashboardComponent = ({ params }: Props) => {
     [handleUpdateWidget],
   );
 
-  const handleDeleteWidget = useCallback(
-    (widgetId: string) => {
-      setWidgetState((prev) => {
-        const widget = prev.widgets.find((w) => w.id === widgetId);
-        const isNewWidget = prev.pendingChanges[widgetId]?.isNew;
+  const handleDuplicateWidget = useCallback(
+    (sourceWidget: Widget) => {
+      const duplicatedWidget: Widget = {
+        ...sourceWidget,
+        id: `temp-${uuidv4()}`,
+        name: sourceWidget.name ? `${sourceWidget.name} (Copy)` : undefined,
+        position: sourceWidget.position
+          ? {
+              ...sourceWidget.position,
+              x: Math.min((sourceWidget.position.x || 0) + 1, 10),
+              y: (sourceWidget.position.y || 0) + 1,
+            }
+          : findNextAvailablePosition(sourceWidget.definition?.type),
+      };
 
-        const newState = {
-          ...prev,
-          widgets: prev.widgets.filter((w) => w.id !== widgetId),
-          deletedWidgets: isNewWidget
-            ? prev.deletedWidgets // Don't track deletion of new widgets
-            : [...prev.deletedWidgets, widgetId],
-          pendingChanges: {
-            ...prev.pendingChanges,
-          },
-        };
-
-        // Remove from pending changes if it was a new widget
-        if (isNewWidget) {
-          delete newState.pendingChanges[widgetId];
-        }
-
-        persistStateToStorage(newState);
-        return newState;
-      });
-
-      setIsDirty(true);
+      handleAddWidget(duplicatedWidget);
     },
-    [persistStateToStorage],
+    [handleAddWidget, findNextAvailablePosition],
   );
 
-  const handlers: WidgetHandlers = {
-    onAdd: handleAddWidget,
-    onUpdate: handleUpdateWidget,
-    onDelete: handleDeleteWidget,
-    onMove: handleMoveWidget,
-  };
-
-  // Batch save all changes to database
   const handleSaveAndApply = async () => {
-    if (!isDirty) {
+    if (!stats.isDirty) {
       router.push(`/dashboard/devices/${params.id}`);
       return;
     }
 
     setIsLoading(true);
     try {
-      const { pendingChanges, deletedWidgets } = widgetState;
-
-      // Prepare batch operations
-      const operations = [];
-
-      // Create new widgets
-      const createPromises = Object.entries(pendingChanges)
+      // Prepare batch payload
+      const newWidgets = Object.entries(widgetState.pendingChanges)
         .filter(([_, change]) => change.isNew)
-        .map(([id, widget]) => {
-          const { isNew, ...widgetData } = widget;
-          return fetch(`/api/devices/${params.id}/widgets`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(widgetData),
-          });
+        .map(([_, change]) => {
+          const { isNew, ...widgetData } = change;
+          return widgetData as Widget;
         });
-      operations.push(...createPromises);
 
-      // Update existing widgets
-      const updatePromises = Object.entries(pendingChanges)
+      const updatedWidgets = Object.entries(widgetState.pendingChanges)
         .filter(([_, change]) => !change.isNew)
         .map(([id, changes]) => {
           const { isNew, ...updateData } = changes;
-          return fetch(`/api/devices/${params.id}/widgets/${id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updateData),
-          });
+          return { id, ...updateData };
         });
-      operations.push(...updatePromises);
 
-      // Delete widgets
-      const deletePromises = deletedWidgets.map((id) =>
-        fetch(`/api/devices/${params.id}/widgets/${id}`, {
-          method: "DELETE",
-        }),
-      );
-      operations.push(...deletePromises);
+      const batchPayload = {
+        create: newWidgets,
+        update: updatedWidgets,
+        delete: widgetState.deletedWidgets,
+      };
 
-      // Execute all operations
-      const results = await Promise.allSettled(operations);
+      const response = await fetch(`/api/devices/${params.id}/widgets/batch`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(batchPayload),
+      });
 
-      // Check for failures
-      const failures = results.filter((result) => result.status === "rejected");
-      if (failures.length > 0) {
-        throw new Error(`${failures.length} operations failed`);
+      if (!response.ok) {
+        throw new Error(`Failed to save changes: ${response.statusText}`);
       }
 
-      const rejectedResponses = results
-        .filter((result) => result.status === "fulfilled")
-        .map((result) => (result as PromiseFulfilledResult<Response>).value)
-        .filter((response) => !response.ok);
+      const result = await response.json();
 
-      if (rejectedResponses.length > 0) {
-        throw new Error(`${rejectedResponses.length} requests failed`);
+      if (result.failed > 0) {
+        showToast(
+          `Some operations failed: ${result.errors.map((e: { error: string }) => e.error).join(", ")}`,
+          "error",
+        );
+        return;
       }
 
-      // Clear editing state
-      setWidgetState((prev) => ({
-        widgets: prev.widgets,
-        pendingChanges: {},
-        deletedWidgets: [],
-      }));
-
-      setIsDirty(false);
-
-      // Clear localStorage
-      localStorage.removeItem(`dashboard_edit_${params.id}`);
-
-      // Navigate to view mode
+      showToast(`Successfully saved ${result.successful} changes`, "success");
       router.push(`/dashboard/devices/${params.id}`);
     } catch (error) {
       console.error("Error saving dashboard changes:", error);
-
-      // Optionally implement rollback here
-      const shouldRetry = window.confirm(
-        "Failed to save changes. Would you like to try again? (Click Cancel to continue editing)",
+      showToast(
+        error instanceof Error ? error.message : "Failed to save changes",
+        "error",
       );
-
-      if (shouldRetry) {
-        // Retry the save operation
-        setTimeout(() => handleSaveAndApply(), 1000);
-        return;
-      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleCancel = useCallback(() => {
-    if (isDirty) {
-      const shouldDiscard = window.confirm(
-        "You have unsaved changes. Are you sure you want to discard them?",
-      );
-
-      if (!shouldDiscard) {
-        return;
-      }
+  const handleCancel = () => {
+    if (!stats.isDirty) {
+      router.push(`/dashboard/devices/${params.id}`);
+      return;
     }
+
+    const confirmCancel = window.confirm(
+      "You have unsaved changes. Are you sure you want to cancel?",
+    );
+    if (!confirmCancel) return;
 
     setIsLoading(true);
     try {
-      // Clear editing state
       setWidgetState({
-        widgets: initialWidgets || [],
+        widgets: initialWidgetsRef.current,
         pendingChanges: {},
         deletedWidgets: [],
       });
-
-      setIsDirty(false);
-
-      // Clear localStorage
-      localStorage.removeItem(`dashboard_edit_${params.id}`);
-
-      // Navigate back
       router.push(`/dashboard/devices/${params.id}`);
     } catch (error) {
       console.error("Error canceling dashboard changes:", error);
+      showToast("Error canceling changes", "error");
     } finally {
       setIsLoading(false);
     }
-  }, [isDirty, initialWidgets, params.id, router]);
+  };
 
-  // Prevent accidental navigation with unsaved changes
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (isDirty) {
-        e.preventDefault();
-        e.returnValue =
-          "You have unsaved changes. Are you sure you want to leave?";
-        return e.returnValue;
-      }
-    };
+  const handleDrop = (widget: Widget) => {
+    try {
+      handleAddWidget(widget);
+      showToast("Widget added to dashboard", "success");
+    } catch (error) {
+      console.error("Failed to add widget:", error);
+      showToast("Failed to add widget", "error");
+    }
+  };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [isDirty]);
+  if (isWidgetLoading) {
+    return <LinearLoading />;
+  }
 
-  // Show loading while fetching initial data
-  if (isLoadingWidgets) {
+  if (error) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500"></div>
+        <div className="text-center">
+          <h3 className="text-lg font-medium text-red-600 mb-2">
+            Error loading widgets
+          </h3>
+          <p className="text-sm text-gray-500">{error.message}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <DragDropProvider onDrop={handleAddWidget}>
+    <DragDropProvider onDrop={handleDrop}>
       <div className="max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl xxl:max-w-screen-xxl flex justify-between bg-slate-100 rounded-lg shadow p-2 overflow-hidden gap-1">
         <DeviceSidebar
           deviceId={params.id}
@@ -370,13 +375,7 @@ const EditDashboardComponent = ({ params }: Props) => {
         />
 
         <div className="flex flex-1 min-w-[200px] h-full rounded-md">
-          <WidgetBox
-            deviceId={params.id}
-            onWidgetAdded={(widgetId) => {
-              // Optionally handle widget added callback
-              console.log("Widget added:", widgetId);
-            }}
-          />
+          <WidgetBox deviceId={params.id} />
         </div>
 
         <div className="grid gap-1 w-full rounded-md">
@@ -385,14 +384,18 @@ const EditDashboardComponent = ({ params }: Props) => {
             isLoading={isLoading}
             onSave={handleSaveAndApply}
             onCancel={handleCancel}
-            isDirty={isDirty} // Pass dirty state for UI feedback
+            isDirty={stats.isDirty}
+            stats={stats}
           />
 
           <EditDeviceDashboard
             params={params}
             widgets={widgetState.widgets}
-            handlers={handlers}
-            isDirty={isDirty}
+            onUpdate={handleUpdateWidget}
+            onDelete={handleDeleteWidget}
+            onMove={handleMoveWidget}
+            onDuplicate={handleDuplicateWidget}
+            isDirty={stats.isDirty}
           />
         </div>
       </div>

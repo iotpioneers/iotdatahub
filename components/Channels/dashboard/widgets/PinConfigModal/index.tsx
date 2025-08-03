@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button, Modal, CircularProgress, Alert } from "@mui/material";
+import {
+  Button,
+  Modal,
+  CircularProgress,
+  Alert,
+  Snackbar,
+} from "@mui/material";
 import PinConfigForm from "./PinConfigForm";
 import DatastreamForm from "./DatastreamForm";
 import WidgetPreview from "./WidgetPreview";
@@ -21,6 +27,9 @@ const PinConfigModal: React.FC<PinConfigModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
   const { showToast } = useToast();
 
   // Initialize config when modal opens or existingConfig changes
@@ -30,7 +39,6 @@ const PinConfigModal: React.FC<PinConfigModalProps> = ({
         ...existingConfig,
         widgetId: widget.id,
         deviceId,
-        // Set defaults based on widget type
         title:
           existingConfig?.title || widget.settings?.title || widget.name || "",
         pinType: existingConfig?.pinType || "VIRTUAL",
@@ -54,6 +62,7 @@ const PinConfigModal: React.FC<PinConfigModalProps> = ({
       setConfig(initialConfig);
       setHasUnsavedChanges(false);
       setError(null);
+      setValidationErrors({});
     }
   }, [open, existingConfig, widget, deviceId]);
 
@@ -91,15 +100,11 @@ const PinConfigModal: React.FC<PinConfigModalProps> = ({
     }
   };
 
-  const handleConfigChange = (newConfig: Partial<PinConfig>) => {
-    setConfig(newConfig);
-    setHasUnsavedChanges(true);
-    setError(null);
-  };
+  const validateConfiguration = (): boolean => {
+    const errors: Record<string, string> = {};
 
-  const validateConfiguration = (): string | null => {
     if (!config.pinNumber) {
-      return "Please select or create a datastream";
+      errors.pinNumber = "Please select or create a datastream";
     }
 
     if (config.valueType === "NUMBER") {
@@ -108,29 +113,35 @@ const PinConfigModal: React.FC<PinConfigModalProps> = ({
         config.maxValue !== undefined &&
         config.minValue >= config.maxValue
       ) {
-        return "Minimum value must be less than maximum value";
+        errors.range = "Minimum value must be less than maximum value";
       }
     }
 
-    // Widget-specific validations
     const widgetType = widget.definition?.type;
     if (
       (widgetType === "switch" || widgetType === "toggle") &&
       config.valueType === "BOOLEAN"
     ) {
       if (!config.onValue || !config.offValue) {
-        return "ON and OFF values are required for boolean switches";
+        errors.booleanValues =
+          "ON and OFF values are required for boolean switches";
       }
     }
 
-    return null;
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleConfigChange = (newConfig: Partial<PinConfig>) => {
+    setConfig(newConfig);
+    setHasUnsavedChanges(true);
+    setError(null);
+    validateConfiguration();
   };
 
   const handleSave = async () => {
-    const validationError = validateConfiguration();
-    if (validationError) {
-      setError(validationError);
-      showToast(validationError, "error");
+    if (!validateConfiguration()) {
+      showToast("Please fix validation errors before saving", "error");
       return;
     }
 
@@ -221,6 +232,19 @@ const PinConfigModal: React.FC<PinConfigModalProps> = ({
           </div>
         )}
 
+        {/* Validation Errors */}
+        {Object.keys(validationErrors).length > 0 && (
+          <div className="mx-6 mt-2">
+            <Alert severity="warning">
+              <ul className="list-disc pl-4">
+                {Object.values(validationErrors).map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </Alert>
+          </div>
+        )}
+
         {/* Main Content */}
         <div className="flex flex-1 overflow-hidden">
           {/* Left Panel - Configuration Options */}
@@ -273,7 +297,11 @@ const PinConfigModal: React.FC<PinConfigModalProps> = ({
               variant="contained"
               color="primary"
               onClick={handleSave}
-              disabled={isLoading || !hasUnsavedChanges}
+              disabled={
+                isLoading ||
+                !hasUnsavedChanges ||
+                Object.keys(validationErrors).length > 0
+              }
               className="bg-teal-500 hover:bg-teal-600"
             >
               {isLoading ? "Saving..." : "Save Configuration"}

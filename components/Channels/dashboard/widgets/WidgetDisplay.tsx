@@ -1,12 +1,11 @@
 "use client";
 
-import { Copy, Trash2, Cpu, AlertCircle } from "lucide-react";
-import { useState } from "react";
+import { Copy, Trash2, Cpu, AlertCircle, Undo } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { Widget, WidgetType } from "@/types/widgets";
 import WidgetRegistry from "./WidgetComponents";
 import { cn } from "@/lib/utils";
 import PinConfigModal from "./PinConfigModal";
-import useFetch from "@/hooks/useFetch";
 import { useToast } from "@/hooks/useToast";
 
 interface WidgetDisplayProps {
@@ -26,46 +25,46 @@ export const WidgetDisplay = ({
   const [isHovered, setIsHovered] = useState(false);
   const [showPinConfig, setShowPinConfig] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [pinConfig, setPinConfig] = useState<any>(null);
+  const [pinConfigError, setPinConfigError] = useState<string | null>(null);
   const { showToast } = useToast();
+  const [deleted, setDeleted] = useState(false);
+  const undoTimeoutRef = useRef<NodeJS.Timeout>();
 
-  const {
-    data: pinConfig,
-    isLoading: isPinConfigLoading,
-    error: pinConfigError,
-    refetch: refetchPinConfig,
-  } = useFetch(`/api/devices/${widget.deviceId}/widgets/${widget.id}/pin`);
+  // Load pin config from localStorage on mount
+  useEffect(() => {
+    const loadPinConfig = () => {
+      try {
+        const storedConfig = localStorage.getItem(
+          `widget-pin-config-${widget.id}`,
+        );
+        if (storedConfig) {
+          setPinConfig(JSON.parse(storedConfig));
+        }
+      } catch (error) {
+        console.error("Error loading pin config from localStorage:", error);
+      }
+    };
+
+    loadPinConfig();
+  }, [widget.id]);
 
   const handleSavePinConfig = async (config: any) => {
-    if (isSaving) return;
-
     setIsSaving(true);
     try {
-      const response = await fetch(
-        `/api/devices/${widget.deviceId}/widgets/${widget.id}/pin`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(config),
-        },
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.error || `HTTP ${response.status}: ${response.statusText}`,
-        );
+      // Validate config
+      if (!config.pinNumber) {
+        throw new Error("Pin number is required");
       }
 
-      const savedConfig = await response.json();
+      // Store locally first
+      localStorage.setItem(
+        `widget-pin-config-${widget.id}`,
+        JSON.stringify(config),
+      );
+      setPinConfig(config);
       setShowPinConfig(false);
-      showToast("Pin configuration saved successfully", "success");
-
-      // Refetch the pin config to update the display
-      refetchPinConfig();
-
-      return savedConfig;
+      showToast("Pin configuration saved locally", "success");
     } catch (error) {
       console.error("Error saving pin config:", error);
       const errorMessage =
@@ -88,22 +87,9 @@ export const WidgetDisplay = ({
     if (!confirmed) return;
 
     try {
-      const response = await fetch(
-        `/api/devices/${widget.deviceId}/widgets/${widget.id}/pin`,
-        {
-          method: "DELETE",
-        },
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.error || "Failed to delete pin configuration",
-        );
-      }
-
-      showToast("Pin configuration deleted successfully", "success");
-      refetchPinConfig();
+      localStorage.removeItem(`widget-pin-config-${widget.id}`);
+      setPinConfig(null);
+      showToast("Pin configuration deleted", "success");
     } catch (error) {
       console.error("Error deleting pin config:", error);
       const errorMessage =
@@ -113,6 +99,47 @@ export const WidgetDisplay = ({
       showToast(errorMessage, "error");
     }
   };
+
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete();
+      setDeleted(true);
+
+      // Show undo option for 5 seconds
+      undoTimeoutRef.current = setTimeout(() => {
+        setDeleted(false);
+      }, 5000);
+    }
+  };
+
+  const handleUndoDelete = () => {
+    if (undoTimeoutRef.current) {
+      clearTimeout(undoTimeoutRef.current);
+    }
+    setDeleted(false);
+    // Note: You'll need to implement undo logic in the parent component
+  };
+
+  if (deleted) {
+    return (
+      <div
+        className={cn(
+          "relative h-full w-full p-2 bg-gray-100 rounded-lg border border-dashed border-gray-300",
+          "flex flex-col items-center justify-center",
+          className,
+        )}
+      >
+        <div className="text-sm text-gray-500 mb-2">Widget deleted</div>
+        <button
+          onClick={handleUndoDelete}
+          className="flex items-center text-sm text-blue-500 hover:text-blue-700"
+        >
+          <Undo className="w-4 h-4 mr-1" />
+          Undo
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -134,14 +161,6 @@ export const WidgetDisplay = ({
         </span>
 
         <div className="flex items-center space-x-1">
-          {/* Pin Configuration Status */}
-          {isPinConfigLoading && (
-            <div
-              className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"
-              title="Loading pin config..."
-            />
-          )}
-
           {pinConfigError && (
             <span title="Error loading pin config">
               <AlertCircle className="w-4 h-4 text-red-500" />
@@ -192,7 +211,7 @@ export const WidgetDisplay = ({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              onDelete?.();
+              handleDelete();
             }}
             className="p-1 bg-white rounded-full shadow-md hover:bg-gray-100 text-red-500 hover:text-red-700 transition-colors"
             title="Delete Widget"

@@ -36,43 +36,52 @@ const adjustWidgetSize = (
   h: size.h - reduction,
 });
 
-// Enhanced Widget Preview Components (same as before, keeping for completeness)
+// Enhanced Widget Preview Components (same as original)
 const WidgetPreviewComponents = {
-  switch: () => (
-    <div className="flex items-center justify-start h-8">
-      <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-green-500">
-        <span className="inline-block h-4 w-4 transform rounded-full bg-white translate-x-6" />
+  switch: () => {
+    return (
+      <div className="flex items-center justify-start h-8">
+        <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-green-500">
+          <span className="inline-block h-4 w-4 transform rounded-full bg-white translate-x-6" />
+        </div>
       </div>
-    </div>
-  ),
+    );
+  },
 
-  slider: () => (
-    <div className="flex items-center justify-between h-8 px-2">
-      <span className="text-teal-500 text-sm">−</span>
-      <div className="flex-1 mx-2 relative">
-        <div className="h-1 bg-gray-200 rounded-full">
+  slider: () => {
+    return (
+      <div className="flex items-center justify-between h-8 px-2">
+        <span className="text-teal-500 text-sm">−</span>
+        <div className="flex-1 mx-2 relative">
+          <div className="h-1 bg-gray-200 rounded-full">
+            <div
+              className="h-1 bg-teal-500 rounded-full"
+              style={{ width: `50%` }}
+            />
+          </div>
           <div
-            className="h-1 bg-teal-500 rounded-full"
-            style={{ width: `50%` }}
+            className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-teal-500 rounded-full"
+            style={{
+              left: `50%`,
+              transform: "translate(-50%, -50%)",
+            }}
           />
         </div>
-        <div
-          className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-teal-500 rounded-full"
-          style={{ left: `50%`, transform: "translate(-50%, -50%)" }}
-        />
+        <span className="text-teal-500 text-sm">+</span>
+        <span className="text-gray-600 text-sm ml-2">5</span>
       </div>
-      <span className="text-teal-500 text-sm">+</span>
-      <span className="text-gray-600 text-sm ml-2">5</span>
-    </div>
-  ),
+    );
+  },
 
-  numberInput: () => (
-    <div className="flex items-center justify-between h-8 px-2">
-      <button className="text-teal-500 text-lg">−</button>
-      <span className="text-2xl font-light text-gray-700">0</span>
-      <button className="text-teal-500 text-lg">+</button>
-    </div>
-  ),
+  numberInput: () => {
+    return (
+      <div className="flex items-center justify-between h-8 px-2">
+        <button className="text-teal-500 text-lg">−</button>
+        <span className="text-2xl font-light text-gray-700">0</span>
+        <button className="text-teal-500 text-lg">+</button>
+      </div>
+    );
+  },
 
   imageButton: () => (
     <div className="flex items-center justify-center h-16">
@@ -82,18 +91,22 @@ const WidgetPreviewComponents = {
     </div>
   ),
 
-  led: () => (
-    <div className="flex items-center justify-center h-8">
-      <div className="w-8 h-8 rounded-full bg-green-500 shadow-lg shadow-green-500/50" />
-    </div>
-  ),
+  led: () => {
+    return (
+      <div className="flex items-center justify-center h-8">
+        <div className="w-8 h-8 rounded-full bg-green-500 shadow-lg shadow-green-500/50" />
+      </div>
+    );
+  },
 
-  label: () => (
-    <div className="h-12 p-2">
-      <div className="w-1 h-full bg-blue-600 rounded-full mr-2 float-left" />
-      <div className="text-xl font-bold text-gray-800">167</div>
-    </div>
-  ),
+  label: () => {
+    return (
+      <div className="h-12 p-2">
+        <div className="w-1 h-full bg-blue-600 rounded-full mr-2 float-left" />
+        <div className="text-xl font-bold text-gray-800">167</div>
+      </div>
+    );
+  },
 
   gauge: () => {
     const value = 82;
@@ -186,18 +199,20 @@ const WidgetPreviewComponents = {
     );
   },
 
-  // Add other preview components here (alarmSound, chart, etc.)
-  alarmSound: () => (
-    <div className="flex items-center justify-center h-16">
-      <div className="w-12 h-12 rounded-full flex items-center justify-center bg-green-100">
-        <Volume2 className="w-5 h-5 text-green-500" />
+  alarmSound: () => {
+    return (
+      <div className="flex items-center justify-center h-16">
+        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-green-100">
+          <Volume2 className="w-5 h-5 text-green-500" />
+        </div>
       </div>
-    </div>
-  ),
+    );
+  },
 
   chart: () => {
     const data = [4, 7, 3, 8, 2, 6, 4];
     const maxValue = Math.max(...data);
+
     return (
       <div className="h-16 p-3">
         <div className="flex items-end justify-between h-full">
@@ -205,34 +220,59 @@ const WidgetPreviewComponents = {
             <div
               key={index}
               className="bg-blue-500 rounded-sm"
-              style={{ height: `${(value / maxValue) * 100}%`, width: "10px" }}
+              style={{
+                height: `${(value / maxValue) * 100}%`,
+                width: "10px",
+              }}
             />
           ))}
+        </div>
+        <div className="flex justify-between text-xs text-gray-400 mt-1">
+          <span>8:26 AM</span>
+          <span>8:43 AM</span>
         </div>
       </div>
     );
   },
 
-  // Add remaining preview components...
-  customChart: () => (
-    <div className="h-16 p-2">
-      <svg className="w-full h-full" viewBox="0 0 100 100">
-        <defs>
-          <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="rgb(34, 197, 94)" />
-            <stop offset="50%" stopColor="rgb(59, 130, 246)" />
-            <stop offset="100%" stopColor="rgb(168, 85, 247)" />
-          </linearGradient>
-        </defs>
-        <path
-          d="M 0 50 L 20 25 L 40 75 L 60 30 L 80 45 L 100 20"
-          stroke="url(#lineGradient)"
-          strokeWidth="2"
-          fill="none"
-        />
-      </svg>
-    </div>
-  ),
+  customChart: () => {
+    const data = [
+      { x: 0, y: 0 },
+      { x: 1, y: 45 },
+      { x: 2, y: 25 },
+      { x: 3, y: 55 },
+      { x: 4, y: 40 },
+      { x: 5, y: 100 },
+      { x: 6, y: 50 },
+    ];
+
+    const pathData = data
+      .map(
+        (point, index) =>
+          `${index === 0 ? "M" : "L"} ${(point.x / 6) * 100} ${100 - (point.y / 60) * 80}`,
+      )
+      .join(" ");
+
+    return (
+      <div className="h-16 p-2">
+        <svg className="w-full h-full" viewBox="0 0 100 100">
+          <defs>
+            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="rgb(34, 197, 94)" />
+              <stop offset="50%" stopColor="rgb(59, 130, 246)" />
+              <stop offset="100%" stopColor="rgb(168, 85, 247)" />
+            </linearGradient>
+          </defs>
+          <path
+            d={pathData}
+            stroke="url(#lineGradient)"
+            strokeWidth="2"
+            fill="none"
+          />
+        </svg>
+      </div>
+    );
+  },
 
   heatmapChart: () => (
     <div className="h-16 p-2">
@@ -241,6 +281,10 @@ const WidgetPreviewComponents = {
         <div className="w-8 h-2 bg-blue-400 rounded-sm" />
         <div className="w-4 h-2 bg-gray-300 rounded-sm" />
         <div className="w-12 h-2 bg-gray-200 rounded-sm" />
+      </div>
+      <div className="flex justify-between text-xs text-gray-400">
+        <span>08:26 AM</span>
+        <span>09:00 AM</span>
       </div>
     </div>
   ),
@@ -256,34 +300,40 @@ const WidgetPreviewComponents = {
     </div>
   ),
 
-  terminal: () => (
-    <div className="h-18 p-1">
-      <div className="bg-black text-white text-xs p-1 rounded mb-1 font-mono">
-        &lt; Power On
+  terminal: () => {
+    return (
+      <div className="h-18 p-1">
+        <div className="bg-black text-white text-xs p-1 rounded mb-1 font-mono">
+          &lt; Power On Power Off Enabled
+        </div>
+        <div className="bg-black text-white text-xs p-1 rounded font-mono">
+          Type here
+        </div>
       </div>
-      <div className="bg-black text-white text-xs p-1 rounded font-mono">
-        Type here
-      </div>
-    </div>
-  ),
+    );
+  },
 
-  segmentedSwitch: () => (
-    <div className="flex items-center justify-center h-16 px-2">
-      <div className="flex bg-gray-100 rounded overflow-hidden w-full">
-        <div className="flex-1 py-1 px-2 text-center text-sm bg-green-500 text-white">
-          Zero
-        </div>
-        <div className="flex-1 py-1 px-2 text-center text-sm text-gray-700">
-          One
+  segmentedSwitch: () => {
+    return (
+      <div className="flex items-center justify-center h-16 px-2">
+        <div className="flex bg-gray-100 rounded overflow-hidden w-full">
+          <div className="flex-1 py-1 px-2 text-center text-sm bg-green-500 text-white">
+            Zero
+          </div>
+          <div className="flex-1 py-1 px-2 text-center text-sm text-gray-700">
+            One
+          </div>
         </div>
       </div>
-    </div>
-  ),
+    );
+  },
 
   menu: () => (
     <div className="flex items-center justify-center h-16 px-2">
       <select className="w-full px-2 py-1 border border-gray-300 rounded text-sm appearance-none bg-white">
         <option>Zero</option>
+        <option>One</option>
+        <option>Two</option>
       </select>
     </div>
   ),
@@ -296,6 +346,10 @@ const WidgetPreviewComponents = {
         <div className="w-8 h-4 bg-green-500 rounded-full relative">
           <div className="w-3 h-3 bg-white rounded-full absolute right-0.5 top-0.5" />
         </div>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-gray-700">Label</span>
+        <span className="text-xs text-gray-600">String</span>
       </div>
     </div>
   ),
@@ -531,7 +585,7 @@ const DraggableWidgetBox = ({ widget }: { widget: Widget }) => {
       role="button"
       tabIndex={0}
     >
-      <div className="font-bold text-base">
+      <div className="font-bold text-base mb-1">
         {widget?.definition?.label || `Widget`}
       </div>
       <WidgetPreview widget={widget} />
@@ -548,33 +602,23 @@ const WidgetBox = ({ deviceId, onWidgetAdded }: WidgetBoxProps) => {
   const createWidget = (definition: WidgetDefinition): Widget => ({
     id: `${definition.type}-${Date.now()}`,
     definition,
-    settings: {
-      title: definition.label,
-    },
-    position: {
-      x: 0,
-      y: 0,
-      width: definition.defaultSize?.w || 2,
-      height: definition.defaultSize?.h || 3,
-    },
-    deviceId: deviceId,
+    settings: {},
+    deviceId,
   });
 
-  // Modified to work with drag and drop - no immediate API calls
-  const handleDoubleClick = async (definition: WidgetDefinition) => {
+  const handleDoubleClick = (definition: WidgetDefinition) => {
+    // For double-click, we'll create a temporary widget and trigger the onDrop handler
     const widget = createWidget(definition);
 
-    // This will be handled by the DragDropProvider's onDrop handler
-    // which now adds to local state instead of immediately calling the API
-    const dragDropProvider = document.querySelector(
-      "[data-drag-drop-provider]",
-    );
-    if (dragDropProvider) {
-      // Simulate a drop event for double-click
-      const customEvent = new CustomEvent("widget-add", {
+    // Dispatch a custom event that the DragDropProvider can listen to
+    window.dispatchEvent(
+      new CustomEvent("widget-double-click", {
         detail: { widget },
-      });
-      dragDropProvider.dispatchEvent(customEvent);
+      }),
+    );
+
+    if (onWidgetAdded) {
+      onWidgetAdded(widget.id);
     }
   };
 
@@ -583,9 +627,6 @@ const WidgetBox = ({ deviceId, onWidgetAdded }: WidgetBoxProps) => {
       <div className="p-3 flex items-center gap-2 border-b border-gray-200">
         <WidgetsOutlined className="text-gray-700 text-xl" />
         <h2 className="text-xl font-bold text-gray-800">Widget Box</h2>
-        <div className="ml-auto text-xs text-gray-500">
-          Drag or double-click
-        </div>
       </div>
       <div className="p-3 max-h-[calc(80vh)] overflow-y-auto">
         {Object.entries(widgetDefinitions).map(([category, definitions]) => (
