@@ -31,15 +31,6 @@ export async function GET(
       return NextResponse.json([], { status: 200 }); // Return empty array instead of error
     }
 
-    console.log("====================================");
-    console.log(
-      "returning widgets for device:",
-      params.id,
-      "widgets:",
-      widgets,
-    );
-    console.log("====================================");
-
     return NextResponse.json(widgets);
   } catch (error) {
     console.error("Error fetching widgets:", error);
