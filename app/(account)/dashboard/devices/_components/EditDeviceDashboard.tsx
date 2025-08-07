@@ -57,32 +57,36 @@ const EditDeviceDashboard: React.FC<Props> = ({
       />
 
       <DroppableArea id="dashboard-drop-area">
-        {!widgets || widgets.length === 0 ? (
-          <div className="flex items-center justify-center h-[100vh] border-2 border-dashed border-gray-200 rounded-lg">
-            <div className="text-center">
-              <h3 className="text-lg font-medium text-gray-800">
-                Add new widget
-              </h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Double click the widget or drag it to the canvas
-              </p>
-              {isDirty && (
-                <p className="mt-2 text-xs text-orange-600">
-                  You have unsaved changes
+        <div className="h-[calc(100vh-200px)] overflow-y-auto dashboard-scroll-container">
+          {!widgets || widgets.length === 0 ? (
+            <div className="flex items-center justify-center h-full border-2 border-dashed border-gray-200 rounded-lg m-4">
+              <div className="text-center">
+                <h3 className="text-lg font-medium text-gray-800">
+                  Add new widget
+                </h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  Double click the widget or drag it to the canvas
                 </p>
-              )}
+                {isDirty && (
+                  <p className="mt-2 text-xs text-orange-600">
+                    You have unsaved changes
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        ) : (
-          <EditDeviceDashboardComponent
-            deviceId={params.id}
-            widgets={widgets}
-            onUpdate={onUpdate}
-            onDelete={onDelete}
-            onMove={onMove}
-            onDuplicate={onDuplicate}
-          />
-        )}
+          ) : (
+            <div className="widget-grid-container">
+              <EditDeviceDashboardComponent
+                deviceId={params.id}
+                widgets={widgets}
+                onUpdate={onUpdate}
+                onDelete={onDelete}
+                onMove={onMove}
+                onDuplicate={onDuplicate}
+              />
+            </div>
+          )}
+        </div>
       </DroppableArea>
     </div>
   );

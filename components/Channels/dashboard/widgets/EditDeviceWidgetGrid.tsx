@@ -6,7 +6,6 @@ import { Responsive, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { WidgetDisplay } from "./WidgetDisplay";
-import DeviceSettingModal from "./DeviceSettingModal";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -27,8 +26,6 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
   onWidgetDuplicate,
   deviceId,
 }) => {
-  const [selectedWidget, setSelectedWidget] = useState<Widget | null>(null);
-
   // Memoize layout generation to prevent unnecessary recalculations
   const layout = useMemo(
     () => ({
@@ -42,6 +39,55 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
         minH: 2,
         maxW: 12,
         maxH: 6,
+        static: false, // Allow movement
+      })),
+      md: widgets.map((widget) => ({
+        i: widget.id,
+        x: widget.position?.x ?? 0,
+        y: widget.position?.y ?? 0,
+        w: widget.position?.width ?? 2,
+        h: widget.position?.height ?? 3,
+        minW: 1,
+        minH: 2,
+        maxW: 10,
+        maxH: 6,
+        static: false,
+      })),
+      sm: widgets.map((widget) => ({
+        i: widget.id,
+        x: widget.position?.x ?? 0,
+        y: widget.position?.y ?? 0,
+        w: Math.min(widget.position?.width ?? 2, 6),
+        h: widget.position?.height ?? 3,
+        minW: 1,
+        minH: 2,
+        maxW: 6,
+        maxH: 6,
+        static: false,
+      })),
+      xs: widgets.map((widget) => ({
+        i: widget.id,
+        x: widget.position?.x ?? 0,
+        y: widget.position?.y ?? 0,
+        w: Math.min(widget.position?.width ?? 2, 4),
+        h: widget.position?.height ?? 3,
+        minW: 1,
+        minH: 2,
+        maxW: 4,
+        maxH: 6,
+        static: false,
+      })),
+      xxs: widgets.map((widget) => ({
+        i: widget.id,
+        x: 0, // Stack all widgets in single column for very small screens
+        y: widget.position?.y ?? 0,
+        w: 2,
+        h: widget.position?.height ?? 3,
+        minW: 2,
+        minH: 2,
+        maxW: 2,
+        maxH: 6,
+        static: false,
       })),
     }),
     [widgets],
@@ -94,65 +140,48 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
     return widgets.map((widget) => (
       <div
         key={widget.id}
-        className="widget-content"
-        data-grid={{
-          x: widget.position?.x || 0,
-          y: widget.position?.y || 0,
-          w: widget.position?.width || 2,
-          h: widget.position?.height || 2,
-          minW: 1,
-          minH: 1,
-        }}
+        className="widget-item bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden cursor-move"
+        style={{ height: "100%", width: "100%" }}
       >
-        <WidgetDisplay
-          widget={widget}
-          onDuplicate={() => handleDuplicate(widget)}
-          onSettings={() => setSelectedWidget(widget)}
-          onDelete={() => onWidgetDelete?.(widget.id)}
-          className="widget-content"
-        />
+        <div className="widget-content h-full">
+          <WidgetDisplay
+            widget={widget}
+            onDuplicate={() => handleDuplicate(widget)}
+            onDelete={() => onWidgetDelete?.(widget.id)}
+            className="h-full"
+          />
+        </div>
       </div>
     ));
   }, [widgets, handleDuplicate, onWidgetDelete]);
 
   return (
-    <>
+    <div className="min-h-screen overflow-y-auto">
       <ResponsiveGridLayout
         className="layout"
         layouts={layout}
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
         cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-        rowHeight={30}
+        rowHeight={50}
         margin={[10, 10]}
         containerPadding={[10, 10]}
         onLayoutChange={handleLayoutChange}
-        isDraggable
-        isResizable
+        isDraggable={true}
+        isResizable={true}
         isDroppable={false}
-        draggableCancel=".widget-content, .action-button"
-        draggableHandle=".drag-handle"
+        draggableCancel=".action-button" // Only cancel on action buttons, allow dragging from anywhere else
         resizeHandles={["se"]}
-        useCSSTransforms
+        useCSSTransforms={true}
         measureBeforeMount={false}
-        compactType="vertical"
-        preventCollision={false}
+        compactType={null} // CRITICAL: Disable auto-compacting to maintain positions
+        preventCollision={true} // Prevent widgets from overlapping but don't auto-compact
+        verticalCompact={false} // Disable vertical compacting
+        autoSize={true} // Allow container to grow with content
+        style={{ minHeight: "100vh" }} // Ensure minimum height for scrolling
       >
         {renderWidgets}
       </ResponsiveGridLayout>
-
-      {selectedWidget && (
-        <DeviceSettingModal
-          widget={selectedWidget}
-          onClose={() => setSelectedWidget(null)}
-          onUpdate={(updatedWidget) => {
-            if (onWidgetUpdate) {
-              onWidgetUpdate(updatedWidget);
-            }
-            setSelectedWidget(null);
-          }}
-        />
-      )}
-    </>
+    </div>
   );
 };
 

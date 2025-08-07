@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Trash2, Cpu, AlertCircle, Undo } from "lucide-react";
+import { Copy, Trash2, Cpu, AlertCircle, Undo, Settings } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Widget, WidgetType } from "@/types/widgets";
 import WidgetRegistry from "./WidgetComponents";
@@ -11,7 +11,6 @@ import { useToast } from "@/hooks/useToast";
 interface WidgetDisplayProps {
   widget: Widget;
   onDuplicate?: () => void;
-  onSettings?: () => void;
   onDelete?: () => void;
   className?: string;
 }
@@ -100,7 +99,10 @@ export const WidgetDisplay = ({
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     if (onDelete) {
       onDelete();
       setDeleted(true);
@@ -124,7 +126,7 @@ export const WidgetDisplay = ({
     return (
       <div
         className={cn(
-          "relative h-full w-full p-2 bg-gray-100 rounded-lg border border-dashed border-gray-300",
+          "relative h-full w-full p-4 bg-gray-100 rounded-lg border border-dashed border-gray-300",
           "flex flex-col items-center justify-center",
           className,
         )}
@@ -144,40 +146,36 @@ export const WidgetDisplay = ({
   return (
     <div
       className={cn(
-        "relative h-full w-full p-2 bg-white rounded-lg shadow-sm border",
-        isHovered ? "border-blue-500 ring-2 ring-blue-200" : "border-gray-200",
-        "transition-all duration-150",
+        "relative h-full w-full p-3 bg-white transition-all duration-150",
+        isHovered ? "ring-2 ring-blue-200" : "",
         className,
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Widget Header */}
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium text-gray-700 truncate">
+      {/* Widget Title Header */}
+      <div className="flex items-center justify-between mb-2 min-h-[20px]">
+        <span className="text-sm font-medium text-gray-700 truncate flex-1 mr-2">
           {widget.settings?.title ||
             widget.definition?.label ||
             "Untitled Widget"}
         </span>
 
-        <div className="flex items-center space-x-1">
-          {pinConfigError && (
-            <span title="Error loading pin config">
-              <AlertCircle className="w-4 h-4 text-red-500" />
-            </span>
-          )}
+        {/* Pin Config Indicator (when not hovered) */}
+        {pinConfig && !isHovered && (
+          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+            Pin: {pinConfig.pinNumber}
+          </span>
+        )}
 
-          {pinConfig && (
-            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-              {pinConfig.pinNumber}
-            </span>
-          )}
-        </div>
+        {pinConfigError && !isHovered && (
+          <AlertCircle className="w-4 h-4 text-red-500" />
+        )}
       </div>
 
-      {/* Action Buttons */}
+      {/* Action Buttons - Only show on hover */}
       {isHovered && (
-        <div className="absolute top-0 right-0 flex gap-1 p-1 z-50 action-button">
+        <div className="absolute top-2 right-2 flex gap-1 z-50 action-button">
           <button
             onClick={(e) => {
               e.preventDefault();
@@ -185,7 +183,7 @@ export const WidgetDisplay = ({
               setShowPinConfig(true);
             }}
             className={cn(
-              "p-1 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors",
+              "p-1.5 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors",
               pinConfig
                 ? "text-blue-600 hover:text-blue-800"
                 : "text-gray-600 hover:text-gray-900",
@@ -195,25 +193,22 @@ export const WidgetDisplay = ({
           >
             <Cpu className="w-3 h-3" />
           </button>
+
           <button
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               onDuplicate?.();
             }}
-            className="p-1 bg-white rounded-full shadow-md hover:bg-gray-100 text-gray-600 hover:text-gray-900 transition-colors"
+            className="p-1.5 bg-white rounded-full shadow-md hover:bg-gray-100 text-gray-600 hover:text-gray-900 transition-colors"
             title="Duplicate"
           >
             <Copy className="w-3 h-3" />
           </button>
 
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleDelete();
-            }}
-            className="p-1 bg-white rounded-full shadow-md hover:bg-gray-100 text-red-500 hover:text-red-700 transition-colors"
+            onClick={handleDelete}
+            className="p-1.5 bg-white rounded-full shadow-md hover:bg-gray-100 text-red-500 hover:text-red-700 transition-colors"
             title="Delete Widget"
           >
             <Trash2 className="w-3 h-3" />
@@ -222,7 +217,10 @@ export const WidgetDisplay = ({
       )}
 
       {/* Widget Content */}
-      <div className="h-[calc(100%-32px)] w-full flex items-center justify-center p-1 z-10 widget-content">
+      <div
+        className="flex-1 flex items-center justify-center widget-content"
+        style={{ height: "calc(100% - 32px)" }}
+      >
         <WidgetRegistry
           type={widget.definition?.type as WidgetType}
           value={widget.settings?.value}
