@@ -13,6 +13,7 @@ import {
   WidgetOperation,
   WidgetOperationError,
 } from "@/types/widget-state";
+import { getDefaultSize } from "@/app/store/constant";
 
 interface UseWidgetStateOptions {
   /** Device ID for API calls */
@@ -201,25 +202,6 @@ export const useWidgetState = (
           w: w.position!.width || 2,
           h: w.position!.height || 3,
         }));
-
-      // Default size based on widget type
-      const getDefaultSize = (type?: string) => {
-        switch (type) {
-          case "gauge":
-          case "radialGauge":
-            return { w: 3, h: 3 };
-          case "chart":
-          case "customChart":
-            return { w: 6, h: 4 };
-          case "slider":
-            return { w: 4, h: 2 };
-          case "switch":
-          case "led":
-            return { w: 2, h: 2 };
-          default:
-            return { w: 2, h: 3 };
-        }
-      };
 
       const defaultSize = getDefaultSize(widgetType);
       const maxCols = 12;

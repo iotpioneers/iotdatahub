@@ -219,12 +219,16 @@ export const WidgetDisplay = ({
       {/* Widget Content */}
       <div
         className="flex-1 flex items-center justify-center widget-content"
-        style={{ height: "calc(100% - 32px)" }}
+        style={{
+          height: "calc(100% - 24px)", // Adjusted for smaller header
+          minHeight: "24px", // Ensure minimum height
+        }}
       >
         <WidgetRegistry
           type={widget.definition?.type as WidgetType}
           value={widget.settings?.value}
           settings={widget.settings ?? {}}
+          className="w-full h-full" // Ensure widget fills container
         />
       </div>
 

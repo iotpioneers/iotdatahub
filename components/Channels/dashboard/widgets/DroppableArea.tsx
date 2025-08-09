@@ -29,13 +29,6 @@ export const DroppableArea = ({
       aria-label="Dashboard drop area"
     >
       {children}
-      {isOver && (
-        <div className="absolute inset-0 border-2 border-dashed border-blue-500 rounded-lg pointer-events-none flex items-center justify-center">
-          <div className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium">
-            Drop to add widget
-          </div>
-        </div>
-      )}
     </div>
   );
 };

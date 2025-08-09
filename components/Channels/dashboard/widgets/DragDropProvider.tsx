@@ -1,42 +1,38 @@
 "use client";
 
-import React, { useCallback, useEffect, useState, useRef } from "react";
+import React, { ReactNode, useState, useCallback } from "react";
 import {
   DndContext,
   DragOverlay,
-  DragStartEvent,
-  DragEndEvent,
   useSensor,
   useSensors,
   PointerSensor,
-  KeyboardSensor,
-  TouchSensor,
+  DragStartEvent,
+  DragEndEvent,
+  DragOverEvent,
   closestCenter,
-  defaultDropAnimation,
-  MeasuringStrategy,
+  MouseSensor,
+  TouchSensor,
 } from "@dnd-kit/core";
 import { Widget } from "@/types/widgets";
-import { CSS } from "@dnd-kit/utilities";
-import {
-  restrictToParentElement,
-  restrictToVerticalAxis,
-} from "@dnd-kit/modifiers";
+import { DragDropWidgetPreview } from "./DragDropWidgetPreview";
 
 interface DragDropProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
   onDrop: (widget: Widget) => void;
+  onWidgetAdded?: (widgetId: string) => void;
 }
 
 export const DragDropProvider: React.FC<DragDropProviderProps> = ({
   children,
   onDrop,
+  onWidgetAdded,
 }) => {
   const [activeWidget, setActiveWidget] = useState<Widget | null>(null);
-  const scrollableRef = useRef<HTMLDivElement>(null);
-  const scrollInterval = useRef<NodeJS.Timeout>();
+  const [isOverValidDropZone, setIsOverValidDropZone] = useState(false);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: {
         distance: 8,
       },
@@ -47,111 +43,79 @@ export const DragDropProvider: React.FC<DragDropProviderProps> = ({
         tolerance: 5,
       },
     }),
-    useSensor(KeyboardSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
   );
 
-  const handleScroll = useCallback((direction: "up" | "down") => {
-    if (!scrollableRef.current) return;
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    const { active } = event;
+    const widget = active.data.current?.widget as Widget;
 
-    const scrollAmount = direction === "down" ? 50 : -50;
-    scrollableRef.current.scrollBy({
-      top: scrollAmount,
-      behavior: "smooth",
-    });
+    if (widget) {
+      setActiveWidget(widget);
+    }
   }, []);
 
-  const handleDragStart = useCallback(
-    (event: DragStartEvent) => {
-      const widget = event.active.data.current?.widget;
-      if (widget) {
-        setActiveWidget(widget);
+  const handleDragOver = useCallback((event: DragOverEvent) => {
+    const { over } = event;
 
-        // Start checking for boundary proximity
-        scrollInterval.current = setInterval(() => {
-          if (!scrollableRef.current) return;
+    // Check if we're over a valid drop zone (not WidgetBox)
+    const isValidDropZone =
+      over &&
+      over.id !== "widget-box" &&
+      !over.id.toString().includes("widget-box");
 
-          const { top, bottom, height } =
-            scrollableRef.current.getBoundingClientRect();
-          const { y } = event.activatorEvent as MouseEvent;
-
-          const threshold = 100;
-          if (y < top + threshold) {
-            handleScroll("up");
-          } else if (y > bottom - threshold) {
-            handleScroll("down");
-          }
-        }, 100);
-      }
-    },
-    [handleScroll],
-  );
+    setIsOverValidDropZone(!!isValidDropZone);
+  }, []);
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
+      const widget = active.data.current?.widget as Widget;
 
       setActiveWidget(null);
-      if (scrollInterval.current) {
-        clearInterval(scrollInterval.current);
+      setIsOverValidDropZone(false);
+
+      if (!widget || !over) return;
+
+      // Prevent dropping in WidgetBox
+      if (
+        over.id === "widget-box" ||
+        over.id.toString().includes("widget-box")
+      ) {
+        return;
       }
 
-      if (over && over.id === "dashboard-drop-area") {
-        const widget = active.data.current?.widget;
-        if (widget) {
-          onDrop(widget);
-        }
+      // Handle drop on valid drop zones
+      onDrop(widget);
+
+      if (onWidgetAdded) {
+        onWidgetAdded(widget.id);
       }
     },
-    [onDrop],
+    [onDrop, onWidgetAdded],
   );
-
-  useEffect(() => {
-    return () => {
-      if (scrollInterval.current) {
-        clearInterval(scrollInterval.current);
-      }
-    };
-  }, []);
-
-  const dropAnimation = {
-    ...defaultDropAnimation,
-    dragSourceOpacity: 0.5,
-  };
-
-  const modifiers = [restrictToParentElement, restrictToVerticalAxis];
 
   return (
     <DndContext
       sensors={sensors}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
       collisionDetection={closestCenter}
-      measuring={{
-        droppable: {
-          strategy: MeasuringStrategy.Always,
-        },
-      }}
-      modifiers={modifiers}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
     >
-      <div ref={scrollableRef} className="h-full overflow-auto">
-        {children}
-      </div>
+      {children}
 
-      <DragOverlay dropAnimation={dropAnimation}>
+      <DragOverlay dropAnimation={null}>
         {activeWidget ? (
-          <div
-            className="bg-white rounded-lg shadow-xl border-2 border-blue-500 p-2 opacity-90 transform rotate-2"
-            style={{
-              width: `${(activeWidget.position?.width || 2) * 50}px`,
-              height: `${(activeWidget.position?.height || 3) * 50}px`,
-            }}
-          >
-            <div className="font-bold text-sm text-blue-600">
-              {activeWidget.definition?.label || "Widget"}
-            </div>
-            <div className="text-xs text-gray-500 mt-1">
-              Drop on dashboard to add
-            </div>
+          <div className="transform-gpu">
+            <DragDropWidgetPreview
+              widget={activeWidget}
+              isOverValidDropZone={isOverValidDropZone}
+            />
           </div>
         ) : null}
       </DragOverlay>

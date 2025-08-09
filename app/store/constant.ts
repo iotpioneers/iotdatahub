@@ -78,3 +78,26 @@ export const IoTDATAHUB_PROTOCOL = {
   // Message limits
   MAX_MESSAGE_SIZE: 1024,
 } as const;
+
+// Default size based on widget type
+export const getDefaultSize = (type?: string) => {
+  switch (type) {
+    case "switch":
+    case "led":
+    case "label":
+      return { w: 0.5, h: 1.5 };
+    case "gauge":
+    case "radialGauge":
+    case "modules":
+      return { w: 1, h: 2 };
+    case "chart":
+    case "customChart":
+    case "heatmapChart":
+    case "terminal":
+      return { w: 1, h: 2.5 };
+    case "map":
+      return { w: 1.5, h: 3 };
+    default:
+      return { w: 1, h: 1.5 };
+  }
+};

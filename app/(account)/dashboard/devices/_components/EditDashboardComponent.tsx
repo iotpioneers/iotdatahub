@@ -18,6 +18,7 @@ import useFetch from "@/hooks/useFetch";
 import { LinearLoading } from "@/components/LinearLoading";
 import { useToast } from "@/hooks/useToast";
 import { v4 as uuidv4 } from "uuid";
+import { getDefaultSize } from "@/app/store/constant";
 
 interface Props {
   params: { id: string };
@@ -86,24 +87,6 @@ const EditDashboardComponent = ({ params }: Props) => {
   // Find next available position for new widgets
   const findNextAvailablePosition = useCallback(
     (widgetType?: string) => {
-      const getDefaultSize = (type?: string) => {
-        switch (type) {
-          case "gauge":
-          case "radialGauge":
-            return { w: 1.5, h: 1.5 };
-          case "chart":
-          case "customChart":
-            return { w: 2, h: 1.5 };
-          case "slider":
-            return { w: 2, h: 1.5 };
-          case "switch":
-          case "led":
-            return { w: 1.5, h: 1.5 };
-          default:
-            return { w: 1.5, h: 1.5 };
-        }
-      };
-
       const defaultSize = getDefaultSize(widgetType);
       const occupiedPositions = widgetState.widgets
         .filter((w) => w.position)
