@@ -7,7 +7,6 @@ import { Widget } from "@/types/widgets";
 import { LinearLoading } from "@/components/LinearLoading";
 import EditDeviceDashboardComponent from "./EditDeviceDashboardComponent";
 import { DroppableArea } from "@/components/Channels/dashboard/widgets/DroppableArea";
-import DeviceHeader from "./DeviceHeader";
 
 interface Props {
   params: { id: string };
@@ -50,12 +49,6 @@ const EditDeviceDashboard: React.FC<Props> = ({
 
   return (
     <div className="bg-white rounded-lg shadow-sm">
-      <DeviceHeader
-        device={deviceData}
-        selectedDuration={selectedDuration}
-        onDurationChange={handleDurationChange}
-      />
-
       <DroppableArea id="dashboard-drop-area">
         <div className="h-[calc(100vh-200px)] overflow-y-auto dashboard-scroll-container">
           {!widgets || widgets.length === 0 ? (

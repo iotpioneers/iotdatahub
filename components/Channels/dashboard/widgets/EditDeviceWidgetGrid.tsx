@@ -156,7 +156,7 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
   }, [widgets, handleDuplicate, onWidgetDelete]);
 
   return (
-    <div className="min-h-screen overflow-y-auto">
+    <div className="min-h-screen overflow-y-auto mb-16">
       <ResponsiveGridLayout
         className="layout"
         layouts={layout}

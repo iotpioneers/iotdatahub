@@ -90,17 +90,17 @@ const EditDashboardComponent = ({ params }: Props) => {
         switch (type) {
           case "gauge":
           case "radialGauge":
-            return { w: 3, h: 3 };
+            return { w: 1.5, h: 1.5 };
           case "chart":
           case "customChart":
-            return { w: 6, h: 4 };
+            return { w: 2, h: 1.5 };
           case "slider":
-            return { w: 4, h: 2 };
+            return { w: 2, h: 1.5 };
           case "switch":
           case "led":
-            return { w: 2, h: 2 };
+            return { w: 1.5, h: 1.5 };
           default:
-            return { w: 2, h: 3 };
+            return { w: 1.5, h: 1.5 };
         }
       };
 
