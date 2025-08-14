@@ -169,10 +169,12 @@ const DeviceDetails = ({ params }: Props) => {
             </div>
           </div>
         ) : (
-          <DeviceDashboardComponent
-            deviceId={params.id}
-            widgetData={widgetData}
-          />
+          <div className="bg-white border border-gray-200 rounded-md">
+            <DeviceDashboardComponent
+              deviceId={params.id}
+              widgetData={widgetData}
+            />{" "}
+          </div>
         )}
       </div>
       {/* Modal */}

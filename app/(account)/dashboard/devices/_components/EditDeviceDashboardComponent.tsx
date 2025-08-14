@@ -50,6 +50,14 @@ const EditDeviceDashboardComponent: React.FC<EditDeviceDashboardProps> = ({
     [onDuplicate],
   );
 
+  // **NEW**: Handler for individual widget property updates
+  const handleWidgetPartialUpdate = useMemo(
+    () => (widgetId: string, changes: Partial<Widget>) => {
+      onUpdate(widgetId, changes);
+    },
+    [onUpdate],
+  );
+
   // Memoize widgets to prevent unnecessary re-renders
   const memoizedWidgets = useMemo(() => widgets, [widgets]);
 
@@ -59,6 +67,7 @@ const EditDeviceDashboardComponent: React.FC<EditDeviceDashboardProps> = ({
       onWidgetMove={handleWidgetMove}
       onWidgetDelete={handleWidgetDelete}
       onWidgetUpdate={handleWidgetUpdate}
+      onWidgetPartialUpdate={handleWidgetPartialUpdate}
       onWidgetDuplicate={handleWidgetDuplicate}
       deviceId={deviceId}
     />

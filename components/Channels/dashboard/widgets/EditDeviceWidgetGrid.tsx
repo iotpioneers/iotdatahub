@@ -14,6 +14,7 @@ interface WidgetGridProps {
   onWidgetMove: (widget: Widget, newPosition: Widget["position"]) => void;
   onWidgetDelete?: (widgetId: string) => void;
   onWidgetUpdate?: (widget: Widget) => void;
+  onWidgetPartialUpdate?: (widgetId: string, changes: Partial<Widget>) => void; // **NEW**
   onWidgetDuplicate?: (widget: Widget) => void;
   deviceId: string;
 }
@@ -23,6 +24,7 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
   onWidgetMove,
   onWidgetDelete,
   onWidgetUpdate,
+  onWidgetPartialUpdate, // **NEW**
   onWidgetDuplicate,
   deviceId,
 }) => {
@@ -135,12 +137,22 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
     [onWidgetDuplicate],
   );
 
+  // **NEW**: Handler for partial widget updates (like pin config)
+  const handleWidgetPartialUpdateCallback = useCallback(
+    (widgetId: string) => (changes: Partial<Widget>) => {
+      if (onWidgetPartialUpdate) {
+        onWidgetPartialUpdate(widgetId, changes);
+      }
+    },
+    [onWidgetPartialUpdate],
+  );
+
   // Memoized widget components to prevent unnecessary re-renders
   const renderWidgets = useMemo(() => {
     return widgets.map((widget) => (
       <div
         key={widget.id}
-        className="widget-item bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden cursor-move"
+        className="widgCet-item bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden cursor-move"
         style={{ height: "100%", width: "100%" }}
       >
         <div className="widget-content h-full">
@@ -148,12 +160,18 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
             widget={widget}
             onDuplicate={() => handleDuplicate(widget)}
             onDelete={() => onWidgetDelete?.(widget.id)}
+            onUpdate={handleWidgetPartialUpdateCallback(widget.id)} // **NEW**: Pass the update handler
             className="h-full"
           />
         </div>
       </div>
     ));
-  }, [widgets, handleDuplicate, onWidgetDelete]);
+  }, [
+    widgets,
+    handleDuplicate,
+    onWidgetDelete,
+    handleWidgetPartialUpdateCallback,
+  ]);
 
   return (
     <div className="min-h-screen overflow-y-auto mb-16">

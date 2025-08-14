@@ -170,26 +170,37 @@ export const WidgetGrid: React.FC<WidgetGridProps> = ({
         isResizable={false}
         compactType="vertical"
         draggableCancel=".widget-content"
+        autoSize={true}
+        style={{
+          height: "100%",
+          minHeight: "380px",
+          overflowY: "auto", // Enable vertical scrolling
+          paddingBottom: "12px", // Add some padding at the bottom
+        }}
       >
         {widgets.map((widget) => {
           const widgetStyles = getWidgetStyle(widget);
 
           return (
             <div key={widget.id} {...widgetStyles}>
-              <div className="grid relative h-full w-full bg-white transition-all duration-150">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-700 truncate flex-1 mb-2">
-                    {widget.name ||
-                      widget.settings?.title ||
-                      widget.definition?.label ||
-                      "Untitled"}
+              <div className="flex items-center justify-between px-3 py-1 border-gray-100">
+                <span className="text-sm font-medium text-gray-700 truncate capitalize">
+                  {widget.name ||
+                    widget.settings?.widgetType ||
+                    widget.definition?.type ||
+                    "Untitled"}
+                </span>
+                {(widget.settings?.pinNumber ||
+                  widget.pinConfig?.pinNumber) && (
+                  <span className="text-xs bg-blue-100 text-blue-800 px-2 rounded-full">
+                    {widget.settings?.pinNumber || widget.pinConfig?.pinNumber}
                   </span>
-                </div>
-                <WidgetComponent
-                  widget={widget}
-                  onValueChange={handleValueChange}
-                />
+                )}
               </div>
+              <WidgetComponent
+                widget={widget}
+                onValueChange={handleValueChange}
+              />
             </div>
           );
         })}

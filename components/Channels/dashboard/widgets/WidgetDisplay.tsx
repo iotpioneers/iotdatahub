@@ -12,6 +12,7 @@ interface WidgetDisplayProps {
   widget: Widget;
   onDuplicate?: () => void;
   onDelete?: () => void;
+  onUpdate?: (changes: Partial<Widget>) => void;
   className?: string;
 }
 
@@ -19,6 +20,7 @@ export const WidgetDisplay = ({
   widget,
   onDuplicate,
   onDelete,
+  onUpdate,
   className,
 }: WidgetDisplayProps) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -30,23 +32,36 @@ export const WidgetDisplay = ({
   const [deleted, setDeleted] = useState(false);
   const undoTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Load pin config from localStorage on mount
+  // Load pin config from widget or localStorage on mount
   useEffect(() => {
     const loadPinConfig = () => {
       try {
-        const storedConfig = localStorage.getItem(
-          `widget-pin-config-${widget.id}`,
-        );
-        if (storedConfig) {
-          setPinConfig(JSON.parse(storedConfig));
+        // First try to get from widget data
+        if (widget.pinConfig) {
+          setPinConfig(widget.pinConfig);
+        } else {
+          // Fallback to localStorage for backward compatibility
+          const storedConfig = localStorage.getItem(
+            `widget-pin-config-${widget.id}`,
+          );
+          if (storedConfig) {
+            const parsedConfig = JSON.parse(storedConfig);
+            setPinConfig(parsedConfig);
+
+            // If we found config in localStorage but not in widget,
+            // update the widget to include it
+            if (onUpdate) {
+              onUpdate({ pinConfig: parsedConfig });
+            }
+          }
         }
       } catch (error) {
-        console.error("Error loading pin config from localStorage:", error);
+        console.error("Error loading pin config:", error);
       }
     };
 
     loadPinConfig();
-  }, [widget.id]);
+  }, [widget.id, widget.pinConfig, onUpdate]);
 
   const handleSavePinConfig = async (config: any) => {
     setIsSaving(true);
@@ -56,14 +71,40 @@ export const WidgetDisplay = ({
         throw new Error("Pin number is required");
       }
 
-      // Store locally first
+      // Store locally for immediate feedback
       localStorage.setItem(
         `widget-pin-config-${widget.id}`,
         JSON.stringify(config),
       );
+
+      // Update local state
       setPinConfig(config);
+
+      // **KEY FIX**: Update the widget in the parent component's state
+      // This ensures the pin config is included in the pending changes
+      if (onUpdate) {
+        onUpdate({
+          pinConfig: config,
+          // Also update widget name if title changed
+          name: config.title || widget.name,
+          // Update settings to include pin config values
+          settings: {
+            ...widget.settings,
+            ...config,
+            title: config.title || widget.settings?.title,
+            color: config.widgetColor || widget.settings?.color,
+            min: config.minValue || widget.settings?.min,
+            max: config.maxValue || widget.settings?.max,
+            value:
+              config.defaultValue !== undefined
+                ? config.defaultValue
+                : widget.settings?.value,
+          },
+        });
+      }
+
       setShowPinConfig(false);
-      showToast("Pin configuration saved locally", "success");
+      showToast("Pin configuration saved", "success");
     } catch (error) {
       console.error("Error saving pin config:", error);
       const errorMessage =
@@ -86,8 +127,25 @@ export const WidgetDisplay = ({
     if (!confirmed) return;
 
     try {
+      // Remove from localStorage
       localStorage.removeItem(`widget-pin-config-${widget.id}`);
+
+      // Update local state
       setPinConfig(null);
+
+      // **KEY FIX**: Update the widget to remove pin config
+      if (onUpdate) {
+        onUpdate({
+          pinConfig: null,
+          // Reset settings that were pin-config specific
+          settings: {
+            ...widget.settings,
+            // Keep other settings but remove pin-specific ones
+            title: widget.name || widget.settings?.title,
+          },
+        });
+      }
+
       showToast("Pin configuration deleted", "success");
     } catch (error) {
       console.error("Error deleting pin config:", error);
@@ -157,15 +215,15 @@ export const WidgetDisplay = ({
       <div className="flex items-center justify-between mb-2 min-h-[20px]">
         <span className="text-sm font-medium text-gray-700 truncate flex-1 mr-2">
           {widget.name ||
-            widget.settings?.title ||
-            widget.definition?.label ||
+            widget.settings?.widgetType ||
+            widget.definition?.type ||
             "Untitled"}
         </span>
 
         {/* Pin Config Indicator (when not hovered) */}
         {pinConfig && !isHovered && (
           <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-            Pin: {pinConfig.pinNumber}
+            {pinConfig.pinNumber}
           </span>
         )}
 

@@ -4,11 +4,37 @@ import { getToken } from "next-auth/jwt";
 import { z } from "zod";
 
 // Validation schemas
+const pinConfigSchema = z
+  .object({
+    id: z.string().optional(),
+    widgetId: z.string().optional(),
+    deviceId: z.string().optional(),
+    pinType: z.enum(["VIRTUAL", "GPIO", "DIGITAL", "ANALOG"]).optional(),
+    widgetType: z.string().optional(),
+    pinNumber: z.string(),
+    valueType: z.enum(["BOOLEAN", "NUMBER", "STRING"]),
+    defaultValue: z.union([z.string(), z.number(), z.boolean()]).optional(),
+    minValue: z.number().optional(),
+    maxValue: z.number().optional(),
+    title: z.string().optional(),
+    showLabels: z.boolean().optional(),
+    hideWidgetName: z.boolean().optional(),
+    onValue: z.string().optional(),
+    offValue: z.string().optional(),
+    widgetColor: z.string().optional(),
+    automationType: z.string().optional(),
+    datastreamName: z.string().optional(),
+    datastreamAlias: z.string().optional(),
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional(),
+  })
+  .optional();
+
 const widgetCreateSchema = z
   .object({
     id: z.string().optional(),
     name: z.string().optional(),
-    type: z.string().optional(), // Made optional
+    type: z.string().optional(),
     definition: z
       .object({
         type: z.string(),
@@ -23,10 +49,9 @@ const widgetCreateSchema = z
       })
       .optional(),
     settings: z.any().optional(),
-    pinConfig: z.any().optional(),
+    pinConfig: pinConfigSchema,
   })
   .superRefine((data, ctx) => {
-    // Custom validation to ensure either type or definition.type exists
     if (!data.type && !data.definition?.type) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -50,9 +75,8 @@ const widgetUpdateSchema = z.object({
     })
     .optional(),
   settings: z.any().optional(),
-  pinConfig: z.any().optional(),
+  pinConfig: pinConfigSchema,
 });
-
 const batchPayloadSchema = z.object({
   create: z.array(widgetCreateSchema).default([]),
   update: z.array(widgetUpdateSchema).default([]),
@@ -107,18 +131,7 @@ export async function POST(
     // Parse and validate request body
     const body = await request.json();
 
-    console.log("====================================");
-    console.log("Batch operation payload:", JSON.stringify(body, null, 2));
-    console.log("====================================");
-
     const validation = batchPayloadSchema.safeParse(body);
-
-    console.log("====================================");
-    console.log(
-      "Batch operation validation result:",
-      JSON.stringify(validation, null, 2),
-    );
-    console.log("====================================");
 
     if (!validation.success) {
       return NextResponse.json(
@@ -159,13 +172,6 @@ export async function POST(
       });
 
       const existingIds = new Set(existingWidgets.map((w) => w.id));
-
-      console.log("====================================");
-      console.log(
-        "Existing widgets:",
-        JSON.stringify(existingWidgets, null, 2),
-      );
-      console.log("====================================");
 
       // Filter out non-existent widgets to avoid transaction failures
       const validUpdates = update.filter((u) => {
@@ -249,6 +255,14 @@ export async function POST(
 
                   // Handle pin config update if provided
                   if (pinConfig) {
+                    // Remove problematic fields from pinConfig
+                    const {
+                      id: pinConfigId,
+                      createdAt,
+                      updatedAt,
+                      ...pinConfigData
+                    } = pinConfig;
+
                     const existingPinConfig = await tx.pinConfig.findFirst({
                       where: { widgetId: id },
                     });
@@ -257,14 +271,14 @@ export async function POST(
                       await tx.pinConfig.update({
                         where: { id: existingPinConfig.id },
                         data: {
-                          ...pinConfig,
+                          ...pinConfigData,
                           updatedAt: new Date(),
                         },
                       });
                     } else {
                       await tx.pinConfig.create({
                         data: {
-                          ...pinConfig,
+                          ...pinConfigData,
                           widgetId: id,
                           deviceId: params.id,
                         },
@@ -318,9 +332,11 @@ export async function POST(
 
                   // Handle pin config creation if provided
                   if (pinConfig) {
+                    // Remove the id field from pinConfig before creating
+                    const { id: pinConfigId, ...pinConfigData } = pinConfig;
                     await tx.pinConfig.create({
                       data: {
-                        ...pinConfig,
+                        ...pinConfigData,
                         widgetId: newWidget.id,
                         deviceId: params.id,
                       },
@@ -402,9 +418,16 @@ export async function POST(
             });
 
             if (pinConfig) {
+              const {
+                id: pinConfigId,
+                createdAt,
+                updatedAt,
+                ...pinConfigData
+              } = pinConfig;
+
               await tx.pinConfig.create({
                 data: {
-                  ...pinConfig,
+                  ...pinConfigData,
                   widgetId: newWidget.id,
                   deviceId: params.id,
                 },
@@ -437,10 +460,6 @@ export async function POST(
       return NextResponse.json(result, { status: 400 }); // All failed
     }
 
-    console.log("====================================");
-    console.log("Batch operation completed successfully");
-    console.log("====================================");
-
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
     console.error("Error in batch widget operation:", error);
@@ -463,8 +482,6 @@ async function fallbackToIndividualOperations(
   channelId: string,
   result: BatchResult,
 ) {
-  console.log("Processing operations individually...");
-
   // Handle deletions
   for (const widgetId of deleteIds) {
     try {
@@ -506,17 +523,21 @@ async function fallbackToIndividualOperations(
         });
 
         if (existingPinConfig) {
+          // Remove the id field from pinConfig before updating
+          const { id: pinConfigId, ...pinConfigData } = pinConfig;
           await prisma.pinConfig.update({
             where: { id: existingPinConfig.id },
             data: {
-              ...pinConfig,
+              ...pinConfigData,
               updatedAt: new Date(),
             },
           });
         } else {
+          // Remove the id field from pinConfig before creating
+          const { id: pinConfigId, ...pinConfigData } = pinConfig;
           await prisma.pinConfig.create({
             data: {
-              ...pinConfig,
+              ...pinConfigData,
               widgetId: id,
               deviceId,
             },
@@ -555,9 +576,16 @@ async function fallbackToIndividualOperations(
       });
 
       if (pinConfig) {
+        const {
+          id: pinConfigId,
+          createdAt,
+          updatedAt,
+          ...pinConfigData
+        } = pinConfig;
+
         await prisma.pinConfig.create({
           data: {
-            ...pinConfig,
+            ...pinConfigData,
             widgetId: newWidget.id,
             deviceId,
           },
