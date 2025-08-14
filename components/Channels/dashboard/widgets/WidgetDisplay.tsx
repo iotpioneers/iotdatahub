@@ -156,9 +156,10 @@ export const WidgetDisplay = ({
       {/* Widget Title Header */}
       <div className="flex items-center justify-between mb-2 min-h-[20px]">
         <span className="text-sm font-medium text-gray-700 truncate flex-1 mr-2">
-          {widget.settings?.title ||
+          {widget.name ||
+            widget.settings?.title ||
             widget.definition?.label ||
-            "Untitled Widget"}
+            "Untitled"}
         </span>
 
         {/* Pin Config Indicator (when not hovered) */}

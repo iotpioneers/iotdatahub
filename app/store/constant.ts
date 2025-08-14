@@ -85,19 +85,18 @@ export const getDefaultSize = (type?: string) => {
     case "switch":
     case "led":
     case "label":
-      return { w: 0.5, h: 1.5 };
+      return { w: 3, h: 2 };
+    case "heatmapChart":
+      return { w: 6, h: 3 };
     case "gauge":
     case "radialGauge":
     case "modules":
-      return { w: 1, h: 2 };
     case "chart":
     case "customChart":
-    case "heatmapChart":
     case "terminal":
-      return { w: 1, h: 2.5 };
     case "map":
-      return { w: 1.5, h: 3 };
+      return { w: 6, h: 4 };
     default:
-      return { w: 1, h: 1.5 };
+      return { w: 6, h: 2 };
   }
 };

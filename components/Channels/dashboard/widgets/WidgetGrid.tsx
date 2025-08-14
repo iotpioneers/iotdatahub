@@ -161,13 +161,13 @@ export const WidgetGrid: React.FC<WidgetGridProps> = ({
         className="layout"
         layouts={generateLayout()}
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-        cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+        cols={{ lg: 24, md: 24, sm: 24, xs: 24, xxs: 24 }}
         rowHeight={30}
         margin={[16, 16]}
         containerPadding={[16, 16]}
         onLayoutChange={handleLayoutChange}
-        isDraggable={true}
-        isResizable={true}
+        isDraggable={false}
+        isResizable={false}
         compactType="vertical"
         draggableCancel=".widget-content"
       >
@@ -176,14 +176,20 @@ export const WidgetGrid: React.FC<WidgetGridProps> = ({
 
           return (
             <div key={widget.id} {...widgetStyles}>
-              <WidgetComponent
-                widget={widget}
-                onEdit={() => handleConfigClick(widget.id)}
-                onDelete={onWidgetDelete}
-                onDuplicate={onWidgetDuplicate}
-                onConfig={() => handleConfigClick(widget.id)}
-                onValueChange={handleValueChange}
-              />
+              <div className="grid relative h-full w-full bg-white transition-all duration-150">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700 truncate flex-1 mb-2">
+                    {widget.name ||
+                      widget.settings?.title ||
+                      widget.definition?.label ||
+                      "Untitled"}
+                  </span>
+                </div>
+                <WidgetComponent
+                  widget={widget}
+                  onValueChange={handleValueChange}
+                />
+              </div>
             </div>
           );
         })}

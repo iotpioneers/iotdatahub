@@ -33,60 +33,60 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
         i: widget.id,
         x: widget.position?.x ?? 0,
         y: widget.position?.y ?? 0,
-        w: widget.position?.width ?? 0.5,
-        h: widget.position?.height ?? 1.5,
-        minW: 0.5,
-        minH: 1.5,
-        maxW: 3,
-        maxH: 4,
+        w: widget.position?.width ?? 3,
+        h: widget.position?.height ?? 2,
+        minW: 3,
+        minH: 2,
+        maxW: 12,
+        maxH: 8,
         static: false, // Allow movement
       })),
       md: widgets.map((widget) => ({
         i: widget.id,
         x: widget.position?.x ?? 0,
         y: widget.position?.y ?? 0,
-        w: widget.position?.width ?? 0.5,
-        h: widget.position?.height ?? 1.5,
-        minW: 0.5,
-        minH: 1.5,
-        maxW: 3,
-        maxH: 4,
+        w: widget.position?.width ?? 3,
+        h: widget.position?.height ?? 2,
+        minW: 3,
+        minH: 2,
+        maxW: 12,
+        maxH: 8,
         static: false, // Allow movement
       })),
       sm: widgets.map((widget) => ({
         i: widget.id,
         x: widget.position?.x ?? 0,
         y: widget.position?.y ?? 0,
-        w: widget.position?.width ?? 0.5,
-        h: widget.position?.height ?? 1.5,
-        minW: 0.5,
-        minH: 1.5,
-        maxW: 3,
-        maxH: 4,
+        w: widget.position?.width ?? 3,
+        h: widget.position?.height ?? 2,
+        minW: 3,
+        minH: 2,
+        maxW: 12,
+        maxH: 8,
         static: false, // Allow movement
       })),
       xs: widgets.map((widget) => ({
         i: widget.id,
         x: widget.position?.x ?? 0,
         y: widget.position?.y ?? 0,
-        w: widget.position?.width ?? 0.5,
-        h: widget.position?.height ?? 1.5,
-        minW: 0.5,
-        minH: 1.5,
-        maxW: 3,
-        maxH: 4,
+        w: widget.position?.width ?? 3,
+        h: widget.position?.height ?? 2,
+        minW: 3,
+        minH: 2,
+        maxW: 12,
+        maxH: 8,
         static: false, // Allow movement
       })),
       xxs: widgets.map((widget) => ({
         i: widget.id,
         x: widget.position?.x ?? 0,
         y: widget.position?.y ?? 0,
-        w: widget.position?.width ?? 0.5,
-        h: widget.position?.height ?? 1.5,
-        minW: 0.5,
-        minH: 1.5,
-        maxW: 3,
-        maxH: 4,
+        w: widget.position?.width ?? 3,
+        h: widget.position?.height ?? 2,
+        minW: 3,
+        minH: 2,
+        maxW: 12,
+        maxH: 8,
         static: false, // Allow movement
       })),
     }),
@@ -161,8 +161,8 @@ const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
         className="layout"
         layouts={layout}
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-        cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-        rowHeight={50}
+        cols={{ lg: 24, md: 24, sm: 24, xs: 24, xxs: 24 }}
+        rowHeight={30}
         margin={[10, 10]}
         containerPadding={[10, 10]}
         onLayoutChange={handleLayoutChange}

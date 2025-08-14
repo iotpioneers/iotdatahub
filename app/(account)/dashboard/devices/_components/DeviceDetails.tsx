@@ -81,18 +81,6 @@ const DeviceDetails = ({ params }: Props) => {
     return <LinearLoading />;
   }
 
-  const timelineOptions = [
-    "Live",
-    "1h",
-    "6h",
-    "1d",
-    "1w",
-    "1mo",
-    "3mo",
-    "6mo",
-    "1y",
-  ];
-
   return (
     <div className="min-h-screen px-4">
       {(isLoading || !deviceData || isRedirecting) && <LinearLoading />}
@@ -144,35 +132,19 @@ const DeviceDetails = ({ params }: Props) => {
                     {organizationData.name || ""}
                   </strong>
                 </span>
+                <button
+                  className="px-4 py-2 bg-orange-50 text-white rounded-lg hover:bg-green-600 font-medium"
+                  onClick={() => setIsRedirecting(true)}
+                >
+                  <Link href={`/dashboard/devices/${params.id}/edit`}>
+                    {isRedirecting || !deviceData ? <LinearLoading /> : "Edit"}
+                  </Link>
+                </button>
               </div>
             </div>
           </div>
-          <button
-            className="px-4 py-2 bg-orange-50 text-white rounded-lg hover:bg-green-600 font-medium"
-            onClick={() => setIsRedirecting(true)}
-          >
-            <Link href={`/dashboard/devices/${params.id}/edit`}>
-              {isRedirecting || !deviceData ? <LinearLoading /> : "Edit"}
-            </Link>
-          </button>
         </div>
 
-        {/* Timeline Controls */}
-        <div className="flex space-x-2 mb-8">
-          {timelineOptions.map((option) => (
-            <button
-              key={option}
-              className={`px-4 py-2 rounded-lg ${
-                selectedDuration === option
-                  ? "bg-orange-50 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-              onClick={() => setSelectedDuration(option)}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
         {!widgetData || widgetData.length === 0 ? (
           <div className="flex items-center justify-center h-96 border-2 border-dashed border-gray-200 rounded-lg">
             <div className="text-center">
