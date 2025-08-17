@@ -9,8 +9,8 @@ import { ApiKey, Channel, Device } from "@/types";
 import { LinearLoading } from "@/components/LinearLoading";
 import { HiStatusOffline, HiStatusOnline } from "react-icons/hi";
 import Link from "next/link";
-import DeviceDashboardComponent from "./DeviceDashboardComponent";
 import { useIoTDataHub } from "@/hooks/useIoTDataHub";
+import WidgetGrid from "@/components/Channels/dashboard/widgets/WidgetGrid";
 
 interface Props {
   params: { id: string };
@@ -170,10 +170,7 @@ const DeviceDetails = ({ params }: Props) => {
           </div>
         ) : (
           <div className="bg-white border border-gray-200 rounded-md">
-            <DeviceDashboardComponent
-              deviceId={params.id}
-              widgetData={widgetData}
-            />{" "}
+            <WidgetGrid deviceId={params.id} widgets={widgetData} />
           </div>
         )}
       </div>

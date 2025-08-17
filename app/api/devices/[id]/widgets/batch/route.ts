@@ -3,7 +3,7 @@ import prisma from "@/prisma/client";
 import { getToken } from "next-auth/jwt";
 import { z } from "zod";
 
-// Validation schemas
+// Validation schemas (keeping your existing ones)
 const pinConfigSchema = z
   .object({
     id: z.string().optional(),
@@ -77,6 +77,7 @@ const widgetUpdateSchema = z.object({
   settings: z.any().optional(),
   pinConfig: pinConfigSchema,
 });
+
 const batchPayloadSchema = z.object({
   create: z.array(widgetCreateSchema).default([]),
   update: z.array(widgetUpdateSchema).default([]),
@@ -96,11 +97,22 @@ interface BatchResult {
   deleted: string[];
 }
 
+// Helper function to chunk arrays
+function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+  const chunks = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   try {
+    console.log("=== BATCH WIDGET OPERATION START ===");
+
     // Authentication
     const token = await getToken({ req: request });
     if (!token) {
@@ -130,10 +142,14 @@ export async function POST(
 
     // Parse and validate request body
     const body = await request.json();
+    console.log(
+      `Processing batch: ${body.create?.length || 0} creates, ${body.update?.length || 0} updates, ${body.delete?.length || 0} deletes`,
+    );
 
     const validation = batchPayloadSchema.safeParse(body);
 
     if (!validation.success) {
+      console.error("Validation failed:", validation.error.errors);
       return NextResponse.json(
         {
           error: "Validation failed",
@@ -160,298 +176,216 @@ export async function POST(
       deleted: [],
     };
 
-    // Pre-validate all widgets exist for updates/deletes
-    if (update.length > 0 || deleteIds.length > 0) {
-      const allIds = [...update.map((u) => u.id), ...deleteIds];
-      const existingWidgets = await prisma.widget.findMany({
-        where: {
-          id: { in: allIds },
-          deviceId: params.id,
-        },
-        select: { id: true },
-      });
+    // Process operations sequentially to avoid transaction timeouts
+    console.log("Processing operations sequentially without transactions...");
 
-      const existingIds = new Set(existingWidgets.map((w) => w.id));
+    // 1. Process DELETIONS first
+    if (deleteIds.length > 0) {
+      console.log(`Processing ${deleteIds.length} deletions...`);
 
-      // Filter out non-existent widgets to avoid transaction failures
-      const validUpdates = update.filter((u) => {
-        if (!existingIds.has(u.id)) {
-          result.errors.push({
-            operation: "UPDATE",
-            error: "Widget not found",
-            id: u.id,
+      for (const widgetId of deleteIds) {
+        try {
+          // Check if widget exists
+          const existingWidget = await prisma.widget.findFirst({
+            where: {
+              id: widgetId,
+              deviceId: params.id,
+            },
           });
-          result.failed++;
-          return false;
-        }
-        return true;
-      });
 
-      const validDeletes = deleteIds.filter((id) => {
-        if (!existingIds.has(id)) {
+          if (!existingWidget) {
+            result.errors.push({
+              operation: "DELETE",
+              error: "Widget not found",
+              id: widgetId,
+            });
+            result.failed++;
+            continue;
+          }
+
+          // Delete pin config first (if exists)
+          await prisma.pinConfig.deleteMany({
+            where: {
+              widgetId: widgetId,
+              deviceId: params.id,
+            },
+          });
+
+          // Delete widget
+          await prisma.widget.delete({
+            where: { id: widgetId },
+          });
+
+          result.deleted.push(widgetId);
+          result.successful++;
+          console.log(`Deleted widget ${widgetId}`);
+        } catch (error) {
+          console.error(`Failed to delete widget ${widgetId}:`, error);
           result.errors.push({
             operation: "DELETE",
-            error: "Widget not found",
-            id,
+            error: error instanceof Error ? error.message : "Unknown error",
+            id: widgetId,
           });
           result.failed++;
-          return false;
-        }
-        return true;
-      });
-
-      // Process operations in optimized batches with longer timeout
-      try {
-        await prisma.$transaction(
-          async (tx) => {
-            // 1. Handle deletions first (bulk delete for efficiency)
-            if (validDeletes.length > 0) {
-              try {
-                // Delete pin configs first
-                await tx.pinConfig.deleteMany({
-                  where: {
-                    widgetId: { in: validDeletes },
-                    deviceId: params.id,
-                  },
-                });
-
-                // Delete widgets in bulk
-                const deleteResult = await tx.widget.deleteMany({
-                  where: {
-                    id: { in: validDeletes },
-                    deviceId: params.id,
-                  },
-                });
-
-                result.deleted.push(...validDeletes);
-                result.successful += deleteResult.count;
-              } catch (error) {
-                validDeletes.forEach((id) => {
-                  result.errors.push({
-                    operation: "DELETE",
-                    error:
-                      error instanceof Error ? error.message : "Unknown error",
-                    id,
-                  });
-                  result.failed++;
-                });
-              }
-            }
-
-            // 2. Handle updates in bulk
-            if (validUpdates.length > 0) {
-              for (const updateData of validUpdates) {
-                try {
-                  const { id, pinConfig, ...widgetUpdateData } = updateData;
-
-                  // Update widget
-                  await tx.widget.update({
-                    where: { id },
-                    data: {
-                      ...widgetUpdateData,
-                      updatedAt: new Date(),
-                    },
-                  });
-
-                  // Handle pin config update if provided
-                  if (pinConfig) {
-                    // Remove problematic fields from pinConfig
-                    const {
-                      id: pinConfigId,
-                      createdAt,
-                      updatedAt,
-                      ...pinConfigData
-                    } = pinConfig;
-
-                    const existingPinConfig = await tx.pinConfig.findFirst({
-                      where: { widgetId: id },
-                    });
-
-                    if (existingPinConfig) {
-                      await tx.pinConfig.update({
-                        where: { id: existingPinConfig.id },
-                        data: {
-                          ...pinConfigData,
-                          updatedAt: new Date(),
-                        },
-                      });
-                    } else {
-                      await tx.pinConfig.create({
-                        data: {
-                          ...pinConfigData,
-                          widgetId: id,
-                          deviceId: params.id,
-                        },
-                      });
-                    }
-                  }
-
-                  result.updated.push(id);
-                  result.successful++;
-                } catch (error) {
-                  result.errors.push({
-                    operation: "UPDATE",
-                    error:
-                      error instanceof Error ? error.message : "Unknown error",
-                    id: updateData.id,
-                  });
-                  result.failed++;
-                }
-              }
-            }
-
-            // 3. Handle creations last
-            if (create.length > 0) {
-              for (const createData of create) {
-                try {
-                  const {
-                    id: tempId,
-                    pinConfig,
-                    ...widgetCreateData
-                  } = createData;
-
-                  // Ensure type is set
-                  if (
-                    !widgetCreateData.type &&
-                    widgetCreateData.definition?.type
-                  ) {
-                    widgetCreateData.type = widgetCreateData.definition.type;
-                  }
-
-                  // Create widget
-                  const newWidget = await tx.widget.create({
-                    data: {
-                      ...widgetCreateData,
-                      type: widgetCreateData.type || "unknown",
-                      channelId: device.channelId,
-                      deviceId: params.id,
-                      createdAt: new Date(),
-                      updatedAt: new Date(),
-                    },
-                  });
-
-                  // Handle pin config creation if provided
-                  if (pinConfig) {
-                    // Remove the id field from pinConfig before creating
-                    const { id: pinConfigId, ...pinConfigData } = pinConfig;
-                    await tx.pinConfig.create({
-                      data: {
-                        ...pinConfigData,
-                        widgetId: newWidget.id,
-                        deviceId: params.id,
-                      },
-                    });
-                  }
-
-                  result.created.push({
-                    tempId,
-                    id: newWidget.id,
-                  });
-                  result.successful++;
-                } catch (error) {
-                  result.errors.push({
-                    operation: "CREATE",
-                    error:
-                      error instanceof Error ? error.message : "Unknown error",
-                    id: createData.id,
-                  });
-                  result.failed++;
-                }
-              }
-            }
-          },
-          {
-            maxWait: 10000, // Wait up to 10 seconds to start the transaction
-            timeout: 15000, // Allow transaction to run for up to 15 seconds
-          },
-        );
-      } catch (transactionError) {
-        console.error("Transaction error:", transactionError);
-
-        // If transaction fails completely, try individual operations
-        if (
-          transactionError instanceof Error &&
-          transactionError.message.includes("Transaction already closed")
-        ) {
-          console.log(
-            "Transaction timeout - falling back to individual operations",
-          );
-
-          // Reset results and try individual operations
-          result.successful = 0;
-          result.failed = 0;
-          result.errors = [];
-          result.created = [];
-          result.updated = [];
-          result.deleted = [];
-
-          return await fallbackToIndividualOperations(
-            validDeletes,
-            validUpdates,
-            create,
-            params.id,
-            device.channelId,
-            result,
-          );
-        } else {
-          throw transactionError;
         }
       }
-    } else if (create.length > 0) {
-      // Only creates - simpler transaction
-      await prisma.$transaction(async (tx) => {
-        for (const createData of create) {
-          try {
-            const { id: tempId, pinConfig, ...widgetCreateData } = createData;
+    }
 
-            if (!widgetCreateData.type && widgetCreateData.definition?.type) {
-              widgetCreateData.type = widgetCreateData.definition.type;
-            }
+    // 2. Process UPDATES
+    if (update.length > 0) {
+      console.log(`Processing ${update.length} updates...`);
 
-            const newWidget = await tx.widget.create({
-              data: {
-                ...widgetCreateData,
-                type: widgetCreateData.type || "unknown",
-                channelId: device.channelId,
+      for (const updateData of update) {
+        try {
+          const { id, pinConfig, ...widgetUpdateData } = updateData;
+
+          // Check if widget exists
+          const existingWidget = await prisma.widget.findFirst({
+            where: {
+              id: id,
+              deviceId: params.id,
+            },
+          });
+
+          if (!existingWidget) {
+            result.errors.push({
+              operation: "UPDATE",
+              error: "Widget not found",
+              id: id,
+            });
+            result.failed++;
+            continue;
+          }
+
+          // Update widget
+          await prisma.widget.update({
+            where: { id },
+            data: {
+              ...widgetUpdateData,
+              updatedAt: new Date(),
+            },
+          });
+
+          // Handle pin config if provided
+          if (pinConfig) {
+            const {
+              id: pinConfigId,
+              createdAt,
+              updatedAt,
+              ...pinConfigData
+            } = pinConfig;
+
+            // Find existing pin config
+            const existingPinConfig = await prisma.pinConfig.findFirst({
+              where: {
+                widgetId: id,
                 deviceId: params.id,
               },
             });
 
-            if (pinConfig) {
-              const {
-                id: pinConfigId,
-                createdAt,
-                updatedAt,
-                ...pinConfigData
-              } = pinConfig;
-
-              await tx.pinConfig.create({
+            if (existingPinConfig) {
+              // Update existing
+              await prisma.pinConfig.update({
+                where: { id: existingPinConfig.id },
                 data: {
                   ...pinConfigData,
-                  widgetId: newWidget.id,
+                  updatedAt: new Date(),
+                },
+              });
+            } else {
+              // Create new
+              await prisma.pinConfig.create({
+                data: {
+                  ...pinConfigData,
+                  widgetId: id,
                   deviceId: params.id,
                 },
               });
             }
-
-            result.created.push({
-              tempId,
-              id: newWidget.id,
-            });
-            result.successful++;
-          } catch (error) {
-            result.errors.push({
-              operation: "CREATE",
-              error: error instanceof Error ? error.message : "Unknown error",
-              id: createData.id,
-            });
-            result.failed++;
           }
+
+          result.updated.push(id);
+          result.successful++;
+          console.log(`Updated widget ${id}`);
+        } catch (error) {
+          console.error(`Failed to update widget ${updateData.id}:`, error);
+          result.errors.push({
+            operation: "UPDATE",
+            error: error instanceof Error ? error.message : "Unknown error",
+            id: updateData.id,
+          });
+          result.failed++;
         }
-      });
+      }
     }
 
-    console.log("Batch operation result:", result);
+    // 3. Process CREATIONS last
+    if (create.length > 0) {
+      console.log(`Processing ${create.length} creations...`);
+
+      for (const createData of create) {
+        try {
+          const { id: tempId, pinConfig, ...widgetCreateData } = createData;
+
+          // Generate new widget ID
+
+          // Prepare widget data
+          const widgetData = {
+            ...widgetCreateData,
+            type: widgetCreateData.type || "unknown",
+            channelId: device.channelId,
+            deviceId: params.id,
+          };
+
+          // Create widget
+          const newWidget = await prisma.widget.create({
+            data: widgetData,
+          });
+
+          // Handle pin config if provided
+          if (pinConfig) {
+            const {
+              id: pinConfigId,
+              createdAt,
+              updatedAt,
+              ...pinConfigData
+            } = pinConfig;
+
+            await prisma.pinConfig.create({
+              data: {
+                ...pinConfigData,
+                widgetId: newWidget.id,
+                deviceId: params.id,
+              },
+            });
+          }
+
+          result.created.push({
+            tempId,
+            id: newWidget.id,
+          });
+          result.successful++;
+          console.log(`Created widget ${newWidget.id} (temp: ${tempId})`);
+        } catch (error) {
+          console.error(`Failed to create widget ${createData.id}:`, error);
+          result.errors.push({
+            operation: "CREATE",
+            error: error instanceof Error ? error.message : "Unknown error",
+            id: createData.id,
+          });
+          result.failed++;
+        }
+      }
+    }
+
+    console.log("=== BATCH OPERATION COMPLETED ===");
+    console.log(
+      `Results: ${result.successful} successful, ${result.failed} failed`,
+    );
+
+    if (result.errors.length > 0) {
+      console.log("Errors:", result.errors);
+    }
 
     // Return appropriate status code
     if (result.failed > 0 && result.successful > 0) {
@@ -471,141 +405,4 @@ export async function POST(
       { status: 500 },
     );
   }
-}
-
-// Fallback function for individual operations when transaction times out
-async function fallbackToIndividualOperations(
-  deleteIds: string[],
-  updateData: any[],
-  createData: any[],
-  deviceId: string,
-  channelId: string,
-  result: BatchResult,
-) {
-  // Handle deletions
-  for (const widgetId of deleteIds) {
-    try {
-      // Delete pin configs first
-      await prisma.pinConfig.deleteMany({
-        where: { widgetId, deviceId },
-      });
-
-      // Delete widget
-      await prisma.widget.delete({
-        where: { id: widgetId },
-      });
-
-      result.deleted.push(widgetId);
-      result.successful++;
-    } catch (error) {
-      result.errors.push({
-        operation: "DELETE",
-        error: error instanceof Error ? error.message : "Unknown error",
-        id: widgetId,
-      });
-      result.failed++;
-    }
-  }
-
-  // Handle updates
-  for (const update of updateData) {
-    try {
-      const { id, pinConfig, ...widgetUpdateData } = update;
-
-      await prisma.widget.update({
-        where: { id },
-        data: widgetUpdateData,
-      });
-
-      if (pinConfig) {
-        const existingPinConfig = await prisma.pinConfig.findFirst({
-          where: { widgetId: id },
-        });
-
-        if (existingPinConfig) {
-          // Remove the id field from pinConfig before updating
-          const { id: pinConfigId, ...pinConfigData } = pinConfig;
-          await prisma.pinConfig.update({
-            where: { id: existingPinConfig.id },
-            data: {
-              ...pinConfigData,
-              updatedAt: new Date(),
-            },
-          });
-        } else {
-          // Remove the id field from pinConfig before creating
-          const { id: pinConfigId, ...pinConfigData } = pinConfig;
-          await prisma.pinConfig.create({
-            data: {
-              ...pinConfigData,
-              widgetId: id,
-              deviceId,
-            },
-          });
-        }
-      }
-
-      result.updated.push(id);
-      result.successful++;
-    } catch (error) {
-      result.errors.push({
-        operation: "UPDATE",
-        error: error instanceof Error ? error.message : "Unknown error",
-        id: update.id,
-      });
-      result.failed++;
-    }
-  }
-
-  // Handle creations
-  for (const create of createData) {
-    try {
-      const { id: tempId, pinConfig, ...widgetCreateData } = create;
-
-      if (!widgetCreateData.type && widgetCreateData.definition?.type) {
-        widgetCreateData.type = widgetCreateData.definition.type;
-      }
-
-      const newWidget = await prisma.widget.create({
-        data: {
-          ...widgetCreateData,
-          type: widgetCreateData.type || "unknown",
-          channelId,
-          deviceId,
-        },
-      });
-
-      if (pinConfig) {
-        const {
-          id: pinConfigId,
-          createdAt,
-          updatedAt,
-          ...pinConfigData
-        } = pinConfig;
-
-        await prisma.pinConfig.create({
-          data: {
-            ...pinConfigData,
-            widgetId: newWidget.id,
-            deviceId,
-          },
-        });
-      }
-
-      result.created.push({
-        tempId,
-        id: newWidget.id,
-      });
-      result.successful++;
-    } catch (error) {
-      result.errors.push({
-        operation: "CREATE",
-        error: error instanceof Error ? error.message : "Unknown error",
-        id: create.id,
-      });
-      result.failed++;
-    }
-  }
-
-  return result;
 }

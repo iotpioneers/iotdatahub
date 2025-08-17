@@ -15,16 +15,12 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 interface WidgetGridProps {
   widgets: Widget[];
   onWidgetUpdate?: (widget: Widget) => Promise<void>;
-  onWidgetDelete?: (widgetId: string) => Promise<void>;
-  onWidgetDuplicate?: (widget: Widget) => Promise<void>;
   deviceId: string;
 }
 
 export const WidgetGrid: React.FC<WidgetGridProps> = ({
   widgets,
   onWidgetUpdate,
-  onWidgetDelete,
-  onWidgetDuplicate,
   deviceId,
 }) => {
   const [pendingChanges, setPendingChanges] = useState<{

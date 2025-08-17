@@ -1,7 +1,7 @@
 import net from "net";
 import { EventEmitter } from "events";
 import prisma from "@/prisma/client";
-import { IoTDATAHUB_PROTOCOL } from "@/app/store/constant";
+import { PROTOCOL } from "@/app/store/constant";
 
 interface IoTDataHubMessage {
   type: number;
@@ -23,7 +23,7 @@ export class IoTDataHubTCPServer extends EventEmitter {
   private connections: Map<string, IoTDataHubConnection> = new Map();
   private port: number;
 
-  constructor(port: number = IoTDATAHUB_PROTOCOL.DEFAULT_PORT) {
+  constructor(port: number = PROTOCOL.DEFAULT_PORT) {
     super();
     this.port = port;
     this.server = net.createServer(this.handleConnection.bind(this));
@@ -69,11 +69,7 @@ export class IoTDataHubTCPServer extends EventEmitter {
       this.processMessage(connectionId, message);
     } catch (error) {
       console.error("Error parsing message:", error);
-      this.sendResponse(
-        connectionId,
-        IoTDATAHUB_PROTOCOL.STATUS_ILLEGAL_COMMAND_BODY,
-        0,
-      );
+      this.sendResponse(connectionId, PROTOCOL.STATUS_ILLEGAL_COMMAND_BODY, 0);
     }
   }
 
@@ -98,26 +94,26 @@ export class IoTDataHubTCPServer extends EventEmitter {
     if (!connection) return;
 
     switch (message.type) {
-      case IoTDATAHUB_PROTOCOL.CMD_LOGIN:
+      case PROTOCOL.CMD_LOGIN:
         await this.handleLogin(connectionId, message);
         break;
 
-      case IoTDATAHUB_PROTOCOL.CMD_PING:
+      case PROTOCOL.CMD_PING:
         this.handlePing(connectionId, message);
         break;
 
-      case IoTDATAHUB_PROTOCOL.CMD_HARDWARE:
+      case PROTOCOL.CMD_HARDWARE:
         await this.handleHardware(connectionId, message);
         break;
 
-      case IoTDATAHUB_PROTOCOL.CMD_INTERNAL:
+      case PROTOCOL.CMD_INTERNAL:
         await this.handleInternal(connectionId, message);
         break;
 
       default:
         this.sendResponse(
           connectionId,
-          IoTDATAHUB_PROTOCOL.STATUS_ILLEGAL_COMMAND,
+          PROTOCOL.STATUS_ILLEGAL_COMMAND,
           message.msgId,
         );
     }
@@ -137,7 +133,7 @@ export class IoTDataHubTCPServer extends EventEmitter {
       if (!device) {
         this.sendResponse(
           connectionId,
-          IoTDATAHUB_PROTOCOL.STATUS_INVALID_TOKEN,
+          PROTOCOL.STATUS_INVALID_TOKEN,
           message.msgId,
         );
         return;
@@ -162,11 +158,7 @@ export class IoTDataHubTCPServer extends EventEmitter {
         },
       });
 
-      this.sendResponse(
-        connectionId,
-        IoTDATAHUB_PROTOCOL.STATUS_SUCCESS,
-        message.msgId,
-      );
+      this.sendResponse(connectionId, PROTOCOL.STATUS_SUCCESS, message.msgId);
 
       // Emit connection event
       this.emit("deviceConnected", { deviceId: device.id, authToken });
@@ -174,7 +166,7 @@ export class IoTDataHubTCPServer extends EventEmitter {
       console.error("Login error:", error);
       this.sendResponse(
         connectionId,
-        IoTDATAHUB_PROTOCOL.STATUS_SERVER_EXCEPTION,
+        PROTOCOL.STATUS_SERVER_EXCEPTION,
         message.msgId,
       );
     }
@@ -185,11 +177,7 @@ export class IoTDataHubTCPServer extends EventEmitter {
     if (!connection) return;
 
     connection.lastPing = Date.now();
-    this.sendResponse(
-      connectionId,
-      IoTDATAHUB_PROTOCOL.STATUS_SUCCESS,
-      message.msgId,
-    );
+    this.sendResponse(connectionId, PROTOCOL.STATUS_SUCCESS, message.msgId);
   }
 
   private async handleInternal(
@@ -197,11 +185,7 @@ export class IoTDataHubTCPServer extends EventEmitter {
     message: IoTDataHubMessage,
   ) {
     // Handle internal commands (placeholder - implement specific internal command handling)
-    this.sendResponse(
-      connectionId,
-      IoTDATAHUB_PROTOCOL.STATUS_SUCCESS,
-      message.msgId,
-    );
+    this.sendResponse(connectionId, PROTOCOL.STATUS_SUCCESS, message.msgId);
   }
 
   private async handleHardware(
@@ -212,7 +196,7 @@ export class IoTDataHubTCPServer extends EventEmitter {
     if (!connection || !connection.authenticated) {
       this.sendResponse(
         connectionId,
-        IoTDATAHUB_PROTOCOL.STATUS_NOT_AUTHENTICATED,
+        PROTOCOL.STATUS_NOT_AUTHENTICATED,
         message.msgId,
       );
       return;
@@ -248,16 +232,12 @@ export class IoTDataHubTCPServer extends EventEmitter {
           break;
       }
 
-      this.sendResponse(
-        connectionId,
-        IoTDATAHUB_PROTOCOL.STATUS_SUCCESS,
-        message.msgId,
-      );
+      this.sendResponse(connectionId, PROTOCOL.STATUS_SUCCESS, message.msgId);
     } catch (error) {
       console.error("Hardware command error:", error);
       this.sendResponse(
         connectionId,
-        IoTDATAHUB_PROTOCOL.STATUS_SERVER_EXCEPTION,
+        PROTOCOL.STATUS_SERVER_EXCEPTION,
         message.msgId,
       );
     }
@@ -342,7 +322,7 @@ export class IoTDataHubTCPServer extends EventEmitter {
     const bodyLength = body ? body.length : 0;
     const header = Buffer.alloc(5);
 
-    header.writeUInt8(IoTDATAHUB_PROTOCOL.CMD_RESPONSE, 0);
+    header.writeUInt8(PROTOCOL.CMD_RESPONSE, 0);
     header.writeUInt16BE(msgId, 1);
     header.writeUInt16BE(bodyLength, 3);
 
@@ -360,7 +340,7 @@ export class IoTDataHubTCPServer extends EventEmitter {
     const body = Buffer.from(command, "utf8");
     const header = Buffer.alloc(5);
 
-    header.writeUInt8(IoTDATAHUB_PROTOCOL.CMD_HARDWARE, 0);
+    header.writeUInt8(PROTOCOL.CMD_HARDWARE, 0);
     header.writeUInt16BE(0, 1); // msg id
     header.writeUInt16BE(body.length, 3);
 

@@ -118,45 +118,6 @@ export const WidgetDisplay = ({
     }
   };
 
-  const handleDeletePinConfig = async () => {
-    if (!pinConfig) return;
-
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this pin configuration?",
-    );
-    if (!confirmed) return;
-
-    try {
-      // Remove from localStorage
-      localStorage.removeItem(`widget-pin-config-${widget.id}`);
-
-      // Update local state
-      setPinConfig(null);
-
-      // **KEY FIX**: Update the widget to remove pin config
-      if (onUpdate) {
-        onUpdate({
-          pinConfig: null,
-          // Reset settings that were pin-config specific
-          settings: {
-            ...widget.settings,
-            // Keep other settings but remove pin-specific ones
-            title: widget.name || widget.settings?.title,
-          },
-        });
-      }
-
-      showToast("Pin configuration deleted", "success");
-    } catch (error) {
-      console.error("Error deleting pin config:", error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to delete pin configuration";
-      showToast(errorMessage, "error");
-    }
-  };
-
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -213,7 +174,7 @@ export const WidgetDisplay = ({
     >
       {/* Widget Title Header */}
       <div className="flex items-center justify-between mb-2 min-h-[20px]">
-        <span className="text-sm font-medium text-gray-700 truncate flex-1 mr-2">
+        <span className="text-sm font-medium text-gray-700 truncate flex-1 mr-2 capitalize">
           {widget.name ||
             widget.settings?.widgetType ||
             widget.definition?.type ||

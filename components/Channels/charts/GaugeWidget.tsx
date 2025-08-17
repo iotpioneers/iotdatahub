@@ -14,9 +14,13 @@ interface DataPointProps {
 
 interface GaugeChartProps {
   chartData?: DataPointProps[];
+  WidgetType?: "radial" | "semicircle" | "grafana" | undefined;
 }
 
-const GaugeWidget = ({ chartData = [] }: GaugeChartProps) => {
+const GaugeWidgetComponent = ({
+  chartData = [],
+  WidgetType = "radial",
+}: GaugeChartProps) => {
   const [hoveredValue, setHoveredValue] = useState<number | null>(null);
   const [hoveredTimestamp, setHoveredTimestamp] = useState<string | null>(null);
   const gaugeRef = useRef<HTMLDivElement>(null);
@@ -67,7 +71,7 @@ const GaugeWidget = ({ chartData = [] }: GaugeChartProps) => {
       title={
         hoveredValue !== null && hoveredTimestamp !== null
           ? `Value: ${hoveredValue.toFixed(2)}, Time: ${new Date(
-              hoveredTimestamp
+              hoveredTimestamp,
             ).toLocaleString()}`
           : ""
       }
@@ -82,7 +86,7 @@ const GaugeWidget = ({ chartData = [] }: GaugeChartProps) => {
       >
         <GaugeComponent
           value={currentValue}
-          type="radial"
+          type={WidgetType}
           labels={{
             tickLabels: {
               type: "inner",
@@ -111,4 +115,4 @@ const GaugeWidget = ({ chartData = [] }: GaugeChartProps) => {
   );
 };
 
-export default GaugeWidget;
+export default GaugeWidgetComponent;

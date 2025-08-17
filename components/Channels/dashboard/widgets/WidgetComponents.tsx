@@ -1,8 +1,37 @@
-import React from "react";
-import { Image as ImageIcon, Volume2, PlaySquare } from "lucide-react";
+import React, { memo, useCallback, useMemo } from "react";
+import {
+  Image as ImageIcon,
+  Volume2,
+  PlaySquare,
+  Minus,
+  Plus,
+} from "lucide-react";
 import { WidgetType } from "@/types/widgets";
 import { cn } from "@/lib/utils";
 import DeviceMap from "@/app/(account)/dashboard/devices/_components/DeviceMap";
+
+//  UI components
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+
+// Recharts components
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
+import GaugeWidgetComponent from "../../charts/GaugeWidget";
 
 interface BaseWidgetProps {
   value?: any;
@@ -19,482 +48,635 @@ interface BaseWidgetProps {
   onClick?: () => void;
 }
 
-export const SwitchWidget: React.FC<BaseWidgetProps> = ({
-  value = true,
-  onChange,
-  className,
-}) => (
-  <div className={cn("flex items-center justify-start h-4", className)}>
-    <div className="relative inline-flex h-3 w-6 items-center rounded-full bg-green-500">
-      <span
+export const SwitchWidget: React.FC<BaseWidgetProps> = memo(
+  ({ value = true, onChange, className }) => (
+    <div
+      className={cn(
+        "flex items-center justify-center h-full w-full p-[4%]",
+        className,
+      )}
+    >
+      <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-green-500">
+        <span className="inline-block h-4 w-4 transform rounded-full bg-white translate-x-6" />
+      </div>
+      <style jsx>{`
+        .switch-thumb {
+          width: var(--thumb-size);
+          height: var(--thumb-size);
+          transition: transform 200ms ease;
+        }
+      `}</style>
+    </div>
+  ),
+);
+
+export const SliderWidget: React.FC<BaseWidgetProps> = memo(
+  ({ value = 5, onChange, settings, className }) => {
+    const min = settings?.min || 0;
+    const max = settings?.max || 10;
+
+    const handleValueChange = useCallback(
+      (newValue: number[]) => {
+        onChange?.(newValue[0]);
+      },
+      [onChange],
+    );
+
+    return (
+      <div
         className={cn(
-          "inline-block h-2 w-2 transform rounded-full bg-white transition-transform",
-          value ? "translate-x-3" : "translate-x-0.5",
+          "flex items-center justify-between h-full w-full p-[4%] gap-[2%]",
+          className,
         )}
+      >
+        <span className="text-teal-500 text-sm">−</span>
+        <div className="flex-1 mx-2 relative">
+          <div className="h-1 bg-gray-200 rounded-full">
+            <div
+              className="h-1 bg-teal-500 rounded-full"
+              style={{ width: `50%` }}
+            />
+          </div>
+          <div
+            className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-teal-500 rounded-full"
+            style={{
+              left: `50%`,
+              transform: "translate(-50%, -50%)",
+            }}
+          />
+        </div>
+        <span className="text-teal-500 text-sm">+</span>
+        <span className="text-gray-600 text-sm ml-2">5</span>
+      </div>
+    );
+  },
+);
+
+export const NumberInputWidget: React.FC<BaseWidgetProps> = memo(
+  ({ value = 0, onChange, className }) => {
+    const decrement = useCallback(() => {
+      onChange?.(Number(value) - 1);
+    }, [value, onChange]);
+
+    const increment = useCallback(() => {
+      onChange?.(Number(value) + 1);
+    }, [value, onChange]);
+
+    return (
+      <div
+        className={cn(
+          "flex items-center justify-between h-full w-full p-[4%] gap-[2%]",
+          className,
+        )}
+      >
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-teal-500 hover:bg-transparent p-0"
+          style={{
+            width: "clamp(24px, 15%, 48px)",
+            height: "clamp(24px, 15%, 48px)",
+          }}
+          onClick={decrement}
+        >
+          <Minus style={{ width: "70%", height: "70%" }} />
+        </Button>
+        <Label
+          className="font-light text-gray-700 text-center flex-1"
+          style={{ fontSize: "clamp(16px, 6vw, 24px)" }}
+        >
+          {value}
+        </Label>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-teal-500 hover:bg-transparent p-0"
+          style={{
+            width: "clamp(24px, 15%, 48px)",
+            height: "clamp(24px, 15%, 48px)",
+          }}
+          onClick={increment}
+        >
+          <Plus style={{ width: "70%", height: "70%" }} />
+        </Button>
+      </div>
+    );
+  },
+);
+
+export const LabelWidget: React.FC<BaseWidgetProps> = memo(
+  ({ value = "167", className }) => (
+    <div
+      className={cn(
+        "flex items-center justify-center h-full w-full p-[4%] gap-[2%]",
+        className,
+      )}
+    >
+      <div
+        className="bg-blue-600 rounded-full"
+        style={{
+          width: "clamp(4px, 2%, 8px)",
+          height: "60%",
+        }}
+      />
+      <Label
+        className="font-bold text-gray-800 text-center flex-1"
+        style={{ fontSize: "clamp(16px, 6vw, 28px)" }}
+      >
+        {value}
+      </Label>
+    </div>
+  ),
+);
+
+export const GaugeWidget: React.FC<BaseWidgetProps> = memo(
+  ({ value = 82, settings, className }) => {
+    const min = settings?.min || 0;
+    const max = settings?.max || 100;
+
+    return (
+      <div
+        className={cn(
+          "flex flex-col items-center justify-center h-full w-full",
+          className,
+        )}
+      >
+        <div className="relative w-full h-[85%] flex items-center justify-center">
+          <GaugeWidgetComponent
+            chartData={[
+              {
+                id: "gauge-circle",
+                value,
+                timestamp: Date.now().toString(),
+              },
+            ]}
+            WidgetType="grafana"
+          />
+        </div>
+      </div>
+    );
+  },
+);
+
+export const RadialGaugeWidget: React.FC<BaseWidgetProps> = memo(
+  ({ value = 42, settings, className }) => {
+    return (
+      <div
+        className={cn(
+          "flex flex-col items-center justify-center h-full w-full p-[4%]",
+          className,
+        )}
+      >
+        <div className="relative w-full h-full flex items-center justify-center">
+          <GaugeWidgetComponent
+            chartData={[
+              { id: "gauge", value, timestamp: Date.now().toString() },
+            ]}
+          />
+        </div>
+      </div>
+    );
+  },
+);
+
+export const ImageButtonWidget: React.FC<BaseWidgetProps> = memo(
+  ({ className, onChange }) => (
+    <div
+      className={cn(
+        "flex items-center justify-center h-full w-full p-[4%]",
+        className,
+      )}
+    >
+      <Button
+        variant="outline"
+        size="icon"
+        className="border-teal-400 hover:bg-teal-50 transition-colors p-0"
+        style={{
+          width: "clamp(72px, 60%, 192px)",
+          height: "clamp(72px, 60%, 192px)",
+        }}
+        onClick={() => onChange?.(true)}
+      >
+        <ImageIcon
+          style={{ width: "50%", height: "50%" }}
+          className="text-teal-400"
+        />
+      </Button>
+    </div>
+  ),
+);
+
+export const VideoWidget: React.FC<BaseWidgetProps> = memo(({ className }) => (
+  <div
+    className={cn(
+      "flex items-center justify-center h-full w-full p-[4%]",
+      className,
+    )}
+  >
+    <PlaySquare
+      className="text-gray-600"
+      style={{
+        width: "clamp(48px, 45%, 144px)",
+        height: "clamp(48px, 45%, 144px)",
+      }}
+    />
+  </div>
+));
+
+export const AudioWidget: React.FC<BaseWidgetProps> = memo(({ className }) => (
+  <div
+    className={cn(
+      "flex items-center justify-center h-full w-full p-[4%]",
+      className,
+    )}
+  >
+    <div
+      className="rounded-full flex items-center justify-center bg-green-100 transition-colors"
+      style={{
+        width: "clamp(24px, 20%, 64px)",
+        height: "clamp(24px, 20%, 64px)",
+      }}
+    >
+      <Volume2
+        className="text-green-500"
+        style={{ width: "50%", height: "50%" }}
       />
     </div>
   </div>
-);
+));
 
-export const SliderWidget: React.FC<BaseWidgetProps> = ({
-  value = 5,
-  onChange,
-  settings,
-  className,
-}) => {
-  const min = settings?.min || 0;
-  const max = settings?.max || 10;
-  const percentage = ((value - min) / (max - min)) * 100;
-
-  return (
+export const ImageGalleryWidget: React.FC<BaseWidgetProps> = memo(
+  ({ value = [], className }) => (
     <div
-      className={cn("flex items-center justify-between h-4 px-1", className)}
+      className={cn(
+        "flex items-center justify-center h-full w-full p-[4%]",
+        className,
+      )}
     >
-      <span className="text-teal-500 text-xs">−</span>
-      <div className="flex-1 mx-1 relative">
-        <div className="h-0.5 bg-gray-200 rounded-full">
-          <div
-            className="h-0.5 bg-teal-500 rounded-full"
-            style={{ width: `${percentage}%` }}
+      <div className="relative">
+        <div
+          className="border border-teal-400 rounded flex items-center justify-center transition-colors"
+          style={{
+            width: "clamp(72px, 45%, 144px)",
+            height: "clamp(54px, 36%, 108px)",
+          }}
+        >
+          <ImageIcon
+            className="text-teal-400"
+            style={{ width: "60%", height: "60%" }}
           />
         </div>
         <div
-          className="absolute top-1/2 -translate-y-1/2 w-2 h-2 bg-white border border-teal-500 rounded-full"
+          className="absolute border border-teal-400 rounded bg-white flex items-center justify-center"
           style={{
-            left: `${percentage}%`,
-            transform: "translate(-50%, -50%)",
+            width: "clamp(60px, 36%, 120px)",
+            height: "clamp(45px, 30%, 90px)",
+            top: "clamp(-6px, -15%, -12px)",
+            right: "clamp(-6px, -15%, -12px)",
           }}
-        />
-      </div>
-      <span className="text-teal-500 text-xs">+</span>
-      <span className="text-gray-600 text-xs ml-1">{value}</span>
-    </div>
-  );
-};
-
-export const NumberInputWidget: React.FC<BaseWidgetProps> = ({
-  value = 0,
-  onChange,
-  className,
-}) => (
-  <div className={cn("flex items-center justify-between h-4 px-1", className)}>
-    <button
-      onClick={() => onChange?.(Number(value) - 1)}
-      className="text-teal-500 text-sm"
-    >
-      −
-    </button>
-    <span className="text-sm font-light text-gray-700">{value}</span>
-    <button
-      onClick={() => onChange?.(Number(value) + 1)}
-      className="text-teal-500 text-sm"
-    >
-      +
-    </button>
-  </div>
-);
-
-export const LabelWidget: React.FC<BaseWidgetProps> = ({
-  value = "167",
-  className,
-}) => (
-  <div className={cn("h-6 p-1", className)}>
-    <div className="w-0.5 h-full bg-blue-600 rounded-full mr-1 float-left" />
-    <div className="text-sm font-bold text-gray-800">{value}</div>
-  </div>
-);
-
-export const GaugeWidget: React.FC<BaseWidgetProps> = ({
-  value = 82,
-  settings,
-  className,
-}) => {
-  const min = settings?.min || 0;
-  const max = settings?.max || 100;
-
-  // Calculate the arc parameters (reversed 180° anticlockwise)
-  const centerX = 50;
-  const centerY = 50;
-  const radius = 40;
-  const strokeWidth = 14;
-
-  // Convert degrees to radians (rotated 180° anticlockwise)
-  const startAngle = 135 * (Math.PI / 180); // 135° in radians (315° - 180°)
-  const endAngle = 45 * (Math.PI / 180); // 45° in radians (225° - 180°)
-
-  // Calculate start and end points for the background arc
-  const startX = centerX + radius * Math.cos(startAngle);
-  const startY = centerY + radius * Math.sin(startAngle);
-  const endX = centerX + radius * Math.cos(endAngle);
-  const endY = centerY + radius * Math.sin(endAngle);
-
-  // Create the background arc path (135° to 45°)
-  const backgroundPath = `
-    M ${startX} ${startY}
-    A ${radius} ${radius} 0 1 1 ${endX} ${endY}
-  `;
-
-  // Calculate the end point for the progress arc
-  const totalAngle = 270; // degrees (135° to 45° = 270°)
-  const progressAngle =
-    startAngle + (value / 100) * ((totalAngle * Math.PI) / 180);
-  const progressEndX = centerX + radius * Math.cos(progressAngle);
-  const progressEndY = centerY + radius * Math.sin(progressAngle);
-
-  // Determine if we need a large arc flag for the progress
-  const progressAngleSpan = (value / 100) * totalAngle;
-  const largeArcFlag = progressAngleSpan > 180 ? 1 : 0;
-
-  // Create the progress arc path
-  const progressPath = `
-    M ${startX} ${startY}
-    A ${radius} ${radius} 0 ${largeArcFlag} 1 ${progressEndX} ${progressEndY}
-  `;
-
-  return (
-    <div
-      className={cn(
-        "flex flex-col items-center justify-center h-10",
-        className,
-      )}
-    >
-      <div className="relative w-8 h-8">
-        <svg className="w-full h-full" viewBox="0 0 100 100">
-          {/* Background arc */}
-          <path
-            d={backgroundPath}
-            stroke="rgb(229, 231, 235)"
-            strokeWidth={strokeWidth}
-            fill="none"
-            strokeLinecap="round"
+        >
+          <ImageIcon
+            className="text-teal-400"
+            style={{ width: "50%", height: "50%" }}
           />
-          {/* Progress arc */}
-          <path
-            d={progressPath}
-            stroke="rgb(34, 197, 94)"
-            strokeWidth={strokeWidth}
-            fill="none"
-            strokeLinecap="round"
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xs font-medium text-gray-700">{value}</span>
-        </div>
-      </div>
-      <div className="flex justify-center items-center w-full text-[10px] text-gray-500 mt-0.5 gap-2">
-        <span>0</span>
-        <span>100</span>
-      </div>
-    </div>
-  );
-};
-
-export const RadialGaugeWidget: React.FC<BaseWidgetProps> = ({
-  value = 42,
-  settings,
-  className,
-}) => {
-  const min = settings?.min || 0;
-  const max = settings?.max || 100;
-  const circumference = 2 * Math.PI * 35;
-  const strokeDashoffset = circumference - (value / 100) * circumference;
-  const strokeWidth = 10;
-
-  return (
-    <div
-      className={cn(
-        "flex flex-col items-center justify-center h-12",
-        className,
-      )}
-    >
-      <div className="relative w-8 h-8">
-        <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80">
-          <circle
-            cx="40"
-            cy="40"
-            r="35"
-            stroke="rgb(229, 231, 235)"
-            strokeWidth={strokeWidth}
-            fill="none"
-          />
-          <circle
-            cx="40"
-            cy="40"
-            r="35"
-            stroke="rgb(16, 185, 129)"
-            strokeWidth={strokeWidth}
-            fill="none"
-            strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
-            strokeLinecap="round"
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xs font-medium text-gray-700">{value}</span>
         </div>
       </div>
     </div>
-  );
-};
-
-export const ImageButtonWidget: React.FC<BaseWidgetProps> = ({
-  className,
-  onChange,
-}) => (
-  <div className={cn("flex items-center justify-center h-8", className)}>
-    <div
-      className="w-6 h-6 border border-teal-400 rounded flex items-center justify-center cursor-pointer hover:bg-teal-50"
-      onClick={() => onChange?.(true)}
-    >
-      <ImageIcon className="w-3 h-3 text-teal-400" />
-    </div>
-  </div>
+  ),
 );
 
-export const VideoWidget: React.FC<BaseWidgetProps> = ({ className }) => (
-  <div className={cn("flex items-center justify-center h-8", className)}>
-    <PlaySquare className="w-4 h-4 text-gray-600" />
-  </div>
-);
+export const CustomChartWidget: React.FC<BaseWidgetProps> = memo(
+  ({ value = [], className }) => {
+    const data = useMemo(
+      () => [
+        { x: 0, y: 0 },
+        { x: 1, y: 45 },
+        { x: 2, y: 25 },
+        { x: 3, y: 55 },
+        { x: 4, y: 40 },
+        { x: 5, y: 100 },
+        { x: 6, y: 50 },
+      ],
+      [],
+    );
 
-export const AudioWidget: React.FC<BaseWidgetProps> = ({ className }) => (
-  <div className={cn("flex items-center justify-center h-8", className)}>
-    <div className="w-6 h-6 rounded-full flex items-center justify-center bg-green-100">
-      <Volume2 className="w-2.5 h-2.5 text-green-500" />
-    </div>
-  </div>
-);
-
-export const ImageGalleryWidget: React.FC<BaseWidgetProps> = ({
-  value = [],
-  className,
-}) => (
-  <div className={cn("flex items-center justify-center h-8", className)}>
-    <div className="relative">
-      <div className="w-5 h-4 border border-teal-400 rounded flex items-center justify-center">
-        <ImageIcon className="w-2 h-2 text-teal-400" />
+    return (
+      <div className={cn("h-full w-full p-[4%]", className)}>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data}>
+            <defs>
+              <linearGradient
+                id="customLineGradient"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="0%"
+              >
+                <stop offset="0%" stopColor="rgb(34, 197, 94)" />
+                <stop offset="50%" stopColor="rgb(59, 130, 246)" />
+                <stop offset="100%" stopColor="rgb(168, 85, 247)" />
+              </linearGradient>
+            </defs>
+            <Line
+              type="linear"
+              dataKey="y"
+              stroke="url(#customLineGradient)"
+              strokeWidth="clamp(1, 0.3vw, 4)"
+              dot={false}
+              activeDot={false}
+            />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
-      <div className="absolute -top-0.5 -right-0.5 w-4 h-3 border border-teal-400 rounded bg-white flex items-center justify-center">
-        <ImageIcon className="w-1.5 h-1.5 text-teal-400" />
-      </div>
-    </div>
-  </div>
+    );
+  },
 );
 
-export const CustomChartWidget: React.FC<BaseWidgetProps> = ({
-  value = [],
-  className,
-}) => {
-  const data = [
-    { x: 0, y: 0 },
-    { x: 1, y: 45 },
-    { x: 2, y: 25 },
-    { x: 3, y: 55 },
-    { x: 4, y: 40 },
-    { x: 5, y: 100 },
-    { x: 6, y: 50 },
-  ];
-
-  const pathData = data
-    .map(
-      (point, index) =>
-        `${index === 0 ? "M" : "L"} ${(point.x / 6) * 100} ${100 - (point.y / 60) * 80}`,
-    )
-    .join(" ");
-
-  return (
-    <div className={cn("h-8 p-1", className)}>
-      <svg className="w-full h-full" viewBox="0 0 100 100">
-        <defs>
-          <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="rgb(34, 197, 94)" />
-            <stop offset="50%" stopColor="rgb(59, 130, 246)" />
-            <stop offset="100%" stopColor="rgb(168, 85, 247)" />
-          </linearGradient>
-        </defs>
-        <path
-          d={pathData}
-          stroke="url(#lineGradient)"
-          strokeWidth="1"
-          fill="none"
+export const HeatmapChartWidget: React.FC<BaseWidgetProps> = memo(
+  ({ value = [], className }) => (
+    <div className={cn("h-full w-full p-[4%] flex flex-col", className)}>
+      <Label
+        className="font-medium text-gray-700 mb-[2%]"
+        style={{ fontSize: "clamp(10px, 3vw, 16px)" }}
+      >
+        Timeline
+      </Label>
+      <div className="flex items-center gap-[2%] mb-[3%] flex-1 max-h-[20%]">
+        <div
+          className="bg-blue-400 rounded-sm transition-colors h-full"
+          style={{ width: "30%" }}
         />
-      </svg>
-    </div>
-  );
-};
-
-export const HeatmapChartWidget: React.FC<BaseWidgetProps> = ({
-  value = [],
-  className,
-}) => (
-  <div className={cn("h-8 p-1", className)}>
-    <div className="text-[10px] font-medium text-gray-700 mb-0.5">Timeline</div>
-    <div className="flex items-center gap-0.5 mb-0.5">
-      <div className="w-4 h-1 bg-blue-400 rounded-sm" />
-      <div className="w-2 h-1 bg-gray-300 rounded-sm" />
-      <div className="w-6 h-1 bg-gray-200 rounded-sm" />
-    </div>
-    <div className="flex justify-between text-[10px] text-gray-400">
-      <span>08:26 AM</span>
-      <span>09:00 AM</span>
-    </div>
-  </div>
-);
-
-export const ChartWidget: React.FC<BaseWidgetProps> = ({
-  value = [],
-  className,
-}) => {
-  const data = [4, 7, 3, 8, 2, 6, 4];
-  const maxValue = Math.max(...data);
-
-  return (
-    <div className={cn("h-8 p-1.5", className)}>
-      <div className="flex items-end justify-between h-full">
-        {data.map((value, index) => (
-          <div
-            key={index}
-            className="bg-blue-500 rounded-sm"
-            style={{
-              height: `${(value / maxValue) * 100}%`,
-              width: "5px",
-            }}
-          />
-        ))}
+        <div
+          className="bg-gray-300 rounded-sm transition-colors h-full"
+          style={{ width: "15%" }}
+        />
+        <div
+          className="bg-gray-200 rounded-sm transition-colors h-full"
+          style={{ width: "45%" }}
+        />
       </div>
-      <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
-        <span>8:26 AM</span>
-        <span>8:43 AM</span>
+      <div
+        className="flex justify-between text-gray-400"
+        style={{ fontSize: "clamp(8px, 2.5vw, 14px)" }}
+      >
+        <span>08:26 AM</span>
+        <span>09:00 AM</span>
       </div>
     </div>
-  );
-};
-
-export const LedWidget: React.FC<BaseWidgetProps> = ({
-  value = true,
-  className,
-}) => (
-  <div className={cn("flex items-center justify-center h-4", className)}>
-    <div className="w-4 h-4 rounded-full bg-green-500 shadow-md shadow-green-500/50" />
-  </div>
+  ),
 );
 
-export const AlarmSoundWidget: React.FC<BaseWidgetProps> = ({
-  value = false,
-  className,
-}) => (
-  <div className={cn("flex items-center justify-center h-8", className)}>
-    <div className="w-6 h-6 rounded-full flex items-center justify-center bg-green-100">
-      <Volume2 className="w-2.5 h-2.5 text-green-500" />
+export const ChartWidget: React.FC<BaseWidgetProps> = memo(
+  ({ value = [], className }) => {
+    const data = useMemo(
+      () => [
+        { name: "1", value: 4 },
+        { name: "2", value: 7 },
+        { name: "3", value: 3 },
+        { name: "4", value: 8 },
+        { name: "5", value: 2 },
+        { name: "6", value: 6 },
+        { name: "7", value: 4 },
+      ],
+      [],
+    );
+
+    return (
+      <div className={cn("h-full w-full p-[4%] flex flex-col", className)}>
+        <div className="h-[85%]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} barCategoryGap={2}>
+              <Bar dataKey="value" radius={4}>
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill="rgb(59, 130, 246)" />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div
+          className="flex justify-between text-gray-400 h-[15%] items-center"
+          style={{ fontSize: "clamp(8px, 2.5vw, 14px)" }}
+        >
+          <span>8:26 AM</span>
+          <span>8:43 AM</span>
+        </div>
+      </div>
+    );
+  },
+);
+
+export const LedWidget: React.FC<BaseWidgetProps> = memo(
+  ({ value = true, className }) => (
+    <div
+      className={cn(
+        "flex items-center justify-center h-full w-full p-[4%]",
+        className,
+      )}
+    >
+      <div
+        className={cn(
+          "rounded-full transition-all duration-300",
+          value ? "bg-green-500 shadow-md shadow-green-500/50" : "bg-gray-300",
+        )}
+        style={{
+          width: "clamp(24px, 25%, 80px)",
+          height: "clamp(24px, 25%, 80px)",
+        }}
+      />
     </div>
-  </div>
+  ),
 );
 
-export const TerminalWidget: React.FC<BaseWidgetProps> = ({
-  value = "",
-  className,
-}) => (
-  <div className={cn("h-9 p-0.5", className)}>
-    <div className="bg-black text-white text-[10px] p-0.5 rounded mb-0.5 font-mono">
-      &lt; Power On Power Off Enabled
-    </div>
-    <div className="bg-black text-white text-[10px] p-0.5 rounded font-mono">
-      Type here
-    </div>
-  </div>
-);
-
-export const TextInputWidget: React.FC<BaseWidgetProps> = ({
-  value = "Zero",
-  onChange,
-  className,
-}) => (
-  <div className={cn("flex items-center justify-center h-4 px-1", className)}>
-    <input
-      type="text"
-      placeholder="Zero"
-      value={value}
-      onChange={(e) => onChange?.(e.target.value)}
-      className="w-full px-1 py-0.5 border border-gray-300 rounded text-xs"
-    />
-  </div>
-);
-
-export const SegmentedSwitchWidget: React.FC<BaseWidgetProps> = ({
-  value = 0,
-  onChange,
-  settings,
-  className,
-}) => {
-  const options = settings?.options || ["Zero", "One"];
-
-  return (
-    <div className={cn("flex items-center justify-center h-8 px-1", className)}>
-      <div className="flex bg-gray-100 rounded overflow-hidden w-full">
-        {options.map((option, index) => (
-          <div
-            key={index}
-            className={cn(
-              "flex-1 py-0.5 px-1 text-center text-xs cursor-pointer",
-              value === index
-                ? "bg-green-500 text-white"
-                : "text-gray-700 hover:bg-gray-200",
-            )}
-            onClick={() => onChange?.(index)}
-          >
-            {option}
-          </div>
-        ))}
+export const AlarmSoundWidget: React.FC<BaseWidgetProps> = memo(
+  ({ value = false, className }) => (
+    <div
+      className={cn(
+        "flex items-center justify-center h-full w-full p-[4%]",
+        className,
+      )}
+    >
+      <div
+        className={cn(
+          "rounded-full flex items-center justify-center transition-colors",
+          value ? "bg-red-100" : "bg-green-100",
+        )}
+        style={{
+          width: "clamp(72px, 60%, 192px)",
+          height: "clamp(72px, 60%, 192px)",
+        }}
+      >
+        <Volume2
+          className={cn(
+            "transition-colors",
+            value ? "text-red-500" : "text-green-500",
+          )}
+          style={{ width: "50%", height: "50%" }}
+        />
       </div>
     </div>
-  );
-};
+  ),
+);
 
-export const MenuWidget: React.FC<BaseWidgetProps> = ({
-  value = "Zero",
-  onChange,
-  settings,
-  className,
-}) => {
-  const options = settings?.options || ["Zero", "One", "Two"];
+export const TerminalWidget: React.FC<BaseWidgetProps> = memo(
+  ({ value = "", className }) => (
+    <div
+      className={cn("h-full w-full p-[4%] flex flex-col gap-[3%]", className)}
+    >
+      <div
+        className="bg-black text-white rounded font-mono p-[3%] flex-1"
+        style={{ fontSize: "clamp(8px, 2.5vw, 14px)" }}
+      >
+        &lt; Power On Power Off Enabled
+      </div>
+      <div
+        className="bg-black text-white rounded font-mono p-[3%] flex-1"
+        style={{ fontSize: "clamp(8px, 2.5vw, 14px)" }}
+      >
+        Type here
+      </div>
+    </div>
+  ),
+);
 
-  return (
-    <div className={cn("flex items-center justify-center h-8 px-1", className)}>
-      <select
-        className="w-full px-1 py-0.5 border border-gray-300 rounded text-xs appearance-none bg-white"
+export const TextInputWidget: React.FC<BaseWidgetProps> = memo(
+  ({ value = "Zero", onChange, className }) => (
+    <div
+      className={cn(
+        "flex items-center justify-center h-full w-full p-[4%]",
+        className,
+      )}
+    >
+      <Input
+        type="text"
+        placeholder="Zero"
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
-      >
-        {options.map((option, index) => (
-          <option key={index} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
+        className="w-full border border-gray-300"
+        style={{
+          height: "clamp(32px, 15%, 64px)",
+          fontSize: "clamp(14px, 5vw, 20px)",
+          padding: "0 clamp(8px, 4%, 16px)",
+        }}
+      />
     </div>
-  );
-};
-
-export const ModulesWidget: React.FC<BaseWidgetProps> = ({
-  value = {},
-  className,
-}) => (
-  <div className={cn("h-8 p-1 space-y-0.5", className)}>
-    <div className="text-[10px] text-gray-600">Module</div>
-    <div className="flex items-center justify-between">
-      <span className="text-[10px] text-gray-700">Switch</span>
-      <div className="w-4 h-2 bg-green-500 rounded-full relative">
-        <div className="w-1.5 h-1.5 bg-white rounded-full absolute right-0.25 top-0.25" />
-      </div>
-    </div>
-    <div className="flex items-center justify-between">
-      <span className="text-[10px] text-gray-700">Label</span>
-      <span className="text-[10px] text-gray-600">String</span>
-    </div>
-  </div>
+  ),
 );
 
-// Widget Registry
+export const SegmentedSwitchWidget: React.FC<BaseWidgetProps> = memo(
+  ({ value = 0, onChange, settings, className }) => {
+    const options = settings?.options || ["Zero", "One"];
+
+    return (
+      <div
+        className={cn(
+          "flex items-center justify-center h-full w-full p-[4%]",
+          className,
+        )}
+      >
+        <div className="flex bg-gray-100 rounded overflow-hidden w-full h-full">
+          {options.map((option, index) => (
+            <Button
+              key={index}
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "flex-1 h-full rounded-none transition-all duration-200",
+                value === index
+                  ? "bg-green-500 text-white hover:bg-green-600"
+                  : "text-gray-700 hover:bg-gray-200",
+              )}
+              style={{
+                fontSize: "clamp(8px, 2.5vw, 14px)",
+                padding: "0 clamp(2px, 1%, 8px)",
+              }}
+              onClick={() => onChange?.(index)}
+            >
+              {option}
+            </Button>
+          ))}
+        </div>
+      </div>
+    );
+  },
+);
+
+export const MenuWidget: React.FC<BaseWidgetProps> = memo(
+  ({ value = "Zero", onChange, settings, className }) => {
+    const options = settings?.options || ["Zero", "One", "Two"];
+
+    return (
+      <div
+        className={cn(
+          "flex items-center justify-center h-full w-full p-[4%]",
+          className,
+        )}
+      >
+        <Select value={value} onValueChange={onChange}>
+          <SelectTrigger
+            className="w-full border border-gray-300"
+            style={{
+              height: "clamp(32px, 15%, 64px)",
+              fontSize: "clamp(14px, 5vw, 20px)",
+              padding: "0 clamp(8px, 4%, 16px)",
+            }}
+          >
+            <SelectValue placeholder="Select option" />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((option, index) => (
+              <SelectItem
+                key={index}
+                value={option}
+                style={{ fontSize: "clamp(14px, 5vw, 20px)" }}
+              >
+                {option}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    );
+  },
+);
+
+export const ModulesWidget: React.FC<BaseWidgetProps> = memo(
+  ({ value = {}, className }) => (
+    <div
+      className={cn("h-full w-full p-[4%] flex flex-col gap-[3%]", className)}
+    >
+      <div className="flex items-center justify-between flex-1 pr-[2%]">
+        <Label
+          className="text-gray-700 flex-1"
+          style={{ fontSize: "clamp(10px, 3vw, 16px)" }}
+        >
+          Switch
+        </Label>
+        <div className="flex-shrink-0">
+          <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-green-500">
+            <span className="inline-block h-4 w-4 transform rounded-full bg-white translate-x-6" />
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center justify-between flex-1">
+        <Label
+          className="text-gray-700"
+          style={{ fontSize: "clamp(10px, 3vw, 16px)" }}
+        >
+          Label
+        </Label>
+        <Label
+          className="text-gray-600"
+          style={{ fontSize: "clamp(10px, 3vw, 16px)" }}
+        >
+          String
+        </Label>
+      </div>
+    </div>
+  ),
+);
+
+// Widget Registry with memoized components
 const components: Record<WidgetType, React.FC<BaseWidgetProps>> = {
   switch: SwitchWidget,
   slider: SliderWidget,
@@ -520,11 +702,34 @@ const components: Record<WidgetType, React.FC<BaseWidgetProps>> = {
   modules: ModulesWidget,
 };
 
-export default function WidgetRegistry({
+// Memoized registry component
+export default memo(function WidgetRegistry({
   type,
   className,
   ...props
 }: { type: WidgetType } & BaseWidgetProps) {
   const Component = components[type] || LabelWidget;
   return <Component className={className} {...props} />;
-}
+});
+
+// Set display names for better debugging
+SwitchWidget.displayName = "SwitchWidget";
+SliderWidget.displayName = "SliderWidget";
+NumberInputWidget.displayName = "NumberInputWidget";
+LabelWidget.displayName = "LabelWidget";
+GaugeWidget.displayName = "GaugeWidget";
+RadialGaugeWidget.displayName = "RadialGaugeWidget";
+ImageButtonWidget.displayName = "ImageButtonWidget";
+VideoWidget.displayName = "VideoWidget";
+AudioWidget.displayName = "AudioWidget";
+ImageGalleryWidget.displayName = "ImageGalleryWidget";
+CustomChartWidget.displayName = "CustomChartWidget";
+HeatmapChartWidget.displayName = "HeatmapChartWidget";
+ChartWidget.displayName = "ChartWidget";
+LedWidget.displayName = "LedWidget";
+AlarmSoundWidget.displayName = "AlarmSoundWidget";
+TerminalWidget.displayName = "TerminalWidget";
+TextInputWidget.displayName = "TextInputWidget";
+SegmentedSwitchWidget.displayName = "SegmentedSwitchWidget";
+MenuWidget.displayName = "MenuWidget";
+ModulesWidget.displayName = "ModulesWidget";

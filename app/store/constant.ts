@@ -7,76 +7,14 @@ export const appDrawerWidth = 320;
 // PROTOCOL CONSTANTS
 // ========================================
 
-export const IoTDATAHUB_PROTOCOL = {
-  // Command types
+export const PROTOCOL = {
   CMD_RESPONSE: 0,
-  CMD_REGISTER: 1,
-  CMD_LOGIN: 2,
-  CMD_SAVE_PROF: 3,
-  CMD_LOAD_PROF: 4,
-  CMD_GET_TOKEN: 5,
   CMD_PING: 6,
-  CMD_ACTIVATE: 7,
-  CMD_DEACTIVATE: 8,
-  CMD_REFRESH: 9,
-  CMD_GET_GRAPH_DATA: 10,
-  CMD_GET_GRAPH_DATA_RESPONSE: 11,
-  CMD_TWEET: 12,
-  CMD_EMAIL: 13,
-  CMD_NOTIFY: 14,
-  CMD_BRIDGE: 15,
+  CMD_HARDWARE: 20,
   CMD_HARDWARE_SYNC: 16,
   CMD_INTERNAL: 17,
-  CMD_SMS: 18,
-  CMD_PROPERTY: 19,
-  CMD_HARDWARE: 20,
-  CMD_CREATE_DASH: 21,
-  CMD_UPDATE_DASH: 22,
-  CMD_DELETE_DASH: 23,
-  CMD_LOAD_PROFILE_GZIPPED: 24,
-  CMD_SYNC: 25,
-  CMD_SHARING: 26,
-  CMD_ADD_PUSH_TOKEN: 27,
-  CMD_EXPORT_GRAPH_DATA: 28,
-  CMD_SET_WIDGET_PROPERTY: 29,
-  CMD_BRIDGE_EVENT: 30,
-  CMD_HARDWARE_LOGIN: 31,
-  CMD_EVENTOR: 32,
-  CMD_WEB_SOCKETS: 33,
-  CMD_WEB_HOOKS: 34,
-  CMD_APP_SYNC: 35,
-  CMD_ASSIGN_TOKEN: 36,
-  CMD_GET_SHARED_DASH: 37,
-  CMD_GET_SHARE_TOKEN: 38,
-  CMD_REFRESH_SHARE_TOKEN: 39,
-  CMD_SHARE_LOGIN: 40,
-
-  // Status codes
+  CMD_HW_LOGIN: 29,
   STATUS_SUCCESS: 200,
-  STATUS_QUOTA_LIMIT: 1,
-  STATUS_ILLEGAL_COMMAND: 2,
-  STATUS_NOT_REGISTERED: 3,
-  STATUS_ALREADY_REGISTERED: 4,
-  STATUS_NOT_AUTHENTICATED: 5,
-  STATUS_NOT_ALLOWED: 6,
-  STATUS_DEVICE_NOT_IN_NETWORK: 7,
-  STATUS_NO_ACTIVE_DASHBOARD: 8,
-  STATUS_INVALID_TOKEN: 9,
-  STATUS_ILLEGAL_COMMAND_BODY: 11,
-  STATUS_GET_GRAPH_DATA_EXCEPTION: 12,
-  STATUS_NO_DATA_EXCEPTION: 17,
-  STATUS_DEVICE_WENT_OFFLINE: 18,
-  STATUS_SERVER_EXCEPTION: 19,
-  STATUS_NTF_INVALID_BODY: 13,
-  STATUS_NTF_NOT_AUTHORIZED: 14,
-  STATUS_NTF_ECXEPTION: 15,
-
-  // Default ports
-  DEFAULT_PORT: 8080,
-  DEFAULT_SSL_PORT: 443,
-
-  // Message limits
-  MAX_MESSAGE_SIZE: 1024,
 } as const;
 
 // Default size based on widget type
@@ -84,19 +22,20 @@ export const getDefaultSize = (type?: string) => {
   switch (type) {
     case "switch":
     case "led":
-    case "label":
       return { w: 3, h: 2 };
+    case "label":
+      return { w: 4, h: 3 };
     case "heatmapChart":
+    case "textInput":
+    case "segmentedSwitch":
       return { w: 6, h: 3 };
     case "gauge":
     case "radialGauge":
-    case "modules":
     case "chart":
     case "customChart":
-    case "terminal":
     case "map":
-      return { w: 6, h: 4 };
+      return { w: 9, h: 6 };
     default:
-      return { w: 6, h: 2 };
+      return { w: 6, h: 4 };
   }
 };

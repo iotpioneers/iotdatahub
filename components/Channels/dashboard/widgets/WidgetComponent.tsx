@@ -14,6 +14,10 @@ export const WidgetComponent: React.FC<WidgetComponentProps> = ({
   widget,
   onValueChange,
 }) => {
+  console.log("====================================");
+  console.log("Received widget data:", widget);
+  console.log("====================================");
+
   const { showToast } = useToast();
 
   const handleValueChange = async (newValue: any) => {
@@ -42,7 +46,7 @@ export const WidgetComponent: React.FC<WidgetComponentProps> = ({
       <div className="w-full h-full flex items-center justify-center relative group">
         <WidgetRegistry
           type={widget.definition.type}
-          value={widget.settings?.value}
+          value={widget.value || widget.settings?.value}
           color={widget.settings?.color || "#10B981"}
           onChange={handleValueChange}
           settings={widgetSettings}

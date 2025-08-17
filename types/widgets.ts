@@ -3,6 +3,7 @@ import { PinConfig } from "./pin-config";
 export interface Widget {
   id: string;
   name?: string | null;
+  value?: string | null;
   dataSource?: {
     fieldId?: string;
     refreshInterval?: number;

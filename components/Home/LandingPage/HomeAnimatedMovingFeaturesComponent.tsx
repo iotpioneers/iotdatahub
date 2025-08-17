@@ -71,10 +71,10 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
 };
 
 // Data generation functions
-const generateSensorData = (
+export const generateSensorData = (
   points: number = 20,
   min: number,
-  max: number
+  max: number,
 ): ChartDataPoint[] => {
   return Array.from({ length: points }, (_, i) => ({
     id: i,
@@ -121,13 +121,13 @@ const GaugeWidget: React.FC<GaugeWidgetProps> = ({
   maxValue,
 }) => {
   const [currentValue, setCurrentValue] = useState(
-    chartData[0]?.value || minValue
+    chartData[0]?.value || minValue,
   );
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentValue(
-        Math.floor(Math.random() * (maxValue - minValue)) + minValue
+        Math.floor(Math.random() * (maxValue - minValue)) + minValue,
       );
     }, 2000);
     return () => clearInterval(interval);

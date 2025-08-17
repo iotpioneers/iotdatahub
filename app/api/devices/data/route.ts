@@ -73,6 +73,24 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    const widgets = await prisma.widget.findMany({
+      where: {
+        deviceId: device.id,
+        type: { not: null }, // Only fetch widgets with a type
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    widgets.forEach((widget) => {
+      const widgetPinNumber = (widget?.settings as { pinNumber?: string })
+        ?.pinNumber;
+      if (widgetPinNumber) {
+        if (widgetPinNumber.replace("V", "") === pinNumber) {
+          widget.value = value.toString();
+        }
+      }
+    });
+
     return NextResponse.json({
       success: true,
       device: device.name,

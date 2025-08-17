@@ -351,16 +351,6 @@ const EditDashboardComponent = ({ params }: Props) => {
   return (
     <DragDropProvider onDrop={handleDrop}>
       <div className="max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl xxl:max-w-screen-xxl flex justify-between bg-slate-100 rounded-lg shadow p-2 overflow-hidden gap-1">
-        <DeviceSidebar
-          deviceId={params.id}
-          isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
-        />
-
-        <div className="flex flex-1 min-w-[200px] h-full rounded-md">
-          <WidgetBox deviceId={params.id} />
-        </div>
-
         <div className="grid gap-1 w-full rounded-md">
           <DeviceHeaderComponent
             deviceId={params.id}
@@ -380,6 +370,16 @@ const EditDashboardComponent = ({ params }: Props) => {
             onDuplicate={handleDuplicateWidget}
             isDirty={stats.isDirty}
           />
+        </div>
+
+        <DeviceSidebar
+          deviceId={params.id}
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+        />
+
+        <div className="flex flex-1 min-w-[200px] h-full rounded-md">
+          <WidgetBox deviceId={params.id} />
         </div>
       </div>
     </DragDropProvider>

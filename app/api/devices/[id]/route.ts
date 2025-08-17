@@ -20,6 +20,7 @@ export async function GET(
           orderBy: { createdAt: "desc" },
           take: 5,
         },
+        virtualPins: true,
       },
     });
 
