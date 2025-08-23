@@ -9,7 +9,6 @@ import { ApiKey, Channel, Device } from "@/types";
 import { LinearLoading } from "@/components/LinearLoading";
 import { HiStatusOffline, HiStatusOnline } from "react-icons/hi";
 import Link from "next/link";
-import { useIoTDataHub } from "@/hooks/useIoTDataHub";
 import WidgetGrid from "@/components/Channels/dashboard/widgets/WidgetGrid";
 
 interface Props {
@@ -27,18 +26,10 @@ interface Organization {
 const DeviceDetails = ({ params }: Props) => {
   const [DeviceDetails, setShowModal] = useState(true);
   const [isRedirecting, setIsRedirecting] = useState(false);
-  const [selectedDuration, setSelectedDuration] = useState<string>("1mo");
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [device, setDevice] = useState<Device | null>(null);
 
   const { data: session, status } = useSession();
-
-  const { data: RealTimeData, virtualWrite } = useIoTDataHub({
-    deviceId: params.id,
-  });
-
-  console.log("RealTimeData:", RealTimeData);
-  console.log("virtualWrite:", virtualWrite);
 
   if (status === "loading" || status === "unauthenticated" || !session) {
     return <LinearLoading />;

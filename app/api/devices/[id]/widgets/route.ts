@@ -24,6 +24,7 @@ export async function GET(
       orderBy: { createdAt: "desc" },
       include: {
         pinConfig: true, // Include pin config in the response
+        device: true,
       },
     });
 

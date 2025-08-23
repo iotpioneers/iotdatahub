@@ -30,7 +30,8 @@ const GaugeWidgetComponent = ({
     chartData.length > 0 ? chartData[chartData.length - 1] : null;
 
   // Use the value from the latest data point, or default to 0
-  const currentValue = latestDataPoint ? latestDataPoint.value : 0;
+  // Ensure the value is always a number
+  const currentValue = latestDataPoint ? Number(latestDataPoint.value) || 0 : 0;
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     if (!gaugeRef.current || chartData.length === 0) return;
@@ -51,13 +52,17 @@ const GaugeWidgetComponent = ({
 
     // Find the closest data point
     const closestDataPoint = chartData.reduce((prev, curr) => {
-      return Math.abs(curr.value - mappedValue) <
-        Math.abs(prev.value - mappedValue)
+      const prevValue = Number(prev.value) || 0;
+      const currValue = Number(curr.value) || 0;
+      return Math.abs(currValue - mappedValue) <
+        Math.abs(prevValue - mappedValue)
         ? curr
         : prev;
     }, chartData[0]);
 
-    setHoveredValue(closestDataPoint.value);
+    // Ensure the hovered value is a number
+    const numericValue = Number(closestDataPoint.value) || 0;
+    setHoveredValue(numericValue);
     setHoveredTimestamp(closestDataPoint.timestamp);
   };
 

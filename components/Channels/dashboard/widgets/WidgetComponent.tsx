@@ -47,6 +47,8 @@ export const WidgetComponent: React.FC<WidgetComponentProps> = ({
         <WidgetRegistry
           type={widget.definition.type}
           value={widget.value || widget.settings?.value}
+          deviceId={widget.device?.id}
+          pinNumber={widget.settings?.pinNumber.replace("V", "")}
           color={widget.settings?.color || "#10B981"}
           onChange={handleValueChange}
           settings={widgetSettings}

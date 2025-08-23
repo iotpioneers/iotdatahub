@@ -1,12 +1,44 @@
-const config = require("./config");
-const logger = require("./logger");
+import type {
+  DeviceInfo,
+  DeviceUpdateData,
+  HardwareDataRequest,
+} from "./types";
+import config from "./config";
+import logger from "./logger";
 
-// Enhanced device data storage function - NOW WITH DATABASE STORAGE
-async function storeDeviceInfo(deviceToken, deviceInfo, clientIP) {
+interface APIDeviceInfoResponse {
+  device: string;
+}
+
+interface APIHardwareDataResponse {
+  device: string;
+  pin: number;
+  value: string | number;
+}
+
+async function storeDeviceInfo(
+  deviceToken: string,
+  deviceInfo: DeviceInfo,
+  clientIP: string,
+): Promise<void> {
   try {
-    const updateData = {
+    const updateData: DeviceUpdateData = {
       lastPing: new Date(),
       status: "ONLINE",
+      metadata: {
+        mcuVersion: deviceInfo.mcu,
+        firmwareType: deviceInfo.firmware,
+        buildInfo: deviceInfo.build,
+        iotVersion: deviceInfo.version,
+        heartbeat: deviceInfo.heartbeat
+          ? parseInt(deviceInfo.heartbeat, 10)
+          : null,
+        bufferSize: deviceInfo.buffer ? parseInt(deviceInfo.buffer, 10) : null,
+        template: deviceInfo.template,
+        lastInfoUpdate: new Date().toISOString(),
+        connectionCount: 1,
+        rawDeviceInfo: deviceInfo,
+      },
     };
 
     // Map parsed info to device fields
@@ -22,20 +54,6 @@ async function storeDeviceInfo(deviceToken, deviceInfo, clientIP) {
       updateData.ipAddress = clientIP;
     }
 
-    // Create metadata object with all parsed info
-    updateData.metadata = {
-      mcuVersion: deviceInfo.mcu,
-      firmwareType: deviceInfo.firmware,
-      buildInfo: deviceInfo.build,
-      iotVersion: deviceInfo.version,
-      heartbeat: deviceInfo.heartbeat ? parseInt(deviceInfo.heartbeat) : null,
-      bufferSize: deviceInfo.buffer ? parseInt(deviceInfo.buffer) : null,
-      template: deviceInfo.template,
-      lastInfoUpdate: new Date().toISOString(),
-      connectionCount: 1,
-      rawDeviceInfo: deviceInfo,
-    };
-
     // Make API call to store device info
     const response = await fetch(`${config.apiBaseUrl}/api/devices/info`, {
       method: "POST",
@@ -49,7 +67,7 @@ async function storeDeviceInfo(deviceToken, deviceInfo, clientIP) {
     });
 
     if (response.ok) {
-      const result = await response.json();
+      const result = (await response.json()) as APIDeviceInfoResponse;
       logger.info("Device info stored in database", {
         device: result.device,
         updates: Object.keys(updateData),
@@ -66,35 +84,43 @@ async function storeDeviceInfo(deviceToken, deviceInfo, clientIP) {
       });
     }
   } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     logger.error("Error storing device info in database", {
-      error: error.message,
+      error: errorMessage,
     });
     // Still log locally as fallback
     logger.info("Device info stored locally (fallback)", {
       deviceToken: deviceToken.substring(0, 8) + "...",
-      updates: Object.keys(updateData),
+      updates: ["lastPing", "status"],
     });
   }
 }
 
-async function storeHardwareData(deviceToken, pin, value) {
+async function storeHardwareData(
+  deviceToken: string,
+  pin: number,
+  value: string | number,
+): Promise<void> {
   try {
+    const dataRequest: HardwareDataRequest = {
+      deviceToken,
+      pinNumber: pin,
+      value: value,
+      dataType: isNaN(parseFloat(String(value))) ? "STRING" : "FLOAT",
+    };
+
     // Make API call to store hardware data
     const response = await fetch(`${config.apiBaseUrl}/api/devices/data`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        deviceToken,
-        pinNumber: pin,
-        value: value,
-        dataType: isNaN(parseFloat(value)) ? "STRING" : "FLOAT",
-      }),
+      body: JSON.stringify(dataRequest),
     });
 
     if (response.ok) {
-      const result = await response.json();
+      const result = (await response.json()) as APIHardwareDataResponse;
       logger.info("Hardware data stored in database", {
         device: result.device,
         pin: result.pin,
@@ -110,24 +136,23 @@ async function storeHardwareData(deviceToken, pin, value) {
         device: deviceToken.substring(0, 8) + "...",
         pin: pin,
         value: value,
-        dataType: isNaN(parseFloat(value)) ? "STRING" : "FLOAT",
+        dataType: dataRequest.dataType,
       });
     }
   } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     logger.error("Error storing hardware data in database", {
-      error: error.message,
+      error: errorMessage,
     });
     // Still log locally as fallback
     logger.info("Hardware data stored locally (fallback)", {
       device: deviceToken.substring(0, 8) + "...",
       pin: pin,
       value: value,
-      dataType: isNaN(parseFloat(value)) ? "STRING" : "FLOAT",
+      dataType: isNaN(parseFloat(String(value))) ? "STRING" : "FLOAT",
     });
   }
 }
 
-module.exports = {
-  storeDeviceInfo,
-  storeHardwareData,
-};
+export { storeDeviceInfo, storeHardwareData };

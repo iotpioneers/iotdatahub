@@ -1,4 +1,6 @@
-function debugBuffer(buffer, label = "Buffer") {
+import type { ParsedCommand, DeviceInfo } from "./types";
+
+function debugBuffer(buffer: Buffer, label = "Buffer"): void {
   console.log(`====== ${label} Debug ======`);
   console.log("Length:", buffer.length);
   console.log("Hex:", buffer.toString("hex"));
@@ -13,7 +15,7 @@ function debugBuffer(buffer, label = "Buffer") {
   console.log("=============================");
 }
 
-function parseHardwareCommand(body) {
+function parseHardwareCommand(body: Buffer): ParsedCommand | null {
   debugBuffer(body, "Hardware Command");
 
   // The correct format is: vw\0<pin>\0<value>
@@ -25,7 +27,7 @@ function parseHardwareCommand(body) {
   console.log("Null-separated parts:", nullParts);
 
   if (nullParts.length >= 3 && nullParts[0] === "vw") {
-    const pin = parseInt(nullParts[1]);
+    const pin = parseInt(nullParts[1], 10);
     const value = nullParts[2];
 
     if (!isNaN(pin)) {
@@ -44,7 +46,7 @@ function parseHardwareCommand(body) {
   }
 
   if (nullParts.length >= 3 && nullParts[0] === "vr") {
-    const pin = parseInt(nullParts[1]);
+    const pin = parseInt(nullParts[1], 10);
 
     if (!isNaN(pin)) {
       console.log("====================================");
@@ -59,8 +61,8 @@ function parseHardwareCommand(body) {
   }
 
   if (nullParts.length >= 3 && nullParts[0] === "dw") {
-    const pin = parseInt(nullParts[1]);
-    const value = parseInt(nullParts[2]);
+    const pin = parseInt(nullParts[1], 10);
+    const value = parseInt(nullParts[2], 10);
 
     if (!isNaN(pin) && !isNaN(value)) {
       console.log("====================================");
@@ -90,7 +92,7 @@ function parseHardwareCommand(body) {
   console.log("Command parts (fallback):", parts);
 
   if (parts.length >= 3 && parts[0] === "vw") {
-    const pin = parseInt(parts[1]);
+    const pin = parseInt(parts[1], 10);
     const value = parts[2];
 
     if (!isNaN(pin)) {
@@ -109,9 +111,9 @@ function parseHardwareCommand(body) {
   }
 
   // Fallback: Standard format vw<pin><value> (no separators) - LEAST LIKELY TO BE CORRECT
-  let vwMatch = command.match(/^vw(\d+)(.+)$/);
+  const vwMatch = command.match(/^vw(\d+)(.+)$/);
   if (vwMatch) {
-    const pin = parseInt(vwMatch[1]);
+    const pin = parseInt(vwMatch[1], 10);
     const value = vwMatch[2];
 
     console.log("====================================");
@@ -130,7 +132,7 @@ function parseHardwareCommand(body) {
   // Fallback: Parse virtual read commands: vr<pin>
   const vrMatch = command.match(/^vr(\d+)$/);
   if (vrMatch) {
-    const pin = parseInt(vrMatch[1]);
+    const pin = parseInt(vrMatch[1], 10);
 
     console.log("====================================");
     console.log(`✅ Parsed VIRTUAL_READ (fallback): pin=${pin}`);
@@ -145,8 +147,8 @@ function parseHardwareCommand(body) {
   // Fallback: Parse digital write commands: dw<pin><value>
   const dwMatch = command.match(/^dw(\d+)(\d+)$/);
   if (dwMatch) {
-    const pin = parseInt(dwMatch[1]);
-    const value = parseInt(dwMatch[2]);
+    const pin = parseInt(dwMatch[1], 10);
+    const value = parseInt(dwMatch[2], 10);
 
     console.log("====================================");
     console.log(
@@ -169,7 +171,7 @@ function parseHardwareCommand(body) {
   return null;
 }
 
-function parseDeviceInfo(body) {
+function parseDeviceInfo(body: Buffer): DeviceInfo {
   debugBuffer(body, "Device Info");
 
   const infoString = body.toString("utf8");
@@ -177,7 +179,7 @@ function parseDeviceInfo(body) {
   console.log("Raw device info:", infoString);
   console.log("====================================");
 
-  const deviceInfo = {};
+  const deviceInfo: DeviceInfo = {};
 
   // Parse null-byte separated key-value pairs
   const parts = infoString.split("\0").filter((part) => part.length > 0);
@@ -232,8 +234,4 @@ function parseDeviceInfo(body) {
   return deviceInfo;
 }
 
-module.exports = {
-  parseHardwareCommand,
-  parseDeviceInfo,
-  debugBuffer,
-};
+export { parseHardwareCommand, parseDeviceInfo, debugBuffer };

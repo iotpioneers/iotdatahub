@@ -46,28 +46,83 @@ interface BaseWidgetProps {
   className?: string;
   color?: string;
   onClick?: () => void;
+  deviceId?: string;
+  pinNumber?: number;
 }
 
 export const SwitchWidget: React.FC<BaseWidgetProps> = memo(
-  ({ value = true, onChange, className }) => (
-    <div
-      className={cn(
-        "flex items-center justify-center h-full w-full p-[4%]",
-        className,
-      )}
-    >
-      <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-green-500">
-        <span className="inline-block h-4 w-4 transform rounded-full bg-white translate-x-6" />
-      </div>
-      <style jsx>{`
-        .switch-thumb {
-          width: var(--thumb-size);
-          height: var(--thumb-size);
-          transition: transform 200ms ease;
+  ({
+    value = true,
+    onChange,
+    className,
+    deviceId: deviceAuthToken,
+    pinNumber,
+  }) => {
+    const handleToggle = useCallback(async () => {
+      const newValue = !value;
+      onChange?.(newValue);
+
+      if (deviceAuthToken && pinNumber !== undefined) {
+        try {
+          const response = await fetch(
+            `/api/devices/${deviceAuthToken}/send-command`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                pin: pinNumber,
+                value: newValue ? 1 : 0,
+              }),
+            },
+          );
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP ${response.status}`);
+          }
+
+          const result = await response.json();
+
+          if (!result.success) {
+            throw new Error(result.error || "Command failed");
+          }
+
+          console.log("Hardware command sent successfully:", result);
+        } catch (error) {
+          // Revert the change if the API call fails
+          onChange?.(value);
+          console.error("Failed to update hardware:", error);
+
+          // Optional: Show user-friendly error message
+          // You might want to add a toast notification here
         }
-      `}</style>
-    </div>
-  ),
+      }
+    }, [value, onChange, deviceAuthToken, pinNumber]);
+
+    return (
+      <div
+        className={cn(
+          "flex items-center justify-center h-full w-full p-[4%]",
+          className,
+        )}
+        onClick={handleToggle}
+      >
+        <div
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
+            value ? "bg-green-500" : "bg-gray-300"
+          }`}
+        >
+          <span
+            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+              value ? "translate-x-6" : "translate-x-1"
+            }`}
+          />
+        </div>
+      </div>
+    );
+  },
 );
 
 export const SliderWidget: React.FC<BaseWidgetProps> = memo(
@@ -708,6 +763,17 @@ export default memo(function WidgetRegistry({
   className,
   ...props
 }: { type: WidgetType } & BaseWidgetProps) {
+  console.log("====================================");
+  console.log(
+    "Widget received with type:",
+    type,
+    "and props:",
+    props,
+    "and className:",
+    className,
+  );
+  console.log("====================================");
+
   const Component = components[type] || LabelWidget;
   return <Component className={className} {...props} />;
 });

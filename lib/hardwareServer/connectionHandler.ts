@@ -1,33 +1,33 @@
-const crypto = require("crypto");
-const SimpleMessage = require("./message");
-const { PROTOCOL } = require("./constants");
-const logger = require("./logger");
-
-// Message type descriptions for meaningful logging
-const MESSAGE_TYPES = {
-  [PROTOCOL.CMD_RESPONSE]: "RESPONSE",
-  [PROTOCOL.CMD_PING]: "PING",
-  [PROTOCOL.CMD_HARDWARE]: "HARDWARE_COMMAND",
-  [PROTOCOL.CMD_HARDWARE_SYNC]: "HARDWARE_SYNC",
-  [PROTOCOL.CMD_INTERNAL]: "DEVICE_INFO",
-  [PROTOCOL.CMD_HW_LOGIN]: "LOGIN",
-};
+import crypto from "crypto";
+import type {
+  DeviceSocket,
+  IDeviceManager,
+  IProtocolHandler,
+  ParsedMessage,
+  DeviceConnectionInfo,
+  ConnectionId,
+  ClientAddress,
+} from "./types";
+import { MESSAGE_TYPES, PROTOCOL } from "./types";
+import SimpleMessage from "./message";
+import logger from "./logger";
 
 // Get meaningful message type name
-function getMessageTypeName(type) {
+function getMessageTypeName(type: number): string {
   return MESSAGE_TYPES[type] || `UNKNOWN(${type})`;
 }
 
 // Format message body for display based on message type
-function formatMessageBody(message) {
+function formatMessageBody(message: ParsedMessage): string {
   const bodyStr = message.body.toString("utf8");
 
   switch (message.type) {
-    case PROTOCOL.CMD_HW_LOGIN:
+    case PROTOCOL.CMD_HW_LOGIN: {
       const token = bodyStr.trim();
       return `Token=${token.substring(0, 8)}...${token.substring(token.length - 4)}`;
+    }
 
-    case PROTOCOL.CMD_HARDWARE:
+    case PROTOCOL.CMD_HARDWARE: {
       // Try to parse hardware command
       const nullParts = bodyStr.split("\0").filter((p) => p.length > 0);
       if (nullParts.length >= 2) {
@@ -35,7 +35,7 @@ function formatMessageBody(message) {
         const pin = nullParts[1];
         const value = nullParts[2] || "";
 
-        const commandNames = {
+        const commandNames: Record<string, string> = {
           vw: "VirtualWrite",
           vr: "VirtualRead",
           dw: "DigitalWrite",
@@ -48,27 +48,32 @@ function formatMessageBody(message) {
           : `${commandName}(pin=${pin})`;
       }
       return `Raw=${bodyStr.replace(/\0/g, "\\0")}`;
+    }
 
-    case PROTOCOL.CMD_INTERNAL:
+    case PROTOCOL.CMD_INTERNAL: {
       // Parse device info
       const parts = bodyStr.split("\0").filter((part) => part.length > 0);
-      const infoItems = [];
+      const infoItems: string[] = [];
       for (let i = 0; i < parts.length - 1; i += 2) {
         if (parts[i] && parts[i + 1]) {
           infoItems.push(`${parts[i]}=${parts[i + 1]}`);
         }
       }
       return infoItems.length > 0 ? infoItems.join(", ") : "DeviceInfo";
+    }
 
     default:
       return bodyStr.length > 50 ? `${bodyStr.substring(0, 47)}...` : bodyStr;
   }
 }
 
-// Simple Connection Handler with Enhanced Logging
-function handleDeviceConnection(socket, deviceManager, protocolHandler) {
-  const connectionId = crypto.randomBytes(4).toString("hex");
-  const clientAddress = `${socket.remoteAddress}:${socket.remotePort}`;
+function handleDeviceConnection(
+  socket: DeviceSocket,
+  deviceManager: IDeviceManager,
+  protocolHandler: IProtocolHandler,
+): void {
+  const connectionId: ConnectionId = crypto.randomBytes(4).toString("hex");
+  const clientAddress: ClientAddress = `${socket.remoteAddress}:${socket.remotePort}`;
 
   logger.info("Connection established", {
     connectionId,
@@ -80,10 +85,13 @@ function handleDeviceConnection(socket, deviceManager, protocolHandler) {
   console.log("====================================");
 
   let messageBuffer = Buffer.alloc(0);
-  let deviceToken = null;
-  let deviceInfo = { token: null, authenticated: false };
+  let deviceToken: string | null = null;
+  const deviceInfo: DeviceConnectionInfo = {
+    token: null,
+    authenticated: false,
+  };
 
-  socket.on("data", async (data) => {
+  socket.on("data", async (data: Buffer) => {
     try {
       messageBuffer = Buffer.concat([messageBuffer, data]);
 
@@ -120,15 +128,17 @@ function handleDeviceConnection(socket, deviceManager, protocolHandler) {
         await protocolHandler.handleMessage(socket, message, deviceToken);
       }
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       logger.error("Data processing error", {
-        error: error.message,
+        error: errorMessage,
         connectionId,
         deviceToken: deviceToken ? deviceManager.maskToken(deviceToken) : null,
       });
 
       console.log("====================================");
       console.log(`❌ ERROR processing message from ${connectionId}`);
-      console.log(`   Error: ${error.message}`);
+      console.log(`   Error: ${errorMessage}`);
       console.log("====================================");
     }
   });
@@ -152,7 +162,7 @@ function handleDeviceConnection(socket, deviceManager, protocolHandler) {
     console.log("====================================");
   });
 
-  socket.on("error", (err) => {
+  socket.on("error", (err: Error) => {
     logger.error("Socket error", {
       error: err.message,
       connectionId,
@@ -169,4 +179,4 @@ function handleDeviceConnection(socket, deviceManager, protocolHandler) {
   });
 }
 
-module.exports = handleDeviceConnection;
+export default handleDeviceConnection;

@@ -1,24 +1,33 @@
-const net = require("net");
-const tls = require("tls");
-const fs = require("fs");
-const path = require("path");
-const config = require("./config");
-const logger = require("./logger");
-const handleDeviceConnection = require("./connectionHandler");
+import net from "net";
+import tls from "tls";
+import fs from "fs";
+import path from "path";
+import type {
+  IDeviceManager,
+  IProtocolHandler,
+  ServerComponents,
+  SSLOptions,
+} from "./types";
+import config from "./config";
+import logger from "./logger";
+import handleDeviceConnection from "./connectionHandler";
 
-function createTCPServer(deviceManager, protocolHandler) {
+function createTCPServer(
+  deviceManager: IDeviceManager,
+  protocolHandler: IProtocolHandler,
+): ServerComponents {
   // Create TCP server for IoT devices
   const iotServer = net.createServer((socket) => {
     handleDeviceConnection(socket, deviceManager, protocolHandler);
   });
 
   // Create SSL TCP server if certificates exist
-  let iotSSLServer = null;
+  let iotSSLServer: tls.Server | null = null;
   const sslCertPath = path.join(__dirname, "../../ssl/server.crt");
   const sslKeyPath = path.join(__dirname, "../../ssl/server.key");
 
   if (fs.existsSync(sslCertPath) && fs.existsSync(sslKeyPath)) {
-    const sslOptions = {
+    const sslOptions: SSLOptions = {
       key: fs.readFileSync(sslKeyPath),
       cert: fs.readFileSync(sslCertPath),
       rejectUnauthorized: false,
@@ -32,15 +41,18 @@ function createTCPServer(deviceManager, protocolHandler) {
   return { iotServer, iotSSLServer };
 }
 
-function startTCPServers(iotServer, iotSSLServer) {
+function startTCPServers(
+  iotServer: net.Server,
+  iotSSLServer: tls.Server | null,
+): ServerComponents {
   // Start servers
-  iotServer.listen(config.iotPort, (err) => {
+  iotServer.listen(config.iotPort, (err?: Error) => {
     if (err) throw err;
     logger.info("TCP server started", { port: config.iotPort });
   });
 
   if (iotSSLServer) {
-    iotSSLServer.listen(config.iotSSLPort, (err) => {
+    iotSSLServer.listen(config.iotSSLPort, (err?: Error) => {
       if (err) throw err;
       logger.info("SSL server started", { port: config.iotSSLPort });
     });
@@ -62,7 +74,4 @@ function startTCPServers(iotServer, iotSSLServer) {
   return { iotServer, iotSSLServer };
 }
 
-module.exports = {
-  createTCPServer,
-  startTCPServers,
-};
+export { createTCPServer, startTCPServers };

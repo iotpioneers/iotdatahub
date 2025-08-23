@@ -5,10 +5,6 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    console.log("====================================");
-    console.log("Received widget data:", body);
-    console.log("====================================");
-
     const { deviceToken, pinNumber, value, dataType = "STRING" } = body;
 
     if (!deviceToken || pinNumber === undefined || value === undefined) {

@@ -50,6 +50,7 @@ const widgetCreateSchema = z
       .optional(),
     settings: z.any().optional(),
     pinConfig: pinConfigSchema,
+    pinNumber: z.number().optional(),
   })
   .superRefine((data, ctx) => {
     if (!data.type && !data.definition?.type) {
@@ -165,6 +166,7 @@ export async function POST(
     create = create.map((item) => ({
       ...item,
       type: item.type || item.definition?.type || "unknown",
+      pinNumber: item.settings?.pinNumber.replace("V", ""),
     }));
 
     const result: BatchResult = {
@@ -262,6 +264,7 @@ export async function POST(
             where: { id },
             data: {
               ...widgetUpdateData,
+              pinNumber: widgetUpdateData.settings.pinNumber.replace("V", ""),
               updatedAt: new Date(),
             },
           });
@@ -333,6 +336,7 @@ export async function POST(
           const widgetData = {
             ...widgetCreateData,
             type: widgetCreateData.type || "unknown",
+            pinNumber: widgetCreateData.settings.pinNumber.replace("V", ""),
             channelId: device.channelId,
             deviceId: params.id,
           };

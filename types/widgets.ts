@@ -1,9 +1,11 @@
+import { DeviceData } from "./device";
 import { PinConfig } from "./pin-config";
 
 export interface Widget {
   id: string;
   name?: string | null;
   value?: string | null;
+  device?: DeviceData | null;
   dataSource?: {
     fieldId?: string;
     refreshInterval?: number;
