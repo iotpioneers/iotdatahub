@@ -31,12 +31,6 @@ function parseHardwareCommand(body: Buffer): ParsedCommand | null {
     const value = nullParts[2];
 
     if (!isNaN(pin)) {
-      console.log("====================================");
-      console.log(
-        `✅ Parsed VIRTUAL_WRITE (null-separated): pin=${pin}, value=${value}`,
-      );
-      console.log("====================================");
-
       return {
         type: "VIRTUAL_WRITE",
         pin: pin,
@@ -49,10 +43,6 @@ function parseHardwareCommand(body: Buffer): ParsedCommand | null {
     const pin = parseInt(nullParts[1], 10);
 
     if (!isNaN(pin)) {
-      console.log("====================================");
-      console.log(`✅ Parsed VIRTUAL_READ (null-separated): pin=${pin}`);
-      console.log("====================================");
-
       return {
         type: "VIRTUAL_READ",
         pin: pin,
@@ -65,12 +55,6 @@ function parseHardwareCommand(body: Buffer): ParsedCommand | null {
     const value = parseInt(nullParts[2], 10);
 
     if (!isNaN(pin) && !isNaN(value)) {
-      console.log("====================================");
-      console.log(
-        `✅ Parsed DIGITAL_WRITE (null-separated): pin=${pin}, value=${value}`,
-      );
-      console.log("====================================");
-
       return {
         type: "DIGITAL_WRITE",
         pin: pin,
@@ -82,11 +66,6 @@ function parseHardwareCommand(body: Buffer): ParsedCommand | null {
   // Fallback: Clean the command and try other methods
   const command = body.toString("utf8").replace(/\0/g, "").trim();
 
-  console.log("====================================");
-  console.log("Cleaned command (fallback):", command);
-  console.log("Command length:", command.length);
-  console.log("====================================");
-
   // Fallback: Handle space or comma separated format
   const parts = command.split(/[\s,]+/).filter((p) => p.length > 0);
   console.log("Command parts (fallback):", parts);
@@ -96,12 +75,6 @@ function parseHardwareCommand(body: Buffer): ParsedCommand | null {
     const value = parts[2];
 
     if (!isNaN(pin)) {
-      console.log("====================================");
-      console.log(
-        `✅ Parsed VIRTUAL_WRITE (space/comma separated): pin=${pin}, value=${value}`,
-      );
-      console.log("====================================");
-
       return {
         type: "VIRTUAL_WRITE",
         pin: pin,
@@ -116,12 +89,6 @@ function parseHardwareCommand(body: Buffer): ParsedCommand | null {
     const pin = parseInt(vwMatch[1], 10);
     const value = vwMatch[2];
 
-    console.log("====================================");
-    console.log(
-      `⚠️ Parsed VIRTUAL_WRITE (no separators - may be incorrect): pin=${pin}, value=${value}`,
-    );
-    console.log("====================================");
-
     return {
       type: "VIRTUAL_WRITE",
       pin: pin,
@@ -133,10 +100,6 @@ function parseHardwareCommand(body: Buffer): ParsedCommand | null {
   const vrMatch = command.match(/^vr(\d+)$/);
   if (vrMatch) {
     const pin = parseInt(vrMatch[1], 10);
-
-    console.log("====================================");
-    console.log(`✅ Parsed VIRTUAL_READ (fallback): pin=${pin}`);
-    console.log("====================================");
 
     return {
       type: "VIRTUAL_READ",
@@ -150,23 +113,12 @@ function parseHardwareCommand(body: Buffer): ParsedCommand | null {
     const pin = parseInt(dwMatch[1], 10);
     const value = parseInt(dwMatch[2], 10);
 
-    console.log("====================================");
-    console.log(
-      `✅ Parsed DIGITAL_WRITE (fallback): pin=${pin}, value=${value}`,
-    );
-    console.log("====================================");
-
     return {
       type: "DIGITAL_WRITE",
       pin: pin,
       value: value,
     };
   }
-
-  console.log("====================================");
-  console.log("❌ Could not parse command:", command);
-  console.log("All parsing methods failed");
-  console.log("====================================");
 
   return null;
 }
@@ -175,17 +127,11 @@ function parseDeviceInfo(body: Buffer): DeviceInfo {
   debugBuffer(body, "Device Info");
 
   const infoString = body.toString("utf8");
-  console.log("====================================");
-  console.log("Raw device info:", infoString);
-  console.log("====================================");
 
   const deviceInfo: DeviceInfo = {};
 
   // Parse null-byte separated key-value pairs
   const parts = infoString.split("\0").filter((part) => part.length > 0);
-  console.log("====================================");
-  console.log("Device info parts:", parts);
-  console.log("====================================");
 
   // Process pairs: key, value, key, value, etc.
   for (let i = 0; i < parts.length - 1; i += 2) {
@@ -226,10 +172,6 @@ function parseDeviceInfo(body: Buffer): DeviceInfo {
       }
     }
   }
-
-  console.log("====================================");
-  console.log("Parsed device info:", deviceInfo);
-  console.log("====================================");
 
   return deviceInfo;
 }

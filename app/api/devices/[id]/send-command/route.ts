@@ -30,17 +30,6 @@ export async function POST(
       return NextResponse.json({ error: "Device not found" }, { status: 404 });
     }
 
-    console.log("====================================");
-    console.log(
-      "Sending write hardware command to pin:",
-      pin,
-      "with value:",
-      value,
-      "to device:",
-      device.authToken,
-    );
-    console.log("====================================");
-
     // Make HTTP request to the hardware API server
     try {
       const response = await fetch(
@@ -60,10 +49,6 @@ export async function POST(
       );
 
       const result = await response.json();
-
-      console.log("====================================");
-      console.log("Virtual write hardware command result:", result);
-      console.log("====================================");
 
       if (response.ok && result.success) {
         // Update widget value in the database

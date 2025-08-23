@@ -14,10 +14,6 @@ export const WidgetComponent: React.FC<WidgetComponentProps> = ({
   widget,
   onValueChange,
 }) => {
-  console.log("====================================");
-  console.log("Received widget data:", widget);
-  console.log("====================================");
-
   const { showToast } = useToast();
 
   const handleValueChange = async (newValue: any) => {

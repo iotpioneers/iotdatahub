@@ -763,17 +763,6 @@ export default memo(function WidgetRegistry({
   className,
   ...props
 }: { type: WidgetType } & BaseWidgetProps) {
-  console.log("====================================");
-  console.log(
-    "Widget received with type:",
-    type,
-    "and props:",
-    props,
-    "and className:",
-    className,
-  );
-  console.log("====================================");
-
   const Component = components[type] || LabelWidget;
   return <Component className={className} {...props} />;
 });

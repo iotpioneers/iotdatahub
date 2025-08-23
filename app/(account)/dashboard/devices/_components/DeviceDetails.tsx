@@ -1,15 +1,17 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { X } from "lucide-react";
 import { Box } from "@mui/material";
 import useFetch from "@/hooks/useFetch";
+import { useWebSocket } from "@/hooks/useWebSocket";
 import { useSession } from "next-auth/react";
 import { ApiKey, Channel, Device } from "@/types";
 import { LinearLoading } from "@/components/LinearLoading";
 import { HiStatusOffline, HiStatusOnline } from "react-icons/hi";
 import Link from "next/link";
 import WidgetGrid from "@/components/Channels/dashboard/widgets/WidgetGrid";
+import { WebSocketMessage } from "@/types/websocket";
 
 interface Props {
   params: { id: string };
@@ -24,12 +26,87 @@ interface Organization {
 }
 
 const DeviceDetails = ({ params }: Props) => {
-  const [DeviceDetails, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(true);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [device, setDevice] = useState<Device | null>(null);
+  const [widgetData, setWidgetData] = useState<any[]>([]);
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
   const { data: session, status } = useSession();
+
+  // WebSocket for real-time updates
+  const handleWebSocketMessage = useCallback(
+    (message: WebSocketMessage) => {
+      console.log("Received WebSocket message:", message);
+
+      // Only handle messages for this specific device
+      if (message.deviceId && message.deviceId === params.id) {
+        switch (message.type) {
+          case "DEVICE_UPDATE":
+            // Update device data
+            setDevice((prevDevice) =>
+              prevDevice
+                ? {
+                    ...prevDevice,
+                    ...message.data,
+                  }
+                : null,
+            );
+            setLastUpdate(new Date());
+            break;
+
+          case "HARDWARE_DATA":
+            console.log("📡 Hardware data update received:", message.data);
+            // Update widget data with new hardware values
+            setWidgetData((prevWidgets) => {
+              return prevWidgets.map((widget) => {
+                if (
+                  widget.pinConfig?.pinNumber === message.data.pin.toString()
+                ) {
+                  console.log(
+                    `🔄 Updating widget for pin ${message.data.pin} with value:`,
+                    message.data.value,
+                  );
+                  return {
+                    ...widget,
+                    value: message.data.value,
+                    pinConfig: {
+                      ...widget.pinConfig,
+                      value: message.data.value,
+                    },
+                  };
+                }
+                return widget;
+              });
+            });
+            setLastUpdate(new Date());
+            break;
+
+          case "DEVICE_STATUS":
+            // Update device status
+            setDevice((prevDevice) =>
+              prevDevice
+                ? {
+                    ...prevDevice,
+                    status: message.data.status,
+                    lastPing: message.data.lastPing,
+                  }
+                : null,
+            );
+            setLastUpdate(new Date());
+            break;
+        }
+      }
+    },
+    [params.id],
+  );
+
+  const { isConnected, error: wsError } = useWebSocket({
+    deviceId: params.id,
+    onMessage: handleWebSocketMessage,
+    enabled: !!session && status === "authenticated",
+  });
 
   if (status === "loading" || status === "unauthenticated" || !session) {
     return <LinearLoading />;
@@ -39,18 +116,41 @@ const DeviceDetails = ({ params }: Props) => {
     data: deviceData,
     isLoading,
     error,
+    refetch: refetchDevice,
   } = useFetch(`/api/devices/${params.id}`);
 
   const { data: organizationData } = useFetch(
     `/api/organizations/${session.user.organizationId}`,
   );
 
-  const { data: widgetData } = useFetch(`/api/devices/${params.id}/widgets`);
+  const { data: initialWidgetData, refetch: refetchWidgets } = useFetch(
+    `/api/devices/${params.id}/widgets`,
+  );
+
+  // Manual refresh function
+  const handleManualRefresh = async () => {
+    console.log("Manual refresh triggered");
+    await Promise.all([refetchDevice(), refetchWidgets()]);
+    setLastUpdate(new Date());
+  };
 
   useEffect(() => {
     if (deviceData) setDevice(deviceData);
     if (organizationData) setOrganization(organizationData);
-  }, [deviceData, organizationData]);
+    if (initialWidgetData) setWidgetData(initialWidgetData);
+  }, [deviceData, organizationData, initialWidgetData]);
+
+  // Fallback: Poll for updates every 10 seconds if WebSocket is not connected
+  useEffect(() => {
+    if (!isConnected) {
+      const pollInterval = setInterval(() => {
+        console.log("Polling for updates (WebSocket not connected)");
+        handleManualRefresh();
+      }, 10000); // Poll every 10 seconds
+
+      return () => clearInterval(pollInterval);
+    }
+  }, [isConnected]);
 
   if (error) {
     console.error("Error fetching device:", error);
@@ -75,6 +175,27 @@ const DeviceDetails = ({ params }: Props) => {
   return (
     <div className="min-h-screen px-4">
       {(isLoading || !deviceData || isRedirecting) && <LinearLoading />}
+
+      {/* Connection Status Indicator */}
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center space-x-2 text-sm text-gray-500">
+          <span
+            className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : "bg-yellow-500"}`}
+          ></span>
+          <span>
+            {isConnected ? "Real-time connected" : "Using polling updates"}
+          </span>
+          <span>•</span>
+          <span>Last update: {lastUpdate.toLocaleTimeString()}</span>
+        </div>
+        <button
+          onClick={handleManualRefresh}
+          className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+        >
+          Refresh
+        </button>
+      </div>
+
       {/* Main Dashboard Container */}
       <div className="bg-white rounded-lg shadow-sm p-6 mb-4">
         {/* Header */}
@@ -100,15 +221,15 @@ const DeviceDetails = ({ params }: Props) => {
             <div>
               <div className="flex items-center space-x-4">
                 <h1 className="text-2xl font-semibold text-orange-50">
-                  {deviceData.name}
+                  {device.name}
                 </h1>
                 <span className="flex items-center">
-                  {deviceData.status === "OFFLINE" ? (
+                  {device.status === "OFFLINE" ? (
                     <HiStatusOffline className="text-red-500 mr-2" />
                   ) : (
                     <HiStatusOnline className="text-green-500 mr-2" />
                   )}
-                  <strong className="font-bold"> {deviceData.status}</strong>
+                  <strong className="font-bold"> {device.status}</strong>
                 </span>
               </div>
               <div className="flex items-center space-x-2 text-gray-500">
@@ -120,7 +241,7 @@ const DeviceDetails = ({ params }: Props) => {
                 <span>
                   Organization:{" "}
                   <strong className="font-bold">
-                    {organizationData.name || ""}
+                    {organization.name || ""}
                   </strong>
                 </span>
                 <button
@@ -165,8 +286,9 @@ const DeviceDetails = ({ params }: Props) => {
           </div>
         )}
       </div>
+
       {/* Modal */}
-      {DeviceDetails && (
+      {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-black text-white rounded-lg p-6 w-full max-w-lg">
             <div className="flex justify-between items-center mb-6">

@@ -53,19 +53,6 @@ function createAPIServer(
       try {
         const { deviceToken, command, pin, value } = req.body;
 
-        console.log("====================================");
-        console.log(
-          "Sending hardware command:",
-          command,
-          "to pin:",
-          pin,
-          "with value:",
-          value,
-          "to device:",
-          deviceToken,
-        );
-        console.log("====================================");
-
         if (!command || pin === undefined) {
           res.status(400).json({
             success: false,
@@ -86,19 +73,6 @@ function createAPIServer(
           pin,
           value,
         );
-
-        console.log("====================================");
-        console.log(
-          "Hardware command sent:",
-          success,
-          "to pin:",
-          pin,
-          "with value:",
-          value,
-          "to device:",
-          deviceToken,
-        );
-        console.log("====================================");
 
         if (success) {
           const responseData: HardwareCommandData = {

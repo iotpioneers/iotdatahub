@@ -3,9 +3,9 @@ import type {
   IDeviceManager,
   DeviceSocket,
   ParsedMessage,
-  COMMAND_NAMES,
 } from "./types";
 import { PROTOCOL } from "./types";
+import WebSocketManager from "./websocketManager";
 import SimpleMessage from "./message";
 import { parseHardwareCommand, parseDeviceInfo } from "./commandParser";
 import { storeDeviceInfo, storeHardwareData } from "./dataStorage";
@@ -13,9 +13,11 @@ import logger from "./logger";
 
 class SimpleProtocolHandler implements IProtocolHandler {
   private readonly deviceManager: IDeviceManager;
+  private readonly wsManager: WebSocketManager;
 
-  constructor(deviceManager: IDeviceManager) {
+  constructor(deviceManager: IDeviceManager, wsManager: WebSocketManager) {
     this.deviceManager = deviceManager;
+    this.wsManager = wsManager;
   }
 
   async handleMessage(
@@ -61,11 +63,98 @@ class SimpleProtocolHandler implements IProtocolHandler {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
       logger.error("Message handling error", { error: errorMessage });
-      // Still send success even on error
       this.sendSuccessResponse(
         socket,
         message.id,
         `Error handled: ${errorMessage}`,
+      );
+    }
+  }
+
+  private async handleHardwareMessage(
+    socket: DeviceSocket,
+    message: ParsedMessage,
+    deviceToken: string | null,
+  ): Promise<void> {
+    try {
+      const parsedCommand = parseHardwareCommand(message.body);
+
+      if (parsedCommand && deviceToken) {
+        logger.info("Hardware command parsed", {
+          token: this.deviceManager.maskToken(deviceToken),
+          command: parsedCommand,
+        });
+
+        // 🚀 BROADCAST TO WEBSOCKET CLIENTS!
+        this.wsManager.broadcastHardwareUpdate(
+          deviceToken,
+          parsedCommand.pin,
+          parsedCommand.value!,
+          parsedCommand.type,
+        );
+
+        console.log("====================================");
+        console.log(`🔧 HARDWARE COMMAND EXECUTED`);
+        console.log(`   Device: ${this.deviceManager.maskToken(deviceToken)}`);
+        console.log(`   Command: ${parsedCommand.type}`);
+        console.log(`   Pin: ${parsedCommand.pin}`);
+        if (parsedCommand.value !== undefined) {
+          console.log(`   Value: ${parsedCommand.value}`);
+        }
+        console.log("====================================");
+
+        // Store virtual pin data and broadcast updates
+        if (parsedCommand.type === "VIRTUAL_WRITE") {
+          const device = this.deviceManager.getDevice(deviceToken);
+          if (device) {
+            device.virtualPins.set(parsedCommand.pin.toString(), {
+              value: parsedCommand.value!,
+              timestamp: Date.now(),
+            });
+          }
+
+          // Store in database
+          await storeHardwareData(
+            deviceToken,
+            parsedCommand.pin,
+            parsedCommand.value!,
+          );
+
+          this.sendSuccessResponse(
+            socket,
+            message.id,
+            `VirtualWrite(${parsedCommand.pin}=${parsedCommand.value}) executed`,
+          );
+        } else {
+          // Also broadcast other command types
+          this.wsManager.broadcastHardwareUpdate(
+            deviceToken,
+            parsedCommand.pin,
+            parsedCommand.value || "",
+            parsedCommand.type,
+          );
+
+          this.sendSuccessResponse(
+            socket,
+            message.id,
+            `${parsedCommand.type} executed`,
+          );
+        }
+      } else {
+        this.sendSuccessResponse(
+          socket,
+          message.id,
+          "Hardware command processed",
+        );
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      logger.error("Hardware message handling error", { error: errorMessage });
+      this.sendSuccessResponse(
+        socket,
+        message.id,
+        "Hardware command processed (with errors)",
       );
     }
   }
@@ -82,9 +171,11 @@ class SimpleProtocolHandler implements IProtocolHandler {
 
       if (Object.keys(deviceInfo).length > 0 && deviceToken) {
         await storeDeviceInfo(deviceToken, deviceInfo, clientIP);
+
+        // Broadcast device status update via WebSocket
+        this.wsManager.broadcastDeviceStatus(deviceToken, "ONLINE", new Date());
       }
 
-      // Enhanced logging for device info
       const infoSummary: string[] = [];
       if (deviceInfo.firmware) infoSummary.push(`fw:${deviceInfo.firmware}`);
       if (deviceInfo.device) infoSummary.push(`device:${deviceInfo.device}`);
@@ -108,76 +199,6 @@ class SimpleProtocolHandler implements IProtocolHandler {
         socket,
         message.id,
         "Device info processed (with errors)",
-      );
-    }
-  }
-
-  private async handleHardwareMessage(
-    socket: DeviceSocket,
-    message: ParsedMessage,
-    deviceToken: string | null,
-  ): Promise<void> {
-    try {
-      const parsedCommand = parseHardwareCommand(message.body);
-
-      if (parsedCommand && deviceToken) {
-        logger.info("Hardware command parsed", {
-          token: this.deviceManager.maskToken(deviceToken),
-          command: parsedCommand,
-        });
-
-        // Enhanced logging for hardware commands
-        console.log("====================================");
-        console.log(`🔧 HARDWARE COMMAND EXECUTED`);
-        console.log(`   Device: ${this.deviceManager.maskToken(deviceToken)}`);
-        console.log(`   Command: ${parsedCommand.type}`);
-        console.log(`   Pin: ${parsedCommand.pin}`);
-        if (parsedCommand.value !== undefined) {
-          console.log(`   Value: ${parsedCommand.value}`);
-        }
-        console.log("====================================");
-
-        // Store virtual pin data
-        if (parsedCommand.type === "VIRTUAL_WRITE") {
-          const device = this.deviceManager.getDevice(deviceToken);
-          if (device) {
-            device.virtualPins.set(parsedCommand.pin.toString(), {
-              value: parsedCommand.value!,
-              timestamp: Date.now(),
-            });
-          }
-          await storeHardwareData(
-            deviceToken,
-            parsedCommand.pin,
-            parsedCommand.value!,
-          );
-          this.sendSuccessResponse(
-            socket,
-            message.id,
-            `VirtualWrite(${parsedCommand.pin}=${parsedCommand.value}) executed`,
-          );
-        } else {
-          this.sendSuccessResponse(
-            socket,
-            message.id,
-            `${parsedCommand.type} executed`,
-          );
-        }
-      } else {
-        this.sendSuccessResponse(
-          socket,
-          message.id,
-          "Hardware command processed",
-        );
-      }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-      logger.error("Hardware message handling error", { error: errorMessage });
-      this.sendSuccessResponse(
-        socket,
-        message.id,
-        "Hardware command processed (with errors)",
       );
     }
   }
@@ -217,7 +238,6 @@ class SimpleProtocolHandler implements IProtocolHandler {
       const buffer = message.toBuffer();
       device.socket.write(buffer);
 
-      // Enhanced logging for sent commands
       const commandNames: Record<string, string> = {
         vw: "VirtualWrite",
         vr: "VirtualRead",

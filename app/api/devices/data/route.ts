@@ -19,10 +19,6 @@ export async function POST(request: NextRequest) {
       where: { authToken: deviceToken },
     });
 
-    console.log("====================================");
-    console.log("Received device data:", device);
-    console.log("====================================");
-
     if (!device) {
       return NextResponse.json({ error: "Device not found" }, { status: 404 });
     }
@@ -108,16 +104,6 @@ export async function GET(request: NextRequest) {
     const searchParams = new URL(request.url).searchParams;
     const deviceToken = searchParams.get("deviceToken");
     const pinNumber = searchParams.get("pinNumber");
-
-    console.log("====================================");
-    console.log(
-      "Received GET request for hardware data:",
-      "deviceToken:",
-      deviceToken,
-      "pinNumber:",
-      pinNumber,
-    );
-    console.log("====================================");
 
     if (!deviceToken) {
       return NextResponse.json(

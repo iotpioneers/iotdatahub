@@ -38,10 +38,6 @@ interface UseWidgetStateOptions {
 export const useWidgetState = (
   options: UseWidgetStateOptions,
 ): UseWidgetStateReturn => {
-  console.log("====================================");
-  console.log("useWidgetState options:", options);
-  console.log("====================================");
-
   const {
     deviceId,
     initialWidgets = [],
@@ -438,10 +434,6 @@ export const useWidgetState = (
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(batchPayload),
       });
-
-      console.log("====================================");
-      console.log("Response from batch save:", response.json());
-      console.log("====================================");
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);

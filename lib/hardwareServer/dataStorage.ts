@@ -121,6 +121,7 @@ async function storeHardwareData(
 
     if (response.ok) {
       const result = (await response.json()) as APIHardwareDataResponse;
+
       logger.info("Hardware data stored in database", {
         device: result.device,
         pin: result.pin,
@@ -140,6 +141,10 @@ async function storeHardwareData(
       });
     }
   } catch (error) {
+    console.log("====================================");
+    console.log("Error storing hardware data in database", error);
+    console.log("====================================");
+
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
     logger.error("Error storing hardware data in database", {

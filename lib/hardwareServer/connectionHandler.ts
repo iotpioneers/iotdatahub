@@ -80,10 +80,6 @@ function handleDeviceConnection(
     client: clientAddress,
   });
 
-  console.log("====================================");
-  console.log(`🔌 NEW CONNECTION: ${clientAddress} (ID: ${connectionId})`);
-  console.log("====================================");
-
   let messageBuffer = Buffer.alloc(0);
   let deviceToken: string | null = null;
   const deviceInfo: DeviceConnectionInfo = {
@@ -115,15 +111,6 @@ function handleDeviceConnection(
           ? `${deviceToken.substring(0, 4)}...${deviceToken.substring(deviceToken.length - 4)}`
           : "NOT_AUTHENTICATED";
 
-        console.log("====================================");
-        console.log(`📨 RECEIVED: ${messageTypeName}`);
-        console.log(`   Connection: ${connectionId} (${clientAddress})`);
-        console.log(`   Device: ${maskedToken}`);
-        console.log(`   Message ID: ${message.id}`);
-        console.log(`   Length: ${message.length} bytes`);
-        console.log(`   Content: ${formattedBody}`);
-        console.log("====================================");
-
         // Handle the message
         await protocolHandler.handleMessage(socket, message, deviceToken);
       }
@@ -135,11 +122,6 @@ function handleDeviceConnection(
         connectionId,
         deviceToken: deviceToken ? deviceManager.maskToken(deviceToken) : null,
       });
-
-      console.log("====================================");
-      console.log(`❌ ERROR processing message from ${connectionId}`);
-      console.log(`   Error: ${errorMessage}`);
-      console.log("====================================");
     }
   });
 
@@ -152,14 +134,6 @@ function handleDeviceConnection(
       connectionId,
       deviceToken: deviceInfo.token,
     });
-
-    console.log("====================================");
-    console.log(`🔌 CONNECTION CLOSED: ${clientAddress} (ID: ${connectionId})`);
-    console.log(
-      `   Device: ${deviceInfo.token ? deviceManager.maskToken(deviceInfo.token) : "NOT_AUTHENTICATED"}`,
-    );
-    console.log(`   Duration: Connection closed gracefully`);
-    console.log("====================================");
   });
 
   socket.on("error", (err: Error) => {
@@ -168,14 +142,6 @@ function handleDeviceConnection(
       connectionId,
       deviceToken: deviceInfo.token,
     });
-
-    console.log("====================================");
-    console.log(`❌ SOCKET ERROR: ${clientAddress} (ID: ${connectionId})`);
-    console.log(`   Error: ${err.message}`);
-    console.log(
-      `   Device: ${deviceInfo.token ? deviceManager.maskToken(deviceInfo.token) : "NOT_AUTHENTICATED"}`,
-    );
-    console.log("====================================");
   });
 }
 
