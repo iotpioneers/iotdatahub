@@ -3,18 +3,8 @@ import type {
   DeviceUpdateData,
   HardwareDataRequest,
 } from "./types";
-import config from "./config";
 import logger from "./logger";
-
-interface APIDeviceInfoResponse {
-  device: string;
-}
-
-interface APIHardwareDataResponse {
-  device: string;
-  pin: number;
-  value: string | number;
-}
+import prisma from "../../prisma/client";
 
 async function storeDeviceInfo(
   deviceToken: string,
@@ -22,77 +12,85 @@ async function storeDeviceInfo(
   clientIP: string,
 ): Promise<void> {
   try {
-    const updateData: DeviceUpdateData = {
-      lastPing: new Date(),
-      status: "ONLINE",
-      metadata: {
-        mcuVersion: deviceInfo.mcu,
-        firmwareType: deviceInfo.firmware,
-        buildInfo: deviceInfo.build,
-        iotVersion: deviceInfo.version,
-        heartbeat: deviceInfo.heartbeat
-          ? parseInt(deviceInfo.heartbeat, 10)
-          : null,
-        bufferSize: deviceInfo.buffer ? parseInt(deviceInfo.buffer, 10) : null,
-        template: deviceInfo.template,
-        lastInfoUpdate: new Date().toISOString(),
-        connectionCount: 1,
-        rawDeviceInfo: deviceInfo,
-      },
-    };
-
-    // Map parsed info to device fields
-    if (deviceInfo.firmware) {
-      updateData.firmware = deviceInfo.firmware;
-    }
-
-    if (deviceInfo.device) {
-      updateData.model = deviceInfo.device;
-    }
-
-    if (clientIP) {
-      updateData.ipAddress = clientIP;
-    }
-
-    // Make API call to store device info
-    const response = await fetch(`${config.apiBaseUrl}/api/devices/info`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        deviceToken,
-        ...updateData,
-      }),
+    // Find the device by auth token
+    const device = await prisma.device.findUnique({
+      where: { authToken: deviceToken },
     });
 
-    if (response.ok) {
-      const result = (await response.json()) as APIDeviceInfoResponse;
-      logger.info("Device info stored in database", {
-        device: result.device,
-        updates: Object.keys(updateData),
+    if (!device) {
+      logger.warn("Device not found for info update", {
+        token: deviceToken.substring(0, 8) + "...",
       });
-    } else {
-      logger.error("Failed to store device info in database", {
-        status: response.status,
-        statusText: response.statusText,
-      });
-      // Still log locally as fallback
-      logger.info("Device info stored locally (fallback)", {
-        deviceToken: deviceToken.substring(0, 8) + "...",
-        updates: Object.keys(updateData),
-      });
+      return;
     }
+
+    // Determine device type based on model
+    const deviceType = deviceInfo.device?.startsWith("ESP")
+      ? "GATEWAY"
+      : deviceInfo.device?.startsWith("ARDUINO")
+        ? "CONTROLLER"
+        : device.deviceType;
+
+    // Update device with new information
+    const updatedDevice = await prisma.device.update({
+      where: { id: device.id },
+      data: {
+        firmware: deviceInfo.firmware || device.firmware,
+        model: deviceInfo.device || device.model,
+        ipAddress: clientIP || device.ipAddress,
+        deviceType: deviceType,
+        metadata: deviceInfo
+          ? {
+              ...((device.metadata as object) || {}),
+              mcuVersion: deviceInfo.mcu,
+              firmwareType: deviceInfo.firmware,
+              buildInfo: deviceInfo.build,
+              iotVersion: deviceInfo.version,
+              heartbeat: deviceInfo.heartbeat
+                ? parseInt(deviceInfo.heartbeat, 10)
+                : null,
+              bufferSize: deviceInfo.buffer
+                ? parseInt(deviceInfo.buffer, 10)
+                : null,
+              template: deviceInfo.template,
+              lastInfoUpdate: new Date().toISOString(),
+              connectionCount: 1,
+              rawDeviceInfo: deviceInfo,
+            }
+          : device.metadata,
+        lastPing: new Date(),
+        status: "ONLINE",
+      },
+    });
+
+    // Log the device info update
+    await prisma.deviceLog.create({
+      data: {
+        deviceId: device.id,
+        level: "INFO",
+        message: "Device information updated via socket connection",
+        data: {
+          updatedFields: {
+            firmware: !!deviceInfo.firmware,
+            model: !!deviceInfo.device,
+            ipAddress: !!clientIP,
+            metadata: !!deviceInfo,
+          },
+          source: "socket_connection",
+        },
+      },
+    });
+
+    logger.info("Device info stored in database", {
+      device: updatedDevice.name,
+      deviceId: updatedDevice.id,
+      updates: Object.keys(deviceInfo),
+    });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
     logger.error("Error storing device info in database", {
       error: errorMessage,
-    });
-    // Still log locally as fallback
-    logger.info("Device info stored locally (fallback)", {
-      deviceToken: deviceToken.substring(0, 8) + "...",
-      updates: ["lastPing", "status"],
     });
   }
 }
@@ -103,59 +101,95 @@ async function storeHardwareData(
   value: string | number,
 ): Promise<void> {
   try {
-    const dataRequest: HardwareDataRequest = {
-      deviceToken,
-      pinNumber: pin,
-      value: value,
-      dataType: isNaN(parseFloat(String(value))) ? "STRING" : "FLOAT",
-    };
-
-    // Make API call to store hardware data
-    const response = await fetch(`${config.apiBaseUrl}/api/devices/data`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(dataRequest),
+    // Find the device by auth token
+    const device = await prisma.device.findUnique({
+      where: { authToken: deviceToken },
     });
 
-    if (response.ok) {
-      const result = (await response.json()) as APIHardwareDataResponse;
+    if (!device) {
+      logger.warn("Device not found for hardware data", {
+        token: deviceToken.substring(0, 8) + "...",
+        pin,
+        value,
+      });
+      return;
+    }
 
-      logger.info("Hardware data stored in database", {
-        device: result.device,
-        pin: result.pin,
-        value: result.value,
-      });
-    } else {
-      logger.error("Failed to store hardware data in database", {
-        status: response.status,
-        statusText: response.statusText,
-      });
-      // Still log locally as fallback
-      logger.info("Hardware data stored locally (fallback)", {
-        device: deviceToken.substring(0, 8) + "...",
-        pin: pin,
-        value: value,
-        dataType: dataRequest.dataType,
+    // Update device status to ONLINE since we're receiving data
+    await prisma.device.update({
+      where: { id: device.id },
+      data: {
+        status: "ONLINE",
+        lastPing: new Date(),
+      },
+    });
+
+    const dataType = isNaN(parseFloat(String(value))) ? "STRING" : "FLOAT";
+
+    // Upsert virtual pin data
+    await prisma.virtualPin.upsert({
+      where: {
+        deviceId_pinNumber: {
+          deviceId: device.id,
+          pinNumber: pin,
+        },
+      },
+      update: {
+        value: value.toString(),
+        dataType: dataType,
+        lastUpdated: new Date(),
+      },
+      create: {
+        deviceId: device.id,
+        pinNumber: pin,
+        value: value.toString(),
+        dataType: dataType,
+        lastUpdated: new Date(),
+      },
+    });
+
+    // Store in pin history for analytics
+    await prisma.pinHistory.create({
+      data: {
+        deviceId: device.id,
+        pinNumber: pin,
+        value: value.toString(),
+        dataType: dataType,
+        timestamp: new Date(),
+      },
+    });
+
+    // Update widgets that use this pin
+    const widgets = await prisma.widget.findMany({
+      where: {
+        deviceId: device.id,
+        pinNumber: pin,
+      },
+    });
+
+    for (const widget of widgets) {
+      await prisma.widget.update({
+        where: { id: widget.id },
+        data: {
+          value: value.toString(),
+          updatedAt: new Date(),
+        },
       });
     }
-  } catch (error) {
-    console.log("====================================");
-    console.log("Error storing hardware data in database", error);
-    console.log("====================================");
 
+    logger.info("Hardware data stored in database", {
+      device: device.name,
+      deviceId: device.id,
+      pin,
+      value,
+      dataType,
+      widgetUpdates: widgets.length,
+    });
+  } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
     logger.error("Error storing hardware data in database", {
       error: errorMessage,
-    });
-    // Still log locally as fallback
-    logger.info("Hardware data stored locally (fallback)", {
-      device: deviceToken.substring(0, 8) + "...",
-      pin: pin,
-      value: value,
-      dataType: isNaN(parseFloat(String(value))) ? "STRING" : "FLOAT",
     });
   }
 }

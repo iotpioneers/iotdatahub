@@ -17,6 +17,7 @@ import {
 } from "./lib/hardwareServer/apiServer";
 
 import config from "./lib/hardwareServer/config";
+import prisma from "./prisma/client";
 
 // Initialize core components in proper order
 const deviceCache = new DeviceCacheManager();
@@ -58,12 +59,15 @@ httpServer.listen(config.apiPort, () => {
 });
 
 // Graceful shutdown with cache cleanup
-process.on("SIGINT", () => {
+process.on("SIGINT", async () => {
   console.log("Shutting down all servers and cleaning up cache...");
 
   // Clean up cache first
   deviceCache.cleanup();
   wsManager.cleanup();
+
+  // Close Prisma connection
+  await prisma.$disconnect();
 
   httpServer.close();
   iotServer.close();
@@ -72,11 +76,14 @@ process.on("SIGINT", () => {
   process.exit(0);
 });
 
-process.on("SIGTERM", () => {
+process.on("SIGTERM", async () => {
   console.log("Received SIGTERM, shutting down gracefully...");
 
   deviceCache.cleanup();
   wsManager.cleanup();
+
+  // Close Prisma connection
+  await prisma.$disconnect();
 
   httpServer.close(() => {
     process.exit(0);

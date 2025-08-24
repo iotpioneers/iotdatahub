@@ -1,12 +1,12 @@
+import { DeviceStatus } from "@prisma/client";
 import logger from "./logger";
-import config from "./config";
-import prisma from "@/prisma/client";
+import prisma from "../../prisma/client";
 
 export interface CachedDevice {
   id: string;
   token: string;
   name: string;
-  status: "ONLINE" | "OFFLINE";
+  status: DeviceStatus;
   lastPing: Date;
   widgets: CachedWidget[];
   pinHistory: Map<string, PinHistoryEntry>;
@@ -62,114 +62,44 @@ class DeviceCacheManager {
     organizationId: string,
   ): Promise<void> {
     try {
-      logger.info("Initializing device cache", { userId, organizationId });
+      logger.info("Initializing device cache with Prisma", {
+        userId,
+        organizationId,
+      });
 
-      // Fetch all devices for the user/organization
-      const devicesResponse = await fetch(
-        `${config.apiBaseUrl}/api/organizations/${organizationId}`,
-        {
-          headers: { "Content-Type": "application/json" },
+      // Fetch all devices for the user/organization using Prisma
+      const devicesData = await prisma.device.findMany({
+        where: {
+          OR: [{ userId: userId }, { organizationId: organizationId }],
         },
-      );
+        include: {
+          widgets: {
+            include: {
+              pinConfig: true,
+            },
+          },
+          virtualPins: true,
+        },
+      });
 
-      if (!devicesResponse.ok) {
-        throw new Error(`Failed to fetch devices: ${devicesResponse.status}`);
-      }
-
-      const organizationData = await devicesResponse.json();
-
-      // FIX: Extract devices from organization data
-      // The organization object has a Device field that contains the array of devices
-      const devicesData = organizationData.Device;
-
-      // Validate that devicesData exists and is an array
-      if (!devicesData) {
-        logger.warn("No devices found in organization data", {
+      if (!devicesData || devicesData.length === 0) {
+        logger.warn("No devices found for user/organization", {
+          userId,
           organizationId,
         });
         this.isInitialized = true;
         return;
       }
 
-      if (!Array.isArray(devicesData)) {
-        throw new Error(
-          `Expected devices to be an array, got: ${typeof devicesData}`,
-        );
-      }
-
-      logger.info("Processing devices from organization", {
+      logger.info("Processing devices from database", {
         deviceCount: devicesData.length,
         organizationId,
       });
 
       for (const deviceData of devicesData) {
         try {
-          // Fetch widgets for each device
-          const widgetsResponse = await fetch(
-            `${config.apiBaseUrl}/api/devices/${deviceData.id}/widgets`,
-            {
-              headers: { "Content-Type": "application/json" },
-            },
-          );
-
-          let widgets: CachedWidget[] = [];
-          if (widgetsResponse.ok) {
-            const widgetsData = await widgetsResponse.json();
-
-            // Validate widgets data is an array
-            if (Array.isArray(widgetsData)) {
-              widgets = widgetsData.map((widget: any) => ({
-                id: widget.id,
-                deviceId: deviceData.id,
-                pinConfig: widget.pinConfig || {
-                  pinNumber:
-                    widget.settings?.pinNumber?.toString().replace("V", "") ||
-                    "0",
-                  value: widget.value || widget.settings?.value || 0,
-                  dataType: "FLOAT",
-                },
-                value:
-                  widget.pinConfig?.value ||
-                  widget.value ||
-                  widget.settings?.value ||
-                  0,
-                lastUpdated: new Date(),
-              }));
-            } else {
-              logger.warn("Widgets data is not an array", {
-                deviceId: deviceData.id,
-                widgetsType: typeof widgetsData,
-              });
-            }
-          } else {
-            logger.warn("Failed to fetch widgets", {
-              deviceId: deviceData.id,
-              status: widgetsResponse.status,
-            });
-          }
-
-          // Validate device has required fields
-          if (!deviceData.id || !deviceData.authToken) {
-            logger.warn("Device missing required fields", {
-              deviceId: deviceData.id,
-              hasToken: !!deviceData.authToken,
-            });
-            continue;
-          }
-
           // Create cached device
-          const cachedDevice: CachedDevice = {
-            id: deviceData.id,
-            token: deviceData.authToken, // Note: using authToken, not token
-            name: deviceData.name || "Unknown Device",
-            status: deviceData.status || "OFFLINE",
-            lastPing: deviceData.lastPing
-              ? new Date(deviceData.lastPing)
-              : new Date(),
-            widgets,
-            pinHistory: new Map(),
-            metadata: deviceData.metadata,
-          };
+          const cachedDevice = this.createCachedDevice(deviceData);
 
           // Store in cache
           this.devices.set(deviceData.id, cachedDevice);
@@ -178,7 +108,7 @@ class DeviceCacheManager {
           logger.info("Device cached", {
             deviceId: deviceData.id,
             deviceName: cachedDevice.name,
-            widgetCount: widgets.length,
+            widgetCount: cachedDevice.widgets.length,
             token: this.maskToken(deviceData.authToken),
           });
         } catch (deviceError) {
@@ -189,12 +119,11 @@ class DeviceCacheManager {
                 ? deviceError.message
                 : "Unknown error",
           });
-          // Continue with other devices
         }
       }
 
       this.isInitialized = true;
-      logger.info("Device cache initialized successfully", {
+      logger.info("Device cache initialized successfully with Prisma", {
         deviceCount: this.devices.size,
         userId,
         organizationId,
@@ -202,7 +131,7 @@ class DeviceCacheManager {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
-      logger.error("Failed to initialize device cache", {
+      logger.error("Failed to initialize device cache with Prisma", {
         error: errorMessage,
         userId,
         organizationId,
@@ -212,31 +141,193 @@ class DeviceCacheManager {
   }
 
   /**
-   * Get device ID from token (instant lookup)
+   * Helper method to create cached device from database data
    */
-  getDeviceIdFromToken(token: string): string | null {
+  private createCachedDevice(deviceData: any): CachedDevice {
+    return {
+      id: deviceData.id,
+      token: deviceData.authToken,
+      name: deviceData.name || "Unknown Device",
+      status: deviceData.status || DeviceStatus.OFFLINE,
+      lastPing: deviceData.lastPing || new Date(),
+      widgets: deviceData.widgets.map((widget: any) => ({
+        id: widget.id,
+        deviceId: deviceData.id,
+        pinConfig: {
+          pinNumber:
+            widget.pinNumber?.toString() ||
+            (widget.settings as any)?.pinNumber?.toString().replace("V", "") ||
+            "0",
+          value: widget.value || (widget.settings as any)?.value || 0,
+          dataType: "FLOAT",
+        },
+        value: widget.value || (widget.settings as any)?.value || 0,
+        lastUpdated: widget.updatedAt,
+      })),
+      pinHistory: new Map(),
+      metadata: deviceData.metadata,
+    };
+  }
+
+  /**
+   * Load device from database and add to cache
+   */
+  private async loadDeviceFromDatabase(
+    token: string,
+  ): Promise<CachedDevice | null> {
+    try {
+      logger.info("Loading device from database", {
+        token: this.maskToken(token),
+      });
+
+      const deviceData = await prisma.device.findFirst({
+        where: {
+          authToken: token,
+        },
+        include: {
+          widgets: {
+            include: {
+              pinConfig: true,
+            },
+          },
+          virtualPins: true,
+        },
+      });
+
+      if (!deviceData) {
+        logger.warn("Device not found in database", {
+          token: this.maskToken(token),
+        });
+        return null;
+      }
+
+      // Create cached device
+      const cachedDevice = this.createCachedDevice(deviceData);
+
+      // Add to cache
+      this.devices.set(deviceData.id, cachedDevice);
+      this.tokenToId.set(deviceData.authToken, deviceData.id);
+
+      logger.info("Device loaded from database and cached", {
+        deviceId: deviceData.id,
+        deviceName: cachedDevice.name,
+        widgetCount: cachedDevice.widgets.length,
+        token: this.maskToken(token),
+      });
+
+      return cachedDevice;
+    } catch (error) {
+      logger.error("Failed to load device from database", {
+        token: this.maskToken(token),
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return null;
+    }
+  }
+
+  /**
+   * Get device ID from token (with database fallback)
+   */
+  async getDeviceIdFromToken(token: string): Promise<string | null> {
+    // First check cache
+    const cachedId = this.tokenToId.get(token);
+    if (cachedId) {
+      return cachedId;
+    }
+
+    // Fallback to database
+    logger.info("Device not found in cache, checking database", {
+      token: this.maskToken(token),
+    });
+
+    const device = await this.loadDeviceFromDatabase(token);
+    return device ? device.id : null;
+  }
+
+  /**
+   * Get device ID from token (synchronous, cache only)
+   */
+  getDeviceIdFromTokenSync(token: string): string | null {
     return this.tokenToId.get(token) || null;
   }
 
   /**
-   * Get cached device by ID
+   * Get cached device by ID (with database fallback)
    */
-  getDevice(deviceId: string): CachedDevice | null {
+  async getDevice(deviceId: string): Promise<CachedDevice | null> {
+    // First check cache
+    const cachedDevice = this.devices.get(deviceId);
+    if (cachedDevice) {
+      return cachedDevice;
+    }
+
+    // Fallback to database - find by device ID
+    try {
+      const deviceData = await prisma.device.findUnique({
+        where: { id: deviceId },
+        include: {
+          widgets: {
+            include: {
+              pinConfig: true,
+            },
+          },
+          virtualPins: true,
+        },
+      });
+
+      if (!deviceData) {
+        return null;
+      }
+
+      const cachedDevice = this.createCachedDevice(deviceData);
+
+      // Add to cache
+      this.devices.set(deviceData.id, cachedDevice);
+      this.tokenToId.set(deviceData.authToken, deviceData.id);
+
+      logger.info("Device loaded from database by ID and cached", {
+        deviceId: deviceData.id,
+        deviceName: cachedDevice.name,
+        token: this.maskToken(deviceData.authToken),
+      });
+
+      return cachedDevice;
+    } catch (error) {
+      logger.error("Failed to load device by ID from database", {
+        deviceId,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return null;
+    }
+  }
+
+  /**
+   * Get cached device by ID (synchronous, cache only)
+   */
+  getDeviceSync(deviceId: string): CachedDevice | null {
     return this.devices.get(deviceId) || null;
   }
 
   /**
-   * Get cached device by token
+   * Get cached device by token (with database fallback)
    */
-  getDeviceByToken(token: string): CachedDevice | null {
-    const deviceId = this.getDeviceIdFromToken(token);
-    return deviceId ? this.getDevice(deviceId) : null;
+  async getDeviceByToken(token: string): Promise<CachedDevice | null> {
+    const deviceId = await this.getDeviceIdFromToken(token);
+    return deviceId ? await this.getDevice(deviceId) : null;
+  }
+
+  /**
+   * Get cached device by token (synchronous, cache only)
+   */
+  getDeviceByTokenSync(token: string): CachedDevice | null {
+    const deviceId = this.getDeviceIdFromTokenSync(token);
+    return deviceId ? this.getDeviceSync(deviceId) : null;
   }
 
   /**
    * Update device info in cache and queue for database update
    */
-  updateDeviceInfo(
+  async updateDeviceInfo(
     token: string,
     updates: {
       status?: "ONLINE" | "OFFLINE";
@@ -244,16 +335,16 @@ class DeviceCacheManager {
       metadata?: any;
       [key: string]: any;
     },
-  ): void {
-    const deviceId = this.getDeviceIdFromToken(token);
+  ): Promise<void> {
+    const deviceId = await this.getDeviceIdFromToken(token);
     if (!deviceId) {
-      logger.warn("Device not found in cache for info update", {
+      logger.warn("Device not found in cache or database for info update", {
         token: this.maskToken(token),
       });
       return;
     }
 
-    const device = this.devices.get(deviceId);
+    const device = await this.getDevice(deviceId);
     if (!device) return;
 
     // Update cache immediately
@@ -272,15 +363,15 @@ class DeviceCacheManager {
   /**
    * Update hardware data in cache and queue for database update
    */
-  updateHardwareData(
+  async updateHardwareData(
     token: string,
     pin: number,
     value: string | number,
     command: string,
-  ): { deviceId: string; updatedWidget: CachedWidget | null } | null {
-    const deviceId = this.getDeviceIdFromToken(token);
+  ): Promise<{ deviceId: string; updatedWidget: CachedWidget | null } | null> {
+    const deviceId = await this.getDeviceIdFromToken(token);
     if (!deviceId) {
-      logger.warn("Device not found in cache for hardware update", {
+      logger.warn("Device not found in cache or database for hardware update", {
         token: this.maskToken(token),
         pin,
         value,
@@ -288,8 +379,15 @@ class DeviceCacheManager {
       return null;
     }
 
-    const device = this.devices.get(deviceId);
-    if (!device) return null;
+    const device = await this.getDevice(deviceId);
+    if (!device) {
+      logger.error("Hardware update failed - device not found", {
+        deviceToken: this.maskToken(token),
+        pin,
+        value,
+      });
+      return null;
+    }
 
     const pinStr = pin.toString();
 
@@ -422,75 +520,64 @@ class DeviceCacheManager {
   ): Promise<void> {
     const { deviceId, updates } = batch;
 
-    // Update device info if needed
-    if (updates.device) {
-      const response = await fetch(
-        `${config.apiBaseUrl}/api/devices/${deviceId}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ data: updates.device }),
-        },
-      );
+    try {
+      // Update device info if needed
+      if (updates.device) {
+        // Extract widgets from device updates since they need special handling
+        const { widgets, pinHistory, ...deviceOnlyUpdates } = updates.device;
 
-      if (!response.ok) {
-        throw new Error(`Device update failed: ${response.status}`);
-      }
-    }
-
-    // Update widgets if needed
-    if (updates.widgets && updates.widgets.length > 0) {
-      for (const widget of updates.widgets) {
-        const response = await fetch(
-          `${config.apiBaseUrl}/api/widgets/${widget.id}`,
-          {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              value: widget.value,
-              pinConfig: widget.pinConfig,
-            }),
-          },
-        );
-
-        if (!response.ok) {
-          logger.warn("Widget update failed", {
-            widgetId: widget.id,
-            status: response.status,
-          });
-        }
-      }
-    }
-
-    // Store pin history if needed
-    if (updates.pinHistory && updates.pinHistory.length > 0) {
-      for (const entry of updates.pinHistory) {
-        const response = await prisma.pinHistory.create({
+        await prisma.device.update({
+          where: { id: deviceId },
           data: {
-            deviceId,
-            pinNumber: Number(entry.pin),
-            value: entry.value.toString(),
-            dataType: "STRING",
-            timestamp: entry.timestamp,
+            ...deviceOnlyUpdates,
+            lastPing: updates.device.lastPing || new Date(),
           },
         });
+      }
 
-        if (!response) {
-          logger.warn("Pin history storage failed", {
-            deviceId,
-            pin: entry.pin,
-            status: "Failed",
+      // Update widgets if needed
+      if (updates.widgets && updates.widgets.length > 0) {
+        for (const widget of updates.widgets) {
+          await prisma.widget.update({
+            where: { id: widget.id },
+            data: {
+              value: widget.value.toString(),
+              updatedAt: new Date(),
+            },
           });
         }
       }
-    }
 
-    logger.debug("Device updated in database", {
-      deviceId,
-      deviceUpdates: !!updates.device,
-      widgetUpdates: updates.widgets?.length || 0,
-      historyEntries: updates.pinHistory?.length || 0,
-    });
+      // Store pin history if needed
+      if (updates.pinHistory && updates.pinHistory.length > 0) {
+        for (const entry of updates.pinHistory) {
+          await prisma.pinHistory.create({
+            data: {
+              deviceId: deviceId,
+              pinNumber: parseInt(entry.pin),
+              value: entry.value.toString(),
+              dataType: isNaN(parseFloat(String(entry.value)))
+                ? "STRING"
+                : "FLOAT",
+              timestamp: entry.timestamp,
+            },
+          });
+        }
+      }
+
+      logger.debug("Device updated in database via Prisma", {
+        deviceId,
+        deviceUpdates: !!updates.device,
+        widgetUpdates: updates.widgets?.length || 0,
+        historyEntries: updates.pinHistory?.length || 0,
+      });
+    } catch (error) {
+      logger.error("Failed to update device in database via Prisma", {
+        deviceId,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      throw error;
+    }
   }
 
   /**

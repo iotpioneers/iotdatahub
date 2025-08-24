@@ -175,7 +175,7 @@ class WebSocketManager {
   /**
    * Main method to broadcast hardware data updates (NOW INSTANT!)
    */
-  broadcastHardwareUpdate(
+  async broadcastHardwareUpdate(
     deviceToken: string,
     pin: number,
     value: string | number,
@@ -184,7 +184,7 @@ class WebSocketManager {
     if (!this.wss) return;
 
     // INSTANT lookup from cache - no API call!
-    const result = this.deviceCache.updateHardwareData(
+    const result = await this.deviceCache.updateHardwareData(
       deviceToken,
       pin,
       value,
@@ -242,7 +242,11 @@ class WebSocketManager {
   /**
    * Broadcast device status updates (using cache)
    */
-  broadcastDeviceStatus(deviceToken: string, status: string, lastPing?: Date) {
+  async broadcastDeviceStatus(
+    deviceToken: string,
+    status: string,
+    lastPing?: Date,
+  ) {
     if (!this.wss) return;
 
     // Update in cache first
@@ -252,7 +256,7 @@ class WebSocketManager {
     });
 
     // Get device ID from cache
-    const deviceId = this.deviceCache.getDeviceIdFromToken(deviceToken);
+    const deviceId = await this.deviceCache.getDeviceIdFromToken(deviceToken);
 
     if (deviceId) {
       const message = {
