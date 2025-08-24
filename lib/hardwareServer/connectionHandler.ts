@@ -111,6 +111,14 @@ function handleDeviceConnection(
           ? `${deviceToken.substring(0, 4)}...${deviceToken.substring(deviceToken.length - 4)}`
           : "NOT_AUTHENTICATED";
 
+        console.log("====================================");
+        console.log(
+          `Received ${messageTypeName} message from ${clientAddress} (${maskedToken})`,
+          " and body:",
+          formattedBody,
+        );
+        console.log("====================================");
+
         // Handle the message
         await protocolHandler.handleMessage(socket, message, deviceToken);
       }

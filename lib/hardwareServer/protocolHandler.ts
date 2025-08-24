@@ -6,6 +6,7 @@ import type {
 } from "./types";
 import { PROTOCOL } from "./types";
 import WebSocketManager from "./websocketManager";
+import DeviceCacheManager from "./deviceCacheManager";
 import SimpleMessage from "./message";
 import { parseHardwareCommand, parseDeviceInfo } from "./commandParser";
 import { storeDeviceInfo, storeHardwareData } from "./dataStorage";
@@ -14,10 +15,16 @@ import logger from "./logger";
 class SimpleProtocolHandler implements IProtocolHandler {
   private readonly deviceManager: IDeviceManager;
   private readonly wsManager: WebSocketManager;
+  private readonly deviceCache: DeviceCacheManager;
 
-  constructor(deviceManager: IDeviceManager, wsManager: WebSocketManager) {
+  constructor(
+    deviceManager: IDeviceManager,
+    wsManager: WebSocketManager,
+    deviceCache: DeviceCacheManager,
+  ) {
     this.deviceManager = deviceManager;
     this.wsManager = wsManager;
+    this.deviceCache = deviceCache;
   }
 
   async handleMessage(
@@ -85,7 +92,7 @@ class SimpleProtocolHandler implements IProtocolHandler {
           command: parsedCommand,
         });
 
-        // 🚀 BROADCAST TO WEBSOCKET CLIENTS!
+        // INSTANT WebSocket broadcast using cache (NO DATABASE DELAYS!)
         this.wsManager.broadcastHardwareUpdate(
           deviceToken,
           parsedCommand.pin,
@@ -94,16 +101,17 @@ class SimpleProtocolHandler implements IProtocolHandler {
         );
 
         console.log("====================================");
-        console.log(`🔧 HARDWARE COMMAND EXECUTED`);
+        console.log("HARDWARE COMMAND EXECUTED");
         console.log(`   Device: ${this.deviceManager.maskToken(deviceToken)}`);
         console.log(`   Command: ${parsedCommand.type}`);
         console.log(`   Pin: ${parsedCommand.pin}`);
         if (parsedCommand.value !== undefined) {
           console.log(`   Value: ${parsedCommand.value}`);
         }
+        console.log("   Status: INSTANT CACHE UPDATE + DELAYED DB SAVE");
         console.log("====================================");
 
-        // Store virtual pin data and broadcast updates
+        // Store virtual pin data in device manager (for protocol compatibility)
         if (parsedCommand.type === "VIRTUAL_WRITE") {
           const device = this.deviceManager.getDevice(deviceToken);
           if (device) {
@@ -113,12 +121,15 @@ class SimpleProtocolHandler implements IProtocolHandler {
             });
           }
 
-          // Store in database
-          await storeHardwareData(
+          // Legacy database storage (will be handled by cache background process)
+          // Keep this for backward compatibility, but it won't block real-time updates
+          storeHardwareData(
             deviceToken,
             parsedCommand.pin,
             parsedCommand.value!,
-          );
+          ).catch((error) => {
+            logger.warn("Background database storage failed", { error });
+          });
 
           this.sendSuccessResponse(
             socket,
@@ -126,14 +137,6 @@ class SimpleProtocolHandler implements IProtocolHandler {
             `VirtualWrite(${parsedCommand.pin}=${parsedCommand.value}) executed`,
           );
         } else {
-          // Also broadcast other command types
-          this.wsManager.broadcastHardwareUpdate(
-            deviceToken,
-            parsedCommand.pin,
-            parsedCommand.value || "",
-            parsedCommand.type,
-          );
-
           this.sendSuccessResponse(
             socket,
             message.id,
@@ -170,9 +173,34 @@ class SimpleProtocolHandler implements IProtocolHandler {
       const deviceInfo = parseDeviceInfo(message.body);
 
       if (Object.keys(deviceInfo).length > 0 && deviceToken) {
-        await storeDeviceInfo(deviceToken, deviceInfo, clientIP);
+        // Update cache immediately for instant status updates
+        this.deviceCache.updateDeviceInfo(deviceToken, {
+          status: "ONLINE",
+          lastPing: new Date(),
+          metadata: {
+            mcuVersion: deviceInfo.mcu,
+            firmwareType: deviceInfo.firmware,
+            buildInfo: deviceInfo.build,
+            iotVersion: deviceInfo.version,
+            heartbeat: deviceInfo.heartbeat
+              ? parseInt(deviceInfo.heartbeat, 10)
+              : null,
+            bufferSize: deviceInfo.buffer
+              ? parseInt(deviceInfo.buffer, 10)
+              : null,
+            template: deviceInfo.template,
+            lastInfoUpdate: new Date().toISOString(),
+            connectionCount: 1,
+            rawDeviceInfo: deviceInfo,
+          },
+        });
 
-        // Broadcast device status update via WebSocket
+        // Legacy database storage (background, non-blocking)
+        storeDeviceInfo(deviceToken, deviceInfo, clientIP).catch((error) => {
+          logger.warn("Background device info storage failed", { error });
+        });
+
+        // Broadcast device status update via WebSocket (instant)
         this.wsManager.broadcastDeviceStatus(deviceToken, "ONLINE", new Date());
       }
 
@@ -182,12 +210,13 @@ class SimpleProtocolHandler implements IProtocolHandler {
       if (deviceInfo.version) infoSummary.push(`ver:${deviceInfo.version}`);
 
       console.log("====================================");
-      console.log(`📋 DEVICE INFO RECEIVED`);
+      console.log("DEVICE INFO RECEIVED");
       console.log(
         `   Device: ${deviceToken ? this.deviceManager.maskToken(deviceToken) : "UNKNOWN"}`,
       );
       console.log(`   IP: ${clientIP}`);
       console.log(`   Info: ${infoSummary.join(", ") || "No parsed info"}`);
+      console.log("   Status: INSTANT CACHE UPDATE + DELAYED DB SAVE");
       console.log("====================================");
 
       this.sendSuccessResponse(socket, message.id, "Device info stored");
@@ -248,7 +277,7 @@ class SimpleProtocolHandler implements IProtocolHandler {
       const commandName = commandNames[command] || command.toUpperCase();
 
       console.log("====================================");
-      console.log(`📤 SENDING COMMAND TO DEVICE`);
+      console.log("SENDING COMMAND TO DEVICE");
       console.log(`   Device: ${this.deviceManager.maskToken(deviceToken)}`);
       console.log(`   Command: ${commandName}`);
       console.log(`   Pin: ${pin}`);
@@ -286,7 +315,7 @@ class SimpleProtocolHandler implements IProtocolHandler {
   ): Promise<boolean> {
     console.log("====================================");
     console.log(
-      "📤 SENDING VIRTUAL WRITE COMMAND TO DEVICE",
+      "SENDING VIRTUAL WRITE COMMAND TO DEVICE",
       deviceToken,
       "Pin",
       pin,
@@ -324,11 +353,20 @@ class SimpleProtocolHandler implements IProtocolHandler {
       this.deviceManager.addDevice(token, socket);
       (socket as DeviceSocket & { deviceToken?: string }).deviceToken = token;
 
+      // Update device status in cache if device exists
+      this.deviceCache.updateDeviceInfo(token, {
+        status: "ONLINE",
+        lastPing: new Date(),
+      });
+
       console.log("====================================");
-      console.log(`🔐 DEVICE LOGIN SUCCESSFUL`);
+      console.log("DEVICE LOGIN SUCCESSFUL");
       console.log(`   Token: ${this.deviceManager.maskToken(token)}`);
       console.log(`   Client: ${socket.remoteAddress}:${socket.remotePort}`);
       console.log(`   Status: Authenticated and ready`);
+      console.log(
+        `   Cache Status: ${this.deviceCache.isReady() ? "Ready" : "Initializing"}`,
+      );
       console.log("====================================");
 
       this.sendSuccessResponse(
@@ -369,7 +407,7 @@ class SimpleProtocolHandler implements IProtocolHandler {
       socket.write(buffer);
 
       console.log("====================================");
-      console.log(`✅ RESPONSE SENT: ${description}`);
+      console.log(`RESPONSE SENT: ${description}`);
       console.log(`   Message ID: ${responseId}`);
       console.log(`   Status: 200 (SUCCESS)`);
       console.log(`   Buffer: ${buffer.toString("hex")}`);

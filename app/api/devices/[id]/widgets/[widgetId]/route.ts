@@ -32,6 +32,69 @@ export async function PUT(
   }
 }
 
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string; widgetId: string } },
+) {
+  try {
+    const body = await request.json();
+
+    console.log("Patching widget:", params.widgetId, body);
+
+    // Verify the widget exists and belongs to the device
+    const existingWidget = await prisma.widget.findUnique({
+      where: {
+        id: params.widgetId,
+        deviceId: params.id,
+      },
+    });
+
+    if (!existingWidget) {
+      return NextResponse.json({ error: "Widget not found" }, { status: 404 });
+    }
+
+    // Update only the provided fields
+    const updateData: any = {};
+
+    // Handle common widget update fields
+    if (body.value !== undefined) updateData.value = body.value;
+    if (body.isActive !== undefined) updateData.isActive = body.isActive;
+    if (body.dataSource !== undefined) updateData.dataSource = body.dataSource;
+
+    const widget = await prisma.widget.update({
+      where: {
+        id: params.widgetId,
+        deviceId: params.id,
+      },
+      data: updateData,
+    });
+
+    console.log("Widget patched:", widget);
+
+    const existingConfig = await prisma.pinConfig.findFirst({
+      where: {
+        widgetId: params.widgetId,
+        deviceId: params.id,
+      },
+    });
+
+    if (existingConfig) {
+      await prisma.pinConfig.update({
+        where: { id: existingConfig.id },
+        data: updateData.value,
+      });
+    }
+
+    return NextResponse.json(widget);
+  } catch (error) {
+    console.error("Error patching widget:", error);
+    return NextResponse.json(
+      { error: "Error updating widget" },
+      { status: 500 },
+    );
+  }
+}
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string; widgetId: string } },

@@ -4,6 +4,7 @@ import http from "http";
 import SimpleDeviceManager from "./lib/hardwareServer/deviceManager";
 import SimpleProtocolHandler from "./lib/hardwareServer/protocolHandler";
 import WebSocketManager from "./lib/hardwareServer/websocketManager";
+import DeviceCacheManager from "./lib/hardwareServer/deviceCacheManager";
 
 // Servers
 import {
@@ -17,10 +18,15 @@ import {
 
 import config from "./lib/hardwareServer/config";
 
-// Initialize core components
+// Initialize core components in proper order
+const deviceCache = new DeviceCacheManager();
 const deviceManager = new SimpleDeviceManager();
-const wsManager = new WebSocketManager();
-const protocolHandler = new SimpleProtocolHandler(deviceManager, wsManager);
+const wsManager = new WebSocketManager(deviceCache); // Pass cache to WebSocket manager
+const protocolHandler = new SimpleProtocolHandler(
+  deviceManager,
+  wsManager,
+  deviceCache,
+);
 
 // Create API server first (Express app)
 const apiApp = createAPIServer(deviceManager, protocolHandler);
@@ -44,20 +50,35 @@ startTCPServers(iotServer, iotSSLServer);
 httpServer.listen(config.apiPort, () => {
   console.log(`
 ====================================
-🚀 Hardware Command API + WebSocket Server running on port ${config.apiPort}
+🚀 Enhanced Hardware Command API + WebSocket Server running on port ${config.apiPort}
 📡 WebSocket endpoint: ws://localhost:${config.apiPort}/api/ws
-🔌 TCP IoT Server running on port ${config.iotPort}
+📱 TCP IoT Server running on port ${config.iotPort}
 ====================================
 `);
 });
 
-// Graceful shutdown
+// Graceful shutdown with cache cleanup
 process.on("SIGINT", () => {
-  console.log("Shutting down all servers...");
+  console.log("Shutting down all servers and cleaning up cache...");
+
+  // Clean up cache first
+  deviceCache.cleanup();
+  wsManager.cleanup();
 
   httpServer.close();
   iotServer.close();
   if (iotSSLServer) iotSSLServer.close();
 
   process.exit(0);
+});
+
+process.on("SIGTERM", () => {
+  console.log("Received SIGTERM, shutting down gracefully...");
+
+  deviceCache.cleanup();
+  wsManager.cleanup();
+
+  httpServer.close(() => {
+    process.exit(0);
+  });
 });

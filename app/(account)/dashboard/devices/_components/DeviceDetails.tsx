@@ -32,10 +32,11 @@ const DeviceDetails = ({ params }: Props) => {
   const [device, setDevice] = useState<Device | null>(null);
   const [widgetData, setWidgetData] = useState<any[]>([]);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [cacheInitialized, setCacheInitialized] = useState(false);
 
   const { data: session, status } = useSession();
 
-  // WebSocket for real-time updates
+  // Enhanced WebSocket message handler for cache-based updates
   const handleWebSocketMessage = useCallback(
     (message: WebSocketMessage) => {
       console.log("Received WebSocket message:", message);
@@ -57,15 +58,16 @@ const DeviceDetails = ({ params }: Props) => {
             break;
 
           case "HARDWARE_DATA":
-            console.log("📡 Hardware data update received:", message.data);
-            // Update widget data with new hardware values
+            console.log("INSTANT hardware data update received:", message.data);
+
+            // Update widget data with new hardware values (INSTANT UPDATE)
             setWidgetData((prevWidgets) => {
               return prevWidgets.map((widget) => {
                 if (
                   widget.pinConfig?.pinNumber === message.data.pin.toString()
                 ) {
                   console.log(
-                    `🔄 Updating widget for pin ${message.data.pin} with value:`,
+                    `Updating widget for pin ${message.data.pin} with value:`,
                     message.data.value,
                   );
                   return {
@@ -83,6 +85,13 @@ const DeviceDetails = ({ params }: Props) => {
             setLastUpdate(new Date());
             break;
 
+          case "WIDGET_UPDATE":
+            // Direct widget updates from cache
+            console.log("Widget update from cache:", message.data);
+            setWidgetData(message.data.widgets);
+            setLastUpdate(new Date());
+            break;
+
           case "DEVICE_STATUS":
             // Update device status
             setDevice((prevDevice) =>
@@ -96,13 +105,29 @@ const DeviceDetails = ({ params }: Props) => {
             );
             setLastUpdate(new Date());
             break;
+
+          case "CACHE_INITIALIZED":
+            console.log("Device cache initialized:", message.stats);
+            setCacheInitialized(true);
+            setLastUpdate(new Date());
+            break;
         }
+      }
+
+      // Handle global cache status messages
+      if (message.type === "CONNECTION_ESTABLISHED") {
+        setCacheInitialized(message.cacheReady || false);
+        console.log("WebSocket connected. Cache ready:", message.cacheReady);
       }
     },
     [params.id],
   );
 
-  const { isConnected, error: wsError } = useWebSocket({
+  const {
+    isConnected,
+    error: wsError,
+    sendMessage,
+  } = useWebSocket({
     deviceId: params.id,
     onMessage: handleWebSocketMessage,
     enabled: !!session && status === "authenticated",
@@ -127,10 +152,33 @@ const DeviceDetails = ({ params }: Props) => {
     `/api/devices/${params.id}/widgets`,
   );
 
-  // Manual refresh function
+  // Initialize cache when WebSocket connects
+  useEffect(() => {
+    if (isConnected && session?.user?.organizationId && !cacheInitialized) {
+      console.log("Requesting cache initialization...");
+      sendMessage({
+        type: "INITIALIZE_CACHE",
+        userId: session.user.id,
+        organizationId: session.user.organizationId,
+      });
+    }
+  }, [isConnected, session, cacheInitialized, sendMessage]);
+
+  // Manual refresh function (now works with cache)
   const handleManualRefresh = async () => {
     console.log("Manual refresh triggered");
-    await Promise.all([refetchDevice(), refetchWidgets()]);
+
+    if (cacheInitialized && isConnected) {
+      // If cache is ready, just request fresh data via WebSocket
+      sendMessage({
+        type: "REFRESH_DEVICE",
+        deviceId: params.id,
+      });
+    } else {
+      // Fallback to API refresh
+      await Promise.all([refetchDevice(), refetchWidgets()]);
+    }
+
     setLastUpdate(new Date());
   };
 
@@ -140,17 +188,17 @@ const DeviceDetails = ({ params }: Props) => {
     if (initialWidgetData) setWidgetData(initialWidgetData);
   }, [deviceData, organizationData, initialWidgetData]);
 
-  // Fallback: Poll for updates every 10 seconds if WebSocket is not connected
+  // Enhanced fallback: Only poll if WebSocket is not connected AND cache is not ready
   useEffect(() => {
-    if (!isConnected) {
+    if (!isConnected || !cacheInitialized) {
       const pollInterval = setInterval(() => {
-        console.log("Polling for updates (WebSocket not connected)");
+        console.log("Polling for updates (WebSocket/Cache not ready)");
         handleManualRefresh();
       }, 10000); // Poll every 10 seconds
 
       return () => clearInterval(pollInterval);
     }
-  }, [isConnected]);
+  }, [isConnected, cacheInitialized]);
 
   if (error) {
     console.error("Error fetching device:", error);
@@ -172,21 +220,38 @@ const DeviceDetails = ({ params }: Props) => {
     return <LinearLoading />;
   }
 
+  // Connection status logic
+  const getConnectionStatus = () => {
+    if (isConnected && cacheInitialized) {
+      return { color: "bg-green-500", text: "Real-time with cache" };
+    } else if (isConnected) {
+      return { color: "bg-yellow-500", text: "Connected, initializing cache" };
+    } else {
+      return { color: "bg-red-500", text: "Using API polling" };
+    }
+  };
+
+  const connectionStatus = getConnectionStatus();
+
   return (
     <div className="min-h-screen px-4">
       {(isLoading || !deviceData || isRedirecting) && <LinearLoading />}
 
-      {/* Connection Status Indicator */}
+      {/* Enhanced Connection Status Indicator */}
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center space-x-2 text-sm text-gray-500">
           <span
-            className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : "bg-yellow-500"}`}
+            className={`w-2 h-2 rounded-full ${connectionStatus.color}`}
           ></span>
-          <span>
-            {isConnected ? "Real-time connected" : "Using polling updates"}
-          </span>
+          <span>{connectionStatus.text}</span>
           <span>•</span>
           <span>Last update: {lastUpdate.toLocaleTimeString()}</span>
+          {cacheInitialized && (
+            <>
+              <span>•</span>
+              <span className="text-green-600 font-medium">Cache Active</span>
+            </>
+          )}
         </div>
         <button
           onClick={handleManualRefresh}
@@ -195,6 +260,17 @@ const DeviceDetails = ({ params }: Props) => {
           Refresh
         </button>
       </div>
+
+      {/* Performance Indicator */}
+      {cacheInitialized && isConnected && (
+        <div className="mb-4 p-2 bg-green-50 border border-green-200 rounded-md">
+          <div className="flex items-center space-x-2 text-sm text-green-700">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="font-medium">High Performance Mode Active</span>
+            <span>- Instant hardware updates, no database delays</span>
+          </div>
+        </div>
+      )}
 
       {/* Main Dashboard Container */}
       <div className="bg-white rounded-lg shadow-sm p-6 mb-4">
@@ -278,6 +354,11 @@ const DeviceDetails = ({ params }: Props) => {
               <h3 className="text-lg font-medium text-orange-50">
                 No Dashboard widgets
               </h3>
+              {!cacheInitialized && (
+                <p className="text-sm text-gray-500 mt-2">
+                  Cache is initializing... Widgets will appear once ready.
+                </p>
+              )}
             </div>
           </div>
         ) : (
@@ -312,6 +393,14 @@ const DeviceDetails = ({ params }: Props) => {
                 <div className="text-gray-400">CHANNEL_API_KEY</div>
                 <div className="text-orange-50">"{apiKey?.apiKey}"</div>
               </div>
+              {cacheInitialized && (
+                <div>
+                  <div className="text-gray-400">CACHE_STATUS</div>
+                  <div className="text-green-400">
+                    "ACTIVE - INSTANT UPDATES"
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

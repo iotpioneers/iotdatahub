@@ -38,6 +38,56 @@ export async function GET(
   }
 }
 
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  try {
+    const body = await request.json();
+
+    console.log("====================================");
+    console.log("PATCH /api/devices/[id]", body);
+    console.log("====================================");
+
+    const device = await prisma.device.findUnique({
+      where: { id: params.id },
+    });
+
+    console.log("====================================");
+    console.log("Device found:", device);
+    console.log("====================================");
+
+    if (!device) {
+      return NextResponse.json({ error: "Device not found" }, { status: 404 });
+    }
+
+    const updatedDevice = await prisma.device.update({
+      where: { id: params.id },
+      data: body.data,
+      include: {
+        automations: true,
+        alerts: true,
+        commands: {
+          orderBy: { createdAt: "desc" },
+          take: 5,
+        },
+      },
+    });
+
+    console.log("====================================");
+    console.log("Device updated:", updatedDevice);
+    console.log("====================================");
+
+    return NextResponse.json(updatedDevice);
+  } catch (error) {
+    console.error("Error updating device:", error);
+    return NextResponse.json(
+      { error: "Error updating device" },
+      { status: 500 },
+    );
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } },

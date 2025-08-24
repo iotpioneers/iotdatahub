@@ -7,11 +7,16 @@ export interface WebSocketMessage {
     | "DEVICE_STATUS"
     | "CONNECTION_ESTABLISHED"
     | "SUBSCRIPTION_CONFIRMED"
+    | "WIDGET_UPDATE"
+    | "CACHE_INITIALIZED"
     | "PONG"
     | "ERROR";
   deviceId?: string;
   data?: any;
   clientId?: string;
+  stats?: any;
+  cacheReady?: boolean;
+  cacheStats?: any;
   error?: string;
   timestamp?: string;
 }
@@ -29,4 +34,9 @@ export interface DeviceUpdate {
   value: string | number;
   timestamp: string;
   command: string;
+  widget?: {
+    id: string;
+    value: string | number;
+    pinConfig: any;
+  };
 }

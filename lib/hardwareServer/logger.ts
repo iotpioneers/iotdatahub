@@ -28,6 +28,10 @@ class SimpleLogger implements Logger {
   error(message: string, data?: LogData): void {
     this.log("ERROR", message, data);
   }
+
+  warn(message: string, data?: LogData): void {
+    this.log("WARN", message, data);
+  }
 }
 
 export default new SimpleLogger();
