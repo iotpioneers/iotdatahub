@@ -4,21 +4,8 @@ import React from "react";
 import { redirect } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { TypeAnimation } from "react-type-animation";
-
-// material-ui
-import { useTheme } from "@mui/material/styles";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
-
-// project imports
+import { Hand } from "lucide-react";
 import MainCard from "../cards/MainCard";
-
-// assets
-import HailOutlinedIcon from "@mui/icons-material/HailOutlined";
-
-// ==============================|| DASHBOARD DEFAULT - POPULAR CARD ||============================== //
 
 // Greeting function
 const getGreeting = () => {
@@ -30,15 +17,13 @@ const getGreeting = () => {
 
 // Array of welcome messages
 const welcomeMessages = [
-  "Welcome to your personalized IoT Data Hub dashboard. Here, you can manage your devices, monitor data, and stay connected.",
+  "Welcome to your personalized IoTDataHub dashboard. Here, you can manage your devices, monitor data, and stay connected.",
   "Explore your IoT ecosystem with ease. Monitor, manage, and optimize your connected devices all in one place.",
   "Your gateway to the world of IoT. Dive into real-time data, device management, and intelligent insights.",
   "Unleash the power of your IoT network. Streamline operations, enhance efficiency, and make data-driven decisions.",
 ];
 
 const WelcomeContentCard = () => {
-  const theme = useTheme();
-
   const { status, data: session } = useSession();
 
   if (status !== "loading" && status === "unauthenticated") {
@@ -49,104 +34,48 @@ const WelcomeContentCard = () => {
   const welcomeSequence = welcomeMessages.flatMap((message) => [message, 3000]);
 
   return (
-    <>
-      <MainCard
-        border={false}
-        content={false}
-        sx={{
-          bgcolor: "orange.main",
-          color: "#fff",
-          overflow: "hidden",
-          position: "relative",
-          "&:after": {
-            content: '""',
-            position: "absolute",
-            width: 210,
-            height: 210,
-            background: theme.palette.secondary[800],
-            borderRadius: "50%",
-            top: { xs: -105, sm: -85 },
-            right: { xs: -140, sm: -95 },
-          },
-          "&:before": {
-            content: '""',
-            position: "absolute",
-            width: 210,
-            height: 210,
-            background: theme.palette.secondary[800],
-            borderRadius: "50%",
-            top: { xs: -155, sm: -125 },
-            right: { xs: -70, sm: -15 },
-            opacity: 0.5,
-          },
-        }}
-      >
-        <Box sx={{ p: 2.25 }}>
-          <Grid container direction="column">
-            <Grid item>
-              <Grid container justifyContent="space-between">
-                <Grid item>
-                  <Avatar
-                    variant="rounded"
-                    sx={{
-                      ...theme.typography.commonAvatar,
-                      ...theme.typography.largeAvatar,
-                      bgcolor: "secondary.800",
-                      mt: 1,
-                    }}
-                  >
-                    <HailOutlinedIcon fontSize="inherit" />
-                  </Avatar>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item>
-              <Grid container alignItems="center">
-                <Grid item>
-                  <Typography
-                    sx={{
-                      fontSize: "2.125rem",
-                      fontWeight: 500,
-                      mr: 1,
-                      mt: 1.75,
-                      mb: 0.75,
-                    }}
-                  >
-                    <TypeAnimation
-                      sequence={[
-                        `${getGreeting()} ${
-                          session?.user?.name?.split(" ")[0] || ""
-                        }`,
-                        1000,
-                      ]}
-                      wrapper="span"
-                      speed={50}
-                      repeat={1}
-                    />
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item sx={{ mb: 1.25 }}>
-              <Typography
-                sx={{
-                  fontSize: "1rem",
-                  fontWeight: 500,
-                  color: "grey.700",
-                }}
-              >
-                <TypeAnimation
-                  sequence={welcomeSequence}
-                  wrapper="span"
-                  speed={50}
-                  repeat={Infinity}
-                />
-              </Typography>
-            </Grid>
-          </Grid>
-        </Box>
-      </MainCard>
-    </>
+    <MainCard
+      border={false}
+      content={false}
+      className="bg-gradient-to-br from-orange-500 to-orange-700 text-white overflow-hidden relative"
+    >
+      <div className="absolute -top-16 -right-16 w-32 h-32 bg-orange-400/20 rounded-full" />
+      <div className="absolute -top-20 -right-4 w-32 h-32 bg-orange-400/10 rounded-full" />
+
+      <div className="p-6 relative z-10">
+        <div className="flex flex-col space-y-4">
+          <div className="flex justify-between items-start">
+            <div className="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center">
+              <Hand className="h-6 w-6 text-white" />
+            </div>
+          </div>
+
+          <div>
+            <div className="text-3xl font-bold mb-2">
+              <TypeAnimation
+                sequence={[
+                  `${getGreeting()} ${
+                    session?.user?.name?.split(" ")[0] || ""
+                  }`,
+                  1000,
+                ]}
+                wrapper="span"
+                speed={50}
+                repeat={1}
+              />
+            </div>
+            <div className="text-black text-base leading-relaxed min-h-[3rem]">
+              <TypeAnimation
+                sequence={welcomeSequence}
+                wrapper="span"
+                speed={50}
+                repeat={Infinity}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </MainCard>
   );
 };
 

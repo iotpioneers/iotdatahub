@@ -56,7 +56,7 @@ const UserActivityOverviewCard = ({
 
   const filterDataByPeriod = (
     data: DataPoint[],
-    period: Period
+    period: Period,
   ): DataPoint[] => {
     const now = new Date();
     const startDate = new Date();
@@ -76,7 +76,7 @@ const UserActivityOverviewCard = ({
     return data.filter(
       (point) =>
         new Date(point.timestamp) >= startDate &&
-        new Date(point.timestamp) <= now
+        new Date(point.timestamp) <= now,
     );
   };
 
@@ -88,7 +88,7 @@ const UserActivityOverviewCard = ({
 
     fields.forEach((field) => {
       const count = filteredData.filter(
-        (point) => point.fieldId === field.id
+        (point) => point.fieldId === field.id,
       ).length;
       result.push({ id: field.name, value: count, label: field.name });
     });
@@ -201,12 +201,6 @@ const UserActivityOverviewCard = ({
               </Grid>
             </Grid>
           </CardContent>
-          <CardActions sx={{ p: 1.25, pt: 0, justifyContent: "center" }}>
-            <Button size="small" disableElevation>
-              View All
-              <ChevronRightOutlinedIcon />
-            </Button>
-          </CardActions>
         </MainCard>
       )}
     </>

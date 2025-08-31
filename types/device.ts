@@ -4,6 +4,7 @@ import { Channel, Organization, User } from "@/types";
 export interface DeviceData {
   id: string;
   name: string;
+  authToken?: string;
   description?: string;
   deviceType?: "SENSOR" | "ACTUATOR" | "GATEWAY" | "CONTROLLER" | "OTHER";
   status: "ONLINE" | "OFFLINE" | "MAINTENANCE" | "ERROR" | "DISABLED";

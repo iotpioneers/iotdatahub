@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { Widget } from "@/types/widgets";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { WidgetDisplay } from "./WidgetDisplay";
-import DeviceSettingModal from "./DeviceSettingModal";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -14,133 +13,194 @@ interface WidgetGridProps {
   widgets: Widget[];
   onWidgetMove: (widget: Widget, newPosition: Widget["position"]) => void;
   onWidgetDelete?: (widgetId: string) => void;
-  deviceId: string;
   onWidgetUpdate?: (widget: Widget) => void;
+  onWidgetPartialUpdate?: (widgetId: string, changes: Partial<Widget>) => void; // **NEW**
+  onWidgetDuplicate?: (widget: Widget) => void;
+  deviceId: string;
 }
 
 const EditDeviceWidgetGrid: React.FC<WidgetGridProps> = ({
   widgets,
   onWidgetMove,
   onWidgetDelete,
-  deviceId,
   onWidgetUpdate,
+  onWidgetPartialUpdate, // **NEW**
+  onWidgetDuplicate,
+  deviceId,
 }) => {
-  const [selectedWidget, setSelectedWidget] = useState<Widget | null>(null);
+  // Memoize layout generation to prevent unnecessary recalculations
+  const layout = useMemo(
+    () => ({
+      lg: widgets.map((widget) => ({
+        i: widget.id,
+        x: widget.position?.x ?? 0,
+        y: widget.position?.y ?? 0,
+        w: widget.position?.width ?? 3,
+        h: widget.position?.height ?? 2,
+        minW: 3,
+        minH: 2,
+        maxW: 12,
+        maxH: 8,
+        static: false, // Allow movement
+      })),
+      md: widgets.map((widget) => ({
+        i: widget.id,
+        x: widget.position?.x ?? 0,
+        y: widget.position?.y ?? 0,
+        w: widget.position?.width ?? 3,
+        h: widget.position?.height ?? 2,
+        minW: 3,
+        minH: 2,
+        maxW: 12,
+        maxH: 8,
+        static: false, // Allow movement
+      })),
+      sm: widgets.map((widget) => ({
+        i: widget.id,
+        x: widget.position?.x ?? 0,
+        y: widget.position?.y ?? 0,
+        w: widget.position?.width ?? 3,
+        h: widget.position?.height ?? 2,
+        minW: 3,
+        minH: 2,
+        maxW: 12,
+        maxH: 8,
+        static: false, // Allow movement
+      })),
+      xs: widgets.map((widget) => ({
+        i: widget.id,
+        x: widget.position?.x ?? 0,
+        y: widget.position?.y ?? 0,
+        w: widget.position?.width ?? 3,
+        h: widget.position?.height ?? 2,
+        minW: 3,
+        minH: 2,
+        maxW: 12,
+        maxH: 8,
+        static: false, // Allow movement
+      })),
+      xxs: widgets.map((widget) => ({
+        i: widget.id,
+        x: widget.position?.x ?? 0,
+        y: widget.position?.y ?? 0,
+        w: widget.position?.width ?? 3,
+        h: widget.position?.height ?? 2,
+        minW: 3,
+        minH: 2,
+        maxW: 12,
+        maxH: 8,
+        static: false, // Allow movement
+      })),
+    }),
+    [widgets],
+  );
 
-  const generateLayout = () => ({
-    lg: widgets.map((widget) => ({
-      i: widget.id,
-      x: widget.position?.x ?? 0,
-      y: widget.position?.y ?? 0,
-      w: widget.position?.width ?? 2,
-      h: widget.position?.height ?? 3,
-      minW: 1,
-      minH: 2,
-      maxW: 12,
-      maxH: 6,
-    })),
-  });
+  // Optimized layout change handler
+  const handleLayoutChange = useCallback(
+    (currentLayout: any[]) => {
+      const layoutMap = new Map(currentLayout.map((item) => [item.i, item]));
 
-  const handleLayoutChange = (currentLayout: any[]) => {
-    currentLayout.forEach((item) => {
-      const widget = widgets.find((w) => w.id === item.i);
-      if (widget) {
-        onWidgetMove(widget, {
-          x: item.x,
-          y: item.y,
-          width: item.w,
-          height: item.h,
-        });
-      }
-    });
-  };
+      widgets.forEach((widget) => {
+        const layoutItem = layoutMap.get(widget.id);
+        if (layoutItem) {
+          const newPosition = {
+            x: layoutItem.x,
+            y: layoutItem.y,
+            width: layoutItem.w,
+            height: layoutItem.h,
+          };
 
-  const handleDuplicate = async (widget: Widget) => {
-    try {
-      const response = await fetch(`/api/devices/${deviceId}/widgets`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...widget,
-          id: `widget-${widget.definition?.type}-${Date.now()}`,
-          position: {
-            ...widget.position,
-            x: (widget.position?.x || 0) + 1,
-            y: (widget.position?.y || 0) + 1,
-          },
-        }),
+          // Only update if position actually changed
+          const currentPosition = widget.position;
+          if (
+            !currentPosition ||
+            currentPosition.x !== newPosition.x ||
+            currentPosition.y !== newPosition.y ||
+            currentPosition.width !== newPosition.width ||
+            currentPosition.height !== newPosition.height
+          ) {
+            onWidgetMove(widget, newPosition);
+          }
+        }
       });
+    },
+    [widgets, onWidgetMove],
+  );
 
-      if (!response.ok) throw new Error("Failed to duplicate widget");
-      const newWidget = await response.json();
-      if (onWidgetUpdate) {
-        onWidgetUpdate(newWidget);
+  // Local duplicate handler (for immediate UI feedback)
+  const handleDuplicate = useCallback(
+    (widget: Widget) => {
+      if (onWidgetDuplicate) {
+        onWidgetDuplicate(widget);
       }
-    } catch (error) {
-      console.error("Error duplicating widget:", error);
-    }
-  };
+    },
+    [onWidgetDuplicate],
+  );
+
+  // **NEW**: Handler for partial widget updates (like pin config)
+  const handleWidgetPartialUpdateCallback = useCallback(
+    (widgetId: string) => (changes: Partial<Widget>) => {
+      if (onWidgetPartialUpdate) {
+        onWidgetPartialUpdate(widgetId, changes);
+      }
+    },
+    [onWidgetPartialUpdate],
+  );
+
+  // Memoized widget components to prevent unnecessary re-renders
+  const renderWidgets = useMemo(() => {
+    return widgets.map((widget) => (
+      <div
+        key={widget.id}
+        className="widgCet-item bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden cursor-move"
+        style={{ height: "100%", width: "100%" }}
+      >
+        <div className="widget-content h-full">
+          <WidgetDisplay
+            widget={widget}
+            onDuplicate={() => handleDuplicate(widget)}
+            onDelete={() => onWidgetDelete?.(widget.id)}
+            onUpdate={handleWidgetPartialUpdateCallback(widget.id)} // **NEW**: Pass the update handler
+            className="h-full"
+          />
+        </div>
+      </div>
+    ));
+  }, [
+    widgets,
+    handleDuplicate,
+    onWidgetDelete,
+    handleWidgetPartialUpdateCallback,
+  ]);
 
   return (
-    <>
+    <div className="min-h-screen overflow-y-auto mb-16">
       <ResponsiveGridLayout
         className="layout"
-        layouts={generateLayout()}
+        layouts={layout}
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-        cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+        cols={{ lg: 24, md: 24, sm: 24, xs: 24, xxs: 24 }}
         rowHeight={30}
         margin={[10, 10]}
         containerPadding={[10, 10]}
         onLayoutChange={handleLayoutChange}
-        isDraggable
-        isResizable
+        isDraggable={true}
+        isResizable={true}
         isDroppable={false}
-        draggableCancel=".widget-content, .action-button"
-        draggableHandle=".drag-handle"
+        draggableCancel=".action-button" // Only cancel on action buttons, allow dragging from anywhere else
         resizeHandles={["se"]}
-        preventCollision
-        useCSSTransforms
+        useCSSTransforms={true}
+        measureBeforeMount={false}
+        compactType={null} // CRITICAL: Disable auto-compacting to maintain positions
+        preventCollision={true} // Prevent widgets from overlapping but don't auto-compact
+        verticalCompact={false} // Disable vertical compacting
+        autoSize={true} // Allow container to grow with content
+        style={{ minHeight: "100vh" }} // Ensure minimum height for scrolling
       >
-        {widgets.map((widget) => (
-          <div
-            key={widget.id}
-            className="widget-content"
-            data-grid={{
-              x: widget.position?.x || 0,
-              y: widget.position?.y || 0,
-              w: widget.position?.width || 2,
-              h: widget.position?.height || 2,
-              minW: 1,
-              minH: 1,
-            }}
-          >
-            <WidgetDisplay
-              widget={widget}
-              onDuplicate={() => handleDuplicate(widget)}
-              onSettings={() => setSelectedWidget(widget)}
-              onDelete={() => onWidgetDelete?.(widget.id)}
-              className="widget-content"
-            />
-          </div>
-        ))}
+        {renderWidgets}
       </ResponsiveGridLayout>
-
-      {selectedWidget && (
-        <DeviceSettingModal
-          widget={selectedWidget}
-          onClose={() => setSelectedWidget(null)}
-          onUpdate={(updatedWidget) => {
-            if (onWidgetUpdate) {
-              onWidgetUpdate(updatedWidget);
-            }
-            setSelectedWidget(null);
-          }}
-        />
-      )}
-    </>
+    </div>
   );
 };
 
-export default EditDeviceWidgetGrid;
+export default React.memo(EditDeviceWidgetGrid);

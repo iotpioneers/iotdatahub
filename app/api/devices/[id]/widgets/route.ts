@@ -24,9 +24,25 @@ export async function GET(
       orderBy: { createdAt: "desc" },
       include: {
         pinConfig: true, // Include pin config in the response
+        device: true,
       },
     });
 
+    const virtualPins = await prisma.virtualPin.findMany({
+      where: { deviceId: device.id },
+    });
+
+    widgets.forEach((widget) => {
+      const pinNumber = (widget?.settings as { pinNumber?: string })?.pinNumber;
+      if (pinNumber) {
+        const virtualPin = virtualPins.find(
+          (vp) => vp.pinNumber.toString() === pinNumber.replace("V", ""),
+        );
+        if (virtualPin && widget.value != virtualPin.value) {
+          widget.value = virtualPin.value;
+        }
+      }
+    });
     if (!widgets || widgets.length === 0) {
       return NextResponse.json([], { status: 200 }); // Return empty array instead of error
     }

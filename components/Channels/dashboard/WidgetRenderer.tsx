@@ -51,7 +51,7 @@ const WidgetRenderer: React.FC<Props> = ({
     <div className="widget-container h-full">
       <div className="widget-drag-handle p-2 bg-gray-50 flex justify-between items-center">
         <span className="text-sm font-medium">
-          {widget?.settings?.title || "Untitled Widget"}
+          {widget?.settings?.title || "Untitled"}
         </span>
         <div className="flex space-x-2">
           <button

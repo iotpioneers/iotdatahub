@@ -1,103 +1,77 @@
 "use client";
 
-import React, {
-  useState,
-  useEffect,
-  forwardRef,
-  useImperativeHandle,
-} from "react";
+import React, { useMemo } from "react";
 import { Widget } from "@/types/widgets";
 import EditDeviceWidgetGrid from "@/components/Channels/dashboard/widgets/EditDeviceWidgetGrid";
 
 interface EditDeviceDashboardProps {
   deviceId: string;
-  widgetData: Widget[];
+  widgets: Widget[];
+  onUpdate: (id: string, changes: Partial<Widget>) => void;
+  onDelete: (id: string) => void;
+  onMove: (id: string, position: Widget["position"]) => void;
+  onDuplicate: (widget: Widget) => void;
 }
 
-const EditDeviceDashboardComponent = forwardRef<
-  {
-    saveChanges: () => Promise<void>;
-    cancelChanges: () => void;
-  },
-  EditDeviceDashboardProps
->(({ deviceId, widgetData }, ref) => {
-  const [widgets, setWidgets] = useState<Widget[]>(widgetData);
-  const [pendingChanges, setPendingChanges] = useState<{
-    [key: string]: any;
-  }>({});
-  const [deletedWidgets, setDeletedWidgets] = useState<string[]>([]);
-
-  useEffect(() => {
-    setWidgets(widgetData);
-  }, [widgetData]);
-
-  const handleWidgetMove = (widget: Widget, newPosition: any) => {
-    setPendingChanges((prev) => ({
-      ...prev,
-      [widget.id]: { ...newPosition },
-    }));
-  };
-
-  const handleWidgetDelete = (widgetId: string) => {
-    setDeletedWidgets((prev) => [...prev, widgetId]);
-    setWidgets((prev) => prev.filter((w) => w.id !== widgetId));
-  };
-
-  useImperativeHandle(ref, () => ({
-    async saveChanges() {
-      try {
-        const updatePromises = Object.entries(pendingChanges).map(
-          ([widgetId, position]) =>
-            fetch(`/api/devices/${deviceId}/widgets/${widgetId}`, {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ position }),
-            }),
-        );
-
-        const deletePromises = deletedWidgets.map((widgetId) =>
-          fetch(`/api/devices/${deviceId}/widgets/${widgetId}`, {
-            method: "DELETE",
-          }),
-        );
-
-        await Promise.all([...updatePromises, ...deletePromises]);
-
-        setWidgets((prev) =>
-          prev.map((widget) => ({
-            ...widget,
-            position: pendingChanges[widget.id] || widget.position,
-          })),
-        );
-
-        setPendingChanges({});
-        setDeletedWidgets([]);
-
-        return Promise.resolve();
-      } catch (error) {
-        console.error("Error saving changes:", error);
-        return Promise.reject(error);
-      }
+const EditDeviceDashboardComponent: React.FC<EditDeviceDashboardProps> = ({
+  deviceId,
+  widgets,
+  onUpdate,
+  onDelete,
+  onMove,
+  onDuplicate,
+}) => {
+  // Memoize widget handlers to prevent unnecessary re-renders
+  const handleWidgetMove = useMemo(
+    () => (widget: Widget, newPosition: Widget["position"]) => {
+      onMove(widget.id, newPosition);
     },
-    cancelChanges() {
-      setWidgets(widgetData);
-      setPendingChanges({});
-      setDeletedWidgets([]);
+    [onMove],
+  );
+
+  const handleWidgetDelete = useMemo(
+    () => (widgetId: string) => {
+      onDelete(widgetId);
     },
-  }));
+    [onDelete],
+  );
+
+  const handleWidgetUpdate = useMemo(
+    () => (widget: Widget) => {
+      onUpdate(widget.id, widget);
+    },
+    [onUpdate],
+  );
+
+  const handleWidgetDuplicate = useMemo(
+    () => (widget: Widget) => {
+      onDuplicate(widget);
+    },
+    [onDuplicate],
+  );
+
+  // **NEW**: Handler for individual widget property updates
+  const handleWidgetPartialUpdate = useMemo(
+    () => (widgetId: string, changes: Partial<Widget>) => {
+      onUpdate(widgetId, changes);
+    },
+    [onUpdate],
+  );
+
+  // Memoize widgets to prevent unnecessary re-renders
+  const memoizedWidgets = useMemo(() => widgets, [widgets]);
 
   return (
     <EditDeviceWidgetGrid
-      widgets={widgets}
+      widgets={memoizedWidgets}
       onWidgetMove={handleWidgetMove}
       onWidgetDelete={handleWidgetDelete}
+      onWidgetUpdate={handleWidgetUpdate}
+      onWidgetPartialUpdate={handleWidgetPartialUpdate}
+      onWidgetDuplicate={handleWidgetDuplicate}
       deviceId={deviceId}
     />
   );
-});
+};
 
-EditDeviceDashboardComponent.displayName = "EditDeviceDashboardComponent";
-
-export default EditDeviceDashboardComponent;
+export default React.memo(EditDeviceDashboardComponent);

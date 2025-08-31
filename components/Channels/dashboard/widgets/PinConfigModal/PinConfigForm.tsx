@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Button, TextField, Select, Switch } from "@mui/material";
+import { Button, TextField, Switch } from "@mui/material";
 import ColorPicker from "./ColorPicker";
 import { PinConfigFormProps } from "@/types/pin-config";
 import { generatePinOptions } from "@/app/utils/pin-config.utils";

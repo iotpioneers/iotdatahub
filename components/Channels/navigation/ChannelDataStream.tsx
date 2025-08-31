@@ -8,7 +8,7 @@ import MainCard from "@/components/dashboard/cards/MainCard";
 import { Channel, DataPoint, Field } from "@/types";
 import BarChartWidget from "../charts/BarChartWidget";
 import { AddChartComponent } from "../charts";
-import GaugeWidget from "../charts/GaugeWidget";
+import GaugeWidgetComponent from "../charts/GaugeWidget";
 
 const widgets = [
   { value: "lineChart", label: "Line Chart" },
@@ -24,7 +24,7 @@ interface Props {
 
 const ChannelDataStream = ({ channel, fields, dataPoint }: Props) => {
   const [fieldWidgets, setFieldWidgets] = useState<Record<string, string>>(
-    Object.fromEntries(fields.map((field) => [field.id, "lineChart"]))
+    Object.fromEntries(fields.map((field) => [field.id, "lineChart"])),
   );
 
   console.log("Data Points", dataPoint);
@@ -36,7 +36,7 @@ const ChannelDataStream = ({ channel, fields, dataPoint }: Props) => {
       case "barChart":
         return <BarChartWidget chartData={chartData} />;
       case "gauge":
-        return <GaugeWidget chartData={chartData} />;
+        return <GaugeWidgetComponent chartData={chartData} />;
       default:
         return null;
     }
@@ -50,7 +50,7 @@ const ChannelDataStream = ({ channel, fields, dataPoint }: Props) => {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {fields.map((field) => {
         const chartData = dataPoint.filter(
-          (datapoint) => datapoint.fieldId === field.id
+          (datapoint) => datapoint.fieldId === field.id,
         );
         return (
           <div key={field.id}>

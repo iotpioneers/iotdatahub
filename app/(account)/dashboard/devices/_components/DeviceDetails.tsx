@@ -1,16 +1,17 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { X } from "lucide-react";
 import { Box } from "@mui/material";
 import useFetch from "@/hooks/useFetch";
+import { useWebSocket } from "@/hooks/useWebSocket";
 import { useSession } from "next-auth/react";
 import { ApiKey, Channel, Device } from "@/types";
 import { LinearLoading } from "@/components/LinearLoading";
 import { HiStatusOffline, HiStatusOnline } from "react-icons/hi";
 import Link from "next/link";
-import DeviceDashboardComponent from "./DeviceDashboardComponent";
-import { useIoTDataHub } from "@/hooks/useIoTDataHub";
+import WidgetGrid from "@/components/Channels/dashboard/widgets/WidgetGrid";
+import { WebSocketMessage } from "@/types/websocket";
 
 interface Props {
   params: { id: string };
@@ -25,21 +26,111 @@ interface Organization {
 }
 
 const DeviceDetails = ({ params }: Props) => {
-  const [DeviceDetails, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(true);
   const [isRedirecting, setIsRedirecting] = useState(false);
-  const [selectedDuration, setSelectedDuration] = useState<string>("1mo");
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [device, setDevice] = useState<Device | null>(null);
+  const [widgetData, setWidgetData] = useState<any[]>([]);
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [cacheInitialized, setCacheInitialized] = useState(false);
 
   const { data: session, status } = useSession();
 
+  // Enhanced WebSocket message handler for cache-based updates
+  const handleWebSocketMessage = useCallback(
+    (message: WebSocketMessage) => {
+      console.log("Received WebSocket message:", message);
+
+      // Only handle messages for this specific device
+      if (message.deviceId && message.deviceId === params.id) {
+        switch (message.type) {
+          case "DEVICE_UPDATE":
+            // Update device data
+            setDevice((prevDevice) =>
+              prevDevice
+                ? {
+                    ...prevDevice,
+                    ...message.data,
+                  }
+                : null,
+            );
+            setLastUpdate(new Date());
+            break;
+
+          case "HARDWARE_DATA":
+            console.log("INSTANT hardware data update received:", message.data);
+
+            // Update widget data with new hardware values (INSTANT UPDATE)
+            setWidgetData((prevWidgets) => {
+              return prevWidgets.map((widget) => {
+                if (
+                  widget.pinConfig?.pinNumber === message.data.pin.toString()
+                ) {
+                  console.log(
+                    `Updating widget for pin ${message.data.pin} with value:`,
+                    message.data.value,
+                  );
+                  return {
+                    ...widget,
+                    value: message.data.value,
+                    pinConfig: {
+                      ...widget.pinConfig,
+                      value: message.data.value,
+                    },
+                  };
+                }
+                return widget;
+              });
+            });
+            setLastUpdate(new Date());
+            break;
+
+          case "WIDGET_UPDATE":
+            // Direct widget updates from cache
+            console.log("Widget update from cache:", message.data);
+            setWidgetData(message.data.widgets);
+            setLastUpdate(new Date());
+            break;
+
+          case "DEVICE_STATUS":
+            // Update device status
+            setDevice((prevDevice) =>
+              prevDevice
+                ? {
+                    ...prevDevice,
+                    status: message.data.status,
+                    lastPing: message.data.lastPing,
+                  }
+                : null,
+            );
+            setLastUpdate(new Date());
+            break;
+
+          case "CACHE_INITIALIZED":
+            console.log("Device cache initialized:", message.stats);
+            setCacheInitialized(true);
+            setLastUpdate(new Date());
+            break;
+        }
+      }
+
+      // Handle global cache status messages
+      if (message.type === "CONNECTION_ESTABLISHED") {
+        setCacheInitialized(message.cacheReady || false);
+        console.log("WebSocket connected. Cache ready:", message.cacheReady);
+      }
+    },
+    [params.id],
+  );
+
   const {
-    data: RealTimeData,
-    connected,
-    deviceStatus,
-    virtualWrite,
-  } = useIoTDataHub({
+    isConnected,
+    error: wsError,
+    sendMessage,
+  } = useWebSocket({
     deviceId: params.id,
+    onMessage: handleWebSocketMessage,
+    enabled: !!session && status === "authenticated",
   });
 
   if (status === "loading" || status === "unauthenticated" || !session) {
@@ -50,18 +141,64 @@ const DeviceDetails = ({ params }: Props) => {
     data: deviceData,
     isLoading,
     error,
+    refetch: refetchDevice,
   } = useFetch(`/api/devices/${params.id}`);
 
   const { data: organizationData } = useFetch(
     `/api/organizations/${session.user.organizationId}`,
   );
 
-  const { data: widgetData } = useFetch(`/api/devices/${params.id}/widgets`);
+  const { data: initialWidgetData, refetch: refetchWidgets } = useFetch(
+    `/api/devices/${params.id}/widgets`,
+  );
+
+  // Initialize cache when WebSocket connects
+  useEffect(() => {
+    if (isConnected && session?.user?.organizationId && !cacheInitialized) {
+      console.log("Requesting cache initialization...");
+      sendMessage({
+        type: "INITIALIZE_CACHE",
+        userId: session.user.id,
+        organizationId: session.user.organizationId,
+      });
+    }
+  }, [isConnected, session, cacheInitialized, sendMessage]);
+
+  // Manual refresh function (now works with cache)
+  const handleManualRefresh = async () => {
+    console.log("Manual refresh triggered");
+
+    if (cacheInitialized && isConnected) {
+      // If cache is ready, just request fresh data via WebSocket
+      sendMessage({
+        type: "REFRESH_DEVICE",
+        deviceId: params.id,
+      });
+    } else {
+      // Fallback to API refresh
+      await Promise.all([refetchDevice(), refetchWidgets()]);
+    }
+
+    setLastUpdate(new Date());
+  };
 
   useEffect(() => {
     if (deviceData) setDevice(deviceData);
     if (organizationData) setOrganization(organizationData);
-  }, [deviceData, organizationData]);
+    if (initialWidgetData) setWidgetData(initialWidgetData);
+  }, [deviceData, organizationData, initialWidgetData]);
+
+  // Enhanced fallback: Only poll if WebSocket is not connected AND cache is not ready
+  useEffect(() => {
+    if (!isConnected || !cacheInitialized) {
+      const pollInterval = setInterval(() => {
+        console.log("Polling for updates (WebSocket/Cache not ready)");
+        handleManualRefresh();
+      }, 10000); // Poll every 10 seconds
+
+      return () => clearInterval(pollInterval);
+    }
+  }, [isConnected, cacheInitialized]);
 
   if (error) {
     console.error("Error fetching device:", error);
@@ -83,21 +220,58 @@ const DeviceDetails = ({ params }: Props) => {
     return <LinearLoading />;
   }
 
-  const timelineOptions = [
-    "Live",
-    "1h",
-    "6h",
-    "1d",
-    "1w",
-    "1mo",
-    "3mo",
-    "6mo",
-    "1y",
-  ];
+  // Connection status logic
+  const getConnectionStatus = () => {
+    if (isConnected && cacheInitialized) {
+      return { color: "bg-green-500", text: "Real-time with cache" };
+    } else if (isConnected) {
+      return { color: "bg-yellow-500", text: "Connected, initializing cache" };
+    } else {
+      return { color: "bg-red-500", text: "Using API polling" };
+    }
+  };
+
+  const connectionStatus = getConnectionStatus();
 
   return (
     <div className="min-h-screen px-4">
       {(isLoading || !deviceData || isRedirecting) && <LinearLoading />}
+
+      {/* Enhanced Connection Status Indicator */}
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center space-x-2 text-sm text-gray-500">
+          <span
+            className={`w-2 h-2 rounded-full ${connectionStatus.color}`}
+          ></span>
+          <span>{connectionStatus.text}</span>
+          <span>•</span>
+          <span>Last update: {lastUpdate.toLocaleTimeString()}</span>
+          {cacheInitialized && (
+            <>
+              <span>•</span>
+              <span className="text-green-600 font-medium">Cache Active</span>
+            </>
+          )}
+        </div>
+        <button
+          onClick={handleManualRefresh}
+          className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+        >
+          Refresh
+        </button>
+      </div>
+
+      {/* Performance Indicator */}
+      {cacheInitialized && isConnected && (
+        <div className="mb-4 p-2 bg-green-50 border border-green-200 rounded-md">
+          <div className="flex items-center space-x-2 text-sm text-green-700">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="font-medium">High Performance Mode Active</span>
+            <span>- Instant hardware updates, no database delays</span>
+          </div>
+        </div>
+      )}
+
       {/* Main Dashboard Container */}
       <div className="bg-white rounded-lg shadow-sm p-6 mb-4">
         {/* Header */}
@@ -123,15 +297,15 @@ const DeviceDetails = ({ params }: Props) => {
             <div>
               <div className="flex items-center space-x-4">
                 <h1 className="text-2xl font-semibold text-orange-50">
-                  {deviceData.name}
+                  {device.name}
                 </h1>
                 <span className="flex items-center">
-                  {deviceData.status === "OFFLINE" ? (
+                  {device.status === "OFFLINE" ? (
                     <HiStatusOffline className="text-red-500 mr-2" />
                   ) : (
                     <HiStatusOnline className="text-green-500 mr-2" />
                   )}
-                  <strong className="font-bold"> {deviceData.status}</strong>
+                  <strong className="font-bold"> {device.status}</strong>
                 </span>
               </div>
               <div className="flex items-center space-x-2 text-gray-500">
@@ -143,38 +317,22 @@ const DeviceDetails = ({ params }: Props) => {
                 <span>
                   Organization:{" "}
                   <strong className="font-bold">
-                    {organizationData.name || ""}
+                    {organization.name || ""}
                   </strong>
                 </span>
+                <button
+                  className="px-4 py-2 bg-orange-50 text-white rounded-lg hover:bg-green-600 font-medium"
+                  onClick={() => setIsRedirecting(true)}
+                >
+                  <Link href={`/dashboard/devices/${params.id}/edit`}>
+                    {isRedirecting || !deviceData ? <LinearLoading /> : "Edit"}
+                  </Link>
+                </button>
               </div>
             </div>
           </div>
-          <button
-            className="px-4 py-2 bg-orange-50 text-white rounded-lg hover:bg-green-600 font-medium"
-            onClick={() => setIsRedirecting(true)}
-          >
-            <Link href={`/dashboard/devices/${params.id}/edit`}>
-              {isRedirecting || !deviceData ? <LinearLoading /> : "Edit"}
-            </Link>
-          </button>
         </div>
 
-        {/* Timeline Controls */}
-        <div className="flex space-x-2 mb-8">
-          {timelineOptions.map((option) => (
-            <button
-              key={option}
-              className={`px-4 py-2 rounded-lg ${
-                selectedDuration === option
-                  ? "bg-orange-50 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-              onClick={() => setSelectedDuration(option)}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
         {!widgetData || widgetData.length === 0 ? (
           <div className="flex items-center justify-center h-96 border-2 border-dashed border-gray-200 rounded-lg">
             <div className="text-center">
@@ -196,17 +354,22 @@ const DeviceDetails = ({ params }: Props) => {
               <h3 className="text-lg font-medium text-orange-50">
                 No Dashboard widgets
               </h3>
+              {!cacheInitialized && (
+                <p className="text-sm text-gray-500 mt-2">
+                  Cache is initializing... Widgets will appear once ready.
+                </p>
+              )}
             </div>
           </div>
         ) : (
-          <DeviceDashboardComponent
-            deviceId={params.id}
-            widgetData={widgetData}
-          />
+          <div className="bg-white border border-gray-200 rounded-md">
+            <WidgetGrid deviceId={params.id} widgets={widgetData} />
+          </div>
         )}
       </div>
+
       {/* Modal */}
-      {DeviceDetails && (
+      {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-black text-white rounded-lg p-6 w-full max-w-lg">
             <div className="flex justify-between items-center mb-6">
@@ -230,13 +393,14 @@ const DeviceDetails = ({ params }: Props) => {
                 <div className="text-gray-400">CHANNEL_API_KEY</div>
                 <div className="text-orange-50">"{apiKey?.apiKey}"</div>
               </div>
-            </div>
-
-            <div>
-              <p>Status: {deviceStatus}</p>
-              <p>Data: {JSON.stringify(RealTimeData)}</p>
-              <p>Connected: {String(connected)}</p>
-              <button onClick={() => virtualWrite("V3", 1)}>Turn On LED</button>
+              {cacheInitialized && (
+                <div>
+                  <div className="text-gray-400">CACHE_STATUS</div>
+                  <div className="text-green-400">
+                    "ACTIVE - INSTANT UPDATES"
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

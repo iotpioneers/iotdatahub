@@ -15,16 +15,12 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 interface WidgetGridProps {
   widgets: Widget[];
   onWidgetUpdate?: (widget: Widget) => Promise<void>;
-  onWidgetDelete?: (widgetId: string) => Promise<void>;
-  onWidgetDuplicate?: (widget: Widget) => Promise<void>;
   deviceId: string;
 }
 
 export const WidgetGrid: React.FC<WidgetGridProps> = ({
   widgets,
   onWidgetUpdate,
-  onWidgetDelete,
-  onWidgetDuplicate,
   deviceId,
 }) => {
   const [pendingChanges, setPendingChanges] = useState<{
@@ -161,27 +157,44 @@ export const WidgetGrid: React.FC<WidgetGridProps> = ({
         className="layout"
         layouts={generateLayout()}
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-        cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+        cols={{ lg: 24, md: 24, sm: 24, xs: 24, xxs: 24 }}
         rowHeight={30}
         margin={[16, 16]}
         containerPadding={[16, 16]}
         onLayoutChange={handleLayoutChange}
-        isDraggable={true}
-        isResizable={true}
+        isDraggable={false}
+        isResizable={false}
         compactType="vertical"
         draggableCancel=".widget-content"
+        autoSize={true}
+        style={{
+          height: "100%",
+          minHeight: "380px",
+          overflowY: "auto", // Enable vertical scrolling
+          paddingBottom: "12px", // Add some padding at the bottom
+        }}
       >
         {widgets.map((widget) => {
           const widgetStyles = getWidgetStyle(widget);
 
           return (
             <div key={widget.id} {...widgetStyles}>
+              <div className="flex items-center justify-between px-3 py-1 border-gray-100">
+                <span className="text-sm font-medium text-gray-700 truncate capitalize">
+                  {widget.name ||
+                    widget.settings?.widgetType ||
+                    widget.definition?.type ||
+                    "Untitled"}
+                </span>
+                {(widget.settings?.pinNumber ||
+                  widget.pinConfig?.pinNumber) && (
+                  <span className="text-xs bg-blue-100 text-blue-800 px-2 rounded-full">
+                    {widget.settings?.pinNumber || widget.pinConfig?.pinNumber}
+                  </span>
+                )}
+              </div>
               <WidgetComponent
                 widget={widget}
-                onEdit={() => handleConfigClick(widget.id)}
-                onDelete={onWidgetDelete}
-                onDuplicate={onWidgetDuplicate}
-                onConfig={() => handleConfigClick(widget.id)}
                 onValueChange={handleValueChange}
               />
             </div>

@@ -25,10 +25,8 @@ import * as Yup from "yup";
 import { Formik } from "formik";
 
 // project imports
-import AnimateButton from "@/components/Auth/AnimateButton";
 import reducer from "@/app/store/reducer";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
-import CountryList from "@/components/Auth/authentication/auth-forms/CountryList";
 
 const store = configureStore({ reducer });
 
@@ -45,15 +43,6 @@ interface CountryType {
 const schema = Yup.object().shape({
   firstname: Yup.string().max(255).required("Firstname is required"),
   lastname: Yup.string().max(255).required("Lastname is required"),
-  country: Yup.string().required("Country is required"),
-  phonecode: Yup.string().optional(),
-  phonenumber: Yup.string()
-    .test(
-      "is-number",
-      "Must be a valid phone number",
-      (value) => value === "" || (!isNaN(Number(value)) && Number(value) > 0)
-    )
-    .required("Phone is required"),
 });
 
 type FormData = Yup.InferType<typeof schema>;
@@ -66,11 +55,11 @@ export function AccountDetailsForm({ ...others }): React.JSX.Element {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
-    "success"
+    "success",
   );
   const { status } = useSession();
   const [selectedCountry, setSelectedCountry] = useState<CountryType | null>(
-    null
+    null,
   );
 
   const { currentUser } = state;
@@ -100,7 +89,6 @@ export function AccountDetailsForm({ ...others }): React.JSX.Element {
           ...currentUser,
           ...data,
           name: `${data.firstname} ${data.lastname}`,
-          phonenumber: `${data.phonecode} ${data.phonenumber}`,
         };
         await updateUserData(updatedUserData);
         setSnackbarMessage("User data updated successfully");
@@ -117,7 +105,7 @@ export function AccountDetailsForm({ ...others }): React.JSX.Element {
 
   const handleCloseSnackbar = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;
@@ -225,38 +213,6 @@ export function AccountDetailsForm({ ...others }): React.JSX.Element {
                 </FormControl>
               </Grid>
             </Grid>
-            <FormControl
-              fullWidth
-              error={Boolean(touched.country && errors.country)}
-              sx={{ ...theme.typography.customInput }}
-            >
-              <CountryList
-                selectedCountry={selectedCountry}
-                setSelectedCountry={(country) => {
-                  setSelectedCountry(country);
-                  handleChange({
-                    target: {
-                      name: "country",
-                      value: country?.label || "",
-                    },
-                  });
-                  handleChange({
-                    target: {
-                      name: "phonecode",
-                      value: country?.phone || "",
-                    },
-                  });
-                }}
-              />
-              {touched.country && errors.country && (
-                <FormHelperText
-                  error
-                  id="standard-weight-helper-text--register"
-                >
-                  {errors.country}
-                </FormHelperText>
-              )}
-            </FormControl>
             <Grid container spacing={matchDownSM ? 0 : 2}>
               <Grid item xs={12} sm={3}>
                 <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
@@ -320,22 +276,20 @@ export function AccountDetailsForm({ ...others }): React.JSX.Element {
             )}
 
             <Box sx={{ mt: 2 }}>
-              <AnimateButton>
-                <Button
-                  disableElevation
-                  disabled={isSubmitting || isLoading}
-                  fullWidth
-                  size="large"
-                  type="submit"
-                  variant="contained"
-                  color="secondary"
-                >
-                  {isSubmitting || isLoading
-                    ? "Please wait while saving changes..."
-                    : "Save Changes"}
-                </Button>
-                {isSubmitting || (isLoading && <LoadingProgressBar />)}
-              </AnimateButton>
+              <Button
+                disableElevation
+                disabled={isSubmitting || isLoading}
+                fullWidth
+                size="large"
+                type="submit"
+                variant="contained"
+                color="secondary"
+              >
+                {isSubmitting || isLoading
+                  ? "Please wait while saving changes..."
+                  : "Save Changes"}
+              </Button>
+              {isSubmitting || (isLoading && <LoadingProgressBar />)}
             </Box>
           </form>
         )}

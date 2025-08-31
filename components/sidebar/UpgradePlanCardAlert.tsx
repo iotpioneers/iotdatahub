@@ -2,30 +2,14 @@
 
 import { memo, useState, useEffect } from "react";
 import axios from "axios";
-
-// material-ui
-import { useTheme } from "@mui/material/styles";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import Grid from "@mui/material/Grid";
-import LinearProgress, {
-  linearProgressClasses,
-} from "@mui/material/LinearProgress";
-import AnimateButton from "@/components/Auth/AnimateButton";
-import { Link } from "@mui/material";
-import Button from "@mui/material/Button";
-import Stack from "@mui/material/Stack";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import ListItemText from "@mui/material/ListItemText";
-import Typography from "@mui/material/Typography";
-
-// assets
-import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
 import { useSession } from "next-auth/react";
 import { UserSubscriptionData } from "@/types";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Sparkles } from "lucide-react";
+import Link from "next/link";
 
 // ==============================|| PROGRESS BAR WITH LABEL ||============================== //
 
@@ -36,75 +20,48 @@ const formatDate = (date: Date) =>
     weekday: "long",
   }).format(new Date(date));
 
-const LinearProgressWithLabel = ({
+const ProgressWithLabel = ({
   value,
   remainingDays,
-  ...others
 }: {
   value: number;
   remainingDays: number | null;
 }) => {
-  const getProgressBarColor = () => {
+  const getProgressColor = () => {
     if (remainingDays !== null && remainingDays <= 10) {
-      return "warning";
+      return "bg-yellow-500";
     } else if (value >= 80) {
-      return "error";
+      return "bg-red-500";
     } else {
-      return "primary";
+      return "bg-blue-500";
     }
   };
 
   return (
-    <Grid container direction="column" spacing={1} sx={{ mt: 1.5 }}>
-      <Grid item>
-        <Grid container justifyContent="space-between">
-          <Grid item>
-            <Typography variant="h6" sx={{ color: "primary.800" }}>
-              Usage
-            </Typography>
-          </Grid>
-          <Grid item>
-            {Math.round(value) > 0 ? (
-              <Typography variant="h6" color="inherit">
-                {`${Math.round(value)}%`} of limit
-              </Typography>
-            ) : (
-              <Typography variant="h6" color="red">
-                Exosted
-              </Typography>
-            )}
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid item>
-        <LinearProgress
-          aria-label="progress of theme"
-          variant="determinate"
-          value={value}
-          color={getProgressBarColor()}
-          {...others}
-          sx={{
-            height: 10,
-            borderRadius: 30,
-            [`&.${linearProgressClasses.colorPrimary}`]: {
-              bgcolor: "background.paper",
-            },
-            [`& .${linearProgressClasses.bar}`]: {
-              borderRadius: 5,
-              bgcolor: "primary.dark",
-            },
-          }}
-        />
-      </Grid>
-    </Grid>
+    <div className="space-y-3 mt-6">
+      <div className="flex justify-between items-center">
+        <h6 className="text-sm font-medium text-primary/80">Usage</h6>
+        {Math.round(value) > 0 ? (
+          <span className="text-sm font-medium">
+            {`${Math.round(value)}%`} of limit
+          </span>
+        ) : (
+          <span className="text-sm font-medium text-red-500">Exhausted</span>
+        )}
+      </div>
+      <Progress
+        value={value}
+        className="h-2.5 bg-background"
+        // You can customize the progress color with CSS custom properties or className
+      />
+    </div>
   );
 };
 
 const UpgradePlanCardAlert = () => {
-  const theme = useTheme();
   const { status, data: session } = useSession();
   const [subscription, setSubscription] = useState<UserSubscriptionData | null>(
-    null
+    null,
   );
 
   useEffect(() => {
@@ -112,7 +69,7 @@ const UpgradePlanCardAlert = () => {
       if (status !== "loading" && status === "authenticated") {
         try {
           const res = await axios.get(
-            process.env.NEXT_PUBLIC_BASE_URL + `/api/pricing/current`
+            process.env.NEXT_PUBLIC_BASE_URL + `/api/pricing/current`,
           );
           setSubscription(res.data);
         } catch (error) {
@@ -135,7 +92,7 @@ const UpgradePlanCardAlert = () => {
   const remainingDays =
     currentPeriodStart !== null && currentPeriodEnd !== null
       ? Math.floor(
-          (currentPeriodEnd - currentPeriodStart) / (1000 * 60 * 60 * 24)
+          (currentPeriodEnd - currentPeriodStart) / (1000 * 60 * 60 * 24),
         )
       : null;
 
@@ -146,7 +103,7 @@ const UpgradePlanCardAlert = () => {
       ? Math.round(
           ((currentPeriodEnd - Date.now()) /
             (currentPeriodEnd - currentPeriodStart)) *
-            100
+            100,
         )
       : 0;
 
@@ -156,174 +113,94 @@ const UpgradePlanCardAlert = () => {
 
   if (!subscription) {
     return (
-      <Card
-        sx={{
-          bgcolor: "primary.light",
-          mb: 2.75,
-          overflow: "hidden",
-          position: "relative",
-          "&:after": {
-            content: '""',
-            position: "absolute",
-            width: 157,
-            height: 157,
-            bgcolor: "primary.200",
-            borderRadius: "50%",
-            top: -105,
-            right: -96,
-          },
-        }}
-      >
-        <Box sx={{ p: 2 }}>
-          <List disablePadding sx={{ m: 0 }}>
-            <ListItem alignItems="flex-start" disableGutters disablePadding>
-              <ListItemAvatar sx={{ mt: 0 }}>
-                <Avatar
-                  variant="rounded"
-                  sx={{
-                    ...theme.typography.commonAvatar,
-                    ...theme.typography.largeAvatar,
-                    color: "primary.main",
-                    border: "none",
-                    borderColor: "primary.main",
-                    bgcolor: "background.paper",
-                  }}
-                >
-                  <AutoAwesomeRoundedIcon fontSize="small" />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                sx={{ mt: 0 }}
-                primary={
-                  <Typography variant="h5" sx={{ color: "primary.800" }}>
-                    Free Plan
-                  </Typography>
-                }
-                secondary={
-                  <Typography variant="h6" sx={{ color: "secondary.800" }}>
-                    Your current plan
-                  </Typography>
-                }
-              />
-            </ListItem>
-          </List>
-          <Grid
-            container
-            justifyContent="space-between"
-            alignItems="center"
-            sx={{ mt: 2 }}
-          >
-            <Stack direction="row">
-              <Link
-                sx={{ textDecoration: "none" }}
-                href="/dashboard/subscription"
+      <Card className="bg-primary/5 border-primary/10 overflow-hidden relative">
+        {/* Background decoration */}
+        <div className="absolute -top-20 -right-24 w-40 h-40 bg-primary/10 rounded-full" />
+
+        <CardContent className="p-4 relative">
+          <div className="flex items-start space-x-3">
+            <Avatar className="h-10 w-10 bg-background border-2 border-primary/20">
+              <AvatarFallback className="bg-background text-primary">
+                <Sparkles className="h-5 w-5" />
+              </AvatarFallback>
+            </Avatar>
+
+            <div className="flex-1 space-y-1">
+              <h5 className="text-sm font-semibold text-primary/90">
+                Free Plan
+              </h5>
+              <p className="text-xs text-muted-foreground">Your current plan</p>
+            </div>
+          </div>
+
+          <div className="mt-4 flex justify-start">
+            <Link href="/dashboard/subscription">
+              <Button
+                size="sm"
+                className={`shadow-none ${
+                  remainingDays !== null && remainingDays <= 10
+                    ? "bg-yellow-500 hover:bg-yellow-600"
+                    : "bg-primary hover:bg-primary/90"
+                }`}
               >
-                <AnimateButton>
-                  <Button
-                    variant="contained"
-                    color={
-                      remainingDays !== null && remainingDays <= 10
-                        ? "warning"
-                        : "primary"
-                    }
-                    sx={{ boxShadow: "none" }}
-                  >
-                    Upgrade
-                  </Button>
-                </AnimateButton>
-              </Link>
-            </Stack>
-          </Grid>
-        </Box>
+                Upgrade
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card
-      sx={{
-        bgcolor: "primary.light",
-        mb: 2.75,
-        overflow: "hidden",
-        position: "relative",
-        "&:after": {
-          content: '""',
-          position: "absolute",
-          width: 157,
-          height: 157,
-          bgcolor: "primary.200",
-          borderRadius: "50%",
-          top: -105,
-          right: -96,
-        },
-      }}
-    >
-      <Box sx={{ p: 2 }}>
-        <List disablePadding sx={{ m: 0 }}>
-          <ListItem alignItems="flex-start" disableGutters disablePadding>
-            <ListItemAvatar sx={{ mt: 0 }}>
-              <Avatar
-                variant="rounded"
-                sx={{
-                  ...theme.typography.commonAvatar,
-                  ...theme.typography.largeAvatar,
-                  color: "primary.main",
-                  border: "none",
-                  borderColor: "primary.main",
-                  bgcolor: "background.paper",
-                }}
-              >
-                <AutoAwesomeRoundedIcon fontSize="small" />
-              </Avatar>
-            </ListItemAvatar>
-            <ListItemText
-              sx={{ mt: 0 }}
-              primary={
-                <Typography variant="subtitle1" sx={{ color: "primary.800" }}>
-                  {subscription.type}
-                </Typography>
-              }
-              secondary={
-                <Typography variant="caption">Your current plan </Typography>
-              }
-            />
-          </ListItem>
-        </List>
+    <Card className="bg-primary/5 border-primary/10 overflow-hidden relative">
+      {/* Background decoration */}
+      <div className="absolute -top-20 -right-24 w-40 h-40 bg-primary/10 rounded-full" />
+
+      <CardContent className="p-4 relative">
+        <div className="flex items-start space-x-3">
+          <Avatar className="h-10 w-10 bg-background border-2 border-primary/20">
+            <AvatarFallback className="bg-background text-primary">
+              <Sparkles className="h-5 w-5" />
+            </AvatarFallback>
+          </Avatar>
+
+          <div className="flex-1 space-y-1">
+            <h5 className="text-sm font-semibold text-primary/90">
+              {subscription.type}
+            </h5>
+            <p className="text-xs text-muted-foreground">Your current plan</p>
+          </div>
+        </div>
+
         {subscription.type !== "Free" && (
-          <LinearProgressWithLabel
+          <ProgressWithLabel
             value={usagePercentage}
             remainingDays={remainingDays}
           />
         )}
-        <Grid item sx={{ marginTop: 2 }}>
-          <Stack direction="row">
-            <Link
-              sx={{ textDecoration: "none" }}
-              href="/dashboard/subscription"
+
+        <div className="mt-4 flex justify-start">
+          <Link href="/dashboard/subscription">
+            <Button
+              size="sm"
+              className={`shadow-none ${
+                remainingDays !== null && remainingDays <= 10
+                  ? "bg-yellow-500 hover:bg-yellow-600"
+                  : "bg-primary hover:bg-primary/90"
+              }`}
             >
-              <AnimateButton>
-                <Button
-                  variant="contained"
-                  color={
-                    remainingDays !== null && remainingDays <= 10
-                      ? "warning"
-                      : "primary"
-                  }
-                  sx={{ boxShadow: "none" }}
-                >
-                  {subscription.type === "Free" ||
-                  subscription.type === "" ||
-                  subscription.type === "null"
-                    ? "Upgrade"
-                    : remainingDays !== null && remainingDays <= 10
-                    ? "Renew"
-                    : "Manage"}
-                </Button>
-              </AnimateButton>
-            </Link>
-          </Stack>
-        </Grid>
-      </Box>
+              {subscription.type === "Free" ||
+              subscription.type === "" ||
+              subscription.type === "null"
+                ? "Upgrade"
+                : remainingDays !== null && remainingDays <= 10
+                  ? "Renew"
+                  : "Manage"}
+            </Button>
+          </Link>
+        </div>
+      </CardContent>
     </Card>
   );
 };

@@ -2,9 +2,9 @@ import { PinType } from "@/types/pin-config";
 
 export const generatePinOptions = (pinType: PinType): string[] => {
   if (pinType === "VIRTUAL") {
-    return Array.from({ length: 20 }, (_, i) => `V${i + 1}`);
+    return Array.from({ length: 20 }, (_, i) => `V${i}`);
   } else if (pinType === "DIGITAL") {
-    return Array.from({ length: 20 }, (_, i) => `D${i + 1}`);
+    return Array.from({ length: 20 }, (_, i) => `D${i}`);
   }
   return Array.from({ length: 8 }, (_, i) => `A${i}`);
 };

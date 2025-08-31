@@ -52,7 +52,6 @@ export async function POST(
 ) {
   const body = await request.json();
 
-  console.log("Received widget data:", body);
   const token = await getToken({ req: request });
 
   if (!token) {

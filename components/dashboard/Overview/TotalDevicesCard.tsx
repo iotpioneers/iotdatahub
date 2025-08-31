@@ -1,76 +1,15 @@
 import React, { useMemo } from "react";
-
-// material-ui
-import { useTheme } from "@mui/material/styles";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
-
-// third-party
-import PixOutlinedIcon from "@mui/icons-material/PixOutlined";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ArrowDownRight, Cpu } from "lucide-react";
+import { LineChart, Line, ResponsiveContainer } from "recharts";
 
 // project imports
 import SkeletonTotalChannelDetailsCard from "../cards/Skeleton/SkeletonTotalChannelDetailsCard";
+import { Device } from "@/types";
 
-// assets
-import Chart from "react-apexcharts";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import MainCard from "../cards/MainCard";
-import { Channel, Device, Field } from "@/types";
+// ==============================|| DASHBOARD - TOTAL DEVICES CARD ||============================== //
 
-// ==============================|| DASHBOARD - TOTAL ORDER LINE CHART CARD ||============================== //
-
-// const ChartDeviceData = {
-//   type: "line" as "line",
-//   height: 90,
-//   options: {
-//     chart: {
-//       sparkline: {
-//         enabled: true,
-//       },
-//     },
-//     dataLabels: {
-//       enabled: false,
-//     },
-//     colors: ["#fff"],
-//     fill: {
-//       type: "solid",
-//       opacity: 1,
-//     },
-//     stroke: {
-//       curve: "smooth" as "smooth",
-//       width: 3,
-//     },
-//     yaxis: {
-//       min: 0,
-//       max: 100,
-//     },
-//     tooltip: {
-//       theme: "dark",
-//       fixed: {
-//         enabled: false,
-//       },
-//       x: {
-//         show: false,
-//       },
-//       y: {
-//         title: {
-//           formatter: () => "Total channels",
-//         },
-//       },
-//       marker: {
-//         show: false,
-//       },
-//     },
-//   },
-//   series: [
-//     {
-//       name: "series1",
-//       data: [45, 66, 41, 89, 25, 44, 9, 54],
-//     },
-//   ],
-// };
 interface TotalDevicesCardProps {
   isLoading: boolean;
   devices: Device[] | null;
@@ -80,8 +19,6 @@ const TotalDevicesCard: React.FC<TotalDevicesCardProps> = ({
   isLoading,
   devices,
 }) => {
-  const theme = useTheme();
-
   const chartData = useMemo(() => {
     if (!devices) return [];
 
@@ -91,173 +28,60 @@ const TotalDevicesCard: React.FC<TotalDevicesCardProps> = ({
     }));
   }, [devices]);
 
-  const ChartDeviceData = useMemo(
-    () => ({
-      type: "line" as const,
-      height: 90,
-      options: {
-        chart: {
-          sparkline: {
-            enabled: true,
-          },
-        },
-        dataLabels: {
-          enabled: false,
-        },
-        colors: ["#fff"],
-        fill: {
-          type: "solid",
-          opacity: 1,
-        },
-        stroke: {
-          curve: "smooth" as const,
-          width: 3,
-        },
-        yaxis: {
-          min: 0,
-          max: 1,
-        },
-        tooltip: {
-          theme: "dark",
-          fixed: {
-            enabled: false,
-          },
-          x: {
-            show: false,
-          },
-          y: {
-            title: {
-              formatter: () => "Device Status",
-            },
-          },
-          marker: {
-            show: false,
-          },
-        },
-      },
-      series: [
-        {
-          name: "Device Status",
-          data: chartData,
-        },
-      ],
-    }),
-    [chartData]
-  );
-
   return (
     <>
       {isLoading ? (
         <SkeletonTotalChannelDetailsCard />
       ) : (
-        <MainCard
-          border={false}
-          content={false}
-          sx={{
-            bgcolor: "primary.dark",
-            color: "#fff",
-            overflow: "hidden",
-            position: "relative",
-            "&>div": {
-              position: "relative",
-              zIndex: 5,
-            },
-            "&:after": {
-              content: '""',
-              position: "absolute",
-              width: 210,
-              height: 210,
-              background: theme.palette.primary[800],
-              borderRadius: "50%",
-              top: { xs: -105, sm: -85 },
-              right: { xs: -140, sm: -95 },
-            },
-            "&:before": {
-              content: '""',
-              position: "absolute",
-              width: 210,
-              height: 210,
-              background: theme.palette.primary[800],
-              borderRadius: "50%",
-              top: { xs: -155, sm: -125 },
-              right: { xs: -70, sm: -15 },
-              opacity: 0.5,
-            },
-          }}
-        >
-          <Box sx={{ p: 2.25 }}>
-            <Grid container direction="column">
-              <Grid item>
-                <Grid container justifyContent="space-between">
-                  <Grid item>
-                    <Avatar
-                      variant="rounded"
-                      sx={{
-                        ...theme.typography.commonAvatar,
-                        ...theme.typography.largeAvatar,
-                        bgcolor: "primary.800",
-                        color: "#fff",
-                        mt: 1,
-                      }}
-                    >
-                      <PixOutlinedIcon fontSize="inherit" />
+        <Card className="bg-blue-900 text-white border-none relative overflow-hidden">
+          {/* Background decorative circles */}
+          <div className="absolute w-52 h-52 rounded-full opacity-20 -top-20 sm:-top-24 -right-32 sm:-right-24 bg-blue-700"></div>
+          <div className="absolute w-52 h-52 rounded-full opacity-10 -top-36 sm:-top-32 -right-16 sm:-right-4 bg-blue-700"></div>
+
+          <CardContent className="p-6 relative z-10">
+            <div className="flex flex-col space-y-4">
+              <div className="flex justify-between items-start">
+                <Avatar className="h-12 w-12 bg-blue-700">
+                  <AvatarFallback className="bg-blue-700 text-white">
+                    <Cpu className="h-6 w-6" />
+                  </AvatarFallback>
+                </Avatar>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <h3 className="text-3xl font-medium">
+                      {devices ? devices.length : 0}
+                    </h3>
+                    <Avatar className="h-8 w-8 bg-blue-200 cursor-pointer">
+                      <AvatarFallback className="bg-blue-200 text-blue-900">
+                        <ArrowDownRight className="h-4 w-4 rotate-45" />
+                      </AvatarFallback>
                     </Avatar>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item sx={{ mb: 0.75 }}>
-                <Grid container alignItems="center">
-                  <Grid item xs={6}>
-                    <Grid container alignItems="center">
-                      <Grid item>
-                        <Typography
-                          sx={{
-                            fontSize: "2.125rem",
-                            fontWeight: 500,
-                            mr: 1,
-                            mt: 1.75,
-                            mb: 0.75,
-                          }}
-                        >
-                          {devices ? devices.length : 0}
-                        </Typography>
-                      </Grid>
-                      <Grid item>
-                        <Avatar
-                          sx={{
-                            ...theme.typography.smallAvatar,
-                            cursor: "pointer",
-                            bgcolor: "primary.200",
-                            color: "primary.dark",
-                          }}
-                        >
-                          <ArrowDownwardIcon
-                            fontSize="inherit"
-                            sx={{ transform: "rotate3d(1, 1, 1, 45deg)" }}
-                          />
-                        </Avatar>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Typography
-                          sx={{
-                            fontSize: "1rem",
-                            fontWeight: 500,
-                            color: "primary.200",
-                          }}
-                        >
-                          Total Devices
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Chart {...ChartDeviceData} />
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Box>
-        </MainCard>
+                  </div>
+                  <p className="text-lg font-medium text-blue-200">
+                    Total Devices
+                  </p>
+                </div>
+
+                <div className="h-20">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={chartData}>
+                      <Line
+                        type="monotone"
+                        dataKey="y"
+                        stroke="#ffffff"
+                        strokeWidth={3}
+                        dot={false}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </>
   );

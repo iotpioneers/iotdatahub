@@ -351,3 +351,109 @@ body {
 .action-button {
   pointer-events: auto;
 }
+
+/* Ensure the grid layout container can scroll properly */
+.react-grid-layout {
+  position: relative;
+  min-height: 100%;
+}
+
+/* Make entire widget draggable with proper cursor */
+.widget-item {
+  cursor: move;
+  user-select: none;
+}
+
+.widget-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Ensure action buttons don't interfere with dragging */
+.action-button {
+  cursor: pointer;
+  user-select: none;
+}
+
+.action-button:hover {
+  cursor: pointer;
+}
+
+/* Grid item styling to prevent layout issues */
+.react-grid-item {
+  transition: all 200ms ease;
+  transition-property: left, top, width, height;
+}
+
+.react-grid-item.react-grid-placeholder {
+  background: rgba(59, 130, 246, 0.2);
+  border: 2px dashed rgb(59, 130, 246);
+  opacity: 0.2;
+  transition-duration: 100ms;
+  z-index: 2;
+  user-select: none;
+}
+
+.react-grid-item > .react-resizable-handle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  bottom: 0;
+  right: 0;
+  background: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNiIgaGVpZ2h0PSI2IiB2aWV3Qm94PSIwIDAgNiA2IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxnIGZpbGw9IiM0QTVDNkEiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PGNpcmNsZSBjeD0iNSIgY3k9IjUiIHI9IjEiLz48Y2lyY2xlIGN4PSIxIiBjeT0iNSIgcj0iMSIvPjxjaXJjbGUgY3g9IjUiIGN5PSIxIiByPSIxIi8+PGNpcmNsZSBjeD0iMyIgY3k9IjMiIHI9IjEiLz48Y2lyY2xlIGN4PSIzIiBjeT0iMSIgcj0iMSIvPjxjaXJjbGUgY3g9IjEiIGN5PSIzIiByPSIxIi8+PC9nPjwvc3ZnPg==")
+    no-repeat center center;
+  padding: 0 3px 3px 0;
+  background-size: 6px 6px;
+  cursor: se-resize;
+  z-index: 10;
+}
+
+.react-grid-item > .react-resizable-handle::after {
+  content: "";
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 5px;
+  height: 5px;
+  border-right: 2px solid rgba(0, 0, 0, 0.4);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+}
+
+/* Scrollbar styling for better UX */
+.dashboard-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dashboard-scroll-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.dashboard-scroll-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.dashboard-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Ensure proper spacing and layout */
+.widget-grid-container {
+  padding: 1rem;
+  min-height: calc(100vh - 200px);
+}
+
+/* Prevent text selection during drag operations */
+.react-grid-item.react-dragging {
+  user-select: none;
+}
+
+/* Ensure widgets maintain their aspect ratio */
+.widget-content {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}

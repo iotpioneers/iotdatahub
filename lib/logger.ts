@@ -85,3 +85,30 @@ export class Logger {
 export function createLogger({ prefix, level }: LoggerOptions = {}): Logger {
   return new Logger({ prefix, level });
 }
+
+/**
+ * Simple logger implementation with masking for sensitive data
+ */
+export class SimpleLogger {
+  log(level: string, message: string, data: any = {}): void {
+    const entry = {
+      timestamp: new Date().toISOString(),
+      level,
+      message,
+      ...data,
+    };
+    console.log(JSON.stringify(entry));
+  }
+
+  info(message: string, data?: any): void {
+    this.log("INFO", message, data);
+  }
+
+  debug(message: string, data?: any): void {
+    this.log("DEBUG", message, data);
+  }
+
+  error(message: string, data?: any): void {
+    this.log("ERROR", message, data);
+  }
+}

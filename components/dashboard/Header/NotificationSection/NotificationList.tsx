@@ -6,11 +6,7 @@ import {
   LiveblocksUIConfig,
 } from "@liveblocks/react-ui";
 import { useInboxNotifications } from "@liveblocks/react/suspense";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Divider from "@mui/material/Divider";
-import List from "@mui/material/List";
-import { useTheme } from "@mui/material/styles";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ListItemWrapperProps {
   children: React.ReactNode;
@@ -18,25 +14,13 @@ interface ListItemWrapperProps {
 
 const ListItemWrapper: React.FC<ListItemWrapperProps> = ({ children }) => {
   return (
-    <Box
-      sx={{
-        p: 2,
-        borderBottom: "1px solid",
-        borderColor: "divider",
-        cursor: "pointer",
-        "&:hover": {
-          bgcolor: "primary.light",
-        },
-      }}
-    >
+    <div className="p-2 border-b cursor-pointer hover:bg-secondary/50">
       {children}
-    </Box>
+    </div>
   );
 };
 
 const NotificationList = () => {
-  const theme = useTheme();
-
   const { inboxNotifications } = useInboxNotifications();
 
   const unreadNotifications = inboxNotifications.filter(
@@ -44,26 +28,7 @@ const NotificationList = () => {
   );
 
   return (
-    <List
-      sx={{
-        width: "100%",
-        maxWidth: 400,
-        py: 0,
-        borderRadius: "10px",
-        [theme.breakpoints.down("md")]: {
-          maxWidth: 350,
-        },
-        "& .MuiListItemSecondaryAction-root": {
-          top: 18,
-        },
-        "& .MuiDivider-root": {
-          mb: 6,
-        },
-        "& .list-container": {
-          pl: 7,
-        },
-      }}
-    >
+    <div className="w-full max-w-[400px] rounded-md">
       <ListItemWrapper>
         <LiveblocksUIConfig
           overrides={{
@@ -74,7 +39,7 @@ const NotificationList = () => {
         >
           <InboxNotificationList>
             {unreadNotifications.length <= 0 && (
-              <p className="py-2 text-center text-green-500 text-md">
+              <p className="py-2 text-center text-green-500 text-sm">
                 No new notifications
               </p>
             )}
@@ -84,7 +49,7 @@ const NotificationList = () => {
                 <InboxNotification
                   key={notification.id}
                   inboxNotification={notification}
-                  className="flex items-center text-white gap-4 rounded-[10px] mb-2 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  className="flex items-center gap-4 rounded-[10px] mb-2 hover:bg-secondary/50"
                   href={`/dashboard/channels/${notification.roomId}`}
                   showActions={false}
                   kinds={{
@@ -107,22 +72,28 @@ const NotificationList = () => {
                         title={props.inboxNotification.activities[0].data.title}
                         aside={
                           <InboxNotification.Icon className="bg-transparent">
-                            <Avatar
-                              alt={
-                                typeof props.inboxNotification.activities[0]
-                                  .data.avatar === "string"
-                                  ? props.inboxNotification.activities[0].data
-                                      .avatar
-                                  : ""
-                              }
-                              src={
-                                typeof props.inboxNotification.activities[0]
-                                  .data.avatar === "string"
-                                  ? props.inboxNotification.activities[0].data
-                                      .avatar
-                                  : ""
-                              }
-                            />
+                            <Avatar>
+                              <AvatarImage
+                                src={
+                                  typeof props.inboxNotification.activities[0]
+                                    .data.avatar === "string"
+                                    ? props.inboxNotification.activities[0].data
+                                        .avatar
+                                    : ""
+                                }
+                              />
+                              <AvatarFallback>
+                                {props.inboxNotification.activities[0].data
+                                  .title !== undefined
+                                  ? String(
+                                      props.inboxNotification.activities[0].data
+                                        .title,
+                                    )
+                                      .charAt(0)
+                                      .toUpperCase()
+                                  : "A"}
+                              </AvatarFallback>
+                            </Avatar>
                           </InboxNotification.Icon>
                         }
                       >
@@ -135,8 +106,7 @@ const NotificationList = () => {
           </InboxNotificationList>
         </LiveblocksUIConfig>
       </ListItemWrapper>
-      <Divider />
-    </List>
+    </div>
   );
 };
 

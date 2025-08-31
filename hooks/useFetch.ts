@@ -1,4 +1,3 @@
-import { Widget } from "@/types/widgets";
 import axios from "axios";
 import useSWR from "swr";
 
@@ -18,7 +17,7 @@ const useFetch = (path: string) => {
   const url = `${process.env.NEXT_PUBLIC_BASE_URL}${path}`;
   const { data, error, isLoading } = useSWR(url, fetchData);
 
-  return { data, error, isLoading };
+  return { data, error, isLoading, refetch: () => fetchData(url) };
 };
 
 export default useFetch;

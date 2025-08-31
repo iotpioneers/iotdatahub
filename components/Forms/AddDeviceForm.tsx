@@ -231,7 +231,7 @@ const AddDeviceFormComponent: React.FC = () => {
                   variant="contained"
                   disabled={isSubmitting || loading}
                 >
-                  {loading ? "Creating..." : "Create Device"}
+                  {loading || isSubmitting ? "Creating..." : "Create Device"}
                 </Button>
               </div>
             </form>

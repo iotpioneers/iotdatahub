@@ -15,7 +15,7 @@ import LinearProgress, {
 import axios from "axios";
 import { CircularProgress, List, ListItem, ListItemText } from "@mui/material";
 import { UserData } from "@/types/user";
-import { allCountries } from "@/components/Auth/authentication/auth-forms/CountryList";
+import { allCountries } from "@/components/CountryList";
 
 // Function to generate a color based on index
 function generateColor(index: number, totalCountries: number) {
@@ -82,7 +82,7 @@ export default function ChartUserByCountry() {
     const fetchUsers = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users`,
         );
         setUsers(response.data);
         setLoading(false);
@@ -109,14 +109,14 @@ export default function ChartUserByCountry() {
   const userCounts: { [key: string]: number } = allCountries.reduce(
     (acc, country) => {
       const count = users.filter(
-        (user) => user.country === country.label
+        (user) => user.country === country.label,
       ).length;
       if (count > 0) {
         acc[country.label] = count;
       }
       return acc;
     },
-    {} as { [key: string]: number } // Add this type cast
+    {} as { [key: string]: number }, // Add this type cast
   );
 
   // Sort countries by user count and get top 10

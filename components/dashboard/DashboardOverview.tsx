@@ -2,10 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
-// material-ui
-import Grid from "@mui/material/Grid";
-import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
+import { FiTrendingUp } from "react-icons/fi";
 
 // project imports
 import OrganizarionOverviewCard from "@/components/dashboard/Overview/OrganizarionOverviewCard";
@@ -13,14 +10,11 @@ import TotalDataGeneratedCard from "@/components/dashboard/Overview/TotalDataGen
 import ChannelActivityOverview from "@/components/dashboard/Overview/DeviceActivityOverview";
 import TotalChannelCard from "@/components/dashboard/Overview/TotalChannelCard";
 import TotalDevicesCard from "@/components/dashboard/Overview/TotalDevicesCard";
-import { gridSpacing } from "@/app/store/constant";
-
-// assets
-import { Channel, DataPoint, Field, Device, Organization } from "@/types";
-import { EmployeeMember } from "@/types/employees-member";
 import WelcomeContentCard from "./Overview/WelcomeContentCard";
 
-// ==============================|| DEFAULT DASHBOARD ||============================== //
+// types
+import { Channel, DataPoint, Field, Device, Organization } from "@/types";
+import { EmployeeMember } from "@/types/employees-member";
 
 interface DashboardOverviewProps {
   organization: Organization | null;
@@ -41,7 +35,6 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 }) => {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [isLoading, setLoading] = useState(true);
-
   const router = useRouter();
 
   useEffect(() => {
@@ -55,74 +48,93 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   };
 
   return (
-    <Grid container spacing={gridSpacing}>
-      <Grid item xs={12}>
-        <Grid container spacing={gridSpacing}>
-          <Grid item lg={8} md={12} sm={12} xs={12}>
-            <WelcomeContentCard />
-          </Grid>
-          <Grid item lg={4} md={12} sm={12} xs={12}>
-            <Grid container spacing={gridSpacing}>
-              <Grid item sm={6} xs={12} md={6} lg={12}>
-                <div onClick={() => handleRedirect("/organization/dashboard")}>
+    <div className="h-full">
+      <div className="grid grid-cols-12 gap-4 mb-4 h-full">
+        {/* First Row */}
+        <div className="col-span-12">
+          <div className="grid grid-cols-12 gap-4">
+            {/* Welcome Card (8 columns) */}
+            <div className="col-span-12 md:col-span-8 lg:col-span-8">
+              <WelcomeContentCard />
+            </div>
+
+            {/* Organization and Data Cards (4 columns) */}
+            <div className="col-span-12 md:col-span-4 lg:col-span-4">
+              <div className="grid gap-4">
+                {/* Organization Card */}
+                <div
+                  className="col-span-1 cursor-pointer"
+                  onClick={() => handleRedirect("/organization/dashboard")}
+                >
                   <OrganizarionOverviewCard
                     isLoading={isLoading || isRedirecting}
                     organization={organization}
                     members={members}
                   />
                 </div>
-              </Grid>
 
-              <Grid item sm={6} xs={12} md={6} lg={12}>
-                <TotalDataGeneratedCard
-                  {...{
-                    isLoading: isLoading,
-                    total: datapoints ? datapoints.length : 0,
-                    label: "Total Datapoint Uploads",
-                    icon: <InsightsOutlinedIcon fontSize="inherit" />,
-                  }}
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid item xs={12}>
-        <Grid container spacing={gridSpacing}>
-          <Grid item lg={6} md={6} sm={6} xs={12}>
-            <div onClick={() => handleRedirect("/dashboard/channels")}>
+                {/* Data Generated Card */}
+                <div className="col-span-1">
+                  <TotalDataGeneratedCard
+                    isLoading={isLoading}
+                    total={datapoints ? datapoints.length : 0}
+                    label="Total Datapoint Uploads"
+                    icon={<FiTrendingUp className="text-xl" />}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Second Row */}
+        <div className="col-span-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Channels Card */}
+            <div
+              className="cursor-pointer"
+              onClick={() => handleRedirect("/dashboard/channels")}
+            >
               <TotalChannelCard isLoading={isLoading} channels={channels} />
             </div>
-          </Grid>
-          <Grid item lg={6} md={6} sm={6} xs={12}>
-            <div onClick={() => handleRedirect("/organization/dashboard")}>
+
+            {/* Devices Card */}
+            <div
+              className="cursor-pointer"
+              onClick={() => handleRedirect("/organization/dashboard")}
+            >
               <TotalDevicesCard isLoading={isLoading} devices={devices} />
             </div>
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid item xs={12}>
-        <Grid container spacing={gridSpacing}>
-          <Grid item xs={12} md={8}>
-            <ChannelActivityOverview
-              isLoading={isLoading}
-              channels={channels}
-              fields={fields}
-              dataPoints={datapoints}
-            />
-          </Grid>
-        </Grid>
-        <Grid item xs={12} md={4}>
-          {/* <UserActivityOverviewCard
-            isLoading={isLoading}
-            devices={devices}
-            channels={channels}
-            fields={fields}
-            dataPoints={datapoints}
-          /> */}
-        </Grid>
-      </Grid>
-    </Grid>
+          </div>
+        </div>
+
+        {/* Third Row */}
+        <div className="col-span-12">
+          <div className="grid grid-cols-12 gap-4">
+            {/* Channel Activity Overview */}
+            <div className="col-span-12 md:col-span-8 rounded-md border shadow shadow-black bg-white">
+              <ChannelActivityOverview
+                isLoading={isLoading}
+                channels={channels}
+                fields={fields}
+                dataPoints={datapoints}
+              />
+            </div>
+
+            {/* User Activity Overview */}
+            {/* <div className="col-span-12 md:col-span-4 rounded-md border shadow shadow-black bg-white">
+              <UserActivityOverviewCard
+                isLoading={isLoading}
+                devices={devices}
+                channels={channels}
+                fields={fields}
+                dataPoints={datapoints}
+              /> 
+            </div>*/}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
