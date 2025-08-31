@@ -40,11 +40,13 @@ export const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
       children,
       ...props
     },
-    ref
+    ref,
   ) => {
     const [isScrolling, setIsScrolling] = React.useState(false);
     const [showScrollbar, setShowScrollbar] = React.useState(false);
-    const scrollTimeoutRef = React.useRef<NodeJS.Timeout>(null);
+    const scrollTimeoutRef = React.useRef<NodeJS.Timeout | null>(
+      null,
+    ) as React.MutableRefObject<NodeJS.Timeout | null>;
 
     const handleScroll = () => {
       setIsScrolling(true);
@@ -73,7 +75,7 @@ export const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
           "relative overflow-hidden",
           className,
           type === "always" && "scrollbar-visible",
-          type === "hover" && "scrollbar-hover"
+          type === "hover" && "scrollbar-hover",
         )}
         {...props}
       >
@@ -81,7 +83,7 @@ export const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
           className={cn(
             "h-full w-full overflow-auto",
             orientation === "vertical" ? "scrollbar-width" : "scrollbar-height",
-            type === "hover" && "hover:overflow-auto"
+            type === "hover" && "hover:overflow-auto",
           )}
           onScroll={handleScroll}
         >
@@ -97,7 +99,7 @@ export const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
                 scrollbarClassName,
                 orientation === "vertical"
                   ? "w-2 right-1 top-0 h-full"
-                  : "h-2 bottom-1 left-0 w-full"
+                  : "h-2 bottom-1 left-0 w-full",
               )}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -109,7 +111,7 @@ export const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
                   "rounded-full relative",
                   thumbVariantClasses[variant],
                   thumbClassName,
-                  orientation === "vertical" ? "w-full" : "h-full"
+                  orientation === "vertical" ? "w-full" : "h-full",
                 )}
                 animate={{
                   opacity: isScrolling ? 1 : 0.7,
@@ -125,7 +127,7 @@ export const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
         </AnimatePresence>
       </div>
     );
-  }
+  },
 );
 
 ScrollArea.displayName = "ScrollArea";

@@ -1,0 +1,518 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const client_1 = require("@prisma/client");
+const logger_1 = __importDefault(require("./logger"));
+const client_2 = __importDefault(require("../../prisma/client"));
+class DeviceCacheManager {
+    constructor() {
+        this.devices = new Map(); // deviceId -> device
+        this.tokenToId = new Map(); // token -> deviceId
+        this.pendingUpdates = new Map();
+        this.updateTimer = null;
+        this.UPDATE_DELAY = 5000; // 5 seconds
+        this.isInitialized = false;
+        this.startUpdateTimer();
+    }
+    /**
+     * Initialize cache with user's devices and widgets
+     */
+    async initializeUserDevices(userId, organizationId) {
+        try {
+            logger_1.default.info("Initializing device cache with Prisma", {
+                userId,
+                organizationId,
+            });
+            // Fetch all devices for the user/organization using Prisma
+            const devicesData = await client_2.default.device.findMany({
+                where: {
+                    OR: [{ userId: userId }, { organizationId: organizationId }],
+                },
+                include: {
+                    widgets: {
+                        include: {
+                            pinConfig: true,
+                        },
+                    },
+                    virtualPins: true,
+                },
+            });
+            if (!devicesData || devicesData.length === 0) {
+                logger_1.default.warn("No devices found for user/organization", {
+                    userId,
+                    organizationId,
+                });
+                this.isInitialized = true;
+                return;
+            }
+            logger_1.default.info("Processing devices from database", {
+                deviceCount: devicesData.length,
+                organizationId,
+            });
+            for (const deviceData of devicesData) {
+                try {
+                    // Create cached device
+                    const cachedDevice = this.createCachedDevice(deviceData);
+                    // Store in cache
+                    this.devices.set(deviceData.id, cachedDevice);
+                    this.tokenToId.set(deviceData.authToken, deviceData.id);
+                    logger_1.default.info("Device cached", {
+                        deviceId: deviceData.id,
+                        deviceName: cachedDevice.name,
+                        widgetCount: cachedDevice.widgets.length,
+                        token: this.maskToken(deviceData.authToken),
+                    });
+                }
+                catch (deviceError) {
+                    logger_1.default.error("Failed to process device", {
+                        deviceId: deviceData.id,
+                        error: deviceError instanceof Error
+                            ? deviceError.message
+                            : "Unknown error",
+                    });
+                }
+            }
+            this.isInitialized = true;
+            logger_1.default.info("Device cache initialized successfully with Prisma", {
+                deviceCount: this.devices.size,
+                userId,
+                organizationId,
+            });
+        }
+        catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Unknown error";
+            logger_1.default.error("Failed to initialize device cache with Prisma", {
+                error: errorMessage,
+                userId,
+                organizationId,
+            });
+            throw error;
+        }
+    }
+    /**
+     * Helper method to create cached device from database data
+     */
+    createCachedDevice(deviceData) {
+        return {
+            id: deviceData.id,
+            token: deviceData.authToken,
+            name: deviceData.name || "Unknown Device",
+            status: deviceData.status || client_1.DeviceStatus.OFFLINE,
+            lastPing: deviceData.lastPing || new Date(),
+            widgets: deviceData.widgets.map((widget) => ({
+                id: widget.id,
+                deviceId: deviceData.id,
+                pinConfig: {
+                    pinNumber: widget.pinNumber?.toString() ||
+                        widget.settings?.pinNumber?.toString().replace("V", "") ||
+                        "0",
+                    value: widget.value || widget.settings?.value || 0,
+                    dataType: "FLOAT",
+                },
+                value: widget.value || widget.settings?.value || 0,
+                lastUpdated: widget.updatedAt,
+            })),
+            pinHistory: new Map(),
+            metadata: deviceData.metadata,
+        };
+    }
+    /**
+     * Load device from database and add to cache
+     */
+    async loadDeviceFromDatabase(token) {
+        try {
+            logger_1.default.info("Loading device from database", {
+                token: this.maskToken(token),
+            });
+            const deviceData = await client_2.default.device.findFirst({
+                where: {
+                    authToken: token,
+                },
+                include: {
+                    widgets: {
+                        include: {
+                            pinConfig: true,
+                        },
+                    },
+                    virtualPins: true,
+                },
+            });
+            if (!deviceData) {
+                logger_1.default.warn("Device not found in database", {
+                    token: this.maskToken(token),
+                });
+                return null;
+            }
+            // Create cached device
+            const cachedDevice = this.createCachedDevice(deviceData);
+            // Add to cache
+            this.devices.set(deviceData.id, cachedDevice);
+            this.tokenToId.set(deviceData.authToken, deviceData.id);
+            logger_1.default.info("Device loaded from database and cached", {
+                deviceId: deviceData.id,
+                deviceName: cachedDevice.name,
+                widgetCount: cachedDevice.widgets.length,
+                token: this.maskToken(token),
+            });
+            return cachedDevice;
+        }
+        catch (error) {
+            logger_1.default.error("Failed to load device from database", {
+                token: this.maskToken(token),
+                error: error instanceof Error ? error.message : "Unknown error",
+            });
+            return null;
+        }
+    }
+    /**
+     * Get device ID from token (with database fallback)
+     */
+    async getDeviceIdFromToken(token) {
+        // First check cache
+        const cachedId = this.tokenToId.get(token);
+        if (cachedId) {
+            return cachedId;
+        }
+        // Fallback to database
+        logger_1.default.info("Device not found in cache, checking database", {
+            token: this.maskToken(token),
+        });
+        const device = await this.loadDeviceFromDatabase(token);
+        return device ? device.id : null;
+    }
+    /**
+     * Get device ID from token (synchronous, cache only)
+     */
+    getDeviceIdFromTokenSync(token) {
+        return this.tokenToId.get(token) || null;
+    }
+    /**
+     * Get cached device by ID (with database fallback)
+     */
+    async getDevice(deviceId) {
+        // First check cache
+        const cachedDevice = this.devices.get(deviceId);
+        if (cachedDevice) {
+            return cachedDevice;
+        }
+        // Fallback to database - find by device ID
+        try {
+            const deviceData = await client_2.default.device.findUnique({
+                where: { id: deviceId },
+                include: {
+                    widgets: {
+                        include: {
+                            pinConfig: true,
+                        },
+                    },
+                    virtualPins: true,
+                },
+            });
+            if (!deviceData) {
+                return null;
+            }
+            const cachedDevice = this.createCachedDevice(deviceData);
+            // Add to cache
+            this.devices.set(deviceData.id, cachedDevice);
+            this.tokenToId.set(deviceData.authToken, deviceData.id);
+            logger_1.default.info("Device loaded from database by ID and cached", {
+                deviceId: deviceData.id,
+                deviceName: cachedDevice.name,
+                token: this.maskToken(deviceData.authToken),
+            });
+            return cachedDevice;
+        }
+        catch (error) {
+            logger_1.default.error("Failed to load device by ID from database", {
+                deviceId,
+                error: error instanceof Error ? error.message : "Unknown error",
+            });
+            return null;
+        }
+    }
+    /**
+     * Get cached device by ID (synchronous, cache only)
+     */
+    getDeviceSync(deviceId) {
+        return this.devices.get(deviceId) || null;
+    }
+    /**
+     * Get cached device by token (with database fallback)
+     */
+    async getDeviceByToken(token) {
+        const deviceId = await this.getDeviceIdFromToken(token);
+        return deviceId ? await this.getDevice(deviceId) : null;
+    }
+    /**
+     * Get cached device by token (synchronous, cache only)
+     */
+    getDeviceByTokenSync(token) {
+        const deviceId = this.getDeviceIdFromTokenSync(token);
+        return deviceId ? this.getDeviceSync(deviceId) : null;
+    }
+    /**
+     * Update device info in cache and queue for database update
+     */
+    async updateDeviceInfo(token, updates) {
+        const deviceId = await this.getDeviceIdFromToken(token);
+        if (!deviceId) {
+            logger_1.default.warn("Device not found in cache or database for info update", {
+                token: this.maskToken(token),
+            });
+            return;
+        }
+        const device = await this.getDevice(deviceId);
+        if (!device)
+            return;
+        // Update cache immediately
+        Object.assign(device, updates);
+        device.lastPing = updates.lastPing || new Date();
+        // Queue for database update
+        this.queueDeviceUpdate(deviceId, { device: updates });
+        logger_1.default.debug("Device info updated in cache", {
+            deviceId,
+            updates: Object.keys(updates),
+        });
+    }
+    /**
+     * Update hardware data in cache and queue for database update
+     */
+    async updateHardwareData(token, pin, value, command) {
+        const deviceId = await this.getDeviceIdFromToken(token);
+        if (!deviceId) {
+            logger_1.default.warn("Device not found in cache or database for hardware update", {
+                token: this.maskToken(token),
+                pin,
+                value,
+            });
+            return null;
+        }
+        const device = await this.getDevice(deviceId);
+        if (!device) {
+            logger_1.default.error("Hardware update failed - device not found", {
+                deviceToken: this.maskToken(token),
+                pin,
+                value,
+            });
+            return null;
+        }
+        const pinStr = pin.toString();
+        // Update pin history
+        const historyEntry = {
+            pin: pinStr,
+            value,
+            timestamp: new Date(),
+            command,
+        };
+        device.pinHistory.set(pinStr, historyEntry);
+        // Find and update matching widget
+        let updatedWidget = null;
+        for (const widget of device.widgets) {
+            if (widget.pinConfig.pinNumber === pinStr) {
+                widget.value = value;
+                widget.pinConfig.value = value;
+                widget.lastUpdated = new Date();
+                updatedWidget = widget;
+                break;
+            }
+        }
+        // Queue for database update
+        this.queueDeviceUpdate(deviceId, {
+            widgets: updatedWidget ? [updatedWidget] : [],
+            pinHistory: [historyEntry],
+        });
+        logger_1.default.debug("Hardware data updated in cache", {
+            deviceId,
+            pin,
+            value,
+            command,
+            widgetUpdated: !!updatedWidget,
+        });
+        return { deviceId, updatedWidget };
+    }
+    /**
+     * Queue device updates for batch processing
+     */
+    queueDeviceUpdate(deviceId, updates) {
+        const existing = this.pendingUpdates.get(deviceId);
+        if (existing) {
+            // Merge updates
+            if (updates.device) {
+                existing.updates.device = {
+                    ...existing.updates.device,
+                    ...updates.device,
+                };
+            }
+            if (updates.widgets) {
+                existing.updates.widgets = [
+                    ...(existing.updates.widgets || []),
+                    ...updates.widgets,
+                ];
+            }
+            if (updates.pinHistory) {
+                existing.updates.pinHistory = [
+                    ...(existing.updates.pinHistory || []),
+                    ...updates.pinHistory,
+                ];
+            }
+            existing.timestamp = new Date();
+        }
+        else {
+            // Create new batch
+            this.pendingUpdates.set(deviceId, {
+                deviceId,
+                updates,
+                timestamp: new Date(),
+            });
+        }
+    }
+    /**
+     * Start the periodic database update timer
+     */
+    startUpdateTimer() {
+        this.updateTimer = setInterval(async () => {
+            await this.processPendingUpdates();
+        }, this.UPDATE_DELAY);
+        logger_1.default.info("Device cache update timer started", {
+            updateDelayMs: this.UPDATE_DELAY,
+        });
+    }
+    /**
+     * Process all pending updates to database
+     */
+    async processPendingUpdates() {
+        if (this.pendingUpdates.size === 0)
+            return;
+        const updates = Array.from(this.pendingUpdates.values());
+        this.pendingUpdates.clear();
+        logger_1.default.info("Processing pending device updates", {
+            batchCount: updates.length,
+        });
+        for (const batch of updates) {
+            try {
+                await this.updateDeviceInDatabase(batch);
+            }
+            catch (error) {
+                const errorMessage = error instanceof Error ? error.message : "Unknown error";
+                logger_1.default.error("Failed to update device in database", {
+                    deviceId: batch.deviceId,
+                    error: errorMessage,
+                });
+                // Re-queue failed updates for next cycle
+                this.pendingUpdates.set(batch.deviceId, batch);
+            }
+        }
+    }
+    /**
+     * Update device in database
+     */
+    async updateDeviceInDatabase(batch) {
+        const { deviceId, updates } = batch;
+        try {
+            // Update device info if needed
+            if (updates.device) {
+                // Extract widgets from device updates since they need special handling
+                const { widgets, pinHistory, ...deviceOnlyUpdates } = updates.device;
+                await client_2.default.device.update({
+                    where: { id: deviceId },
+                    data: {
+                        ...deviceOnlyUpdates,
+                        lastPing: updates.device.lastPing || new Date(),
+                    },
+                });
+            }
+            // Update widgets if needed
+            if (updates.widgets && updates.widgets.length > 0) {
+                for (const widget of updates.widgets) {
+                    await client_2.default.widget.update({
+                        where: { id: widget.id },
+                        data: {
+                            value: widget.value.toString(),
+                            updatedAt: new Date(),
+                        },
+                    });
+                }
+            }
+            // Store pin history if needed
+            if (updates.pinHistory && updates.pinHistory.length > 0) {
+                for (const entry of updates.pinHistory) {
+                    await client_2.default.pinHistory.create({
+                        data: {
+                            deviceId: deviceId,
+                            pinNumber: parseInt(entry.pin),
+                            value: entry.value.toString(),
+                            dataType: isNaN(parseFloat(String(entry.value)))
+                                ? "STRING"
+                                : "FLOAT",
+                            timestamp: entry.timestamp,
+                        },
+                    });
+                }
+            }
+            logger_1.default.debug("Device updated in database via Prisma", {
+                deviceId,
+                deviceUpdates: !!updates.device,
+                widgetUpdates: updates.widgets?.length || 0,
+                historyEntries: updates.pinHistory?.length || 0,
+            });
+        }
+        catch (error) {
+            logger_1.default.error("Failed to update device in database via Prisma", {
+                deviceId,
+                error: error instanceof Error ? error.message : "Unknown error",
+            });
+            throw error;
+        }
+    }
+    /**
+     * Get all cached devices
+     */
+    getAllDevices() {
+        return Array.from(this.devices.values());
+    }
+    /**
+     * Check if cache is initialized
+     */
+    isReady() {
+        return this.isInitialized;
+    }
+    /**
+     * Get cache statistics
+     */
+    getStats() {
+        return {
+            deviceCount: this.devices.size,
+            pendingUpdates: this.pendingUpdates.size,
+            isInitialized: this.isInitialized,
+            memoryUsage: {
+                devices: this.devices.size,
+                tokenMappings: this.tokenToId.size,
+            },
+        };
+    }
+    /**
+     * Mask token for logging
+     */
+    maskToken(token) {
+        return token && token.length > 8
+            ? `${token.substring(0, 4)}...${token.substring(token.length - 4)}`
+            : "****";
+    }
+    /**
+     * Cleanup resources
+     */
+    cleanup() {
+        if (this.updateTimer) {
+            clearInterval(this.updateTimer);
+            this.updateTimer = null;
+        }
+        // Process any remaining updates
+        this.processPendingUpdates().catch((error) => {
+            logger_1.default.error("Error during cleanup update processing", { error });
+        });
+        logger_1.default.info("Device cache manager cleaned up");
+    }
+}
+exports.default = DeviceCacheManager;
