@@ -1,7 +1,8 @@
 import { DeviceStatus } from "@prisma/client";
 import logger from "./logger";
-import prisma from "../../prisma/client";
+import { PrismaClient } from "@prisma/client";
 
+const prisma = new PrismaClient();
 export interface CachedDevice {
   id: string;
   token: string;

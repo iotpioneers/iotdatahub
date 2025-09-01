@@ -5,7 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const logger_1 = __importDefault(require("./logger"));
-const client_2 = __importDefault(require("../../prisma/client"));
+const client_2 = require("@prisma/client");
+const prisma = new client_2.PrismaClient();
 class DeviceCacheManager {
     constructor() {
         this.devices = new Map(); // deviceId -> device
@@ -26,7 +27,7 @@ class DeviceCacheManager {
                 organizationId,
             });
             // Fetch all devices for the user/organization using Prisma
-            const devicesData = await client_2.default.device.findMany({
+            const devicesData = await prisma.device.findMany({
                 where: {
                     OR: [{ userId: userId }, { organizationId: organizationId }],
                 },
@@ -126,7 +127,7 @@ class DeviceCacheManager {
             logger_1.default.info("Loading device from database", {
                 token: this.maskToken(token),
             });
-            const deviceData = await client_2.default.device.findFirst({
+            const deviceData = await prisma.device.findFirst({
                 where: {
                     authToken: token,
                 },
@@ -199,7 +200,7 @@ class DeviceCacheManager {
         }
         // Fallback to database - find by device ID
         try {
-            const deviceData = await client_2.default.device.findUnique({
+            const deviceData = await prisma.device.findUnique({
                 where: { id: deviceId },
                 include: {
                     widgets: {
@@ -415,7 +416,7 @@ class DeviceCacheManager {
             if (updates.device) {
                 // Extract widgets from device updates since they need special handling
                 const { widgets, pinHistory, ...deviceOnlyUpdates } = updates.device;
-                await client_2.default.device.update({
+                await prisma.device.update({
                     where: { id: deviceId },
                     data: {
                         ...deviceOnlyUpdates,
@@ -426,7 +427,7 @@ class DeviceCacheManager {
             // Update widgets if needed
             if (updates.widgets && updates.widgets.length > 0) {
                 for (const widget of updates.widgets) {
-                    await client_2.default.widget.update({
+                    await prisma.widget.update({
                         where: { id: widget.id },
                         data: {
                             value: widget.value.toString(),
@@ -438,7 +439,7 @@ class DeviceCacheManager {
             // Store pin history if needed
             if (updates.pinHistory && updates.pinHistory.length > 0) {
                 for (const entry of updates.pinHistory) {
-                    await client_2.default.pinHistory.create({
+                    await prisma.pinHistory.create({
                         data: {
                             deviceId: deviceId,
                             pinNumber: parseInt(entry.pin),
