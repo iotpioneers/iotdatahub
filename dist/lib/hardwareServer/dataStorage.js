@@ -6,11 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.storeDeviceInfo = storeDeviceInfo;
 exports.storeHardwareData = storeHardwareData;
 const logger_1 = __importDefault(require("./logger"));
-const client_1 = __importDefault(require("../../prisma/client"));
+const client_1 = require("@prisma/client");
+const prisma = new client_1.PrismaClient();
 async function storeDeviceInfo(deviceToken, deviceInfo, clientIP) {
     try {
         // Find the device by auth token
-        const device = await client_1.default.device.findUnique({
+        const device = await prisma.device.findUnique({
             where: { authToken: deviceToken },
         });
         if (!device) {
@@ -26,7 +27,7 @@ async function storeDeviceInfo(deviceToken, deviceInfo, clientIP) {
                 ? "CONTROLLER"
                 : device.deviceType;
         // Update device with new information
-        const updatedDevice = await client_1.default.device.update({
+        const updatedDevice = await prisma.device.update({
             where: { id: device.id },
             data: {
                 firmware: deviceInfo.firmware || device.firmware,
@@ -57,7 +58,7 @@ async function storeDeviceInfo(deviceToken, deviceInfo, clientIP) {
             },
         });
         // Log the device info update
-        await client_1.default.deviceLog.create({
+        await prisma.deviceLog.create({
             data: {
                 deviceId: device.id,
                 level: "INFO",
@@ -89,7 +90,7 @@ async function storeDeviceInfo(deviceToken, deviceInfo, clientIP) {
 async function storeHardwareData(deviceToken, pin, value) {
     try {
         // Find the device by auth token
-        const device = await client_1.default.device.findUnique({
+        const device = await prisma.device.findUnique({
             where: { authToken: deviceToken },
         });
         if (!device) {
@@ -101,7 +102,7 @@ async function storeHardwareData(deviceToken, pin, value) {
             return;
         }
         // Update device status to ONLINE since we're receiving data
-        await client_1.default.device.update({
+        await prisma.device.update({
             where: { id: device.id },
             data: {
                 status: "ONLINE",
@@ -110,7 +111,7 @@ async function storeHardwareData(deviceToken, pin, value) {
         });
         const dataType = isNaN(parseFloat(String(value))) ? "STRING" : "FLOAT";
         // Upsert virtual pin data
-        await client_1.default.virtualPin.upsert({
+        await prisma.virtualPin.upsert({
             where: {
                 deviceId_pinNumber: {
                     deviceId: device.id,
@@ -131,7 +132,7 @@ async function storeHardwareData(deviceToken, pin, value) {
             },
         });
         // Store in pin history for analytics
-        await client_1.default.pinHistory.create({
+        await prisma.pinHistory.create({
             data: {
                 deviceId: device.id,
                 pinNumber: pin,
@@ -141,14 +142,14 @@ async function storeHardwareData(deviceToken, pin, value) {
             },
         });
         // Update widgets that use this pin
-        const widgets = await client_1.default.widget.findMany({
+        const widgets = await prisma.widget.findMany({
             where: {
                 deviceId: device.id,
                 pinNumber: pin,
             },
         });
         for (const widget of widgets) {
-            await client_1.default.widget.update({
+            await prisma.widget.update({
                 where: { id: widget.id },
                 data: {
                     value: value.toString(),

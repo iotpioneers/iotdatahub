@@ -13,7 +13,6 @@ const deviceCacheManager_1 = __importDefault(require("./lib/hardwareServer/devic
 const tcpServer_1 = require("./lib/hardwareServer/tcpServer");
 const apiServer_1 = require("./lib/hardwareServer/apiServer");
 const config_1 = __importDefault(require("./lib/hardwareServer/config"));
-const client_1 = __importDefault(require("./prisma/client"));
 // Initialize core components in proper order
 const deviceCache = new deviceCacheManager_1.default();
 const deviceManager = new deviceManager_1.default();
@@ -45,8 +44,6 @@ process.on("SIGINT", async () => {
     // Clean up cache first
     deviceCache.cleanup();
     wsManager.cleanup();
-    // Close Prisma connection
-    await client_1.default.$disconnect();
     httpServer.close();
     iotServer.close();
     if (iotSSLServer)
@@ -57,8 +54,6 @@ process.on("SIGTERM", async () => {
     console.log("Received SIGTERM, shutting down gracefully...");
     deviceCache.cleanup();
     wsManager.cleanup();
-    // Close Prisma connection
-    await client_1.default.$disconnect();
     httpServer.close(() => {
         process.exit(0);
     });
