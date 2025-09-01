@@ -1,10 +1,10 @@
-const { mauve, violet, blackA } = require("@radix-ui/colors");
+import type { Config } from 'tailwindcss'
+import { fontFamily } from "tailwindcss/defaultTheme"
+import plugin from "tailwindcss/plugin"
 
-/** @type {import('tailwindcss').Config} */
-import { fontFamily } from "tailwindcss/defaultTheme";
-import plugin from "tailwindcss/plugin";
+const { mauve, violet, blackA } = require("@radix-ui/colors")
 
-module.exports = {
+const config: Config = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -202,4 +202,6 @@ module.exports = {
       });
     }),
   ],
-};
+}
+
+export default config
