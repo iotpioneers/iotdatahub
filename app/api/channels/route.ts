@@ -50,13 +50,12 @@ export async function POST(request: NextRequest) {
         error:
           "Channel limit reached for your subscription tier, please upgrade your subscription",
       },
-      { status: 403 }
+      { status: 403 },
     );
   }
 
   // Validate the request body against the schema
   const validation = channelSchema.safeParse(body);
-
 
   if (!validation.success) {
     return NextResponse.json(validation.error.errors, { status: 400 });
@@ -70,7 +69,7 @@ export async function POST(request: NextRequest) {
   let existingApiKey: ApiKey | null;
 
   do {
-    apiKey = new ObjectId().toHexString();
+    apiKey = new ObjectId().toString();
     existingApiKey = await prisma.apiKey.findUnique({
       where: { apiKey },
     });
@@ -82,9 +81,9 @@ export async function POST(request: NextRequest) {
       (fieldName: string) => ({
         name: fieldName,
         organization: { connect: { id: organizationId } },
-      })
+      }),
     );
-    
+
     // Create a new channel
     const newChannel = await prisma.channel.create({
       data: {
@@ -110,7 +109,7 @@ export async function POST(request: NextRequest) {
     if (!newChannel) {
       return NextResponse.json(
         { error: "Error creating channel" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -126,7 +125,7 @@ export async function POST(request: NextRequest) {
     console.log("error", error);
     return NextResponse.json(
       { error: "Error creating channel" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -138,7 +137,7 @@ export async function GET(request: NextRequest) {
   if (!token) {
     return NextResponse.json(
       { error: "You must be logged in" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -173,7 +172,7 @@ export async function GET(request: NextRequest) {
   ) {
     return NextResponse.json(
       { error: "No channels found for this user" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -189,7 +188,7 @@ export async function GET(request: NextRequest) {
         ownerEmail: channelOwner?.email,
         ownerImage: channelOwner?.image,
       };
-    })
+    }),
   );
 
   // Map over the invited channels and add invite details
@@ -204,7 +203,7 @@ export async function GET(request: NextRequest) {
         ownerEmail: channelOwner?.email,
         ownerImage: channelOwner?.image,
       };
-    })
+    }),
   );
 
   // Merge owned and invited channels
