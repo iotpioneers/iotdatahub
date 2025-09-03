@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { userSchema } from "@/validations/schema.validation";
 import { getPricingTier, updateOrCreateSubscription } from "@/lib/pricing";
 

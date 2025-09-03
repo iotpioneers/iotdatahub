@@ -52,7 +52,8 @@ class WebSocketManager {
             console.log("====================================");
         });
         ws.on("error", (error) => {
-            logger_1.default.error("WebSocket error", { clientId, error: error.message });
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            logger_1.default.error("WebSocket error", { clientId, error: errorMessage });
             this.clients.delete(clientId);
         });
         // Send connection confirmation with cache status
