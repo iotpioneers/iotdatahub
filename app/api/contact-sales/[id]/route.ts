@@ -1,15 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/client";
-import { ObjectId } from "mongodb";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
-  if (!ObjectId.isValid(params.id)) {
-    return NextResponse.json({ error: "Invalid request ID" }, { status: 400 });
-  }
-
   const contactRequest = await prisma.contactSales.findUnique({
     where: { id: params.id },
     include: { organization: true },
@@ -18,7 +13,7 @@ export async function GET(
   if (!contactRequest) {
     return NextResponse.json(
       { error: "Contact request not found" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -27,12 +22,8 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
-  if (!ObjectId.isValid(params.id)) {
-    return NextResponse.json({ error: "Invalid request ID" }, { status: 400 });
-  }
-
   const body = await request.json();
 
   const contactRequest = await prisma.contactSales.findUnique({
@@ -42,7 +33,7 @@ export async function PUT(
   if (!contactRequest) {
     return NextResponse.json(
       { error: "Contact request not found" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -58,12 +49,8 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
-  if (!ObjectId.isValid(params.id)) {
-    return NextResponse.json({ error: "Invalid request ID" }, { status: 400 });
-  }
-
   const contactRequest = await prisma.contactSales.delete({
     where: { id: params.id },
   });
@@ -71,7 +58,7 @@ export async function DELETE(
   if (!contactRequest) {
     return NextResponse.json(
       { error: "Contact request not found" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 

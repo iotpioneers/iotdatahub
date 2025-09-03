@@ -4,7 +4,9 @@ import type {
   HardwareDataRequest,
 } from "./types";
 import logger from "./logger";
-import prisma from "../../prisma/client";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 async function storeDeviceInfo(
   deviceToken: string,

@@ -60,8 +60,10 @@ class WebSocketManager {
       console.log("====================================");
     });
 
-    ws.on("error", (error) => {
-      logger.error("WebSocket error", { clientId, error: error.message });
+    ws.on("error", (error: unknown) => {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      logger.error("WebSocket error", { clientId, error: errorMessage });
       this.clients.delete(clientId);
     });
 

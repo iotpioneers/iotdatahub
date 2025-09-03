@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/client";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,12 +31,12 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Regitered successfully" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to register a user" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

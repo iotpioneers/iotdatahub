@@ -17,7 +17,6 @@ import {
 } from "./lib/hardwareServer/apiServer";
 
 import config from "./lib/hardwareServer/config";
-import prisma from "./prisma/client";
 
 // Initialize core components in proper order
 const deviceCache = new DeviceCacheManager();
@@ -66,9 +65,6 @@ process.on("SIGINT", async () => {
   deviceCache.cleanup();
   wsManager.cleanup();
 
-  // Close Prisma connection
-  await prisma.$disconnect();
-
   httpServer.close();
   iotServer.close();
   if (iotSSLServer) iotSSLServer.close();
@@ -81,9 +77,6 @@ process.on("SIGTERM", async () => {
 
   deviceCache.cleanup();
   wsManager.cleanup();
-
-  // Close Prisma connection
-  await prisma.$disconnect();
 
   httpServer.close(() => {
     process.exit(0);
