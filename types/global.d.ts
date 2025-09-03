@@ -5,6 +5,3 @@ declare global {
   var iotdatahubServer: IoTDataHubTCPServer | undefined;
   var wsServer: IoTDataHubWebSocketServer | undefined;
 }
-
-declare module "express";
-declare module "cors";
