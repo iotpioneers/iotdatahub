@@ -8,7 +8,10 @@
     "outDir": "./dist",
     "rootDir": ".",
     "allowJs": true,
-    "checkJs": false
+    "checkJs": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true
   },
   "include": ["server.ts", "lib/**/*"],
   "exclude": [
