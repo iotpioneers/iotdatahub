@@ -1,4 +1,3 @@
-// @ts-ignore
 import { WebSocketServer, WebSocket } from "ws";
 import { IncomingMessage, Server } from "http";
 import dotenv from "dotenv";
