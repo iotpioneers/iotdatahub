@@ -6,7 +6,6 @@ import type {
   DeviceRequest,
   APIResponse,
   HardwareCommandData,
-  Device,
 } from "./types";
 import config from "./config";
 import logger from "./logger";
