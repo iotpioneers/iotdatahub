@@ -1,11 +1,18 @@
 declare module "express" {
-  import * as express from "express";
+  import express = require("express");
+
+  // Export the default
   export = express;
   export as namespace express;
-}
 
-declare module "cors" {
-  import cors from "cors";
-  export = cors;
-  export as namespace cors;
+  // Export individual members
+  export const {
+    Request,
+    Response,
+    NextFunction,
+    Application,
+    Router,
+    RequestHandler,
+    ErrorRequestHandler,
+  } = express;
 }
