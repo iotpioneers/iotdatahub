@@ -6,66 +6,6 @@ declare global {
   var wsServer: IoTDataHubWebSocketServer | undefined;
 }
 
-declare module "ws" {
-  export class WebSocket {
-    constructor(address: string | URL, protocols?: string | string[]);
-    static CONNECTING: number;
-    static OPEN: number;
-    static CLOSING: number;
-    static CLOSED: number;
-
-    readyState: number;
-
-    send(data: string | Buffer | ArrayBuffer | Buffer[]): void;
-    close(code?: number, reason?: string): void;
-
-    on(event: "open", listener: () => void): this;
-    on(event: "close", listener: (code: number, reason: string) => void): this;
-    on(event: "message", listener: (data: Buffer) => void): this;
-    on(event: "error", listener: (error: Error) => void): this;
-    on(event: string, listener: (...args: any[]) => void): this;
-  }
-
-  export class WebSocketServer {
-    constructor(options: {
-      server?: any;
-      port?: number;
-      path?: string;
-      host?: string;
-    });
-
-    on(event: "connection", listener: (ws: WebSocket, req: any) => void): this;
-    on(event: "error", listener: (error: Error) => void): this;
-    on(event: string, listener: (...args: any[]) => void): this;
-
-    close(callback?: () => void): void;
-  }
-}
-
-declare module "cors" {
-  interface CorsOptions {
-    origin?:
-      | boolean
-      | string
-      | RegExp
-      | (string | RegExp)[]
-      | ((
-          origin: string | undefined,
-          callback: (err: Error | null, allow?: boolean) => void,
-        ) => void);
-    methods?: string | string[];
-    allowedHeaders?: string | string[];
-    exposedHeaders?: string | string[];
-    credentials?: boolean;
-    maxAge?: number;
-    preflightContinue?: boolean;
-    optionsSuccessStatus?: number;
-  }
-
-  function cors(options?: CorsOptions): (req: any, res: any, next: any) => void;
-  export = cors;
-}
-
 declare module "bcrypt" {
   export function hash(
     data: string | Buffer,
@@ -131,36 +71,6 @@ declare module "jsonwebtoken" {
     token: string,
     options?: { complete?: boolean; json?: boolean },
   ): any;
-}
-
-declare module "nodemailer" {
-  export interface TransportOptions {
-    service?: string;
-    host?: string;
-    port?: number;
-    secure?: boolean;
-    auth?: {
-      user: string;
-      pass: string;
-    };
-  }
-
-  export interface MailOptions {
-    from?: string;
-    to?: string | string[];
-    cc?: string | string[];
-    bcc?: string | string[];
-    subject?: string;
-    text?: string;
-    html?: string;
-    attachments?: any[];
-  }
-
-  export interface Transporter {
-    sendMail(mailOptions: MailOptions): Promise<any>;
-  }
-
-  export function createTransport(options: TransportOptions): Transporter;
 }
 
 declare module "mongodb" {

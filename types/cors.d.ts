@@ -1,1 +1,23 @@
-declare module "cors";
+declare module "cors" {
+  interface CorsOptions {
+    origin?:
+      | boolean
+      | string
+      | RegExp
+      | (string | RegExp)[]
+      | ((
+          origin: string | undefined,
+          callback: (err: Error | null, allow?: boolean) => void,
+        ) => void);
+    methods?: string | string[];
+    allowedHeaders?: string | string[];
+    exposedHeaders?: string | string[];
+    credentials?: boolean;
+    maxAge?: number;
+    preflightContinue?: boolean;
+    optionsSuccessStatus?: number;
+  }
+
+  function cors(options?: CorsOptions): (req: any, res: any, next: any) => void;
+  export = cors;
+}
