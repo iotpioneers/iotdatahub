@@ -4,7 +4,7 @@ import { ObjectId } from "mongodb";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const apiKey = await prisma.apiKey.findUnique({
     where: { id: params.id },
@@ -20,7 +20,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const existingApiKey = await prisma.apiKey.findUnique({
     where: { id: params.id },
@@ -35,7 +35,7 @@ export async function PUT(
   let attempts = 0;
 
   while (!isUnique && attempts < MAX_ATTEMPTS) {
-    newApiKey = new ObjectId().toHexString();
+    newApiKey = new ObjectId().toString();
     const duplicateKey = await prisma.apiKey.findUnique({
       where: { apiKey: newApiKey },
     });
@@ -50,7 +50,7 @@ export async function PUT(
   if (!isUnique || existingApiKey.apiKey === "") {
     return NextResponse.json(
       { error: "Failed to generate a unique API Key after multiple attempts" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -65,14 +65,14 @@ export async function PUT(
     if (!updatedApiKey)
       return NextResponse.json(
         { error: "Failed to update API Key" },
-        { status: 500 }
+        { status: 500 },
       );
 
     return NextResponse.json(updatedApiKey);
   } catch (error) {
     return NextResponse.json(
       { error: "An error occurred while updating the API Key" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
