@@ -1,4 +1,4 @@
-import { alpha, Theme, Components } from "@mui/material/styles";
+import { alpha, type Theme, type Components } from "@mui/material/styles";
 import { gray } from "../themePrimitives";
 
 /* eslint-disable import/prefer-default-export */
@@ -63,7 +63,7 @@ export const surfacesCustomizations: Components<Theme> = {
           gap: 16,
           transition: "all 100ms ease",
           backgroundColor: gray[50],
-          borderRadius: theme.shape.borderRadius,
+          borderRadius: 12,
           border: `1px solid ${theme.palette.divider}`,
           boxShadow: "none",
           ...theme.applyStyles("dark", {
@@ -78,6 +78,7 @@ export const surfacesCustomizations: Components<Theme> = {
                 border: `1px solid ${theme.palette.divider}`,
                 boxShadow: "none",
                 background: "hsl(0, 0%, 100%)",
+                borderRadius: 12,
                 ...theme.applyStyles("dark", {
                   background: alpha(gray[900], 0.4),
                 }),

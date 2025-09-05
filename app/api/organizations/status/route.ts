@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/client";
 import { getToken } from "next-auth/jwt";
+import { getPricingTier, updateOrCreateSubscription } from "@/lib/pricing";
 
 export async function GET(request: NextRequest) {
   try {
@@ -23,17 +24,76 @@ export async function GET(request: NextRequest) {
       throw new Error("User not found");
     }
 
-    const userOrganization = await prisma.organization.findFirst({
+    let userOrganization = await prisma.organization.findFirst({
       where: {
         userId: user.id,
       },
     });
 
     if (!userOrganization) {
-      return NextResponse.json(
-        { hasOrganization: false, organization: null },
-        { status: 200 },
-      );
+      userOrganization = await prisma.organization.create({
+        data: {
+          name: `ORGANIZATION_${Math.random().toString(36).slice(4, 8)}`,
+          address: "N/A",
+          type: "PERSONAL",
+          areaOfInterest: ["TECHNOLOGY"],
+          userId: user.id,
+        },
+        include: { users: true },
+      });
+
+      const existingMember = await prisma.member.findFirst({
+        where: {
+          email: user.email,
+          organizationId: userOrganization.id,
+        },
+      });
+
+      if (existingMember) {
+        return NextResponse.json(
+          {
+            error:
+              "A member with this email already exists in the organization",
+          },
+          { status: 400 },
+        );
+      }
+
+      await prisma.member.create({
+        data: {
+          name: user.name ?? "",
+          email: user.email,
+          avatar: user.image,
+          access: "EDITOR",
+          organizationId: userOrganization.id,
+          phone: user.phonenumber || "N/A",
+        },
+      });
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          organizationId: userOrganization.id,
+        },
+      });
+
+      // Assign a free subscription to the user
+      //1. Find a free subscription
+      const pricingTier = await getPricingTier("Free Plan");
+
+      if (!pricingTier) {
+        throw new Error("Pricing tier not found");
+      }
+
+      //2. Update or create a subscription
+      const subscription = await updateOrCreateSubscription(user, pricingTier);
+
+      if (!user.subscriptionId) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { subscriptionId: subscription.id },
+        });
+      }
     }
 
     const members = await prisma.member.findMany({

@@ -9,7 +9,6 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
-import React from "react";
 
 import {
   FloatingComposer,
@@ -22,7 +21,7 @@ import {
 import FloatingToolbarPlugin from "./plugins/FloatingToolbarPlugin";
 import { useThreads } from "@liveblocks/react/suspense";
 import ChannelComments from "./ChannelComments";
-import { UserAccessType } from "@/types";
+import type { UserAccessType } from "@/types";
 import LoadingSpinner from "../../LoadingSpinner";
 import { Typography } from "@mui/material";
 
@@ -62,14 +61,14 @@ const ChannelCollaborationEditor = ({
           <ToolbarPlugin />
         </div>
 
-        <div className="editor-wrapper flex flex-col items-center justify-start">
+        <div className="editor-wrapper flex flex-col lg:flex-row gap-6 items-start justify-start">
           {status === "not-loaded" || status === "loading" ? (
             <LoadingSpinner />
           ) : (
-            <div className="editor-inner min-h-[1100px] relative mb-5 h-fit w-full max-w-[800px] shadow-md lg:mb-10">
+            <div className="editor-inner flex-1 relative mb-5 h-auto min-h-[400px] w-full max-w-[800px] shadow-md lg:mb-10 rounded-lg">
               <RichTextPlugin
                 contentEditable={
-                  <ContentEditable className="editor-input h-full" />
+                  <ContentEditable className="editor-input h-full min-h-[400px] p-4 rounded-lg" />
                 }
                 placeholder={<Placeholder />}
                 ErrorBoundary={LexicalErrorBoundary}
@@ -80,11 +79,13 @@ const ChannelCollaborationEditor = ({
             </div>
           )}
 
-          <LiveblocksPlugin>
-            <FloatingComposer className="w-[350px]" />
-            <FloatingThreads threads={threads} />
-            <ChannelComments />
-          </LiveblocksPlugin>
+          <div className="flex-shrink-0 w-full lg:w-[350px]">
+            <LiveblocksPlugin>
+              <FloatingComposer className="w-full" />
+              <FloatingThreads threads={threads} />
+              <ChannelComments />
+            </LiveblocksPlugin>
+          </div>
         </div>
       </div>
     </LexicalComposer>

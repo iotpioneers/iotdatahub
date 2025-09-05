@@ -1,12 +1,11 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
-import { Channel, DataPoint, Device, Field, Organization } from "@/types";
-import { EmployeeMember } from "@/types/employees-member";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import { CardSkeleton, ContentSkeleton } from "@/components/ui/unified-loading";
+import type { Channel, DataPoint, Device, Field, Organization } from "@/types";
+import type { EmployeeMember } from "@/types/employees-member";
 import { DashboardOverview } from "@/components/dashboard";
 
 interface ApiResponse {
@@ -38,19 +37,46 @@ const UserDashboardOverview = () => {
 
   useEffect(() => {
     if (data && !data.hasOrganization) {
-      router.push("/feature-creation");
+      router.push("/pricing");
     }
   }, [data, router]);
 
   if (error) return <div>Failed to load</div>;
-  if (!data) return <LoadingProgressBar />;
+  if (!data)
+    return (
+      <div className="p-6 space-y-6">
+        <ContentSkeleton lines={2} className="mb-8" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
+        </div>
+      </div>
+    );
 
   const { organization, members, devices, channels, fields, datapoints } = data;
 
   if (!organization) return null;
 
   return (
-    <Suspense fallback={<LoadingSpinner />}>
+    <Suspense
+      fallback={
+        <div className="p-6 space-y-6">
+          <ContentSkeleton lines={2} className="mb-8" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+          </div>
+        </div>
+      }
+    >
       <DashboardOverview
         organization={organization}
         members={members}

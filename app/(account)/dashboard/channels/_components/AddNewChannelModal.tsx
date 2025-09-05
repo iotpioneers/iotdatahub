@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import {
   Modal,
   Box,
@@ -28,7 +29,6 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useGlobalState } from "@/context";
 import { createChannelRoom } from "@/lib/actions/room.actions";
-import { LinearLoading } from "@/components/LinearLoading";
 
 // Constants
 const hardwareOptions = [
@@ -78,11 +78,18 @@ export default function AddNewChannelModal({
   const { mutate } = useSWRConfig();
   const theme = useTheme();
 
-  if (status !== "loading" && status === "unauthenticated")
-    return <LinearLoading />;
-
   const currentOrganization = state.currentOrganization;
   const { id: userId, email } = session!.user;
+
+  useEffect(() => {
+    if (status !== "loading" && status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
+
+  useEffect(() => {
+    fetchCurrentOrganization();
+  }, [currentOrganization]);
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
@@ -95,7 +102,7 @@ export default function AddNewChannelModal({
   };
 
   const style = {
-    position: "absolute" as "absolute",
+    position: "absolute" as const,
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
@@ -106,12 +113,8 @@ export default function AddNewChannelModal({
     p: 2,
     my: 8,
     mx: 1,
-    borderRadius: 2,
+    borderRadius: 12,
   };
-
-  useEffect(() => {
-    fetchCurrentOrganization();
-  }, [currentOrganization]);
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
     try {
@@ -280,7 +283,7 @@ export default function AddNewChannelModal({
                           <Box key={index} className="mb-4 flex items-center">
                             <FormControl
                               fullWidth
-                              error={!!errors.name}
+                              error={!!errors.fields?.[index]}
                               sx={{ ...theme.typography.customInput }}
                             >
                               <InputLabel

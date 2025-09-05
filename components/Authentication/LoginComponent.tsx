@@ -113,7 +113,8 @@ const LoginComponent = () => {
       });
 
       const result = await signIn("google", {
-        redirect: false,
+        redirect: true,
+        callbackUrl: "/dashboard",
       });
 
       if (result?.error) {

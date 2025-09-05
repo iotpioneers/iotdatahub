@@ -76,13 +76,11 @@ const RegisterComponent = () => {
 
   const { data: session } = useSession();
 
-  let callbackUrl = "/login";
+  let callbackUrl = "/dashboard";
   const role = session?.user?.role;
 
   if (role === "ADMIN") {
     callbackUrl = "/admin";
-  } else {
-    callbackUrl = "/dashboard";
   }
 
   // Handle email submission
@@ -246,7 +244,7 @@ const RegisterComponent = () => {
 
       const result = await signIn("google", {
         callbackUrl: callbackUrl,
-        redirect: false,
+        redirect: true,
       });
 
       if (result?.error) {

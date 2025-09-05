@@ -1,5 +1,4 @@
-import * as React from "react";
-import { alpha, Theme, Components } from "@mui/material/styles";
+import { alpha, type Theme, type Components } from "@mui/material/styles";
 import { outlinedInputClasses } from "@mui/material/OutlinedInput";
 import { svgIconClasses } from "@mui/material/SvgIcon";
 import { toggleButtonGroupClasses } from "@mui/material/ToggleButtonGroup";
@@ -31,7 +30,7 @@ export const inputsCustomizations: Components<Theme> = {
     styleOverrides: {
       root: ({ theme }) => ({
         boxShadow: "none",
-        borderRadius: theme.shape.borderRadius,
+        borderRadius: 8,
         textTransform: "none",
         variants: [
           {
@@ -95,14 +94,8 @@ export const inputsCustomizations: Components<Theme> = {
             style: {
               color: "white",
               backgroundColor: brand[300],
-              backgroundImage: `linear-gradient(to bottom, ${alpha(
-                brand[400],
-                0.8
-              )}, ${brand[500]})`,
-              boxShadow: `inset 0 2px 0 ${alpha(
-                brand[200],
-                0.2
-              )}, inset 0 -2px 0 ${alpha(brand[700], 0.4)}`,
+              backgroundImage: `linear-gradient(to bottom, ${alpha(brand[400], 0.8)}, ${brand[500]})`,
+              boxShadow: `inset 0 2px 0 ${alpha(brand[200], 0.2)}, inset 0 -2px 0 ${alpha(brand[700], 0.4)}`,
               border: `1px solid ${brand[500]}`,
               "&:hover": {
                 backgroundColor: brand[700],
@@ -133,7 +126,6 @@ export const inputsCustomizations: Components<Theme> = {
               ...theme.applyStyles("dark", {
                 backgroundColor: gray[800],
                 borderColor: gray[700],
-
                 "&:hover": {
                   backgroundColor: gray[900],
                   borderColor: gray[600],
@@ -231,7 +223,7 @@ export const inputsCustomizations: Components<Theme> = {
     styleOverrides: {
       root: ({ theme }) => ({
         boxShadow: "none",
-        borderRadius: theme.shape.borderRadius,
+        borderRadius: 8,
         textTransform: "none",
         fontWeight: theme.typography.fontWeightMedium,
         letterSpacing: 0,
@@ -285,7 +277,7 @@ export const inputsCustomizations: Components<Theme> = {
   MuiToggleButtonGroup: {
     styleOverrides: {
       root: ({ theme }) => ({
-        borderRadius: "10px",
+        borderRadius: 12,
         boxShadow: `0 4px 16px ${alpha(gray[400], 0.2)}`,
         [`& .${toggleButtonGroupClasses.selected}`]: {
           color: brand[500],
@@ -304,7 +296,7 @@ export const inputsCustomizations: Components<Theme> = {
       root: ({ theme }) => ({
         padding: "12px 16px",
         textTransform: "none",
-        borderRadius: "10px",
+        borderRadius: 12,
         fontWeight: 500,
         ...theme.applyStyles("dark", {
           color: gray[400],
@@ -332,7 +324,7 @@ export const inputsCustomizations: Components<Theme> = {
         margin: 10,
         height: 16,
         width: 16,
-        borderRadius: 5,
+        borderRadius: 6,
         border: "1px solid ",
         borderColor: alpha(gray[300], 0.8),
         boxShadow: "0 0 0 1.5px hsla(210, 0%, 0%, 0.04) inset",
@@ -392,7 +384,7 @@ export const inputsCustomizations: Components<Theme> = {
       root: ({ theme }) => ({
         padding: "8px 12px",
         color: theme.palette.text.primary,
-        borderRadius: theme.shape.borderRadius,
+        borderRadius: 8,
         border: `1px solid ${theme.palette.divider}`,
         backgroundColor: theme.palette.background.default,
         transition: "border 120ms ease-in",

@@ -1,6 +1,6 @@
-import React from "react";
+import type React from "react";
 import dynamic from "next/dynamic";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import "../globals.css";
 import ClientRootLayout from "../ClientRootLayout";
 import Navbar from "@/components/dashboard/Navbar";
@@ -8,6 +8,7 @@ import HydrationFix from "@/components/HydrationFix";
 import CollaborationProvider from "../CollaborationProvider";
 import { Theme } from "@radix-ui/themes";
 import { ToastProvider } from "@/components/ui/toast-provider";
+import { LoadingProvider } from "@/components/ui/unified-loading";
 
 const Sidebar = dynamic(() => import("@/components/sidebar/SideNavbar"), {
   loading: () => (
@@ -43,31 +44,38 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="h-screen overflow-hidden" suppressHydrationWarning>
+      <body className="h-screen" suppressHydrationWarning>
         <ClientRootLayout>
-          <CollaborationProvider>
-            <HydrationFix>
-              <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
-                {/* Sidebar - Fixed width, full height */}
-                <Sidebar />
-
-                {/* Main content area */}
-                <div className="flex-1 flex flex-col min-w-0">
-                  {/* Navbar - Fixed height */}
-                  <div className="flex-shrink-0">
-                    <Navbar />
+          <LoadingProvider>
+            <CollaborationProvider>
+              <HydrationFix>
+                <div className="flex h-screen">
+                  {/* Sidebar - Fixed position, full height */}
+                  <div className="fixed left-0 top-0 z-30 h-screen">
+                    <Sidebar />
                   </div>
 
-                  {/* Scrollable content area */}
-                  <Theme>
-                    <main className="bg-gray-200 p-2 w-full h-full min-h-screen">
-                      <ToastProvider>{children}</ToastProvider>
-                    </main>
-                  </Theme>
+                  {/* Main content area - Full width with sidebar offset */}
+                  <div className="flex-1 flex flex-col min-w-0 ml-52 transition-all duration-300">
+                    {/* Navbar - Full width with left padding to account for sidebar */}
+                    <div
+                      className="w-full fixed top-0 z-40"
+                      style={{ left: "208px", width: "calc(100% - 208px)" }}
+                    >
+                      <Navbar />
+                    </div>
+
+                    {/* Scrollable content area */}
+                    <Theme>
+                      <main className="flex-1 p-2 overflow-y-auto mt-16">
+                        <ToastProvider>{children}</ToastProvider>
+                      </main>
+                    </Theme>
+                  </div>
                 </div>
-              </div>
-            </HydrationFix>
-          </CollaborationProvider>
+              </HydrationFix>
+            </CollaborationProvider>
+          </LoadingProvider>
         </ClientRootLayout>
       </body>
     </html>

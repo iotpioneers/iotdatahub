@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   Dialog,
@@ -9,7 +11,7 @@ import {
   Box,
   CircularProgress,
 } from "@mui/material";
-import { DeviceData } from "@/types/device";
+import type { DeviceData } from "@/types/device";
 
 interface EditDeviceModalProps {
   open: boolean;
@@ -53,7 +55,13 @@ const EditDeviceModal = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      sx={{ "& .MuiDialog-paper": { borderRadius: 12 } }}
+    >
       <form onSubmit={handleSubmit}>
         <DialogTitle>Edit Device</DialogTitle>
         <DialogContent>

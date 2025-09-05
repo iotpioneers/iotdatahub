@@ -52,7 +52,7 @@ export async function POST(request: Request) {
         name: `ORGANIZATION_${Math.random().toString(36).slice(4, 8)}`,
         address: "N/A",
         type: "PERSONAL",
-        areaOfInterest: body.interests || "TECHNOLOGY",
+        areaOfInterest: body.interests || ["TECHNOLOGY"],
         userId: user.id,
       },
       include: { users: true },
