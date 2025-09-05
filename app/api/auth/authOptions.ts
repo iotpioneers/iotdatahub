@@ -43,7 +43,6 @@ const login = async (credentials: Credentials) => {
 
     return user;
   } catch (error) {
-    console.error("Login error:", error);
     throw error;
   }
 };

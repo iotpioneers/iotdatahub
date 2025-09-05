@@ -95,7 +95,7 @@ const DeviceListingComponent: React.FC = () => {
   const [devices, setDevices] = useState<DeviceData[]>([]);
   const [filteredDevices, setFilteredDevices] = useState<DeviceData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "table">("table");
   const [selectedDevice, setSelectedDevice] = useState<DeviceData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");

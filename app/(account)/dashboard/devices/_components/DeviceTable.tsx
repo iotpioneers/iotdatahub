@@ -1,15 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Box,
-  Typography,
-  IconButton,
-  CircularProgress,
-  Button,
-  Badge,
-  Chip,
-} from "@mui/material";
+import { Box, Typography, IconButton, Button, Chip } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -125,19 +117,6 @@ const DeviceTable = ({ isLoading, devices }: deviceProps) => {
       setActionLoading(id, null);
     }
   };
-
-  if (isLoading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
 
   const columns: GridColDef[] = [
     {
