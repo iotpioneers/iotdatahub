@@ -11,10 +11,7 @@ import {
   createTCPServer,
   startTCPServers,
 } from "./lib/hardwareServer/tcpServer";
-import {
-  createAPIServer,
-  startAPIServer,
-} from "./lib/hardwareServer/apiServer";
+import { createAPIServer } from "./lib/hardwareServer/apiServer";
 
 import config from "./lib/hardwareServer/config";
 

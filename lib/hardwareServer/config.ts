@@ -1,8 +1,4 @@
-import dotenv from "dotenv";
 import type { Config } from "./types";
-
-// Load environment variables
-dotenv.config();
 
 const config: Config = {
   iotPort: parseInt(process.env.IOT_PORT || "80", 10),
