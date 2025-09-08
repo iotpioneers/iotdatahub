@@ -1,9 +1,9 @@
 import { WebSocketServer, WebSocket } from "ws";
-import { IncomingMessage, Server } from "http";
+import type { IncomingMessage, Server } from "http";
 import dotenv from "dotenv";
 import logger from "./logger";
-import DeviceCacheManager from "./deviceCacheManager";
-import { DeviceUpdate, WebSocketClient } from "@/types/websocket";
+import type DeviceCacheManager from "./deviceCacheManager";
+import type { DeviceUpdate, WebSocketClient } from "@/types/websocket";
 
 // Load environment variables
 dotenv.config();
@@ -135,6 +135,12 @@ class WebSocketManager {
           this.initializeCacheForUser(message.userId, message.organizationId);
         }
         break;
+
+      case "REFRESH_DEVICE":
+        if (message.deviceId) {
+          this.handleDeviceRefresh(clientId, message.deviceId);
+        }
+        break;
     }
   }
 
@@ -182,6 +188,7 @@ class WebSocketManager {
     pin: number,
     value: string | number,
     command: string,
+    isCmd20 = false, // Add CMD:20 priority flag
   ) {
     if (!this.wss) return;
 
@@ -191,6 +198,7 @@ class WebSocketManager {
       pin,
       value,
       command,
+      isCmd20, // Pass CMD:20 flag to cache
     );
 
     if (result) {
@@ -202,6 +210,7 @@ class WebSocketManager {
         value,
         timestamp: new Date().toISOString(),
         command,
+        isCmd20,
         widget: updatedWidget
           ? {
               id: updatedWidget.id,
@@ -215,22 +224,31 @@ class WebSocketManager {
         type: "HARDWARE_DATA",
         deviceId,
         data: update,
+        priority: isCmd20 ? "HIGH" : "NORMAL",
       };
 
       console.log("====================================");
-      console.log(`🚀 INSTANT HARDWARE UPDATE BROADCAST`);
+      console.log(
+        `🚀 ${isCmd20 ? "PRIORITY CMD:20" : "INSTANT"} HARDWARE UPDATE BROADCAST`,
+      );
       console.log(`   Device: ${deviceId}`);
       console.log(`   Pin: ${pin}, Value: ${value}`);
       console.log(`   Widget updated: ${!!updatedWidget}`);
+      console.log(`   CMD:20: ${isCmd20 ? "YES" : "NO"}`);
       console.log(`   Subscribers: ${this.getDeviceSubscribers(deviceId)}`);
       console.log("====================================");
 
       this.broadcastToSubscribers(deviceId, message);
 
+      if (isCmd20 && updatedWidget) {
+        this.broadcastWidgetStateSync(deviceId, updatedWidget);
+      }
+
       // Update device status to ONLINE
       this.deviceCache.updateDeviceInfo(deviceToken, {
         status: "ONLINE",
         lastPing: new Date(),
+        lastActivity: new Date(),
       });
     } else {
       logger.warn("Hardware update failed - device not in cache", {
@@ -239,6 +257,29 @@ class WebSocketManager {
         value,
       });
     }
+  }
+
+  private broadcastWidgetStateSync(deviceId: string, widget: any) {
+    const message = {
+      type: "WIDGET_STATE_SYNC",
+      deviceId,
+      data: {
+        widgetId: widget.id,
+        pin: widget.pinConfig.pinNumber,
+        value: widget.value,
+        timestamp: new Date().toISOString(),
+        forceUpdate: true, // Force UI to update immediately
+      },
+    };
+
+    this.broadcastToSubscribers(deviceId, message);
+
+    console.log("🔄 WIDGET STATE SYNC BROADCAST", {
+      deviceId,
+      widgetId: widget.id,
+      pin: widget.pinConfig.pinNumber,
+      value: widget.value,
+    });
   }
 
   /**
@@ -251,10 +292,11 @@ class WebSocketManager {
   ) {
     if (!this.wss) return;
 
-    // Update in cache first
     this.deviceCache.updateDeviceInfo(deviceToken, {
       status: status as "ONLINE" | "OFFLINE",
       lastPing: lastPing || new Date(),
+      lastActivity: new Date(),
+      statusChangeTime: new Date(),
     });
 
     // Get device ID from cache
@@ -268,10 +310,17 @@ class WebSocketManager {
           status,
           lastPing: (lastPing || new Date()).toISOString(),
           timestamp: new Date().toISOString(),
+          realTime: true, // Flag to indicate real-time status update
         },
       };
 
       this.broadcastToSubscribers(deviceId, message);
+
+      console.log("📡 DEVICE STATUS BROADCAST", {
+        deviceId,
+        status,
+        subscribers: this.getDeviceSubscribers(deviceId),
+      });
     }
   }
 
@@ -397,6 +446,34 @@ class WebSocketManager {
 
     this.clients.clear();
     logger.info("WebSocket manager cleaned up");
+  }
+
+  private async handleDeviceRefresh(clientId: string, deviceId: string) {
+    try {
+      const device = await this.deviceCache.getDevice(deviceId);
+      if (device) {
+        const client = this.clients.get(clientId);
+        if (client) {
+          // Send fresh device data
+          this.sendMessage(client.ws, {
+            type: "DEVICE_REFRESH",
+            deviceId,
+            data: {
+              device: {
+                id: device.id,
+                name: device.name,
+                status: device.status,
+                lastPing: device.lastPing.toISOString(),
+              },
+              widgets: device.widgets,
+              timestamp: new Date().toISOString(),
+            },
+          });
+        }
+      }
+    } catch (error) {
+      logger.error("Failed to refresh device", { clientId, deviceId, error });
+    }
   }
 }
 

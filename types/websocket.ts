@@ -1,4 +1,4 @@
-import { WebSocket } from "ws";
+import type { WebSocket } from "ws";
 
 export interface WebSocketMessage {
   type:
@@ -10,7 +10,9 @@ export interface WebSocketMessage {
     | "WIDGET_UPDATE"
     | "CACHE_INITIALIZED"
     | "PONG"
-    | "ERROR";
+    | "ERROR"
+    | "WIDGET_STATE_SYNC"
+    | "DEVICE_REFRESH";
   deviceId?: string;
   data?: any;
   clientId?: string;
@@ -19,6 +21,7 @@ export interface WebSocketMessage {
   cacheStats?: any;
   error?: string;
   timestamp?: string;
+  priority?: "HIGH" | "NORMAL";
 }
 
 export interface WebSocketClient {
@@ -34,6 +37,7 @@ export interface DeviceUpdate {
   value: string | number;
   timestamp: string;
   command: string;
+  isCmd20?: boolean;
   widget?: {
     id: string;
     value: string | number;
