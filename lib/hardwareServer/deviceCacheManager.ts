@@ -48,11 +48,15 @@ class DeviceCacheManager {
   private tokenToId: Map<string, string> = new Map(); // token -> deviceId
   private pendingUpdates: Map<string, DeviceUpdateBatch> = new Map();
   private updateTimer: NodeJS.Timeout | null = null;
-  private readonly UPDATE_DELAY = 5000; // 5 seconds
+  private readonly UPDATE_DELAY = 2000; // 2 seconds instead of 5
+  private heartbeatTimer: NodeJS.Timeout | null = null;
+  private readonly HEARTBEAT_TIMEOUT = 30000; // 30 seconds for online devices
+  private readonly OFFLINE_TIMEOUT = 60000; // 60 seconds before marking offline
   private isInitialized = false;
 
   constructor() {
     this.startUpdateTimer();
+    this.startHeartbeatMonitoring();
   }
 
   /**
@@ -333,6 +337,8 @@ class DeviceCacheManager {
     updates: {
       status?: "ONLINE" | "OFFLINE";
       lastPing?: Date;
+      disconnectedAt?: Date;
+      connectionCount?: number;
       metadata?: any;
       [key: string]: any;
     },
@@ -348,16 +354,46 @@ class DeviceCacheManager {
     const device = await this.getDevice(deviceId);
     if (!device) return;
 
-    // Update cache immediately
+    const wasOffline = device.status === "OFFLINE";
     Object.assign(device, updates);
     device.lastPing = updates.lastPing || new Date();
 
-    // Queue for database update
-    this.queueDeviceUpdate(deviceId, { device: updates });
+    if (!device.metadata) device.metadata = {};
+    device.metadata.lastActivity = new Date();
+    device.metadata.statusChangeTime = new Date();
+    device.metadata.realTimeStatus = updates.status === "ONLINE";
+
+    if (wasOffline && updates.status === "ONLINE") {
+      logger.info("Device came back online", {
+        deviceId,
+        deviceName: device.name,
+        downtime: device.metadata.disconnectedAt
+          ? Math.round(
+              (new Date().getTime() -
+                new Date(device.metadata.disconnectedAt).getTime()) /
+                1000,
+            ) + "s"
+          : "unknown",
+      });
+    }
+
+    if (updates.connectionCount !== undefined)
+      device.metadata.connectionCount = updates.connectionCount;
+    if (updates.disconnectedAt)
+      device.metadata.disconnectedAt = updates.disconnectedAt;
+
+    const dbCompatibleUpdates = {
+      status: updates.status,
+      lastPing: updates.lastPing || new Date(),
+      metadata: device.metadata,
+    };
+
+    this.queueDeviceUpdate(deviceId, { device: dbCompatibleUpdates });
 
     logger.debug("Device info updated in cache", {
       deviceId,
       updates: Object.keys(updates),
+      status: updates.status,
     });
   }
 
@@ -369,6 +405,7 @@ class DeviceCacheManager {
     pin: number,
     value: string | number,
     command: string,
+    isCmd20 = false,
   ): Promise<{ deviceId: string; updatedWidget: CachedWidget | null } | null> {
     const deviceId = await this.getDeviceIdFromToken(token);
     if (!deviceId) {
@@ -392,7 +429,13 @@ class DeviceCacheManager {
 
     const pinStr = pin.toString();
 
-    // Update pin history
+    device.lastPing = new Date();
+    device.status = "ONLINE"; // Ensure device is marked online when receiving data
+    if (!device.metadata) device.metadata = {};
+    device.metadata.lastActivity = new Date();
+    device.metadata.statusChangeTime = new Date();
+    device.metadata.realTimeStatus = true;
+
     const historyEntry: PinHistoryEntry = {
       pin: pinStr,
       value,
@@ -401,7 +444,6 @@ class DeviceCacheManager {
     };
     device.pinHistory.set(pinStr, historyEntry);
 
-    // Find and update matching widget
     let updatedWidget: CachedWidget | null = null;
     for (const widget of device.widgets) {
       if (widget.pinConfig.pinNumber === pinStr) {
@@ -413,21 +455,119 @@ class DeviceCacheManager {
       }
     }
 
-    // Queue for database update
-    this.queueDeviceUpdate(deviceId, {
-      widgets: updatedWidget ? [updatedWidget] : [],
-      pinHistory: [historyEntry],
-    });
+    if (isCmd20) {
+      await this.updateDeviceInDatabaseImmediate(deviceId, {
+        widgets: updatedWidget ? [updatedWidget] : [],
+        pinHistory: [historyEntry],
+        device: {
+          lastPing: new Date(),
+          status: "ONLINE",
+          metadata: device.metadata,
+        },
+      });
+
+      logger.info("CMD:20 - Immediate database sync completed", {
+        deviceId,
+        pin,
+        value,
+        updateTime: new Date().toISOString(),
+      });
+    } else {
+      this.queueDeviceUpdate(deviceId, {
+        widgets: updatedWidget ? [updatedWidget] : [],
+        pinHistory: [historyEntry],
+        device: {
+          lastPing: new Date(),
+          status: "ONLINE",
+          metadata: device.metadata,
+        },
+      });
+    }
 
     logger.debug("Hardware data updated in cache", {
       deviceId,
       pin,
       value,
       command,
+      isCmd20,
       widgetUpdated: !!updatedWidget,
     });
 
     return { deviceId, updatedWidget };
+  }
+
+  private async updateDeviceInDatabaseImmediate(
+    deviceId: string,
+    updates: DeviceUpdateBatch["updates"],
+  ): Promise<void> {
+    try {
+      if (updates.device) {
+        const { widgets, pinHistory, ...deviceOnlyUpdates } = updates.device;
+
+        const dbUpdateData: any = {};
+        if (deviceOnlyUpdates.status)
+          dbUpdateData.status = deviceOnlyUpdates.status;
+        if (deviceOnlyUpdates.lastPing)
+          dbUpdateData.lastPing = deviceOnlyUpdates.lastPing;
+        if (deviceOnlyUpdates.metadata)
+          dbUpdateData.metadata = deviceOnlyUpdates.metadata;
+
+        await prisma.device.update({
+          where: { id: deviceId },
+          data: dbUpdateData,
+        });
+      }
+
+      if (updates.widgets && updates.widgets.length > 0) {
+        for (const widget of updates.widgets) {
+          await prisma.widget.update({
+            where: { id: widget.id },
+            data: {
+              value: widget.value.toString(),
+              updatedAt: new Date(),
+            },
+          });
+        }
+      }
+
+      if (updates.pinHistory && updates.pinHistory.length > 0) {
+        for (const entry of updates.pinHistory) {
+          await prisma.pinHistory.create({
+            data: {
+              deviceId: deviceId,
+              pinNumber: Number.parseInt(entry.pin),
+              value: entry.value.toString(),
+              dataType: isNaN(Number.parseFloat(String(entry.value)))
+                ? "STRING"
+                : "FLOAT",
+              timestamp: entry.timestamp,
+            },
+          });
+        }
+      }
+
+      logger.info("Immediate database update completed", {
+        deviceId,
+        widgetUpdates: updates.widgets?.length || 0,
+        historyEntries: updates.pinHistory?.length || 0,
+      });
+    } catch (error) {
+      logger.error("Immediate database update failed", {
+        deviceId,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      throw error;
+    }
+  }
+
+  async getDeviceLastActivity(token: string): Promise<Date | null> {
+    const deviceId = await this.getDeviceIdFromToken(token);
+    if (!deviceId) return null;
+
+    const device = await this.getDevice(deviceId);
+    if (!device) return null;
+
+    return device.metadata?.lastActivity || device.lastPing;
   }
 
   /**
@@ -440,7 +580,6 @@ class DeviceCacheManager {
     const existing = this.pendingUpdates.get(deviceId);
 
     if (existing) {
-      // Merge updates
       if (updates.device) {
         existing.updates.device = {
           ...existing.updates.device,
@@ -461,7 +600,6 @@ class DeviceCacheManager {
       }
       existing.timestamp = new Date();
     } else {
-      // Create new batch
       this.pendingUpdates.set(deviceId, {
         deviceId,
         updates,
@@ -507,7 +645,6 @@ class DeviceCacheManager {
           error: errorMessage,
         });
 
-        // Re-queue failed updates for next cycle
         this.pendingUpdates.set(batch.deviceId, batch);
       }
     }
@@ -522,21 +659,23 @@ class DeviceCacheManager {
     const { deviceId, updates } = batch;
 
     try {
-      // Update device info if needed
       if (updates.device) {
-        // Extract widgets from device updates since they need special handling
         const { widgets, pinHistory, ...deviceOnlyUpdates } = updates.device;
+
+        const dbUpdateData: any = {};
+        if (deviceOnlyUpdates.status)
+          dbUpdateData.status = deviceOnlyUpdates.status;
+        if (deviceOnlyUpdates.lastPing)
+          dbUpdateData.lastPing = deviceOnlyUpdates.lastPing;
+        if (deviceOnlyUpdates.metadata)
+          dbUpdateData.metadata = deviceOnlyUpdates.metadata;
 
         await prisma.device.update({
           where: { id: deviceId },
-          data: {
-            ...deviceOnlyUpdates,
-            lastPing: updates.device.lastPing || new Date(),
-          },
+          data: dbUpdateData,
         });
       }
 
-      // Update widgets if needed
       if (updates.widgets && updates.widgets.length > 0) {
         for (const widget of updates.widgets) {
           await prisma.widget.update({
@@ -549,15 +688,14 @@ class DeviceCacheManager {
         }
       }
 
-      // Store pin history if needed
       if (updates.pinHistory && updates.pinHistory.length > 0) {
         for (const entry of updates.pinHistory) {
           await prisma.pinHistory.create({
             data: {
               deviceId: deviceId,
-              pinNumber: parseInt(entry.pin),
+              pinNumber: Number.parseInt(entry.pin),
               value: entry.value.toString(),
-              dataType: isNaN(parseFloat(String(entry.value)))
+              dataType: isNaN(Number.parseFloat(String(entry.value)))
                 ? "STRING"
                 : "FLOAT",
               timestamp: entry.timestamp,
@@ -628,12 +766,68 @@ class DeviceCacheManager {
       this.updateTimer = null;
     }
 
-    // Process any remaining updates
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer);
+      this.heartbeatTimer = null;
+    }
+
     this.processPendingUpdates().catch((error) => {
       logger.error("Error during cleanup update processing", { error });
     });
 
     logger.info("Device cache manager cleaned up");
+  }
+
+  private startHeartbeatMonitoring(): void {
+    this.heartbeatTimer = setInterval(async () => {
+      await this.checkDeviceHeartbeats();
+    }, 10000); // Check every 10 seconds
+
+    logger.info("Device heartbeat monitoring started", {
+      checkIntervalMs: 10000,
+      heartbeatTimeoutMs: this.HEARTBEAT_TIMEOUT,
+      offlineTimeoutMs: this.OFFLINE_TIMEOUT,
+    });
+  }
+
+  private async checkDeviceHeartbeats(): Promise<void> {
+    const now = new Date();
+    const devicesUpdated: string[] = [];
+
+    for (const [deviceId, device] of this.devices) {
+      const timeSinceLastPing = now.getTime() - device.lastPing.getTime();
+      const wasOnline = device.status === "ONLINE";
+
+      if (wasOnline && timeSinceLastPing > this.HEARTBEAT_TIMEOUT) {
+        device.status = "OFFLINE";
+        if (!device.metadata) device.metadata = {};
+        device.metadata.disconnectedAt = now;
+        device.metadata.statusChangeTime = now;
+        device.metadata.realTimeStatus = false;
+
+        this.queueDeviceUpdate(deviceId, {
+          device: {
+            status: "OFFLINE",
+            metadata: device.metadata,
+          },
+        });
+
+        devicesUpdated.push(deviceId);
+        logger.info("Device marked offline due to heartbeat timeout", {
+          deviceId,
+          deviceName: device.name,
+          timeSinceLastPing: Math.round(timeSinceLastPing / 1000) + "s",
+        });
+      }
+    }
+
+    if (devicesUpdated.length > 0) {
+      logger.info("Heartbeat check completed", {
+        devicesChecked: this.devices.size,
+        devicesUpdated: devicesUpdated.length,
+        offlineDevices: devicesUpdated,
+      });
+    }
   }
 }
 

@@ -1,17 +1,17 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { X } from "lucide-react";
 import { Box } from "@mui/material";
 import useFetch from "@/hooks/useFetch";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useSession } from "next-auth/react";
-import { ApiKey, Channel, Device } from "@/types";
+import type { ApiKey, Channel, Device } from "@/types";
 import { LinearLoading } from "@/components/LinearLoading";
 import { HiStatusOffline, HiStatusOnline } from "react-icons/hi";
 import Link from "next/link";
 import WidgetGrid from "@/components/Channels/dashboard/widgets/WidgetGrid";
-import { WebSocketMessage } from "@/types/websocket";
+import type { WebSocketMessage } from "@/types/websocket";
 
 interface Props {
   params: { id: string };
@@ -31,111 +31,15 @@ const DeviceDetails = ({ params }: Props) => {
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [device, setDevice] = useState<Device | null>(null);
   const [widgetData, setWidgetData] = useState<any[]>([]);
-  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
-  const [cacheInitialized, setCacheInitialized] = useState(false);
-
-  const { data: session, status } = useSession();
-
-  // Enhanced WebSocket message handler for cache-based updates
-  const handleWebSocketMessage = useCallback(
-    (message: WebSocketMessage) => {
-      console.log("Received WebSocket message:", message);
-
-      // Only handle messages for this specific device
-      if (message.deviceId && message.deviceId === params.id) {
-        switch (message.type) {
-          case "DEVICE_UPDATE":
-            // Update device data
-            setDevice((prevDevice) =>
-              prevDevice
-                ? {
-                    ...prevDevice,
-                    ...message.data,
-                  }
-                : null,
-            );
-            setLastUpdate(new Date());
-            break;
-
-          case "HARDWARE_DATA":
-            console.log("INSTANT hardware data update received:", message.data);
-
-            // Update widget data with new hardware values (INSTANT UPDATE)
-            setWidgetData((prevWidgets) => {
-              return prevWidgets.map((widget) => {
-                if (
-                  widget.pinConfig?.pinNumber === message.data.pin.toString()
-                ) {
-                  console.log(
-                    `Updating widget for pin ${message.data.pin} with value:`,
-                    message.data.value,
-                  );
-                  return {
-                    ...widget,
-                    value: message.data.value,
-                    pinConfig: {
-                      ...widget.pinConfig,
-                      value: message.data.value,
-                    },
-                  };
-                }
-                return widget;
-              });
-            });
-            setLastUpdate(new Date());
-            break;
-
-          case "WIDGET_UPDATE":
-            // Direct widget updates from cache
-            console.log("Widget update from cache:", message.data);
-            setWidgetData(message.data.widgets);
-            setLastUpdate(new Date());
-            break;
-
-          case "DEVICE_STATUS":
-            // Update device status
-            setDevice((prevDevice) =>
-              prevDevice
-                ? {
-                    ...prevDevice,
-                    status: message.data.status,
-                    lastPing: message.data.lastPing,
-                  }
-                : null,
-            );
-            setLastUpdate(new Date());
-            break;
-
-          case "CACHE_INITIALIZED":
-            console.log("Device cache initialized:", message.stats);
-            setCacheInitialized(true);
-            setLastUpdate(new Date());
-            break;
-        }
-      }
-
-      // Handle global cache status messages
-      if (message.type === "CONNECTION_ESTABLISHED") {
-        setCacheInitialized(message.cacheReady || false);
-        console.log("WebSocket connected. Cache ready:", message.cacheReady);
-      }
-    },
-    [params.id],
-  );
-
-  const {
-    isConnected,
-    error: wsError,
-    sendMessage,
-  } = useWebSocket({
-    deviceId: params.id,
-    onMessage: handleWebSocketMessage,
-    enabled: !!session && status === "authenticated",
+  const [realTimeStats, setRealTimeStats] = useState({
+    updateCount: 0,
+    cmd20Count: 0,
+    lastCmd20: null as Date | null,
+    avgUpdateTime: 0,
+    fastestUpdate: Number.POSITIVE_INFINITY,
   });
 
-  if (status === "loading" || status === "unauthenticated" || !session) {
-    return <LinearLoading />;
-  }
+  const { data: session, status } = useSession();
 
   const {
     data: deviceData,
@@ -145,42 +49,165 @@ const DeviceDetails = ({ params }: Props) => {
   } = useFetch(`/api/devices/${params.id}`);
 
   const { data: organizationData } = useFetch(
-    `/api/organizations/${session.user.organizationId}`,
+    `/api/organizations/${session?.user?.organizationId}`,
   );
 
   const { data: initialWidgetData, refetch: refetchWidgets } = useFetch(
     `/api/devices/${params.id}/widgets`,
   );
 
-  // Initialize cache when WebSocket connects
-  useEffect(() => {
-    if (isConnected && session?.user?.organizationId && !cacheInitialized) {
-      console.log("Requesting cache initialization...");
-      sendMessage({
-        type: "INITIALIZE_CACHE",
-        userId: session.user.id,
-        organizationId: session.user.organizationId,
-      });
-    }
-  }, [isConnected, session, cacheInitialized, sendMessage]);
+  const handleWebSocketMessage = useCallback(
+    (message: WebSocketMessage) => {
+      const updateStartTime = performance.now();
 
-  // Manual refresh function (now works with cache)
-  const handleManualRefresh = async () => {
-    console.log("Manual refresh triggered");
+      if (message.deviceId && message.deviceId === params.id) {
+        switch (message.type) {
+          case "DEVICE_UPDATE":
+            setDevice((prevDevice) =>
+              prevDevice
+                ? {
+                    ...prevDevice,
+                    ...message.data,
+                    metadata: {
+                      ...prevDevice.metadata,
+                      realTimeStatus: true,
+                      lastActivity: new Date(),
+                    },
+                  }
+                : null,
+            );
 
-    if (cacheInitialized && isConnected) {
-      // If cache is ready, just request fresh data via WebSocket
-      sendMessage({
-        type: "REFRESH_DEVICE",
-        deviceId: params.id,
-      });
-    } else {
-      // Fallback to API refresh
-      await Promise.all([refetchDevice(), refetchWidgets()]);
-    }
+            break;
 
-    setLastUpdate(new Date());
-  };
+          case "HARDWARE_DATA":
+            const isCmd20 = message.data.isCmd20 || message.priority === "HIGH";
+            const updateTime = performance.now() - updateStartTime;
+
+            if (isCmd20) {
+              setRealTimeStats((prev) => ({
+                ...prev,
+                cmd20Count: prev.cmd20Count + 1,
+                lastCmd20: new Date(),
+              }));
+            }
+
+            setWidgetData((prevWidgets) => {
+              return prevWidgets.map((widget) => {
+                const widgetPin =
+                  widget.pinConfig?.pinNumber?.toString() ||
+                  widget.settings?.pinNumber?.toString();
+                const messagePin = message.data.pin.toString();
+
+                if (
+                  widgetPin === messagePin ||
+                  widgetPin === `V${messagePin}`
+                ) {
+                  return {
+                    ...widget,
+                    value: message.data.value,
+                    pinConfig: {
+                      ...widget.pinConfig,
+                      value: message.data.value,
+                    },
+                    settings: {
+                      ...widget.settings,
+                      value: message.data.value,
+                    },
+                    lastUpdated: new Date(),
+                    isCmd20Update: isCmd20,
+                    instantUpdate: true,
+                    updateTime: updateTime,
+                  };
+                }
+                return widget;
+              });
+            });
+
+            setRealTimeStats((prev) => ({
+              ...prev,
+              updateCount: prev.updateCount + 1,
+              avgUpdateTime:
+                (prev.avgUpdateTime * prev.updateCount + updateTime) /
+                (prev.updateCount + 1),
+              fastestUpdate: Math.min(prev.fastestUpdate, updateTime),
+            }));
+
+            break;
+
+          case "WIDGET_STATE_SYNC":
+            setWidgetData((prevWidgets) => {
+              return prevWidgets.map((widget) => {
+                if (widget.id === message.data.widgetId) {
+                  return {
+                    ...widget,
+                    value: message.data.value,
+                    pinConfig: {
+                      ...widget.pinConfig,
+                      value: message.data.value,
+                    },
+                    settings: {
+                      ...widget.settings,
+                      value: message.data.value,
+                    },
+                    lastUpdated: new Date(),
+                    forcedUpdate: true,
+                  };
+                }
+                return widget;
+              });
+            });
+
+            break;
+
+          case "WIDGET_UPDATE":
+            setWidgetData(message.data.widgets);
+            break;
+
+          case "DEVICE_STATUS":
+            setDevice((prevDevice) =>
+              prevDevice
+                ? {
+                    ...prevDevice,
+                    status: message.data.status,
+                    lastPing: message.data.lastPing,
+                    metadata: {
+                      ...prevDevice.metadata,
+                      realTimeStatus: message.data.realTime || true,
+                      lastActivity: new Date(),
+                      statusChangeTime: new Date(),
+                    },
+                  }
+                : null,
+            );
+
+            break;
+
+          case "DEVICE_REFRESH":
+            if (message.data.device) {
+              setDevice((prevDevice) => ({
+                ...prevDevice,
+                ...message.data.device,
+              }));
+            }
+            if (message.data.widgets) {
+              setWidgetData(message.data.widgets);
+            }
+
+            break;
+
+          case "CACHE_INITIALIZED":
+            break;
+        }
+      }
+    },
+    [params.id],
+  );
+
+  const { isConnected, cacheReady, sendMessage } = useWebSocket({
+    deviceId: params.id,
+    onMessage: handleWebSocketMessage,
+    enabled: !!session && status === "authenticated",
+  });
 
   useEffect(() => {
     if (deviceData) setDevice(deviceData);
@@ -188,20 +215,52 @@ const DeviceDetails = ({ params }: Props) => {
     if (initialWidgetData) setWidgetData(initialWidgetData);
   }, [deviceData, organizationData, initialWidgetData]);
 
-  // Enhanced fallback: Only poll if WebSocket is not connected AND cache is not ready
   useEffect(() => {
-    if (!isConnected || !cacheInitialized) {
+    if (isConnected && session?.user?.organizationId && !cacheReady) {
+      sendMessage({
+        type: "INITIALIZE_CACHE",
+        userId: session.user.id,
+        organizationId: session.user.organizationId,
+      });
+    }
+  }, [isConnected, session, cacheReady, sendMessage]);
+
+  const handleManualRefresh = async () => {
+    if (cacheReady && isConnected) {
+      sendMessage({
+        type: "REFRESH_DEVICE",
+        deviceId: params.id,
+      });
+    } else {
+      await Promise.all([refetchDevice(), refetchWidgets()]);
+    }
+  };
+
+  useEffect(() => {
+    if (!isConnected || !cacheReady) {
       const pollInterval = setInterval(() => {
-        console.log("Polling for updates (WebSocket/Cache not ready)");
         handleManualRefresh();
-      }, 10000); // Poll every 10 seconds
+      }, 8000);
 
       return () => clearInterval(pollInterval);
+    } else if (device?.status === "ONLINE") {
+      const heartbeatInterval = setInterval(() => {
+        sendMessage({
+          type: "DEVICE_HEARTBEAT",
+          deviceId: params.id,
+          timestamp: new Date().toISOString(),
+        });
+      }, 3000);
+
+      return () => clearInterval(heartbeatInterval);
     }
-  }, [isConnected, cacheInitialized]);
+  }, [isConnected, cacheReady, device?.status, params.id, sendMessage]);
+
+  if (status === "loading" || status === "unauthenticated" || !session) {
+    return <LinearLoading />;
+  }
 
   if (error) {
-    console.error("Error fetching device:", error);
     return (
       <Box className="text-red-500">
         {error || "There was an error while fetching the device"}
@@ -220,10 +279,17 @@ const DeviceDetails = ({ params }: Props) => {
     return <LinearLoading />;
   }
 
-  // Connection status logic
   const getConnectionStatus = () => {
-    if (isConnected && cacheInitialized) {
-      return { color: "bg-green-500", text: "Real-time with cache" };
+    if (isConnected && cacheReady) {
+      const avgTime = realTimeStats.avgUpdateTime.toFixed(1);
+      const fastestTime =
+        realTimeStats.fastestUpdate === Number.POSITIVE_INFINITY
+          ? "N/A"
+          : realTimeStats.fastestUpdate.toFixed(1);
+      return {
+        color: "bg-green-500",
+        text: `Real-time (${avgTime}ms avg, ${fastestTime}ms fastest)`,
+      };
     } else if (isConnected) {
       return { color: "bg-yellow-500", text: "Connected, initializing cache" };
     } else {
@@ -233,48 +299,42 @@ const DeviceDetails = ({ params }: Props) => {
 
   const connectionStatus = getConnectionStatus();
 
+  const getDeviceStatusDisplay = () => {
+    if (!device)
+      return { icon: HiStatusOffline, color: "text-gray-500", text: "Unknown" };
+
+    const isRealTimeOnline =
+      device.status === "ONLINE" && device.metadata?.realTimeStatus;
+    const timeSinceLastPing = device.lastPing
+      ? new Date().getTime() - new Date(device.lastPing).getTime()
+      : Number.POSITIVE_INFINITY;
+
+    const onlineThreshold = isRealTimeOnline ? 15000 : 45000;
+    const isActuallyOnline =
+      device.status === "ONLINE" && timeSinceLastPing < onlineThreshold;
+
+    if (isActuallyOnline) {
+      return {
+        icon: HiStatusOnline,
+        color: isRealTimeOnline ? "text-green-500" : "text-yellow-500",
+        text: "ONLINE",
+      };
+    } else {
+      return {
+        icon: HiStatusOffline,
+        color: "text-red-500",
+        text: "OFFLINE",
+      };
+    }
+  };
+
+  const deviceStatusDisplay = getDeviceStatusDisplay();
+
   return (
-    <div className="min-h-screen px-4">
+    <div className="min-h-screen">
       {(isLoading || !deviceData || isRedirecting) && <LinearLoading />}
 
-      {/* Enhanced Connection Status Indicator */}
-      <div className="mb-2 flex items-center justify-between">
-        <div className="flex items-center space-x-2 text-sm text-gray-500">
-          <span
-            className={`w-2 h-2 rounded-full ${connectionStatus.color}`}
-          ></span>
-          <span>{connectionStatus.text}</span>
-          <span>•</span>
-          <span>Last update: {lastUpdate.toLocaleTimeString()}</span>
-          {cacheInitialized && (
-            <>
-              <span>•</span>
-              <span className="text-green-600 font-medium">Cache Active</span>
-            </>
-          )}
-        </div>
-        <button
-          onClick={handleManualRefresh}
-          className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-        >
-          Refresh
-        </button>
-      </div>
-
-      {/* Performance Indicator */}
-      {cacheInitialized && isConnected && (
-        <div className="mb-4 p-2 bg-green-50 border border-green-200 rounded-md">
-          <div className="flex items-center space-x-2 text-sm text-green-700">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="font-medium">High Performance Mode Active</span>
-            <span>- Instant hardware updates, no database delays</span>
-          </div>
-        </div>
-      )}
-
-      {/* Main Dashboard Container */}
       <div className="bg-white rounded-lg shadow-sm p-6 mb-4">
-        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -300,12 +360,12 @@ const DeviceDetails = ({ params }: Props) => {
                   {device.name}
                 </h1>
                 <span className="flex items-center">
-                  {device.status === "OFFLINE" ? (
-                    <HiStatusOffline className="text-red-500 mr-2" />
-                  ) : (
-                    <HiStatusOnline className="text-green-500 mr-2" />
-                  )}
-                  <strong className="font-bold"> {device.status}</strong>
+                  <deviceStatusDisplay.icon
+                    className={`${deviceStatusDisplay.color} mr-2 animate-pulse`}
+                  />
+                  <strong className="font-bold">
+                    {deviceStatusDisplay.text}
+                  </strong>
                 </span>
               </div>
               <div className="flex items-center space-x-2 text-gray-500">
@@ -327,6 +387,12 @@ const DeviceDetails = ({ params }: Props) => {
                   <Link href={`/dashboard/devices/${params.id}/edit`}>
                     {isRedirecting || !deviceData ? <LinearLoading /> : "Edit"}
                   </Link>
+                </button>
+                <button
+                  onClick={handleManualRefresh}
+                  className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                >
+                  Refresh
                 </button>
               </div>
             </div>
@@ -354,7 +420,7 @@ const DeviceDetails = ({ params }: Props) => {
               <h3 className="text-lg font-medium text-orange-50">
                 No Dashboard widgets
               </h3>
-              {!cacheInitialized && (
+              {!cacheReady && (
                 <p className="text-sm text-gray-500 mt-2">
                   Cache is initializing... Widgets will appear once ready.
                 </p>
@@ -368,7 +434,6 @@ const DeviceDetails = ({ params }: Props) => {
         )}
       </div>
 
-      {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-black text-white rounded-lg p-6 w-full max-w-lg">
@@ -393,13 +458,22 @@ const DeviceDetails = ({ params }: Props) => {
                 <div className="text-gray-400">CHANNEL_API_KEY</div>
                 <div className="text-orange-50">"{apiKey?.apiKey}"</div>
               </div>
-              {cacheInitialized && (
-                <div>
-                  <div className="text-gray-400">CACHE_STATUS</div>
-                  <div className="text-green-400">
-                    "ACTIVE - INSTANT UPDATES"
+              {cacheReady && (
+                <>
+                  <div>
+                    <div className="text-gray-400">CACHE_STATUS</div>
+                    <div className="text-green-400">
+                      "ACTIVE - 3s HEARTBEAT"
+                    </div>
                   </div>
-                </div>
+                  <div>
+                    <div className="text-gray-400">PERFORMANCE_STATS</div>
+                    <div className="text-blue-400">
+                      "Updates: {realTimeStats.updateCount}, Avg:{" "}
+                      {realTimeStats.avgUpdateTime.toFixed(1)}ms"
+                    </div>
+                  </div>
+                </>
               )}
             </div>
           </div>

@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
-import { WebSocketMessage } from "@/types/websocket";
+import type { WebSocketMessage } from "@/types/websocket";
 import { useSession } from "next-auth/react";
 import config from "@/lib/hardwareServer/config";
 
@@ -64,6 +66,14 @@ export const useWebSocket = ({
         // Process any queued messages
         processMessageQueue();
 
+        if (session?.user?.id && session?.user?.organizationId) {
+          sendMessage({
+            type: "INITIALIZE_CACHE",
+            userId: session.user.id,
+            organizationId: session.user.organizationId,
+          });
+        }
+
         // Subscribe to device updates if deviceId is provided
         if (deviceId) {
           sendMessage({
@@ -104,10 +114,6 @@ export const useWebSocket = ({
               break;
 
             case "PONG":
-              console.log(
-                "Pong received with cache stats:",
-                message.cacheStats,
-              );
               break;
 
             default:
@@ -127,14 +133,13 @@ export const useWebSocket = ({
         // Clear message queue on disconnect
         messageQueueRef.current = [];
 
-        // Reconnect logic with exponential backoff
-        if (enabled && reconnectAttempts < 5) {
-          const timeout = Math.min(
-            1000 * Math.pow(2, reconnectAttempts),
-            30000,
-          );
+        if (enabled && reconnectAttempts < 3) {
+          const timeout =
+            reconnectAttempts === 0
+              ? 1000
+              : Math.min(1000 * Math.pow(2, reconnectAttempts), 10000);
           console.log(
-            `Reconnecting in ${timeout}ms (attempt ${reconnectAttempts + 1}/5)`,
+            `Reconnecting in ${timeout}ms (attempt ${reconnectAttempts + 1}/3)`,
           );
 
           reconnectTimeoutRef.current = setTimeout(() => {
@@ -196,36 +201,6 @@ export const useWebSocket = ({
     });
   };
 
-  console.log("====================================");
-  console.log(
-    "WebSocket connection state:",
-    isConnected ? "Connected" : "Disconnected",
-    "cacheReady",
-    cacheReady,
-    "error",
-    error,
-    "reconnectAttempts",
-    reconnectAttempts,
-    "deviceId",
-    deviceId,
-    "ping",
-    ping,
-    "sendMessage",
-    sendMessage,
-    "initializeCache",
-    initializeCache,
-    "refreshDevice",
-    refreshDevice,
-    "reconnect",
-    connect,
-    "stats",
-    {
-      reconnectAttempts,
-      maxReconnectAttempts: 5,
-    },
-  );
-  console.log("====================================");
-
   return {
     isConnected,
     cacheReady,
@@ -237,7 +212,7 @@ export const useWebSocket = ({
     reconnect: connect,
     stats: {
       reconnectAttempts,
-      maxReconnectAttempts: 5,
+      maxReconnectAttempts: 3, // Reduced max attempts
     },
   };
 };

@@ -1,7 +1,8 @@
-import { BaseMetadata } from "@liveblocks/client";
-import { ThreadData } from "@liveblocks/node";
-import { EmployeeMember } from "./employees-member";
-import { Widget } from "./widgets";
+import type React from "react";
+import type { BaseMetadata } from "@liveblocks/client";
+import type { ThreadData } from "@liveblocks/node";
+import type { EmployeeMember } from "./employees-member";
+import type { Widget } from "./widgets";
 
 export interface ApiKey {
   id: string;
@@ -18,7 +19,11 @@ export interface Device {
   channelId: string | null;
   organizationId: string;
   status: "ONLINE" | "OFFLINE" | "DISCONNECTED";
+  realTimeStatus?: "ONLINE" | "OFFLINE" | "DISCONNECTED";
+  lastPing?: Date;
+  statusUpdateTime?: Date;
   widgets: Widget[];
+  metadata?: Record<string, any>;
   createdAt: Date;
   updatedAt: Date;
   userId: string;
