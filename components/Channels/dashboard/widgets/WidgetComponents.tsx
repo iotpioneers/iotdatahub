@@ -1,12 +1,9 @@
-import React, { memo, useCallback, useMemo } from "react";
-import {
-  Image as ImageIcon,
-  Volume2,
-  PlaySquare,
-  Minus,
-  Plus,
-} from "lucide-react";
-import { WidgetType } from "@/types/widgets";
+"use client";
+
+import type React from "react";
+import { memo, useCallback, useMemo } from "react";
+import { ImageIcon, Volume2, PlaySquare, Minus, Plus } from "lucide-react";
+import type { WidgetType } from "@/types/widgets";
 import { cn } from "@/lib/utils";
 import DeviceMap from "@/app/(account)/dashboard/devices/_components/DeviceMap";
 
@@ -51,21 +48,15 @@ interface BaseWidgetProps {
 }
 
 export const SwitchWidget: React.FC<BaseWidgetProps> = memo(
-  ({
-    value = true,
-    onChange,
-    className,
-    deviceId: deviceAuthToken,
-    pinNumber,
-  }) => {
+  ({ value = false, onChange, className, deviceId, pinNumber }) => {
     const handleToggle = useCallback(async () => {
       const newValue = !value;
       onChange?.(newValue);
 
-      if (deviceAuthToken && pinNumber !== undefined) {
+      if (deviceId && pinNumber !== undefined) {
         try {
           const response = await fetch(
-            `/api/devices/${deviceAuthToken}/send-command`,
+            `/api/devices/${deviceId}/send-command`,
             {
               method: "POST",
               headers: {
@@ -74,6 +65,7 @@ export const SwitchWidget: React.FC<BaseWidgetProps> = memo(
               body: JSON.stringify({
                 pin: pinNumber,
                 value: newValue ? 1 : 0,
+                command: "SET_PIN",
               }),
             },
           );
@@ -89,17 +81,13 @@ export const SwitchWidget: React.FC<BaseWidgetProps> = memo(
             throw new Error(result.error || "Command failed");
           }
 
-          console.log("Hardware command sent successfully:", result);
+          console.log("[v0] Switch command sent successfully:", result);
         } catch (error) {
-          // Revert the change if the API call fails
           onChange?.(value);
-          console.error("Failed to update hardware:", error);
-
-          // Optional: Show user-friendly error message
-          // You might want to add a toast notification here
+          console.error("[v0] Failed to update switch hardware:", error);
         }
       }
-    }, [value, onChange, deviceAuthToken, pinNumber]);
+    }, [value, onChange, deviceId, pinNumber]);
 
     return (
       <div
@@ -126,16 +114,59 @@ export const SwitchWidget: React.FC<BaseWidgetProps> = memo(
 );
 
 export const SliderWidget: React.FC<BaseWidgetProps> = memo(
-  ({ value = 5, onChange, settings, className }) => {
+  ({ value = 5, onChange, settings, className, deviceId, pinNumber }) => {
     const min = settings?.min || 0;
     const max = settings?.max || 10;
+    const percentage = ((value - min) / (max - min)) * 100;
 
     const handleValueChange = useCallback(
-      (newValue: number[]) => {
-        onChange?.(newValue[0]);
+      async (newValue: number) => {
+        onChange?.(newValue);
+
+        if (deviceId && pinNumber !== undefined) {
+          try {
+            const response = await fetch(
+              `/api/devices/${deviceId}/send-command`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  pin: pinNumber,
+                  value: newValue,
+                  command: "SET_ANALOG",
+                }),
+              },
+            );
+
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (!result.success) {
+              throw new Error(result.error || "Command failed");
+            }
+
+            console.log("[v0] Slider command sent successfully:", result);
+          } catch (error) {
+            console.error("[v0] Failed to update slider hardware:", error);
+          }
+        }
       },
-      [onChange],
+      [onChange, deviceId, pinNumber],
     );
+
+    const handleDecrement = useCallback(() => {
+      const newValue = Math.max(min, value - 1);
+      handleValueChange(newValue);
+    }, [value, min, handleValueChange]);
+
+    const handleIncrement = useCallback(() => {
+      const newValue = Math.min(max, value + 1);
+      handleValueChange(newValue);
+    }, [value, max, handleValueChange]);
 
     return (
       <div
@@ -144,38 +175,92 @@ export const SliderWidget: React.FC<BaseWidgetProps> = memo(
           className,
         )}
       >
-        <span className="text-teal-500 text-sm">−</span>
+        <span
+          className="text-teal-500 text-sm cursor-pointer hover:text-teal-600"
+          onClick={handleDecrement}
+        >
+          −
+        </span>
         <div className="flex-1 mx-2 relative">
           <div className="h-1 bg-gray-200 rounded-full">
             <div
-              className="h-1 bg-teal-500 rounded-full"
-              style={{ width: `50%` }}
+              className="h-1 bg-teal-500 rounded-full transition-all duration-200"
+              style={{ width: `${percentage}%` }}
             />
           </div>
           <div
-            className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-teal-500 rounded-full"
+            className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-teal-500 rounded-full transition-all duration-200"
             style={{
-              left: `50%`,
+              left: `${percentage}%`,
               transform: "translate(-50%, -50%)",
             }}
           />
         </div>
-        <span className="text-teal-500 text-sm">+</span>
-        <span className="text-gray-600 text-sm ml-2">5</span>
+        <span
+          className="text-teal-500 text-sm cursor-pointer hover:text-teal-600"
+          onClick={handleIncrement}
+        >
+          +
+        </span>
+        <span className="text-gray-600 text-sm ml-2">{value}</span>
       </div>
     );
   },
 );
 
 export const NumberInputWidget: React.FC<BaseWidgetProps> = memo(
-  ({ value = 0, onChange, className }) => {
+  ({ value = 0, onChange, className, deviceId, pinNumber }) => {
+    const sendCommand = useCallback(
+      async (newValue: number) => {
+        if (deviceId && pinNumber !== undefined) {
+          try {
+            const response = await fetch(
+              `/api/devices/${deviceId}/send-command`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  pin: pinNumber,
+                  value: newValue,
+                  command: "SET_VALUE",
+                }),
+              },
+            );
+
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (!result.success) {
+              throw new Error(result.error || "Command failed");
+            }
+
+            console.log("[v0] Number input command sent successfully:", result);
+          } catch (error) {
+            console.error(
+              "[v0] Failed to update number input hardware:",
+              error,
+            );
+          }
+        }
+      },
+      [deviceId, pinNumber],
+    );
+
     const decrement = useCallback(() => {
-      onChange?.(Number(value) - 1);
-    }, [value, onChange]);
+      const newValue = Number(value) - 1;
+      onChange?.(newValue);
+      sendCommand(newValue);
+    }, [value, onChange, sendCommand]);
 
     const increment = useCallback(() => {
-      onChange?.(Number(value) + 1);
-    }, [value, onChange]);
+      const newValue = Number(value) + 1;
+      onChange?.(newValue);
+      sendCommand(newValue);
+    }, [value, onChange, sendCommand]);
 
     return (
       <div
@@ -285,7 +370,11 @@ export const RadialGaugeWidget: React.FC<BaseWidgetProps> = memo(
         <div className="relative w-full h-full flex items-center justify-center">
           <GaugeWidgetComponent
             chartData={[
-              { id: "gauge", value, timestamp: Date.now().toString() },
+              {
+                id: "gauge",
+                value,
+                timestamp: Date.now().toString(),
+              },
             ]}
           />
         </div>
@@ -295,7 +384,7 @@ export const RadialGaugeWidget: React.FC<BaseWidgetProps> = memo(
 );
 
 export const ImageButtonWidget: React.FC<BaseWidgetProps> = memo(
-  ({ className, onChange }) => (
+  ({ className, onChange, deviceId, pinNumber }) => (
     <div
       className={cn(
         "flex items-center justify-center h-full w-full p-[4%]",
@@ -305,7 +394,7 @@ export const ImageButtonWidget: React.FC<BaseWidgetProps> = memo(
       <Button
         variant="outline"
         size="icon"
-        className="border-teal-400 hover:bg-teal-50 transition-colors p-0"
+        className="border-teal-400 hover:bg-teal-50 transition-colors p-0 bg-transparent"
         style={{
           width: "clamp(72px, 60%, 192px)",
           height: "clamp(72px, 60%, 192px)",
@@ -595,32 +684,118 @@ export const TerminalWidget: React.FC<BaseWidgetProps> = memo(
 );
 
 export const TextInputWidget: React.FC<BaseWidgetProps> = memo(
-  ({ value = "Zero", onChange, className }) => (
-    <div
-      className={cn(
-        "flex items-center justify-center h-full w-full p-[4%]",
-        className,
-      )}
-    >
-      <Input
-        type="text"
-        placeholder="Zero"
-        value={value}
-        onChange={(e) => onChange?.(e.target.value)}
-        className="w-full border border-gray-300"
-        style={{
-          height: "clamp(32px, 15%, 64px)",
-          fontSize: "clamp(14px, 5vw, 20px)",
-          padding: "0 clamp(8px, 4%, 16px)",
-        }}
-      />
-    </div>
-  ),
+  ({ value = "Zero", onChange, className, deviceId, pinNumber }) => {
+    const handleInputChange = useCallback(
+      async (newValue: string) => {
+        onChange?.(newValue);
+
+        if (deviceId && pinNumber !== undefined) {
+          try {
+            const response = await fetch(
+              `/api/devices/${deviceId}/send-command`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  pin: pinNumber,
+                  value: newValue,
+                  command: "SET_TEXT",
+                }),
+              },
+            );
+
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (!result.success) {
+              throw new Error(result.error || "Command failed");
+            }
+
+            console.log("[v0] Text input command sent successfully:", result);
+          } catch (error) {
+            console.error("[v0] Failed to update text input hardware:", error);
+          }
+        }
+      },
+      [onChange, deviceId, pinNumber],
+    );
+
+    return (
+      <div
+        className={cn(
+          "flex items-center justify-center h-full w-full p-[4%]",
+          className,
+        )}
+      >
+        <Input
+          type="text"
+          placeholder="Zero"
+          value={value}
+          onChange={(e) => handleInputChange(e.target.value)}
+          className="w-full border border-gray-300"
+          style={{
+            height: "clamp(32px, 15%, 64px)",
+            fontSize: "clamp(14px, 5vw, 20px)",
+            padding: "0 clamp(8px, 4%, 16px)",
+          }}
+        />
+      </div>
+    );
+  },
 );
 
 export const SegmentedSwitchWidget: React.FC<BaseWidgetProps> = memo(
-  ({ value = 0, onChange, settings, className }) => {
+  ({ value = 0, onChange, settings, className, deviceId, pinNumber }) => {
     const options = settings?.options || ["Zero", "One"];
+
+    const handleOptionChange = useCallback(
+      async (newValue: number) => {
+        onChange?.(newValue);
+
+        if (deviceId && pinNumber !== undefined) {
+          try {
+            const response = await fetch(
+              `/api/devices/${deviceId}/send-command`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  pin: pinNumber,
+                  value: newValue,
+                  command: "SET_OPTION",
+                }),
+              },
+            );
+
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (!result.success) {
+              throw new Error(result.error || "Command failed");
+            }
+
+            console.log(
+              "[v0] Segmented switch command sent successfully:",
+              result,
+            );
+          } catch (error) {
+            console.error(
+              "[v0] Failed to update segmented switch hardware:",
+              error,
+            );
+          }
+        }
+      },
+      [onChange, deviceId, pinNumber],
+    );
 
     return (
       <div
@@ -645,7 +820,7 @@ export const SegmentedSwitchWidget: React.FC<BaseWidgetProps> = memo(
                 fontSize: "clamp(8px, 2.5vw, 14px)",
                 padding: "0 clamp(2px, 1%, 8px)",
               }}
-              onClick={() => onChange?.(index)}
+              onClick={() => handleOptionChange(index)}
             >
               {option}
             </Button>
@@ -657,8 +832,47 @@ export const SegmentedSwitchWidget: React.FC<BaseWidgetProps> = memo(
 );
 
 export const MenuWidget: React.FC<BaseWidgetProps> = memo(
-  ({ value = "Zero", onChange, settings, className }) => {
+  ({ value = "Zero", onChange, settings, className, deviceId, pinNumber }) => {
     const options = settings?.options || ["Zero", "One", "Two"];
+
+    const handleMenuChange = useCallback(
+      async (newValue: string) => {
+        onChange?.(newValue);
+
+        if (deviceId && pinNumber !== undefined) {
+          try {
+            const response = await fetch(
+              `/api/devices/${deviceId}/send-command`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  pin: pinNumber,
+                  value: newValue,
+                  command: "SET_MENU",
+                }),
+              },
+            );
+
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (!result.success) {
+              throw new Error(result.error || "Command failed");
+            }
+
+            console.log("[v0] Menu command sent successfully:", result);
+          } catch (error) {
+            console.error("[v0] Failed to update menu hardware:", error);
+          }
+        }
+      },
+      [onChange, deviceId, pinNumber],
+    );
 
     return (
       <div
@@ -667,7 +881,7 @@ export const MenuWidget: React.FC<BaseWidgetProps> = memo(
           className,
         )}
       >
-        <Select value={value} onValueChange={onChange}>
+        <Select value={value} onValueChange={handleMenuChange}>
           <SelectTrigger
             className="w-full border border-gray-300"
             style={{
@@ -731,7 +945,6 @@ export const ModulesWidget: React.FC<BaseWidgetProps> = memo(
   ),
 );
 
-// Widget Registry with memoized components
 const components: Record<WidgetType, React.FC<BaseWidgetProps>> = {
   switch: SwitchWidget,
   slider: SliderWidget,
@@ -757,7 +970,6 @@ const components: Record<WidgetType, React.FC<BaseWidgetProps>> = {
   modules: ModulesWidget,
 };
 
-// Memoized registry component
 export default memo(function WidgetRegistry({
   type,
   className,
@@ -767,7 +979,6 @@ export default memo(function WidgetRegistry({
   return <Component className={className} {...props} />;
 });
 
-// Set display names for better debugging
 SwitchWidget.displayName = "SwitchWidget";
 SliderWidget.displayName = "SliderWidget";
 NumberInputWidget.displayName = "NumberInputWidget";
