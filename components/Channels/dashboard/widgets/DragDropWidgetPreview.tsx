@@ -50,6 +50,7 @@ export const DragDropWidgetPreview: React.FC<WidgetPreviewProps> = ({
           {" "}
           {/* Scale down content slightly */}
           <WidgetRegistry
+            widgetId={widget.id}
             type={widget.definition?.type as any}
             value={widget.settings?.value}
             settings={widget.settings ?? {}}

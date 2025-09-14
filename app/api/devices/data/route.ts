@@ -91,7 +91,6 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error("Error storing hardware data:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
@@ -141,7 +140,6 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error("Error fetching hardware data:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

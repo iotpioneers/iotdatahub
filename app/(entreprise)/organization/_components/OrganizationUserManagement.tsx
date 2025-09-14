@@ -31,7 +31,7 @@ const OrganizationUserManagement = (): React.JSX.Element => {
         const data = await response.json();
         setMembers(data.members);
       } catch (error) {
-        console.error("Error:", error);
+        throw error;
       } finally {
         setLoading(false);
       }

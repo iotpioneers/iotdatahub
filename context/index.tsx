@@ -108,7 +108,7 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
         currentOrganization: data.organization,
       }));
     } catch (error) {
-      console.error("Error fetching organization:", error);
+      throw new Error("Error fetching organization");
     } finally {
       setIsLoading(false);
     }
@@ -127,7 +127,7 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
         userChannels: channelsData,
       }));
     } catch (error) {
-      console.error("Error fetching user channels:", error);
+      throw new Error("Error fetching user channels");
     } finally {
       setIsLoading(false);
     }
@@ -166,7 +166,6 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
         currentUser: newData,
       }));
     } catch (error) {
-      console.error("Error updating user data:", error);
       throw error;
     } finally {
       setIsLoading(false);

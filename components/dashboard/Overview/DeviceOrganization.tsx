@@ -46,7 +46,6 @@ const DeviceOrganization = (): React.JSX.Element => {
         const data: Organization = await response.json();
         setOrganization(data);
       } catch (error) {
-        console.error("Error fetching organization:", error);
         setError(
           error instanceof Error
             ? error.message

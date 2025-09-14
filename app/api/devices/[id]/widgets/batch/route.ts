@@ -98,13 +98,28 @@ interface BatchResult {
   deleted: string[];
 }
 
-// Helper function to chunk arrays
-function chunkArray<T>(array: T[], chunkSize: number): T[][] {
-  const chunks = [];
-  for (let i = 0; i < array.length; i += chunkSize) {
-    chunks.push(array.slice(i, i + chunkSize));
+// Helper function to safely extract pin number
+function extractPinNumber(pinNumberStr: string | undefined): number | null {
+  if (!pinNumberStr) return null;
+
+  // Handle virtual pins like "V4" -> 4
+  if (pinNumberStr.startsWith("V")) {
+    const num = parseInt(pinNumberStr.substring(1), 10);
+    return isNaN(num) ? null : num;
   }
-  return chunks;
+
+  // Handle regular numbers
+  const num = parseInt(pinNumberStr, 10);
+  return isNaN(num) ? null : num;
+}
+
+// Helper function to safely get pin number from settings
+function getPinNumberFromSettings(settings: any): number | null {
+  if (!settings) return null;
+
+  // Try different possible property names
+  const pinNumberStr = settings.pinNumber || settings.pin || settings.pinId;
+  return extractPinNumber(pinNumberStr);
 }
 
 export async function POST(
@@ -112,8 +127,6 @@ export async function POST(
   { params }: { params: { id: string } },
 ) {
   try {
-    console.log("=== BATCH WIDGET OPERATION START ===");
-
     // Authentication
     const token = await getToken({ req: request });
     if (!token) {
@@ -143,14 +156,10 @@ export async function POST(
 
     // Parse and validate request body
     const body = await request.json();
-    console.log(
-      `Processing batch: ${body.create?.length || 0} creates, ${body.update?.length || 0} updates, ${body.delete?.length || 0} deletes`,
-    );
 
     const validation = batchPayloadSchema.safeParse(body);
 
     if (!validation.success) {
-      console.error("Validation failed:", validation.error.errors);
       return NextResponse.json(
         {
           error: "Validation failed",
@@ -162,12 +171,22 @@ export async function POST(
 
     let { create, update, delete: deleteIds } = validation.data;
 
-    // Ensure type is set for all create operations
-    create = create.map((item) => ({
-      ...item,
-      type: item.type || item.definition?.type || "unknown",
-      pinNumber: item.settings?.pinNumber.replace("V", ""),
-    }));
+    // Process create operations with safe pin number extraction
+    create = create.map((item) => {
+      const pinNumber = getPinNumberFromSettings(item.settings);
+
+      const mappedItem: any = {
+        ...item,
+        type: item.type || item.definition?.type || "unknown",
+      };
+
+      // Only add pinNumber if it's defined
+      if (pinNumber !== undefined) {
+        mappedItem.pinNumber = pinNumber;
+      }
+
+      return mappedItem;
+    });
 
     const result: BatchResult = {
       successful: 0,
@@ -178,13 +197,8 @@ export async function POST(
       deleted: [],
     };
 
-    // Process operations sequentially to avoid transaction timeouts
-    console.log("Processing operations sequentially without transactions...");
-
     // 1. Process DELETIONS first
     if (deleteIds.length > 0) {
-      console.log(`Processing ${deleteIds.length} deletions...`);
-
       for (const widgetId of deleteIds) {
         try {
           // Check if widget exists
@@ -220,9 +234,7 @@ export async function POST(
 
           result.deleted.push(widgetId);
           result.successful++;
-          console.log(`Deleted widget ${widgetId}`);
         } catch (error) {
-          console.error(`Failed to delete widget ${widgetId}:`, error);
           result.errors.push({
             operation: "DELETE",
             error: error instanceof Error ? error.message : "Unknown error",
@@ -235,8 +247,6 @@ export async function POST(
 
     // 2. Process UPDATES
     if (update.length > 0) {
-      console.log(`Processing ${update.length} updates...`);
-
       for (const updateData of update) {
         try {
           const { id, pinConfig, ...widgetUpdateData } = updateData;
@@ -259,14 +269,24 @@ export async function POST(
             continue;
           }
 
+          // Safely extract pin number for updates
+          const pinNumber = getPinNumberFromSettings(widgetUpdateData.settings);
+
+          // Prepare update data
+          const updatePayload: any = {
+            ...widgetUpdateData,
+            updatedAt: new Date(),
+          };
+
+          // Only include pinNumber if it's valid
+          if (pinNumber !== null) {
+            updatePayload.pinNumber = pinNumber;
+          }
+
           // Update widget
           await prisma.widget.update({
             where: { id },
-            data: {
-              ...widgetUpdateData,
-              pinNumber: widgetUpdateData.settings.pinNumber.replace("V", ""),
-              updatedAt: new Date(),
-            },
+            data: updatePayload,
           });
 
           // Handle pin config if provided
@@ -309,9 +329,7 @@ export async function POST(
 
           result.updated.push(id);
           result.successful++;
-          console.log(`Updated widget ${id}`);
         } catch (error) {
-          console.error(`Failed to update widget ${updateData.id}:`, error);
           result.errors.push({
             operation: "UPDATE",
             error: error instanceof Error ? error.message : "Unknown error",
@@ -324,22 +342,22 @@ export async function POST(
 
     // 3. Process CREATIONS last
     if (create.length > 0) {
-      console.log(`Processing ${create.length} creations...`);
-
       for (const createData of create) {
         try {
           const { id: tempId, pinConfig, ...widgetCreateData } = createData;
 
-          // Generate new widget ID
-
           // Prepare widget data
-          const widgetData = {
+          const widgetData: any = {
             ...widgetCreateData,
             type: widgetCreateData.type || "unknown",
-            pinNumber: widgetCreateData.settings.pinNumber.replace("V", ""),
             channelId: device.channelId,
             deviceId: params.id,
           };
+
+          // Only include pinNumber if it's valid (not undefined)
+          if (widgetCreateData.pinNumber !== undefined) {
+            widgetData.pinNumber = widgetCreateData.pinNumber;
+          }
 
           // Create widget
           const newWidget = await prisma.widget.create({
@@ -369,9 +387,7 @@ export async function POST(
             id: newWidget.id,
           });
           result.successful++;
-          console.log(`Created widget ${newWidget.id} (temp: ${tempId})`);
         } catch (error) {
-          console.error(`Failed to create widget ${createData.id}:`, error);
           result.errors.push({
             operation: "CREATE",
             error: error instanceof Error ? error.message : "Unknown error",
@@ -380,15 +396,6 @@ export async function POST(
           result.failed++;
         }
       }
-    }
-
-    console.log("=== BATCH OPERATION COMPLETED ===");
-    console.log(
-      `Results: ${result.successful} successful, ${result.failed} failed`,
-    );
-
-    if (result.errors.length > 0) {
-      console.log("Errors:", result.errors);
     }
 
     // Return appropriate status code
@@ -400,7 +407,6 @@ export async function POST(
 
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
-    console.error("Error in batch widget operation:", error);
     return NextResponse.json(
       {
         error: "Internal server error",

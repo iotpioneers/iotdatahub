@@ -59,7 +59,6 @@ const LoginComponent = () => {
       // Force a hard refresh to ensure all session data is loaded
       window.location.href = redirectPath;
     } catch (error) {
-      console.error("Error during post-login processing:", error);
       toast({
         message: "Error during login processing",
         type: "error",

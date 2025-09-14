@@ -85,7 +85,7 @@ export const useWidgetState = (
 
         localStorage.setItem(storageKey, JSON.stringify(persistedState));
       } catch (error) {
-        console.warn("Failed to persist widget state:", error);
+        throw error;
       }
     },
     [enablePersistence, deviceId, storageKey],
@@ -117,7 +117,6 @@ export const useWidgetState = (
         deletedWidgets: parsed.deletedWidgets,
       };
     } catch (error) {
-      console.warn("Failed to load persisted widget state:", error);
       return null;
     }
   }, [enablePersistence, storageKey, maxAge, deviceId]);

@@ -59,7 +59,7 @@ const InviteCollaboratorModal = ({
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;
@@ -70,14 +70,13 @@ const InviteCollaboratorModal = ({
   const copyLinkToClipboard = useCallback(() => {
     navigator.clipboard
       .writeText(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/channels/${roomId}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/channels/${roomId}`,
       )
       .then(() => {
         setLinkCopied(true);
         setTimeout(() => setLinkCopied(false), 5000);
       })
       .catch((err) => {
-        console.error("Failed to copy link: ", err);
         setError("Failed to copy link");
         setShowResult(true);
       });
@@ -86,8 +85,8 @@ const InviteCollaboratorModal = ({
   const handleCollaboratorRemoved = (removedEmail: string) => {
     setCollaboratorList((prevCollaborators) =>
       prevCollaborators.filter(
-        (collaborator) => collaborator.email !== removedEmail
-      )
+        (collaborator) => collaborator.email !== removedEmail,
+      ),
     );
   };
 
@@ -128,7 +127,6 @@ const InviteCollaboratorModal = ({
 
       setCollaboratorList(collaboratorsData);
     } catch (error) {
-      console.error("Error fetching room data:", error);
       setError("Failed to fetch collaborators");
     } finally {
       setIsLoading(false);

@@ -263,7 +263,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(payment, { status: 201 });
     })
     .catch((error: any) => {
-      console.log("Error processing payment:", error);
       return NextResponse.json(
         { error: "Error processing payment" },
         { status: 500 },

@@ -6,16 +6,17 @@ export async function POST(
   { params }: { params: { id: string } },
 ) {
   try {
-    const { pin, value } = await request.json();
+    const { pin, value, widgetId } = await request.json();
 
-    if (value === undefined || pin === undefined) {
+    if (value === undefined || pin === undefined || widgetId === undefined) {
       return NextResponse.json(
         {
-          error: "Value and pin are required",
+          error: "Value, pin, and widgetId are required",
           example: {
             command: "vw",
             pin: 3,
             value: 1,
+            widgetId: "1234",
           },
         },
         { status: 400 },
@@ -52,10 +53,9 @@ export async function POST(
 
       if (response.ok && result.success) {
         // Update widget value in the database
-        const widget = await prisma.widget.findFirst({
+        const widget = await prisma.widget.findUnique({
           where: {
-            deviceId: params.id,
-            pinNumber: pin,
+            id: widgetId,
           },
         });
 
@@ -65,10 +65,21 @@ export async function POST(
               id: widget.id,
             },
             data: {
-              value,
+              value: value.toString(),
             },
           });
         }
+
+        // Store in pin history for analytics
+        await prisma.pinHistory.create({
+          data: {
+            deviceId: device.id,
+            pinNumber: parseInt(pin.toString()),
+            value: value.toString(),
+            dataType: "STRING",
+            timestamp: new Date(),
+          },
+        });
 
         return NextResponse.json({
           success: true,
@@ -86,10 +97,6 @@ export async function POST(
         );
       }
     } catch (fetchError) {
-      console.error(
-        "Failed to communicate with hardware API server:",
-        fetchError,
-      );
       return NextResponse.json(
         {
           success: false,
@@ -100,7 +107,6 @@ export async function POST(
       );
     }
   } catch (error) {
-    console.error("API virtual write hardware send error:", error);
     return NextResponse.json(
       { error: "API virtual write hardware send error" },
       { status: 500 },

@@ -13,13 +13,14 @@ const deviceCacheManager_1 = __importDefault(require("./lib/hardwareServer/devic
 const tcpServer_1 = require("./lib/hardwareServer/tcpServer");
 const apiServer_1 = require("./lib/hardwareServer/apiServer");
 const config_1 = __importDefault(require("./lib/hardwareServer/config"));
+const logger_1 = __importDefault(require("./lib/hardwareServer/logger"));
 // Initialize core components in proper order
 const deviceCache = new deviceCacheManager_1.default();
 const deviceManager = new deviceManager_1.default();
 const wsManager = new websocketManager_1.default(deviceCache); // Pass cache to WebSocket manager
 const protocolHandler = new protocolHandler_1.default(deviceManager, wsManager, deviceCache);
 // Create API server first (Express app)
-const apiApp = (0, apiServer_1.createAPIServer)(deviceManager, protocolHandler);
+const apiApp = (0, apiServer_1.createAPIServer)(deviceManager, protocolHandler, deviceCache);
 // Create HTTP server from Express app
 const httpServer = http_1.default.createServer(apiApp);
 // Initialize WebSocket server with the HTTP server
@@ -30,7 +31,7 @@ const { iotServer, iotSSLServer } = (0, tcpServer_1.createTCPServer)(deviceManag
 (0, tcpServer_1.startTCPServers)(iotServer, iotSSLServer);
 // Start HTTP server with WebSocket support (for dashboard)
 httpServer.listen(config_1.default.apiPort, () => {
-    console.log(`
+    logger_1.default.info(`
 ====================================
 🚀 Enhanced Hardware Command API + WebSocket Server running on port ${config_1.default.apiPort}
 📡 WebSocket endpoint: ws://localhost:${config_1.default.apiPort}/api/ws
@@ -40,7 +41,6 @@ httpServer.listen(config_1.default.apiPort, () => {
 });
 // Graceful shutdown with cache cleanup
 process.on("SIGINT", async () => {
-    console.log("Shutting down all servers and cleaning up cache...");
     // Clean up cache first
     deviceCache.cleanup();
     wsManager.cleanup();
@@ -51,7 +51,6 @@ process.on("SIGINT", async () => {
     process.exit(0);
 });
 process.on("SIGTERM", async () => {
-    console.log("Received SIGTERM, shutting down gracefully...");
     deviceCache.cleanup();
     wsManager.cleanup();
     httpServer.close(() => {

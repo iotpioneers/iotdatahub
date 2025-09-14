@@ -26,12 +26,12 @@ import { useSession } from "next-auth/react";
 const GeneralAccess = ({ roomId }: { roomId: string }) => {
   const [generalAccess, setGeneralAccess] = useState<UserAccessType>("viewer");
   const [linkAccessType, setLinkAccessType] = useState<"restricted" | "anyone">(
-    "restricted"
+    "restricted",
   );
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
-    "success"
+    "success",
   );
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
@@ -58,7 +58,6 @@ const GeneralAccess = ({ roomId }: { roomId: string }) => {
           setGeneralAccess("viewer");
         }
       } catch (error) {
-        console.error("Failed to fetch room access:", error);
         setSnackbarMessage("Failed to fetch room access");
         setSnackbarSeverity("error");
         setSnackbarOpen(true);
@@ -71,7 +70,7 @@ const GeneralAccess = ({ roomId }: { roomId: string }) => {
   }, [roomId]);
 
   const handleGeneralAccessChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
+    event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     const value = event.target.value;
     if (value === "anyone") {
@@ -86,7 +85,7 @@ const GeneralAccess = ({ roomId }: { roomId: string }) => {
   };
 
   const updateDefaultAccess = async (
-    accessType: "restricted" | "viewer" | "editor"
+    accessType: "restricted" | "viewer" | "editor",
   ) => {
     setIsLoading(true);
     let defaultAccesses: RoomPermission = [];
@@ -108,7 +107,6 @@ const GeneralAccess = ({ roomId }: { roomId: string }) => {
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
     } catch (error) {
-      console.error("Failed to update channel general access:", error);
       setSnackbarMessage("Failed to update channel general access");
       setSnackbarSeverity("error");
       setSnackbarOpen(true);
@@ -119,7 +117,7 @@ const GeneralAccess = ({ roomId }: { roomId: string }) => {
 
   const handleSnackbarClose = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;
@@ -179,7 +177,7 @@ const GeneralAccess = ({ roomId }: { roomId: string }) => {
                 onChange={(event) => {
                   setGeneralAccess(event.target.value as UserAccessType);
                   updateDefaultAccess(
-                    event.target.value as "viewer" | "editor"
+                    event.target.value as "viewer" | "editor",
                   );
                 }}
                 sx={{ ml: 3, mt: 2 }}

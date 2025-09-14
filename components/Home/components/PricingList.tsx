@@ -14,8 +14,8 @@ import Typography from "@mui/material/Typography";
 import AngledButton from "./design/AngledButton";
 import axios from "axios";
 import { PricingPlanType } from "@/types";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import { useSession } from "next-auth/react";
+import { LinearLoading } from "@/components/LinearLoading";
 
 interface PricingListProps {
   onSelect?: (subscription: PricingPlanType) => void;
@@ -23,7 +23,7 @@ interface PricingListProps {
 
 const PricingList: React.FC<PricingListProps> = ({ onSelect }) => {
   const [subscriptions, setSubscriptions] = React.useState<PricingPlanType[]>(
-    []
+    [],
   );
   const [IsLoading, setIsLoading] = React.useState<boolean>(false);
 
@@ -34,12 +34,12 @@ const PricingList: React.FC<PricingListProps> = ({ onSelect }) => {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`,
         );
 
         setSubscriptions(response.data);
       } catch (error) {
-        console.error("Error fetching subscriptions:", error);
+        throw new Error("Error fetching subscriptions");
       } finally {
         setIsLoading(false);
       }
@@ -50,7 +50,7 @@ const PricingList: React.FC<PricingListProps> = ({ onSelect }) => {
 
   return (
     <Grid container spacing={3} alignItems="center" justifyContent="center">
-      {IsLoading && <LoadingSpinner />}
+      {IsLoading && <LinearLoading />}
       {subscriptions.map((item) => (
         <Grid
           item
@@ -130,20 +130,20 @@ const PricingList: React.FC<PricingListProps> = ({ onSelect }) => {
                   item.price === 0
                     ? "/signup"
                     : item.name.includes("Enterprise")
-                    ? "/contactsales"
-                    : item.name.includes("Premium") &&
-                      status !== "loading" &&
-                      status !== "unauthenticated"
-                    ? "/dashboard/subscription/" + item.id
-                    : "/login"
+                      ? "/contactsales"
+                      : item.name.includes("Premium") &&
+                          status !== "loading" &&
+                          status !== "unauthenticated"
+                        ? "/dashboard/subscription/" + item.id
+                        : "/login"
                 }
                 white={!!item.price}
               >
                 {item.name.includes("Enterprise")
                   ? "Contact Sales"
                   : item.price === 0
-                  ? "Try for free"
-                  : "Get started"}
+                    ? "Try for free"
+                    : "Get started"}
               </AngledButton>
             </CardActions>
 
@@ -170,12 +170,12 @@ const PricingList: React.FC<PricingListProps> = ({ onSelect }) => {
                     {item.maxMessagesPerYear > 1000000000000
                       ? `${item.maxMessagesPerYear / 1000000000000}T`
                       : item.maxMessagesPerYear > 1000000000
-                      ? `${item.maxMessagesPerYear / 1000000000}B`
-                      : item.maxMessagesPerYear > 1000000
-                      ? `${item.maxMessagesPerYear / 1000000}M`
-                      : item.maxMessagesPerYear > 1000
-                      ? `${item.maxMessagesPerYear / 1000}K`
-                      : item.maxMessagesPerYear}{" "}
+                        ? `${item.maxMessagesPerYear / 1000000000}B`
+                        : item.maxMessagesPerYear > 1000000
+                          ? `${item.maxMessagesPerYear / 1000000}M`
+                          : item.maxMessagesPerYear > 1000
+                            ? `${item.maxMessagesPerYear / 1000}K`
+                            : item.maxMessagesPerYear}{" "}
                     Maximun messages
                   </p>
                 </li>

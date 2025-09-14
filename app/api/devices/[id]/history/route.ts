@@ -39,7 +39,9 @@ export async function GET(
 
     return NextResponse.json(history);
   } catch (error) {
-    console.error("Error fetching pin history:", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error fetching pin history" },
+      { status: 500 },
+    );
   }
 }

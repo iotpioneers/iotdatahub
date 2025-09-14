@@ -25,7 +25,7 @@ const UpgradePricingPlan = () => {
         );
         setSubscriptions(response.data);
       } catch (error) {
-        console.error("Error fetching subscriptions:", error);
+        throw new Error("Error fetching subscriptions");
       } finally {
         setIsLoading(false);
       }

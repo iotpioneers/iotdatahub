@@ -33,6 +33,7 @@ export const DragOverlayProvider = ({
         <div className="fixed inset-0 pointer-events-none z-[999] flex items-center justify-center">
           <div className="bg-white p-4 rounded-lg shadow-xl border border-gray-200 transform scale-110">
             <WidgetRegistry
+              widgetId={draggedWidget.id}
               type={draggedWidget.definition?.type ?? "label"}
               settings={draggedWidget.settings || {}}
             />

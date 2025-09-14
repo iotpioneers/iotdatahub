@@ -4,7 +4,7 @@ import { automationSchema } from "@/validations/schema.validation";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const body = await request.json();
   const validation = automationSchema.safeParse(body);
@@ -12,7 +12,7 @@ export async function POST(
   if (!validation.success) {
     return NextResponse.json(
       { error: "Validation failed", details: validation.error.errors },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -34,10 +34,9 @@ export async function POST(
 
     return NextResponse.json(automation, { status: 201 });
   } catch (error) {
-    console.error("Error creating automation:", error);
     return NextResponse.json(
       { error: "Error creating automation" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

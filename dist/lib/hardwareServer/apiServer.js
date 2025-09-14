@@ -7,12 +7,14 @@ exports.createAPIServer = createAPIServer;
 exports.startAPIServer = startAPIServer;
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
+const websocketManager_1 = __importDefault(require("./websocketManager"));
 const config_1 = __importDefault(require("./config"));
 const logger_1 = __importDefault(require("./logger"));
-function createAPIServer(deviceManager, protocolHandler) {
+function createAPIServer(deviceManager, protocolHandler, deviceCache) {
     const app = (0, express_1.default)();
     app.use((0, cors_1.default)());
     app.use(express_1.default.json());
+    const wsManager = new websocketManager_1.default(deviceCache);
     // Middleware to validate device token
     const validateDevice = (req, res, next) => {
         const { deviceToken } = req.body;
@@ -57,6 +59,8 @@ function createAPIServer(deviceManager, protocolHandler) {
                     value,
                     deviceToken: deviceManager.maskToken(deviceToken),
                 };
+                // INSTANT WebSocket broadcast using cache (NO DATABASE DELAYS!)
+                wsManager.broadcastHardwareUpdate(deviceToken, pin, value, "VIRTUAL_WRITE", true);
                 res.json({
                     success: true,
                     message: "Hardware command sent successfully",
@@ -93,6 +97,8 @@ function createAPIServer(deviceManager, protocolHandler) {
                 return;
             }
             const success = await protocolHandler.sendVirtualWrite(deviceToken, pin, value);
+            // INSTANT WebSocket broadcast using cache (NO DATABASE DELAYS!)
+            wsManager.broadcastHardwareUpdate(deviceToken, pin, value, "VIRTUAL_WRITE", true);
             res.json({
                 success,
                 message: success
@@ -136,6 +142,8 @@ function createAPIServer(deviceManager, protocolHandler) {
                 return;
             }
             const success = await protocolHandler.sendDigitalWrite(deviceToken, pin, digitalValue);
+            // INSTANT WebSocket broadcast using cache (NO DATABASE DELAYS!)
+            wsManager.broadcastHardwareUpdate(deviceToken, pin, value, "DIGITAL_WRITE", true);
             res.json({
                 success,
                 message: success
@@ -201,11 +209,6 @@ function startAPIServer(app) {
     // Start API server
     app.listen(config_1.default.apiPort, () => {
         logger_1.default.info("Hardware API server started", { port: config_1.default.apiPort });
-        console.log(`
-====================================
-🚀 Hardware Command API is running on port ${config_1.default.apiPort}
-====================================
-`);
     });
     return app;
 }

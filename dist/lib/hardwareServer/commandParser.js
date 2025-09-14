@@ -2,29 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseHardwareCommand = parseHardwareCommand;
 exports.parseDeviceInfo = parseDeviceInfo;
-exports.debugBuffer = debugBuffer;
-function debugBuffer(buffer, label = "Buffer") {
-    console.log(`====== ${label} Debug ======`);
-    console.log("Length:", buffer.length);
-    console.log("Hex:", buffer.toString("hex"));
-    console.log("UTF8:", JSON.stringify(buffer.toString("utf8")));
-    console.log("Raw bytes:", Array.from(buffer));
-    // Check for common separators
-    const utf8String = buffer.toString("utf8");
-    console.log("Contains null bytes:", utf8String.includes("\0"));
-    console.log("Contains spaces:", utf8String.includes(" "));
-    console.log("Contains commas:", utf8String.includes(","));
-    console.log("=============================");
-}
 function parseHardwareCommand(body) {
-    debugBuffer(body, "Hardware Command");
-    // The correct format is: vw\0<pin>\0<value>
-    // Parse null-byte separated format FIRST (this is the correct format)
     const nullParts = body
         .toString("utf8")
         .split("\0")
         .filter((p) => p.length > 0);
-    console.log("Null-separated parts:", nullParts);
     if (nullParts.length >= 3 && nullParts[0] === "vw") {
         const pin = parseInt(nullParts[1], 10);
         const value = nullParts[2];
@@ -60,7 +42,6 @@ function parseHardwareCommand(body) {
     const command = body.toString("utf8").replace(/\0/g, "").trim();
     // Fallback: Handle space or comma separated format
     const parts = command.split(/[\s,]+/).filter((p) => p.length > 0);
-    console.log("Command parts (fallback):", parts);
     if (parts.length >= 3 && parts[0] === "vw") {
         const pin = parseInt(parts[1], 10);
         const value = parts[2];
@@ -106,7 +87,6 @@ function parseHardwareCommand(body) {
     return null;
 }
 function parseDeviceInfo(body) {
-    debugBuffer(body, "Device Info");
     const infoString = body.toString("utf8");
     const deviceInfo = {};
     // Parse null-byte separated key-value pairs

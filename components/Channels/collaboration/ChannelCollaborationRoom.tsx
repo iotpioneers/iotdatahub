@@ -2,10 +2,10 @@
 import { ClientSideSuspense, RoomProvider } from "@liveblocks/react/suspense";
 
 import type { ChannelCollaborativeRoomProps } from "@/types";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
 import ChannelDetailsHeading from "../ChannelDetailsHeading";
 import ChannelNavigation from "../ChannelNavigation";
 import ChannelCollaborationEditor from "@/components/Channels/collaboration/ChannelCollaborationEditor";
+import { LinearLoading } from "@/components/LinearLoading";
 
 const ChannelCollaborationRoom = ({
   roomId,
@@ -18,7 +18,7 @@ const ChannelCollaborationRoom = ({
 }: ChannelCollaborativeRoomProps) => {
   return (
     <RoomProvider id={roomId}>
-      <ClientSideSuspense fallback={<LoadingProgressBar />}>
+      <ClientSideSuspense fallback={<LinearLoading />}>
         <div className="flex flex-col h-full space-y-4">
           <div className="flex-shrink-0">
             <ChannelDetailsHeading

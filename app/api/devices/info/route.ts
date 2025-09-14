@@ -90,7 +90,6 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error("Error storing device info:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

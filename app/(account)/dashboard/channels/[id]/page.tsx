@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import ChannelDetails from "../_components/ChannelDetails";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import { Metadata } from "next";
+import { LinearLoading } from "@/components/LinearLoading";
 
 interface Props {
   params: { id: string };
@@ -9,7 +9,7 @@ interface Props {
 
 export default function ChannelDetailsPage({ params }: Props) {
   return (
-    <Suspense fallback={<LoadingSpinner />}>
+    <Suspense fallback={<LinearLoading />}>
       <ChannelDetails channelID={params.id} />
     </Suspense>
   );

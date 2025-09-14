@@ -276,7 +276,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newContactRequest, { status: 201 });
   } catch (error) {
-    console.error("Error in contact sales:", error);
     return NextResponse.json(
       { error: "Error processing contact request" },
       { status: 500 },

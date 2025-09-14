@@ -76,7 +76,7 @@ const DeviceTable = ({ isLoading, devices }: deviceProps) => {
       // Refresh data or update local state
       router.refresh();
     } catch (error) {
-      console.error("Error:", error);
+      throw error;
     } finally {
       setActionLoading(selectedDevice.id, null);
       setEditModalOpen(false);
@@ -101,7 +101,7 @@ const DeviceTable = ({ isLoading, devices }: deviceProps) => {
       if (!response.ok) throw new Error("Failed to delete device");
       router.refresh();
     } catch (error) {
-      console.error("Error:", error);
+      throw error;
     } finally {
       setDeleteDialogOpen(false);
       setSelectedDeviceId(null);

@@ -302,7 +302,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(organization, { status: 201 });
   } catch (error) {
-    console.error("Enterprise registration error:", error);
     return NextResponse.json(
       { error: "Error creating enterprise account" },
       { status: 500 },
@@ -319,7 +318,6 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json(organizations);
   } catch (error) {
-    console.error("Error fetching enterprise accounts:", error);
     return NextResponse.json(
       { error: "Error fetching enterprise accounts" },
       { status: 500 },

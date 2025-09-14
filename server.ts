@@ -14,6 +14,7 @@ import {
 import { createAPIServer } from "./lib/hardwareServer/apiServer";
 
 import config from "./lib/hardwareServer/config";
+import logger from "./lib/hardwareServer/logger";
 
 // Initialize core components in proper order
 const deviceCache = new DeviceCacheManager();
@@ -26,7 +27,7 @@ const protocolHandler = new SimpleProtocolHandler(
 );
 
 // Create API server first (Express app)
-const apiApp = createAPIServer(deviceManager, protocolHandler);
+const apiApp = createAPIServer(deviceManager, protocolHandler, deviceCache);
 
 // Create HTTP server from Express app
 const httpServer = http.createServer(apiApp);
@@ -45,7 +46,7 @@ startTCPServers(iotServer, iotSSLServer);
 
 // Start HTTP server with WebSocket support (for dashboard)
 httpServer.listen(config.apiPort, () => {
-  console.log(`
+  logger.info(`
 ====================================
 🚀 Enhanced Hardware Command API + WebSocket Server running on port ${config.apiPort}
 📡 WebSocket endpoint: ws://localhost:${config.apiPort}/api/ws
@@ -56,8 +57,6 @@ httpServer.listen(config.apiPort, () => {
 
 // Graceful shutdown with cache cleanup
 process.on("SIGINT", async () => {
-  console.log("Shutting down all servers and cleaning up cache...");
-
   // Clean up cache first
   deviceCache.cleanup();
   wsManager.cleanup();
@@ -70,8 +69,6 @@ process.on("SIGINT", async () => {
 });
 
 process.on("SIGTERM", async () => {
-  console.log("Received SIGTERM, shutting down gracefully...");
-
   deviceCache.cleanup();
   wsManager.cleanup();
 

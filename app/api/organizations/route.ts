@@ -95,8 +95,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ newOrganization, member }, { status: 201 });
   } catch (error) {
     return NextResponse.json(
-      console.log("Error creating organization:", error),
-      // { error: "Error creating organization" },
+      { error: "Error creating organization" },
       { status: 500 },
     );
   }
@@ -142,7 +141,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(organizations);
   } catch (error) {
-    console.error("Error retrieving organizations:", error);
     return NextResponse.json(
       { error: "Error retrieving organizations" },
       { status: 500 },

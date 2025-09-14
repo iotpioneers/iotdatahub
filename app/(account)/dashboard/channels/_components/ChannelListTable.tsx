@@ -58,7 +58,7 @@ const ChannelListTable = ({
         setChannels(response.data);
       }
     } catch (error) {
-      console.error("Failed to fetch updated channel data:", error);
+      setError("Failed to fetch updated channel data");
     }
   }, []);
 
@@ -86,9 +86,7 @@ const ChannelListTable = ({
       setShowMessage(true);
       setUpdateTrigger((prev) => prev + 1);
     } catch (error) {
-      console.log("Failed to update channel access:", error);
-      // setError("Failed to update channel access");
-      // setShowMessage(true);
+      setError("Failed to update channel access");
     } finally {
       setLoading(false);
     }

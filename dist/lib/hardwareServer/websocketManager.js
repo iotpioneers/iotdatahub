@@ -20,7 +20,6 @@ class WebSocketManager {
             path: "/api/ws",
         });
         this.wss.on("connection", this.handleConnection.bind(this));
-        logger_1.default.info("WebSocket server initialized with device cache");
     }
     handleConnection(ws, req) {
         const clientId = this.generateClientId();
@@ -29,27 +28,17 @@ class WebSocketManager {
             subscriptions: new Set(),
         };
         this.clients.set(clientId, client);
-        console.log("====================================");
-        console.log(`📌 WebSocket CLIENT CONNECTED: ${clientId}`);
-        console.log(`   Total clients: ${this.clients.size}`);
-        console.log(`   Cache ready: ${this.deviceCache.isReady()}`);
-        console.log("====================================");
         ws.on("message", (data) => {
             try {
                 const message = JSON.parse(data.toString());
                 this.handleMessage(clientId, message);
             }
             catch (error) {
-                console.error("Invalid WebSocket message:", error);
                 this.sendError(ws, "Invalid message format");
             }
         });
         ws.on("close", () => {
             this.clients.delete(clientId);
-            console.log("====================================");
-            console.log(`📌 WebSocket CLIENT DISCONNECTED: ${clientId}`);
-            console.log(`   Remaining clients: ${this.clients.size}`);
-            console.log("====================================");
         });
         ws.on("error", (error) => {
             const errorMessage = error instanceof Error ? error.message : String(error);
@@ -68,9 +57,6 @@ class WebSocketManager {
         const client = this.clients.get(clientId);
         if (!client)
             return;
-        console.log("====================================");
-        console.log(`📨 WebSocket MESSAGE from ${clientId}:`, message.type);
-        console.log("====================================");
         switch (message.type) {
             case "SUBSCRIBE_DEVICE":
                 if (message.deviceId) {
@@ -88,13 +74,11 @@ class WebSocketManager {
                         deviceId: message.deviceId,
                         timestamp: new Date().toISOString(),
                     });
-                    console.log(`✅ Client ${clientId} subscribed to device ${message.deviceId}`);
                 }
                 break;
             case "UNSUBSCRIBE_DEVICE":
                 if (message.deviceId) {
                     client.subscriptions.delete(message.deviceId);
-                    console.log(`❌ Client ${clientId} unsubscribed from device ${message.deviceId}`);
                 }
                 break;
             case "PING":
@@ -108,6 +92,11 @@ class WebSocketManager {
                 // Allow clients to manually trigger cache initialization
                 if (message.userId && message.organizationId) {
                     this.initializeCacheForUser(message.userId, message.organizationId);
+                }
+                break;
+            case "REFRESH_DEVICE":
+                if (message.deviceId) {
+                    this.handleDeviceRefresh(clientId, message.deviceId);
                 }
                 break;
         }
@@ -128,12 +117,6 @@ class WebSocketManager {
                 timestamp: new Date().toISOString(),
                 stats: this.deviceCache.getStats(),
             });
-            console.log("====================================");
-            console.log("🚀 DEVICE CACHE INITIALIZED");
-            console.log(`   User ID: ${userId}`);
-            console.log(`   Organization ID: ${organizationId}`);
-            console.log(`   Devices cached: ${this.deviceCache.getStats().deviceCount}`);
-            console.log("====================================");
         }
         catch (error) {
             logger_1.default.error("Failed to initialize device cache", {
@@ -146,11 +129,11 @@ class WebSocketManager {
     /**
      * Main method to broadcast hardware data updates (NOW INSTANT!)
      */
-    async broadcastHardwareUpdate(deviceToken, pin, value, command) {
+    async broadcastHardwareUpdate(deviceToken, pin, value, command, isCmd20 = false) {
         if (!this.wss)
             return;
         // INSTANT lookup from cache - no API call!
-        const result = await this.deviceCache.updateHardwareData(deviceToken, pin, value, command);
+        const result = await this.deviceCache.updateHardwareData(deviceToken, pin, value, command, isCmd20);
         if (result) {
             const { deviceId, updatedWidget } = result;
             const update = {
@@ -159,6 +142,7 @@ class WebSocketManager {
                 value,
                 timestamp: new Date().toISOString(),
                 command,
+                isCmd20,
                 widget: updatedWidget
                     ? {
                         id: updatedWidget.id,
@@ -171,19 +155,17 @@ class WebSocketManager {
                 type: "HARDWARE_DATA",
                 deviceId,
                 data: update,
+                priority: isCmd20 ? "HIGH" : "NORMAL",
             };
-            console.log("====================================");
-            console.log(`🚀 INSTANT HARDWARE UPDATE BROADCAST`);
-            console.log(`   Device: ${deviceId}`);
-            console.log(`   Pin: ${pin}, Value: ${value}`);
-            console.log(`   Widget updated: ${!!updatedWidget}`);
-            console.log(`   Subscribers: ${this.getDeviceSubscribers(deviceId)}`);
-            console.log("====================================");
             this.broadcastToSubscribers(deviceId, message);
+            if (isCmd20 && updatedWidget) {
+                this.broadcastWidgetStateSync(deviceId, updatedWidget);
+            }
             // Update device status to ONLINE
             this.deviceCache.updateDeviceInfo(deviceToken, {
                 status: "ONLINE",
                 lastPing: new Date(),
+                lastActivity: new Date(),
             });
         }
         else {
@@ -194,16 +176,31 @@ class WebSocketManager {
             });
         }
     }
+    broadcastWidgetStateSync(deviceId, widget) {
+        const message = {
+            type: "WIDGET_STATE_SYNC",
+            deviceId,
+            data: {
+                widgetId: widget.id,
+                pin: widget.pinConfig.pinNumber,
+                value: widget.value,
+                timestamp: new Date().toISOString(),
+                forceUpdate: true, // Force UI to update immediately
+            },
+        };
+        this.broadcastToSubscribers(deviceId, message);
+    }
     /**
      * Broadcast device status updates (using cache)
      */
     async broadcastDeviceStatus(deviceToken, status, lastPing) {
         if (!this.wss)
             return;
-        // Update in cache first
         this.deviceCache.updateDeviceInfo(deviceToken, {
             status: status,
             lastPing: lastPing || new Date(),
+            lastActivity: new Date(),
+            statusChangeTime: new Date(),
         });
         // Get device ID from cache
         const deviceId = await this.deviceCache.getDeviceIdFromToken(deviceToken);
@@ -215,6 +212,7 @@ class WebSocketManager {
                     status,
                     lastPing: (lastPing || new Date()).toISOString(),
                     timestamp: new Date().toISOString(),
+                    realTime: true, // Flag to indicate real-time status update
                 },
             };
             this.broadcastToSubscribers(deviceId, message);
@@ -324,6 +322,34 @@ class WebSocketManager {
         }
         this.clients.clear();
         logger_1.default.info("WebSocket manager cleaned up");
+    }
+    async handleDeviceRefresh(clientId, deviceId) {
+        try {
+            const device = await this.deviceCache.getDevice(deviceId);
+            if (device) {
+                const client = this.clients.get(clientId);
+                if (client) {
+                    // Send fresh device data
+                    this.sendMessage(client.ws, {
+                        type: "DEVICE_REFRESH",
+                        deviceId,
+                        data: {
+                            device: {
+                                id: device.id,
+                                name: device.name,
+                                status: device.status,
+                                lastPing: device.lastPing.toISOString(),
+                            },
+                            widgets: device.widgets,
+                            timestamp: new Date().toISOString(),
+                        },
+                    });
+                }
+            }
+        }
+        catch (error) {
+            logger_1.default.error("Failed to refresh device", { clientId, deviceId, error });
+        }
     }
 }
 exports.default = WebSocketManager;

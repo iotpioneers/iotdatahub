@@ -21,7 +21,9 @@ export async function GET(
 
     return NextResponse.json(device.virtualPins);
   } catch (error) {
-    console.error("Error fetching device pins:", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error fetching device pins" },
+      { status: 500 },
+    );
   }
 }

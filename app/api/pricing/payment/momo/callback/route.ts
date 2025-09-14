@@ -189,8 +189,6 @@ export async function POST(request: NextRequest) {
   try {
     const body: PaymentResponse = await request.json();
 
-    console.log("Payment response:", body);
-
     const { ref, status } = body.data;
 
     // Find the existing payment with transaction ID
@@ -285,7 +283,6 @@ export async function POST(request: NextRequest) {
       message: "Payment was not successful",
     });
   } catch (error) {
-    console.error("Payment processing error:", error);
     return NextResponse.json(
       { error: "Failed to process payment" },
       { status: 500 },

@@ -7,16 +7,21 @@ import type {
   APIResponse,
   HardwareCommandData,
 } from "./types";
+import WebSocketManager from "./websocketManager";
 import config from "./config";
 import logger from "./logger";
+import DeviceCacheManager from "./deviceCacheManager";
 
 function createAPIServer(
   deviceManager: IDeviceManager,
   protocolHandler: IProtocolHandler,
+  deviceCache: DeviceCacheManager,
 ): Application {
   const app = express();
   app.use(cors());
   app.use(express.json());
+
+  const wsManager = new WebSocketManager(deviceCache);
 
   // Middleware to validate device token
   const validateDevice = (
@@ -81,6 +86,15 @@ function createAPIServer(
             deviceToken: deviceManager.maskToken(deviceToken),
           };
 
+          // INSTANT WebSocket broadcast using cache (NO DATABASE DELAYS!)
+          wsManager.broadcastHardwareUpdate(
+            deviceToken,
+            pin,
+            value!,
+            "VIRTUAL_WRITE",
+            true, // Pass CMD:20 flag for priority handling
+          );
+
           res.json({
             success: true,
             message: "Hardware command sent successfully",
@@ -126,6 +140,15 @@ function createAPIServer(
           deviceToken,
           pin,
           value,
+        );
+
+        // INSTANT WebSocket broadcast using cache (NO DATABASE DELAYS!)
+        wsManager.broadcastHardwareUpdate(
+          deviceToken,
+          pin,
+          value!,
+          "VIRTUAL_WRITE",
+          true, // Pass CMD:20 flag for priority handling
         );
 
         res.json({
@@ -182,6 +205,15 @@ function createAPIServer(
           deviceToken,
           pin,
           digitalValue,
+        );
+
+        // INSTANT WebSocket broadcast using cache (NO DATABASE DELAYS!)
+        wsManager.broadcastHardwareUpdate(
+          deviceToken,
+          pin,
+          value!,
+          "DIGITAL_WRITE",
+          true, // Pass CMD:20 flag for priority handling
         );
 
         res.json({
@@ -259,11 +291,6 @@ function startAPIServer(app: Application): Application {
   // Start API server
   app.listen(config.apiPort, () => {
     logger.info("Hardware API server started", { port: config.apiPort });
-    console.log(`
-====================================
-🚀 Hardware Command API is running on port ${config.apiPort}
-====================================
-`);
   });
 
   return app;

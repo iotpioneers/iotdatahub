@@ -67,11 +67,6 @@ class DeviceCacheManager {
     organizationId: string,
   ): Promise<void> {
     try {
-      logger.info("Initializing device cache with Prisma", {
-        userId,
-        organizationId,
-      });
-
       // Fetch all devices for the user/organization using Prisma
       const devicesData = await prisma.device.findMany({
         where: {
@@ -96,11 +91,6 @@ class DeviceCacheManager {
         return;
       }
 
-      logger.info("Processing devices from database", {
-        deviceCount: devicesData.length,
-        organizationId,
-      });
-
       for (const deviceData of devicesData) {
         try {
           // Create cached device
@@ -109,13 +99,6 @@ class DeviceCacheManager {
           // Store in cache
           this.devices.set(deviceData.id, cachedDevice);
           this.tokenToId.set(deviceData.authToken, deviceData.id);
-
-          logger.info("Device cached", {
-            deviceId: deviceData.id,
-            deviceName: cachedDevice.name,
-            widgetCount: cachedDevice.widgets.length,
-            token: this.maskToken(deviceData.authToken),
-          });
         } catch (deviceError) {
           logger.error("Failed to process device", {
             deviceId: deviceData.id,
@@ -128,11 +111,6 @@ class DeviceCacheManager {
       }
 
       this.isInitialized = true;
-      logger.info("Device cache initialized successfully with Prisma", {
-        deviceCount: this.devices.size,
-        userId,
-        organizationId,
-      });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
@@ -615,10 +593,6 @@ class DeviceCacheManager {
     this.updateTimer = setInterval(async () => {
       await this.processPendingUpdates();
     }, this.UPDATE_DELAY);
-
-    logger.info("Device cache update timer started", {
-      updateDelayMs: this.UPDATE_DELAY,
-    });
   }
 
   /**
@@ -782,12 +756,6 @@ class DeviceCacheManager {
     this.heartbeatTimer = setInterval(async () => {
       await this.checkDeviceHeartbeats();
     }, 10000); // Check every 10 seconds
-
-    logger.info("Device heartbeat monitoring started", {
-      checkIntervalMs: 10000,
-      heartbeatTimeoutMs: this.HEARTBEAT_TIMEOUT,
-      offlineTimeoutMs: this.OFFLINE_TIMEOUT,
-    });
   }
 
   private async checkDeviceHeartbeats(): Promise<void> {

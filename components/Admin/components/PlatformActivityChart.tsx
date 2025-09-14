@@ -80,7 +80,7 @@ export default function PlatformActivityChart() {
 
         const totalCount = Object.values(processedData).reduce(
           (acc, curr) => acc + curr.reduce((sum, item) => sum + item.value, 0),
-          0
+          0,
         );
         setTotalActivity(totalCount);
 
@@ -90,8 +90,8 @@ export default function PlatformActivityChart() {
 
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching data:", error);
         setLoading(false);
+        throw error;
       }
     };
 
@@ -100,7 +100,7 @@ export default function PlatformActivityChart() {
 
   const processTimeSeriesData = (
     data: DataItem[],
-    dateField: string
+    dateField: string,
   ): ChartDataItem[] => {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -128,8 +128,8 @@ export default function PlatformActivityChart() {
       new Set(
         Object.values(data)
           .flatMap((series) => series.map((item: DataItem) => item.date))
-          .sort()
-      )
+          .sort(),
+      ),
     );
 
     if (allDates.length < 2) return 0; // Not enough data to calculate change
@@ -172,8 +172,8 @@ export default function PlatformActivityChart() {
     new Set(
       Object.values(chartData)
         .flatMap((data) => data.map((item: { date: string }) => item.date))
-        .sort()
-    )
+        .sort(),
+    ),
   );
 
   return (
@@ -225,7 +225,7 @@ export default function PlatformActivityChart() {
             data: allDates.map(
               (date) =>
                 data.find((item: { date: string }) => item.date === date)
-                  ?.value || 0
+                  ?.value || 0,
             ),
           }))}
           height={250}
@@ -235,7 +235,7 @@ export default function PlatformActivityChart() {
             Object.keys(chartData).map((key) => [
               `& .MuiAreaElement-series-${key}`,
               { fill: `url('#${key}')` },
-            ])
+            ]),
           )}
           slotProps={{
             legend: {

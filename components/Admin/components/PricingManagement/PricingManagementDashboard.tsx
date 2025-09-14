@@ -37,12 +37,12 @@ const PricingManagementDashboard: React.FC = () => {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`,
         );
 
         setSubscriptions(response.data);
       } catch (error) {
-        console.error("Error fetching subscriptions:", error);
+        throw error;
       } finally {
         setIsLoading(false);
       }

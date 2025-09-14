@@ -21,7 +21,7 @@ const NewFieldNestedModal = ({ channel }: NewFieldNestedModalProps) => {
   const [loading, setLoading] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
-    "success"
+    "success",
   );
   const [alertMessage, setAlertMessage] = useState("");
 
@@ -30,7 +30,7 @@ const NewFieldNestedModal = ({ channel }: NewFieldNestedModalProps) => {
 
   const handleSnackbarClose = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;
@@ -53,7 +53,7 @@ const NewFieldNestedModal = ({ channel }: NewFieldNestedModalProps) => {
           name: fieldName,
           channelId: channel.id,
           organizationId: channel.organizationId,
-        }
+        },
       );
 
       if (response.status === 200) {
@@ -65,10 +65,9 @@ const NewFieldNestedModal = ({ channel }: NewFieldNestedModalProps) => {
         showAlert("error", "Failed to add field. Please try again.");
       }
     } catch (error) {
-      console.error("Error adding field:", error);
       showAlert(
         "error",
-        "An error occurred while adding the field. Please try again."
+        "An error occurred while adding the field. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -315,7 +314,7 @@ const ModalContent = styled("div")(
     color: ${theme.palette.mode === "dark" ? grey[400] : grey[800]};
     margin-bottom: 4px;
   }
-`
+`,
 );
 
 const FormField = styled("div")`
@@ -393,7 +392,7 @@ const ModalButton = styled(Button)(
       background-color: ${blue[500]};
     }
   }
-`
+`,
 );
 
 export default NewFieldNestedModal;

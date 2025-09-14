@@ -65,7 +65,7 @@ export function DeviceFormModal({
         onClose();
       }, 1000);
     } catch (error) {
-      console.error("Error submitting form:", error);
+      setFormSubmitSuccess(false);
     } finally {
       setIsSubmitting(false);
     }

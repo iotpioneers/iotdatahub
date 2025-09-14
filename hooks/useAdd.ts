@@ -7,7 +7,6 @@ const addData = async (url: string, { arg }: { arg: any }) => {
     const response = await axios.post(url, arg);
     return response.data;
   } catch (error) {
-    console.error("Error adding data:", error);
     throw new Error("Failed to add data");
   }
 };

@@ -29,8 +29,6 @@ export async function GET(
 
     return NextResponse.json(organization);
   } catch (error) {
-    console.log("Error", error);
-
     return NextResponse.json(
       { error: "Error retrieving organization" },
       { status: 500 },

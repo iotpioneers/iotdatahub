@@ -17,11 +17,11 @@ const SubscriptionSelection: React.FC = () => {
     const fetchSubscriptions = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`,
         );
         setSubscriptions(response.data);
       } catch (error) {
-        console.error("Error fetching subscriptions:", error);
+        throw new Error("Error fetching subscriptions");
       }
     };
     fetchSubscriptions();
@@ -36,11 +36,11 @@ const SubscriptionSelection: React.FC = () => {
       try {
         await axios.post(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/subscription`,
-          selectedSubscription
+          selectedSubscription,
         );
         router.push("/dashboard/channels");
       } catch (error) {
-        console.error("Error updating subscription:", error);
+        throw new Error("Error updating subscription");
       }
     }
   };
