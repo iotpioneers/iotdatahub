@@ -38,7 +38,6 @@ export async function GET(
       command: validation.data,
     });
   } catch (error) {
-    console.error("Error fetching widgets:", error);
     return NextResponse.json(
       { error: "Error fetching widgets" },
       { status: 500 },
@@ -78,17 +77,6 @@ export async function POST(
     return NextResponse.json({ error: "Device not found" }, { status: 404 });
   }
 
-  // const validation = widgetSchema.safeParse(body);
-
-  // console.log("Validation result for widget:", validation);
-
-  // if (!validation.success) {
-  //   return NextResponse.json(
-  //     { error: "Validation failed", details: validation.error.errors },
-  //     { status: 400 },
-  //   );
-  // }
-
   try {
     const { id, ...data } = body;
     const widget = await prisma.widget.create({
@@ -101,7 +89,6 @@ export async function POST(
 
     return NextResponse.json(widget, { status: 201 });
   } catch (error) {
-    console.error("Error creating widget:", error);
     return NextResponse.json(
       { error: "Error creating widget" },
       { status: 500 },

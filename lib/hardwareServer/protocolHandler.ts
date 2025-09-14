@@ -96,19 +96,6 @@ class SimpleProtocolHandler implements IProtocolHandler {
           message.body.toString().includes("CMD:20") ||
           (parsedCommand.type === "VIRTUAL_WRITE" && parsedCommand.pin === 20);
 
-        if (isCmd20) {
-          console.log("====================================");
-          console.log("🚨 CMD:20 DETECTED - PRIORITY REAL-TIME UPDATE");
-          console.log(
-            `   Device: ${this.deviceManager.maskToken(deviceToken)}`,
-          );
-          console.log(`   Command: ${parsedCommand.type}`);
-          console.log(`   Pin: ${parsedCommand.pin}`);
-          console.log(`   Value: ${parsedCommand.value}`);
-          console.log("   Action: INSTANT BROADCAST + IMMEDIATE DB SYNC");
-          console.log("====================================");
-        }
-
         // INSTANT WebSocket broadcast using cache (NO DATABASE DELAYS!)
         this.wsManager.broadcastHardwareUpdate(
           deviceToken,
@@ -126,18 +113,6 @@ class SimpleProtocolHandler implements IProtocolHandler {
 
         this.wsManager.broadcastDeviceStatus(deviceToken, "ONLINE", new Date());
 
-        console.log("====================================");
-        console.log("HARDWARE COMMAND EXECUTED");
-        console.log(`   Device: ${this.deviceManager.maskToken(deviceToken)}`);
-        console.log(`   Command: ${parsedCommand.type}`);
-        console.log(`   Pin: ${parsedCommand.pin}`);
-        if (parsedCommand.value !== undefined) {
-          console.log(`   Value: ${parsedCommand.value}`);
-        }
-        console.log(`   CMD:20: ${isCmd20 ? "YES - PRIORITY" : "NO"}`);
-        console.log("   Status: INSTANT CACHE UPDATE + DELAYED DB SAVE");
-        console.log("====================================");
-
         // Store virtual pin data in device manager (for protocol compatibility)
         if (parsedCommand.type === "VIRTUAL_WRITE") {
           const device = this.deviceManager.getDevice(deviceToken);
@@ -154,15 +129,7 @@ class SimpleProtocolHandler implements IProtocolHandler {
               deviceToken,
               parsedCommand.pin,
               parsedCommand.value!,
-            )
-              .then(() => {
-                console.log("✅ CMD:20 - Immediate database sync completed");
-              })
-              .catch((error) => {
-                logger.error("CMD:20 immediate database sync failed", {
-                  error,
-                });
-              });
+            );
           } else {
             // Legacy database storage (will be handled by cache background process)
             storeHardwareData(
@@ -252,16 +219,6 @@ class SimpleProtocolHandler implements IProtocolHandler {
       if (deviceInfo.device) infoSummary.push(`device:${deviceInfo.device}`);
       if (deviceInfo.version) infoSummary.push(`ver:${deviceInfo.version}`);
 
-      console.log("====================================");
-      console.log("DEVICE INFO RECEIVED");
-      console.log(
-        `   Device: ${deviceToken ? this.deviceManager.maskToken(deviceToken) : "UNKNOWN"}`,
-      );
-      console.log(`   IP: ${clientIP}`);
-      console.log(`   Info: ${infoSummary.join(", ") || "No parsed info"}`);
-      console.log("   Status: INSTANT CACHE UPDATE + DELAYED DB SAVE");
-      console.log("====================================");
-
       this.sendSuccessResponse(socket, message.id, "Device info stored");
     } catch (error) {
       const errorMessage =
@@ -310,26 +267,6 @@ class SimpleProtocolHandler implements IProtocolHandler {
       const buffer = message.toBuffer();
       device.socket.write(buffer);
 
-      const commandNames: Record<string, string> = {
-        vw: "VirtualWrite",
-        vr: "VirtualRead",
-        dw: "DigitalWrite",
-        dr: "DigitalRead",
-      };
-
-      const commandName = commandNames[command] || command.toUpperCase();
-
-      console.log("====================================");
-      console.log("SENDING COMMAND TO DEVICE");
-      console.log(`   Device: ${this.deviceManager.maskToken(deviceToken)}`);
-      console.log(`   Command: ${commandName}`);
-      console.log(`   Pin: ${pin}`);
-      if (value !== null) {
-        console.log(`   Value: ${value}`);
-      }
-      console.log(`   Message ID: ${messageId}`);
-      console.log("====================================");
-
       logger.info("Hardware command sent", {
         token: this.deviceManager.maskToken(deviceToken),
         command,
@@ -356,17 +293,6 @@ class SimpleProtocolHandler implements IProtocolHandler {
     pin: number,
     value: string | number,
   ): Promise<boolean> {
-    console.log("====================================");
-    console.log(
-      "SENDING VIRTUAL WRITE COMMAND TO DEVICE",
-      deviceToken,
-      "Pin",
-      pin,
-      "and Value",
-      value,
-    );
-    console.log("====================================");
-
     return await this.sendHardwareCommand(deviceToken, "vw", pin, value);
   }
 
@@ -404,16 +330,6 @@ class SimpleProtocolHandler implements IProtocolHandler {
       });
 
       this.startDeviceHeartbeatMonitoring(token, socket);
-
-      console.log("====================================");
-      console.log("DEVICE LOGIN SUCCESSFUL");
-      console.log(`   Token: ${this.deviceManager.maskToken(token)}`);
-      console.log(`   Client: ${socket.remoteAddress}:${socket.remotePort}`);
-      console.log(`   Status: Authenticated and ready`);
-      console.log(
-        `   Cache Status: ${this.deviceCache.isReady() ? "Ready" : "Initializing"}`,
-      );
-      console.log("====================================");
 
       this.sendSuccessResponse(
         socket,
@@ -459,13 +375,6 @@ class SimpleProtocolHandler implements IProtocolHandler {
         now.getTime() - (lastActivity?.getTime() || 0);
 
       if (timeSinceLastActivity > HEARTBEAT_TIMEOUT) {
-        console.log("====================================");
-        console.log("⚠️  DEVICE HEARTBEAT TIMEOUT");
-        console.log(`   Device: ${this.deviceManager.maskToken(deviceToken)}`);
-        console.log(`   Last Activity: ${timeSinceLastActivity}ms ago`);
-        console.log(`   Action: Setting device OFFLINE`);
-        console.log("====================================");
-
         await this.handleDeviceDisconnection(deviceToken);
         clearInterval(heartbeatTimer);
       }
@@ -488,13 +397,6 @@ class SimpleProtocolHandler implements IProtocolHandler {
 
     // Remove from device manager
     this.deviceManager.removeDevice(deviceToken);
-
-    console.log("====================================");
-    console.log("📴 DEVICE DISCONNECTED");
-    console.log(`   Device: ${this.deviceManager.maskToken(deviceToken)}`);
-    console.log(`   Status: Set to OFFLINE`);
-    console.log(`   Time: ${new Date().toISOString()}`);
-    console.log("====================================");
   }
 
   private sendSuccessResponse(
@@ -512,13 +414,6 @@ class SimpleProtocolHandler implements IProtocolHandler {
       buffer.writeUInt16BE(PROTOCOL.STATUS_SUCCESS, 3);
 
       socket.write(buffer);
-
-      console.log("====================================");
-      console.log(`RESPONSE SENT: ${description}`);
-      console.log(`   Message ID: ${responseId}`);
-      console.log(`   Status: 200 (SUCCESS)`);
-      console.log(`   Buffer: ${buffer.toString("hex")}`);
-      console.log("====================================");
 
       logger.debug("Success response sent", {
         originalId: messageId,

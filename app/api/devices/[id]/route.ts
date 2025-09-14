@@ -30,7 +30,6 @@ export async function GET(
 
     return NextResponse.json(device);
   } catch (error) {
-    console.error("Error fetching device:", error);
     return NextResponse.json(
       { error: "Error fetching device" },
       { status: 500 },
@@ -45,17 +44,9 @@ export async function PATCH(
   try {
     const body = await request.json();
 
-    console.log("====================================");
-    console.log("PATCH /api/devices/[id]", body);
-    console.log("====================================");
-
     const device = await prisma.device.findUnique({
       where: { id: params.id },
     });
-
-    console.log("====================================");
-    console.log("Device found:", device);
-    console.log("====================================");
 
     if (!device) {
       return NextResponse.json({ error: "Device not found" }, { status: 404 });
@@ -74,13 +65,8 @@ export async function PATCH(
       },
     });
 
-    console.log("====================================");
-    console.log("Device updated:", updatedDevice);
-    console.log("====================================");
-
     return NextResponse.json(updatedDevice);
   } catch (error) {
-    console.error("Error updating device:", error);
     return NextResponse.json(
       { error: "Error updating device" },
       { status: 500 },
@@ -126,7 +112,6 @@ export async function PUT(
 
     return NextResponse.json(updatedDevice);
   } catch (error) {
-    console.error("Error updating device:", error);
     return NextResponse.json(
       { error: "Error updating device" },
       { status: 500 },
@@ -148,7 +133,6 @@ export async function DELETE(
       device,
     });
   } catch (error) {
-    console.error("Error deleting device:", error);
     return NextResponse.json(
       { error: "Error deleting device" },
       { status: 500 },

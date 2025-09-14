@@ -13,9 +13,9 @@ import { SignOut as SignOutIcon } from "@phosphor-icons/react/dist/ssr/SignOut";
 import { User as UserIcon } from "@phosphor-icons/react/dist/ssr/User";
 
 import { authClient } from "@/lib/auth/client";
-import { logger } from "@/lib/default-logger";
 import { useUser } from "@/hooks/use-user";
 import { useSession } from "next-auth/react";
+import logger from "@/lib/hardwareServer/logger";
 
 export interface UserPopoverProps {
   anchorEl: Element | null;
@@ -39,7 +39,7 @@ export function UserPopover({
       const { error } = await authClient.signOut();
 
       if (error) {
-        logger.error("Sign out error", error);
+        logger.error("Sign out error");
         return;
       }
 
@@ -50,7 +50,7 @@ export function UserPopover({
       router.refresh();
       // After refresh, AuthGuard will handle the redirect
     } catch (err) {
-      logger.error("Sign out error", err);
+      logger.error("Sign out error");
     }
   }, [checkSession, router]);
 

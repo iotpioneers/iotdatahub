@@ -95,7 +95,6 @@ export function AccountDetailsForm({ ...others }): React.JSX.Element {
         setSnackbarSeverity("success");
         setOpenSnackbar(true);
       } catch (error) {
-        console.error("Error updating user data:", error);
         setSnackbarMessage("Failed to update user data");
         setSnackbarSeverity("error");
         setOpenSnackbar(true);

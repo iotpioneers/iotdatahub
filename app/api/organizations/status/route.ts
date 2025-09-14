@@ -140,7 +140,6 @@ export async function GET(request: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error occurred while fetching organization status", error);
     return NextResponse.json(
       { error: "Error fetching organization status" },
       { status: 500 },

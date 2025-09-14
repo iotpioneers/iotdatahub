@@ -104,7 +104,7 @@ const AddSubscriptionModal: React.FC<SubscriptionModalProps> = ({
       try {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`,
-          values
+          values,
         );
 
         if (response.status === 201) {
@@ -120,7 +120,6 @@ const AddSubscriptionModal: React.FC<SubscriptionModalProps> = ({
           throw new Error("Failed to save subscription");
         }
       } catch (error) {
-        console.error("Failed to save subscription:", error);
         setSnackbar({
           open: true,
           message: "Failed to save subscription",
@@ -276,7 +275,7 @@ const AddSubscriptionModal: React.FC<SubscriptionModalProps> = ({
             onChange={(e) =>
               formik.setFieldValue(
                 "features",
-                e.target.value.split(",").map((f) => f.trim())
+                e.target.value.split(",").map((f) => f.trim()),
               )
             }
             onBlur={formik.handleBlur}

@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const user = await prisma.user.findUnique({
     where: { id: params.id },
@@ -20,7 +20,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const body = await request.json();
 
@@ -61,7 +61,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const user = await prisma.user.findUnique({
@@ -81,7 +81,6 @@ export async function DELETE(
       message: "User and related data deleted successfully",
     });
   } catch (error) {
-    console.error("Error deleting user:", error);
     return NextResponse.json({ error: "Error deleting user" }, { status: 500 });
   }
 }

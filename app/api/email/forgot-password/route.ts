@@ -150,7 +150,6 @@ export async function POST(req: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
-    console.error("Forgot password error:", error);
     return NextResponse.json(
       { error: "Failed to send password reset email" },
       { status: 500 },

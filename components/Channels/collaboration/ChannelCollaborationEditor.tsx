@@ -22,8 +22,8 @@ import FloatingToolbarPlugin from "./plugins/FloatingToolbarPlugin";
 import { useThreads } from "@liveblocks/react/suspense";
 import ChannelComments from "./ChannelComments";
 import type { UserAccessType } from "@/types";
-import LoadingSpinner from "../../LoadingSpinner";
 import { Typography } from "@mui/material";
+import { LinearLoading } from "@/components/LinearLoading";
 
 const ChannelCollaborationEditor = ({
   currentUserType,
@@ -63,7 +63,7 @@ const ChannelCollaborationEditor = ({
 
         <div className="editor-wrapper flex flex-col lg:flex-row gap-6 items-start justify-start">
           {status === "not-loaded" || status === "loading" ? (
-            <LoadingSpinner />
+            <LinearLoading />
           ) : (
             <div className="editor-inner flex-1 relative mb-5 h-auto min-h-[400px] w-full max-w-[800px] shadow-md lg:mb-10 rounded-lg">
               <RichTextPlugin

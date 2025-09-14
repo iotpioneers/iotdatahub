@@ -6,11 +6,11 @@ import {
   ClientSideSuspense,
   LiveblocksProvider,
 } from "@liveblocks/react/suspense";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import { getUsers, getChannelRoomUsers } from "@/lib/actions/user.actions";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import SessionModal from "@/components/Actions/SessionModal";
+import { LinearLoading } from "@/components/LinearLoading";
 
 const CollaborationProvider = ({ children }: { children: ReactNode }) => {
   const { status, data: session } = useSession();
@@ -30,7 +30,7 @@ const CollaborationProvider = ({ children }: { children: ReactNode }) => {
   const handleSnackbarClose = () => setSnackbarOpen(false);
 
   if (status === "loading") {
-    return <LoadingSpinner />;
+    return <LinearLoading />;
   }
 
   if (status === "unauthenticated" || !session?.user) {
@@ -56,7 +56,6 @@ const CollaborationProvider = ({ children }: { children: ReactNode }) => {
       setAlertMessage("Error fetching users");
       setAlertSeverity("error");
       setSnackbarOpen(true);
-      console.error("Error fetching users:", error);
     } finally {
       setLoading(false);
     }
@@ -75,7 +74,6 @@ const CollaborationProvider = ({ children }: { children: ReactNode }) => {
       setAlertMessage("Error fetching channel room users");
       setAlertSeverity("error");
       setSnackbarOpen(true);
-      console.error("Error fetching channel room users:", error);
     } finally {
       setLoading(false);
     }
@@ -106,9 +104,9 @@ const CollaborationProvider = ({ children }: { children: ReactNode }) => {
 
       {/* Loading Spinner when fetching data */}
       {loading ? (
-        <LoadingSpinner />
+        <LinearLoading />
       ) : (
-        <ClientSideSuspense fallback={<LoadingSpinner />}>
+        <ClientSideSuspense fallback={<LinearLoading />}>
           {children}
         </ClientSideSuspense>
       )}

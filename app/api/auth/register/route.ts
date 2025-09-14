@@ -115,7 +115,6 @@ export async function POST(request: Request) {
       { status: 201 },
     );
   } catch (error) {
-    console.log("Error creating user:", error);
     if (error instanceof Error) {
       return NextResponse.json({ message: error.message }, { status: 500 });
     }

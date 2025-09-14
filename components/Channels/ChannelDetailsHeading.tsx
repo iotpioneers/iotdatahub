@@ -17,7 +17,7 @@ import { ChannelHeadingProps } from "@/types";
 import InviteCollaboratorModal from "./collaboration/InviteCollaboratorModal";
 import ActiveCollaborators from "./collaboration/ActiveCollaborators";
 import { Card } from "@mui/material";
-import LoadingSpinner from "../LoadingSpinner";
+import { LinearLoading } from "../LinearLoading";
 
 const ChannelDetailsHeading = ({
   roomId,
@@ -35,7 +35,7 @@ const ChannelDetailsHeading = ({
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;
@@ -48,11 +48,11 @@ const ChannelDetailsHeading = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   if (!channel) {
-    return <LoadingSpinner />;
+    return <LinearLoading />;
   }
 
   const updateChannelTitleHandler = async (
-    e: React.KeyboardEvent<HTMLInputElement>
+    e: React.KeyboardEvent<HTMLInputElement>,
   ) => {
     if (e.key === "Enter") {
       setLoading(true);
@@ -62,7 +62,7 @@ const ChannelDetailsHeading = ({
         if (channelTitle !== channel?.name) {
           const updatedChannel = await updateChannelRoomData(
             roomId,
-            channelTitle
+            channelTitle,
           );
 
           if (!updatedChannel) {

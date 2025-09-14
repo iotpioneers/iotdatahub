@@ -56,7 +56,7 @@ export const WidgetDisplay = ({
           }
         }
       } catch (error) {
-        console.error("Error loading pin config:", error);
+        throw new Error("Error loading pin config");
       }
     };
 
@@ -106,7 +106,6 @@ export const WidgetDisplay = ({
       setShowPinConfig(false);
       showToast("Pin configuration saved", "success");
     } catch (error) {
-      console.error("Error saving pin config:", error);
       const errorMessage =
         error instanceof Error
           ? error.message
@@ -245,6 +244,7 @@ export const WidgetDisplay = ({
         }}
       >
         <WidgetRegistry
+          widgetId={widget.id}
           type={widget.definition?.type as WidgetType}
           value={widget.settings?.value}
           settings={widget.settings ?? {}}

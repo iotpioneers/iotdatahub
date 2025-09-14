@@ -43,7 +43,6 @@ export async function POST(req: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
-    console.error("Token verification error:", error);
     return NextResponse.json(
       { error: "Failed to verify token" },
       { status: 500 },

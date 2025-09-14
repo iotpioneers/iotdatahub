@@ -35,7 +35,7 @@ export const useWebSocket = ({
       // Add to queue if still connecting
       messageQueueRef.current.push(message);
     } else {
-      console.warn("WebSocket not connected, cannot send message:", message);
+      setError("WebSocket not connected, cannot send message");
     }
   };
 
@@ -58,7 +58,6 @@ export const useWebSocket = ({
       wsRef.current = new WebSocket(wsUrl);
 
       wsRef.current.onopen = () => {
-        console.log("WebSocket connected - Enhanced with cache support");
         setIsConnected(true);
         setError(null);
         setReconnectAttempts(0);
@@ -88,28 +87,22 @@ export const useWebSocket = ({
       wsRef.current.onmessage = (event) => {
         try {
           const message: WebSocketMessage = JSON.parse(event.data);
-          console.log("WebSocket message received:", message);
 
           switch (message.type) {
             case "CONNECTION_ESTABLISHED":
-              console.log(
-                "WebSocket connection established:",
-                message.clientId,
-              );
               setCacheReady(message.cacheReady || false);
               break;
 
             case "SUBSCRIPTION_CONFIRMED":
-              console.log("Device subscription confirmed:", message.deviceId);
+              setError("Device subscription confirmed");
               break;
 
             case "CACHE_INITIALIZED":
-              console.log("Cache initialized:", message.stats);
+              setError("Cache initialized");
               setCacheReady(true);
               break;
 
             case "ERROR":
-              console.error("WebSocket error:", message.error);
               setError(message.error ?? null);
               break;
 
@@ -121,12 +114,11 @@ export const useWebSocket = ({
               onMessage?.(message);
           }
         } catch (err) {
-          console.error("Failed to parse WebSocket message:", err);
+          setError("Failed to parse WebSocket message");
         }
       };
 
       wsRef.current.onclose = (event) => {
-        console.log("WebSocket disconnected:", event.code, event.reason);
         setIsConnected(false);
         setCacheReady(false);
 
@@ -138,7 +130,7 @@ export const useWebSocket = ({
             reconnectAttempts === 0
               ? 1000
               : Math.min(1000 * Math.pow(2, reconnectAttempts), 10000);
-          console.log(
+          setError(
             `Reconnecting in ${timeout}ms (attempt ${reconnectAttempts + 1}/3)`,
           );
 
@@ -150,11 +142,9 @@ export const useWebSocket = ({
       };
 
       wsRef.current.onerror = (error) => {
-        console.error("WebSocket error:", error);
         setError("WebSocket connection error");
       };
     } catch (err) {
-      console.error("Failed to create WebSocket connection:", err);
       setError("Failed to create WebSocket connection");
     }
   };

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Widget } from "@/types/widgets";
 import WidgetRegistry from "./WidgetComponents";
 import { useToast } from "@/hooks/useToast";
@@ -41,6 +41,7 @@ export const WidgetComponent: React.FC<WidgetComponentProps> = ({
     return (
       <div className="w-full h-full flex items-center justify-center relative group">
         <WidgetRegistry
+          widgetId={widget.id}
           type={widget.definition.type}
           value={widget.value || widget.settings?.value}
           deviceId={widget.device?.id}

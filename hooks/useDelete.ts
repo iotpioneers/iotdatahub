@@ -7,7 +7,6 @@ const deleteData = async (url: string) => {
     const response = await axios.delete(url);
     return response.data;
   } catch (error) {
-    console.error("Error deleting data:", error);
     throw new Error("Failed to delete data)");
   }
 };

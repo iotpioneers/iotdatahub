@@ -7,7 +7,6 @@ const updateData = async (url: string, { arg }: { arg: any }) => {
     const response = await axios.put(url, arg);
     return response.data;
   } catch (error) {
-    console.error("Error updating data:", error);
     throw new Error("Failed to update data");
   }
 };

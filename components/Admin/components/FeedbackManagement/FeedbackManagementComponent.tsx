@@ -43,7 +43,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type SendReplyFn = (
   url: string,
-  data: ReplyFormValues & { feedbackId: string }
+  data: ReplyFormValues & { feedbackId: string },
 ) => Promise<any>;
 
 const sendReply: SendReplyFn = async (url, data) => {
@@ -62,7 +62,7 @@ function useFeedbackDetail(feedbackId: string | null) {
     feedbackId
       ? `${process.env.NEXT_PUBLIC_BASE_URL}/api/feedback/${feedbackId}`
       : null,
-    fetcher
+    fetcher,
   );
 
   return {
@@ -76,7 +76,7 @@ function useFeedbackDetail(feedbackId: string | null) {
 function useFeedbackData() {
   const { data, error, mutate } = useSWR<Feedback[]>(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/feedback`,
-    fetcher
+    fetcher,
   );
 
   return {
@@ -89,7 +89,7 @@ function useFeedbackData() {
 
 const FeedbackManagementComponent: React.FC = () => {
   const [selectedFeedbackId, setSelectedFeedbackId] = useState<string | null>(
-    null
+    null,
   );
   const [replyModalOpen, setReplyModalOpen] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -109,7 +109,7 @@ const FeedbackManagementComponent: React.FC = () => {
         {
           ...values,
           feedbackId: selectedFeedbackId,
-        }
+        },
       );
 
       setReplyModalOpen(false);
@@ -124,7 +124,7 @@ const FeedbackManagementComponent: React.FC = () => {
 
   const handleStatusChange = async (
     feedbackId: string,
-    newStatus: FeedbackStatus
+    newStatus: FeedbackStatus,
   ) => {
     try {
       const response = await fetch(
@@ -135,10 +135,8 @@ const FeedbackManagementComponent: React.FC = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ status: newStatus }),
-        }
+        },
       );
-
-      console.log("response", response);
 
       if (response.ok) {
         mutateFeedbacks();
@@ -171,7 +169,7 @@ const FeedbackManagementComponent: React.FC = () => {
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/feedback/${selectedFeedbackId}`,
         {
           method: "DELETE",
-        }
+        },
       );
 
       if (response.ok) {
@@ -182,7 +180,6 @@ const FeedbackManagementComponent: React.FC = () => {
         throw new Error("Failed to delete feedback");
       }
     } catch (error) {
-      console.error("Error deleting feedback:", error);
       setSnackbarMessage("Failed to delete feedback");
       setSnackbarOpen(true);
     } finally {
@@ -193,7 +190,7 @@ const FeedbackManagementComponent: React.FC = () => {
 
   const handleMenuOpen = (
     event: React.MouseEvent<HTMLButtonElement>,
-    feedbackId: string
+    feedbackId: string,
   ) => {
     setAnchorEl(event.currentTarget);
     setSelectedFeedbackId(feedbackId);

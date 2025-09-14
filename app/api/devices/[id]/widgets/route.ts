@@ -49,7 +49,6 @@ export async function GET(
 
     return NextResponse.json(widgets);
   } catch (error) {
-    console.error("Error fetching widgets:", error);
     return NextResponse.json(
       { error: "Error fetching widgets" },
       { status: 500 },
@@ -107,7 +106,6 @@ export async function POST(
 
     return NextResponse.json(widget, { status: 201 });
   } catch (error) {
-    console.error("Error creating widget:", error);
     return NextResponse.json(
       { error: "Error creating widget" },
       { status: 500 },

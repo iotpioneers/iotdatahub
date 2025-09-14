@@ -24,7 +24,6 @@ class WebSocketManager {
     });
 
     this.wss.on("connection", this.handleConnection.bind(this));
-    logger.info("WebSocket server initialized with device cache");
   }
 
   private handleConnection(ws: WebSocket, req: IncomingMessage) {
@@ -36,28 +35,17 @@ class WebSocketManager {
 
     this.clients.set(clientId, client);
 
-    console.log("====================================");
-    console.log(`📌 WebSocket CLIENT CONNECTED: ${clientId}`);
-    console.log(`   Total clients: ${this.clients.size}`);
-    console.log(`   Cache ready: ${this.deviceCache.isReady()}`);
-    console.log("====================================");
-
     ws.on("message", (data: Buffer) => {
       try {
         const message = JSON.parse(data.toString());
         this.handleMessage(clientId, message);
       } catch (error) {
-        console.error("Invalid WebSocket message:", error);
         this.sendError(ws, "Invalid message format");
       }
     });
 
     ws.on("close", () => {
       this.clients.delete(clientId);
-      console.log("====================================");
-      console.log(`📌 WebSocket CLIENT DISCONNECTED: ${clientId}`);
-      console.log(`   Remaining clients: ${this.clients.size}`);
-      console.log("====================================");
     });
 
     ws.on("error", (error: unknown) => {
@@ -80,10 +68,6 @@ class WebSocketManager {
     const client = this.clients.get(clientId);
     if (!client) return;
 
-    console.log("====================================");
-    console.log(`📨 WebSocket MESSAGE from ${clientId}:`, message.type);
-    console.log("====================================");
-
     switch (message.type) {
       case "SUBSCRIBE_DEVICE":
         if (message.deviceId) {
@@ -105,19 +89,12 @@ class WebSocketManager {
             deviceId: message.deviceId,
             timestamp: new Date().toISOString(),
           });
-
-          console.log(
-            `✅ Client ${clientId} subscribed to device ${message.deviceId}`,
-          );
         }
         break;
 
       case "UNSUBSCRIBE_DEVICE":
         if (message.deviceId) {
           client.subscriptions.delete(message.deviceId);
-          console.log(
-            `❌ Client ${clientId} unsubscribed from device ${message.deviceId}`,
-          );
         }
         break;
 
@@ -162,15 +139,6 @@ class WebSocketManager {
         timestamp: new Date().toISOString(),
         stats: this.deviceCache.getStats(),
       });
-
-      console.log("====================================");
-      console.log("🚀 DEVICE CACHE INITIALIZED");
-      console.log(`   User ID: ${userId}`);
-      console.log(`   Organization ID: ${organizationId}`);
-      console.log(
-        `   Devices cached: ${this.deviceCache.getStats().deviceCount}`,
-      );
-      console.log("====================================");
     } catch (error) {
       logger.error("Failed to initialize device cache", {
         userId,
@@ -227,17 +195,6 @@ class WebSocketManager {
         priority: isCmd20 ? "HIGH" : "NORMAL",
       };
 
-      console.log("====================================");
-      console.log(
-        `🚀 ${isCmd20 ? "PRIORITY CMD:20" : "INSTANT"} HARDWARE UPDATE BROADCAST`,
-      );
-      console.log(`   Device: ${deviceId}`);
-      console.log(`   Pin: ${pin}, Value: ${value}`);
-      console.log(`   Widget updated: ${!!updatedWidget}`);
-      console.log(`   CMD:20: ${isCmd20 ? "YES" : "NO"}`);
-      console.log(`   Subscribers: ${this.getDeviceSubscribers(deviceId)}`);
-      console.log("====================================");
-
       this.broadcastToSubscribers(deviceId, message);
 
       if (isCmd20 && updatedWidget) {
@@ -273,13 +230,6 @@ class WebSocketManager {
     };
 
     this.broadcastToSubscribers(deviceId, message);
-
-    console.log("🔄 WIDGET STATE SYNC BROADCAST", {
-      deviceId,
-      widgetId: widget.id,
-      pin: widget.pinConfig.pinNumber,
-      value: widget.value,
-    });
   }
 
   /**
@@ -315,12 +265,6 @@ class WebSocketManager {
       };
 
       this.broadcastToSubscribers(deviceId, message);
-
-      console.log("📡 DEVICE STATUS BROADCAST", {
-        deviceId,
-        status,
-        subscribers: this.getDeviceSubscribers(deviceId),
-      });
     }
   }
 

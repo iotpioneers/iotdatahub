@@ -118,7 +118,6 @@ const authOptions: AuthOptions = {
           }
           return user;
         } catch (error: any) {
-          console.error("Authorization error:", error);
           throw new Error(error.message || "Authentication failed");
         }
       },

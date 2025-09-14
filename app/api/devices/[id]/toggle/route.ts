@@ -47,16 +47,8 @@ export async function POST(
       },
     });
 
-    // Here you would typically integrate with your IoT messaging system
-    // For example, publishing to MQTT broker
-    // await publishToMqtt(`device/${device.id}/control`, {
-    //   command: newStatus,
-    //   timestamp: new Date().toISOString()
-    // });
-
     return NextResponse.json(updatedDevice);
   } catch (error) {
-    console.error("Error toggling device:", error);
     return NextResponse.json(
       { error: "Failed to toggle device" },
       { status: 500 },

@@ -27,8 +27,6 @@ const ChannelList = () => {
 
   if (error) return <div>Failed to load channels</div>;
 
-  console.log("channels", !channels?.length);
-
   return (
     <div className="w-full pt-5">
       {isLoading && (

@@ -10,13 +10,12 @@ import React, {
 import WidgetBox from "@/components/Channels/dashboard/WidgetBox";
 import EditDeviceDashboard from "./EditDeviceDashboard";
 import { useRouter } from "next/navigation";
-import DeviceSidebar from "./DeviceSidebar";
 import DeviceHeaderComponent from "./DeviceHeaderComponent";
 import { DragDropProvider } from "@/components/Channels/dashboard/widgets/DragDropProvider";
 import { Widget } from "@/types/widgets";
 import useFetch from "@/hooks/useFetch";
 import { LinearLoading } from "@/components/LinearLoading";
-import { useToast } from "@/hooks/useToast";
+import { useToast } from "@/components/ui/toast-provider";
 import { v4 as uuidv4 } from "uuid";
 import { getDefaultSize } from "@/app/store/constant";
 
@@ -37,8 +36,8 @@ interface WidgetWithIsNew extends Widget {
 const EditDashboardComponent = ({ params }: Props) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-  const { showToast } = useToast();
+  const { toast } = useToast();
+
   const initialWidgetsRef = useRef<Widget[]>([]);
   const [widgetState, setWidgetState] = useState<WidgetState>({
     widgets: [],
@@ -268,21 +267,29 @@ const EditDashboardComponent = ({ params }: Props) => {
       const result = await response.json();
 
       if (result.failed > 0) {
-        showToast(
-          `Some operations failed: ${result.errors.map((e: { error: string }) => e.error).join(", ")}`,
-          "error",
-        );
+        toast({
+          message: `Some operations failed: ${result.errors.map((e: { error: string }) => e.error).join(", ")}`,
+
+          type: "error",
+        });
+
         return;
       }
 
-      showToast(`Successfully saved ${result.successful} changes`, "success");
+      toast({
+        message: `Successfully saved ${result.successful} changes`,
+        type: "success",
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 10000));
+
       router.push(`/dashboard/devices/${params.id}`);
     } catch (error) {
-      console.error("Error saving dashboard changes:", error);
-      showToast(
-        error instanceof Error ? error.message : "Failed to save changes",
-        "error",
-      );
+      toast({
+        message:
+          error instanceof Error ? error.message : "Failed to save changes",
+        type: "error",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -308,8 +315,10 @@ const EditDashboardComponent = ({ params }: Props) => {
       });
       router.push(`/dashboard/devices/${params.id}`);
     } catch (error) {
-      console.error("Error canceling dashboard changes:", error);
-      showToast("Error canceling changes", "error");
+      toast({
+        message: "Error canceling changes",
+        type: "error",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -318,16 +327,17 @@ const EditDashboardComponent = ({ params }: Props) => {
   const handleDrop = (widget: Widget) => {
     try {
       handleAddWidget(widget);
-      showToast("Widget added to dashboard", "success");
+      toast({
+        message: "Widget added to dashboard",
+        type: "success",
+      });
     } catch (error) {
-      console.error("Failed to add widget:", error);
-      showToast("Failed to add widget", "error");
+      toast({
+        message: "Failed to add widget",
+        type: "error",
+      });
     }
   };
-
-  if (isWidgetLoading) {
-    return <LinearLoading />;
-  }
 
   if (error) {
     return (
@@ -351,6 +361,7 @@ const EditDashboardComponent = ({ params }: Props) => {
   return (
     <DragDropProvider onDrop={handleDrop}>
       <div className="max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl xxl:max-w-screen-xxl flex justify-between bg-slate-100 rounded-lg shadow p-2 overflow-hidden gap-1">
+        {isWidgetLoading || (isLoading && <LinearLoading />)}
         <div className="grid gap-1 w-full rounded-md">
           <DeviceHeaderComponent
             deviceId={params.id}
@@ -372,13 +383,7 @@ const EditDashboardComponent = ({ params }: Props) => {
           />
         </div>
 
-        <DeviceSidebar
-          deviceId={params.id}
-          isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
-        />
-
-        <div className="flex flex-1 min-w-[200px] h-full rounded-md">
+        <div className="flex flex-1 min-w-[150px] h-full rounded-md">
           <WidgetBox deviceId={params.id} />
         </div>
       </div>

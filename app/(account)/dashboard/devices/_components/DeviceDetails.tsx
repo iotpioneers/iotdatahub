@@ -256,10 +256,6 @@ const DeviceDetails = ({ params }: Props) => {
     }
   }, [isConnected, cacheReady, device?.status, params.id, sendMessage]);
 
-  if (status === "loading" || status === "unauthenticated" || !session) {
-    return <LinearLoading />;
-  }
-
   if (error) {
     return (
       <Box className="text-red-500">
@@ -274,10 +270,6 @@ const DeviceDetails = ({ params }: Props) => {
   const apiKey = organization?.ApiKey?.find(
     (key: ApiKey) => key.channelId === channel?.id,
   );
-
-  if (!device || !organization || !channel || !apiKey) {
-    return <LinearLoading />;
-  }
 
   const getConnectionStatus = () => {
     if (isConnected && cacheReady) {
@@ -332,7 +324,16 @@ const DeviceDetails = ({ params }: Props) => {
 
   return (
     <div className="min-h-screen">
-      {(isLoading || !deviceData || isRedirecting) && <LinearLoading />}
+      {(isLoading ||
+        !deviceData ||
+        isRedirecting ||
+        !device ||
+        !organization ||
+        !channel ||
+        !apiKey ||
+        status === "loading" ||
+        status === "unauthenticated" ||
+        !session) && <LinearLoading />}
 
       <div className="bg-white rounded-lg shadow-sm p-6 mb-4">
         <div className="flex items-center justify-between mb-6">
@@ -357,7 +358,7 @@ const DeviceDetails = ({ params }: Props) => {
             <div>
               <div className="flex items-center space-x-4">
                 <h1 className="text-2xl font-semibold text-orange-50">
-                  {device.name}
+                  {device?.name || ""}
                 </h1>
                 <span className="flex items-center">
                   <deviceStatusDisplay.icon
@@ -377,7 +378,7 @@ const DeviceDetails = ({ params }: Props) => {
                 <span>
                   Organization:{" "}
                   <strong className="font-bold">
-                    {organization.name || ""}
+                    {organization?.name || ""}
                   </strong>
                 </span>
                 <button
@@ -452,29 +453,12 @@ const DeviceDetails = ({ params }: Props) => {
               </div>
               <div>
                 <div className="text-gray-400">CHANNEL_NAME</div>
-                <div className="text-orange-50">"{channel?.name}"</div>
+                <div className="text-blue-400">"{channel?.name}"</div>
               </div>
               <div>
                 <div className="text-gray-400">CHANNEL_API_KEY</div>
-                <div className="text-orange-50">"{apiKey?.apiKey}"</div>
+                <div className="text-green-400">"{apiKey?.apiKey}"</div>
               </div>
-              {cacheReady && (
-                <>
-                  <div>
-                    <div className="text-gray-400">CACHE_STATUS</div>
-                    <div className="text-green-400">
-                      "ACTIVE - 3s HEARTBEAT"
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-gray-400">PERFORMANCE_STATS</div>
-                    <div className="text-blue-400">
-                      "Updates: {realTimeStats.updateCount}, Avg:{" "}
-                      {realTimeStats.avgUpdateTime.toFixed(1)}ms"
-                    </div>
-                  </div>
-                </>
-              )}
             </div>
           </div>
         </div>

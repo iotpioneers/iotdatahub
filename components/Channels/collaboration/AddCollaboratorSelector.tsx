@@ -69,17 +69,11 @@ const AddCollaboratorSelector: React.FC<AddCollaboratorSelectorProps> = ({
   const [success, setSuccess] = useState("");
   const [showResult, setShowResult] = useState<boolean>(false);
 
-  const { data: users, error: fetchError } = useSWR<UserData[]>(
+  const { data: users } = useSWR<UserData[]>(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/users`,
     fetcher,
-    { refreshInterval: 5000 }
+    { refreshInterval: 5000 },
   );
-
-  useEffect(() => {
-    if (fetchError) {
-      console.error("Error fetching user data:", fetchError);
-    }
-  }, [fetchError]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -107,14 +101,14 @@ const AddCollaboratorSelector: React.FC<AddCollaboratorSelectorProps> = ({
 
   const handleAccessTypeChange = (
     id: string,
-    event: SelectChangeEvent<"Editor" | "Viewer">
+    event: SelectChangeEvent<"Editor" | "Viewer">,
   ) => {
     setSelectedCollaborators((prev) =>
       prev.map((c) =>
         c.id === id
           ? { ...c, accessType: event.target.value as "Editor" | "Viewer" }
-          : c
-      )
+          : c,
+      ),
     );
   };
 
@@ -122,11 +116,11 @@ const AddCollaboratorSelector: React.FC<AddCollaboratorSelectorProps> = ({
     users?.filter(
       (user) =>
         !selectedCollaborators.some(
-          (collaborator) => collaborator.id === user.id
+          (collaborator) => collaborator.id === user.id,
         ) &&
         (user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
           (user.name &&
-            user.name.toLowerCase().includes(searchTerm.toLowerCase())))
+            user.name.toLowerCase().includes(searchTerm.toLowerCase()))),
     ) || [];
 
   useEffect(() => {
@@ -185,7 +179,7 @@ const AddCollaboratorSelector: React.FC<AddCollaboratorSelectorProps> = ({
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;

@@ -97,7 +97,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(payment, { status: 201 });
   } catch (error) {
-    console.error("Payment error:", error);
     return NextResponse.json(
       { error: "Error processing payment" },
       { status: 500 },
@@ -169,7 +168,6 @@ async function processPayment(paymentId: string) {
       });
     }
   } catch (error) {
-    console.error("Payment processing error:", error);
     await prisma.payment.update({
       where: { id: paymentId },
       data: {

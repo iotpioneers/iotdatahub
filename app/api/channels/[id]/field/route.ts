@@ -5,7 +5,7 @@ import { fieldSchema } from "@/validations/schema.validation";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const body = await request.json();
@@ -14,7 +14,7 @@ export async function POST(
     if (!token?.email) {
       return NextResponse.json(
         { error: "You must be logged in to create a field" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -25,7 +25,7 @@ export async function POST(
     if (!user) {
       return NextResponse.json(
         { error: "You must be logged in to create a field" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -34,7 +34,7 @@ export async function POST(
     if (!validation.success) {
       return NextResponse.json(
         { errors: validation.error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -63,10 +63,9 @@ export async function POST(
 
     return NextResponse.json({ updatedChannel });
   } catch (error) {
-    console.error("Error creating field:", error);
     return NextResponse.json(
       { error: "Error creating field" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -78,7 +77,7 @@ export async function GET(request: NextRequest) {
   if (!token) {
     return NextResponse.json(
       { error: "You must be logged in" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -100,7 +99,7 @@ export async function GET(request: NextRequest) {
   if (!allChannels || allChannels.length === 0) {
     return NextResponse.json(
       { error: "No channels found for this user" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -115,7 +114,7 @@ export async function GET(request: NextRequest) {
         ownerEmail: channelOwner?.email,
         ownerImage: channelOwner?.image,
       };
-    })
+    }),
   );
 
   return NextResponse.json(channels);

@@ -30,8 +30,8 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 import { organizationSchema } from "@/validations/schema.validation";
 import { useGlobalState } from "@/context";
-import LoadingSpinner from "../LoadingSpinner";
 import { CenterFocusStrong } from "@mui/icons-material";
+import { LinearLoading } from "../LinearLoading";
 
 // Define the enum AreaOfInterest
 enum AreaOfInterest {
@@ -57,7 +57,6 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   marginBottom: theme.spacing(4),
   backgroundColor: theme.palette.background.paper,
 }));
-
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -148,7 +147,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
   >([]);
   const [customAreaOfInterest, setCustomAreaOfInterest] = useState<string>("");
   const [areasOfInterest, setAreasOfInterest] = useState<string[]>(
-    Object.values(AreaOfInterest)
+    Object.values(AreaOfInterest),
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [open, setOpen] = React.useState(false);
@@ -160,12 +159,12 @@ const OrganizationOnboardingCreation: React.FC = () => {
   }, [status, router]);
 
   if (status === "loading") {
-    return <LoadingSpinner />;
+    return <LinearLoading />;
   }
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;
@@ -191,7 +190,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
   };
 
   const handleOrganizationNameChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setOrganizationName(event.target.value);
     setError("");
@@ -201,12 +200,12 @@ const OrganizationOnboardingCreation: React.FC = () => {
     setSelectedAreasOfInterest((prevSelectedAreas) =>
       prevSelectedAreas.includes(interest)
         ? prevSelectedAreas.filter((area) => area !== interest)
-        : [...prevSelectedAreas, interest]
+        : [...prevSelectedAreas, interest],
     );
   };
 
   const handleCustomAreaOfInterestChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setCustomAreaOfInterest(event.target.value.toUpperCase());
   };
@@ -253,7 +252,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
     try {
       const response = await axios.post(
         process.env.NEXT_PUBLIC_BASE_URL + "/api/organizations",
-        organizationData
+        organizationData,
       );
 
       if (response.status !== 201) {
@@ -274,7 +273,6 @@ const OrganizationOnboardingCreation: React.FC = () => {
         router.push("/dashboard/channels");
       }, 100);
     } catch (error) {
-      console.log("Error creating organization:", error);
       setError("Error creating organization");
       setLoading(false);
     }
@@ -323,12 +321,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
 
         {activeStep === 0 && (
           <Box>
-            <Typography
-              variant="h1"
-              align="center"
-              gutterBottom
-              sx={{ mt: 4}}
-            >
+            <Typography variant="h1" align="center" gutterBottom sx={{ mt: 4 }}>
               Let's start by giving your organization a name
             </Typography>
             <TextField
@@ -339,9 +332,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
               margin="normal"
               required
             />
-            <Box
-              sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}
-            >
+            <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
               <Button
                 variant="contained"
                 onClick={proceedToTypeSelection}
@@ -359,46 +350,56 @@ const OrganizationOnboardingCreation: React.FC = () => {
               Which features do you need more?
             </Typography>
 
-           <Grid container spacing={4}>
-            <Grid item xs={12} md={6} onClick={() => selectOrganizationType("PERSONAL")}>
-              <Paper elevation={3} sx={{ padding: 3 }}>
-                <Typography variant="h5" align="center" gutterBottom>
-                  For makers
-                </Typography>
-                <Box
-                  component="img"
-                  src="/makers.jpg"
-                  alt="For makers"
-                  sx={{
-                    width: '100%',
-                    height: 200,
-                    objectFit: 'cover',
-                    borderRadius: 1,
-                  }}
-                />
-              </Paper>
+            <Grid container spacing={4}>
+              <Grid
+                item
+                xs={12}
+                md={6}
+                onClick={() => selectOrganizationType("PERSONAL")}
+              >
+                <Paper elevation={3} sx={{ padding: 3 }}>
+                  <Typography variant="h5" align="center" gutterBottom>
+                    For makers
+                  </Typography>
+                  <Box
+                    component="img"
+                    src="/makers.jpg"
+                    alt="For makers"
+                    sx={{
+                      width: "100%",
+                      height: 200,
+                      objectFit: "cover",
+                      borderRadius: 1,
+                    }}
+                  />
+                </Paper>
+              </Grid>
+
+              <Grid
+                item
+                xs={12}
+                md={6}
+                onClick={() => selectOrganizationType("ENTREPRISE")}
+              >
+                <Paper elevation={3} sx={{ padding: 3 }}>
+                  <Typography variant="h5" align="center" gutterBottom>
+                    For businesses
+                  </Typography>
+                  <Box
+                    component="img"
+                    src="/businesses.jpg"
+                    alt="For businesses"
+                    sx={{
+                      width: "100%",
+                      height: 200,
+                      objectFit: "cover",
+                      borderRadius: 1,
+                    }}
+                  />
+                </Paper>
+              </Grid>
             </Grid>
 
-  <Grid item xs={12} md={6} onClick={() => selectOrganizationType("ENTREPRISE")}>
-    <Paper elevation={3} sx={{ padding: 3 }}>
-      <Typography variant="h5" align="center" gutterBottom>
-        For businesses
-      </Typography>
-      <Box
-        component="img"
-        src="/businesses.jpg"
-        alt="For businesses"
-        sx={{
-          width: '100%',
-          height: 200,
-          objectFit: 'cover',
-          borderRadius: 1,
-        }}
-      />
-    </Paper>
-  </Grid>
-</Grid>
-            
             <Box
               sx={{ mt: 4, display: "flex", justifyContent: "space-between" }}
             >

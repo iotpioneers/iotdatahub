@@ -1,12 +1,9 @@
-import React, { memo, useCallback, useMemo } from "react";
-import {
-  Image as ImageIcon,
-  Volume2,
-  PlaySquare,
-  Minus,
-  Plus,
-} from "lucide-react";
-import { WidgetType } from "@/types/widgets";
+"use client";
+
+import type React from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { ImageIcon, Volume2, PlaySquare, Minus, Plus } from "lucide-react";
+import type { WidgetType } from "@/types/widgets";
 import { cn } from "@/lib/utils";
 import DeviceMap from "@/app/(account)/dashboard/devices/_components/DeviceMap";
 
@@ -34,6 +31,7 @@ import {
 import GaugeWidgetComponent from "../../charts/GaugeWidget";
 
 interface BaseWidgetProps {
+  widgetId: string;
   value?: any;
   onChange?: (value: any) => void;
   settings?: {
@@ -49,23 +47,39 @@ interface BaseWidgetProps {
   deviceId?: string;
   pinNumber?: number;
 }
-
 export const SwitchWidget: React.FC<BaseWidgetProps> = memo(
-  ({
-    value = true,
-    onChange,
-    className,
-    deviceId: deviceAuthToken,
-    pinNumber,
-  }) => {
+  ({ value = "0", onChange, className, deviceId, pinNumber, widgetId }) => {
+    // Local state to track the current switch value
+    const [localValue, setLocalValue] = useState(value);
+
+    // Effect to sync local state with prop changes
+    useEffect(() => {
+      setLocalValue(value);
+    }, [value]);
+
+    // Normalize value to check if it's "on" - handles both string and number formats
+    const isOn = localValue === "1" || localValue === 1;
+
     const handleToggle = useCallback(async () => {
-      const newValue = !value;
+      // Toggle the value, maintaining the same type as the input
+      const newValue = isOn
+        ? typeof localValue === "string"
+          ? "0"
+          : 0
+        : typeof localValue === "string"
+          ? "1"
+          : 1;
+
+      // Update local state immediately for responsive UI
+      setLocalValue(newValue);
+
+      // Notify parent component of the change
       onChange?.(newValue);
 
-      if (deviceAuthToken && pinNumber !== undefined) {
+      if (deviceId && pinNumber !== undefined) {
         try {
           const response = await fetch(
-            `/api/devices/${deviceAuthToken}/send-command`,
+            `/api/devices/${deviceId}/send-command`,
             {
               method: "POST",
               headers: {
@@ -73,33 +87,28 @@ export const SwitchWidget: React.FC<BaseWidgetProps> = memo(
               },
               body: JSON.stringify({
                 pin: pinNumber,
-                value: newValue ? 1 : 0,
+                value:
+                  typeof newValue === "string" ? parseInt(newValue) : newValue,
+                command: "SET_PIN",
+                widgetId: widgetId,
               }),
             },
           );
-
           if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.error || `HTTP ${response.status}`);
           }
-
           const result = await response.json();
-
           if (!result.success) {
             throw new Error(result.error || "Command failed");
           }
-
-          console.log("Hardware command sent successfully:", result);
         } catch (error) {
-          // Revert the change if the API call fails
-          onChange?.(value);
-          console.error("Failed to update hardware:", error);
-
-          // Optional: Show user-friendly error message
-          // You might want to add a toast notification here
+          // Revert both local state and notify parent on error
+          setLocalValue(localValue);
+          onChange?.(localValue);
         }
       }
-    }, [value, onChange, deviceAuthToken, pinNumber]);
+    }, [localValue, onChange, deviceId, pinNumber, widgetId, isOn]);
 
     return (
       <div
@@ -111,12 +120,12 @@ export const SwitchWidget: React.FC<BaseWidgetProps> = memo(
       >
         <div
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
-            value ? "bg-green-500" : "bg-gray-300"
+            isOn ? "bg-green-500" : "bg-gray-300"
           }`}
         >
           <span
             className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
-              value ? "translate-x-6" : "translate-x-1"
+              isOn ? "translate-x-6" : "translate-x-1"
             }`}
           />
         </div>
@@ -126,16 +135,81 @@ export const SwitchWidget: React.FC<BaseWidgetProps> = memo(
 );
 
 export const SliderWidget: React.FC<BaseWidgetProps> = memo(
-  ({ value = 5, onChange, settings, className }) => {
+  ({
+    value = 5,
+    onChange,
+    settings,
+    className,
+    deviceId,
+    pinNumber,
+    widgetId,
+  }) => {
+    // Local state to track the current slider value
+    const [localValue, setLocalValue] = useState(value);
+
+    // Effect to sync local state with prop changes
+    useEffect(() => {
+      setLocalValue(value);
+    }, [value]);
+
     const min = settings?.min || 0;
     const max = settings?.max || 10;
+    const percentage = ((localValue - min) / (max - min)) * 100;
 
     const handleValueChange = useCallback(
-      (newValue: number[]) => {
-        onChange?.(newValue[0]);
+      async (newValue: number) => {
+        // Update local state immediately for responsive UI
+        setLocalValue(newValue);
+
+        // Notify parent component of the change
+        onChange?.(newValue);
+
+        if (deviceId && pinNumber !== undefined) {
+          try {
+            const response = await fetch(
+              `/api/devices/${deviceId}/send-command`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  pin: pinNumber,
+                  value: newValue,
+                  command: "SET_ANALOG",
+                  widgetId: widgetId,
+                }),
+              },
+            );
+
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (!result.success) {
+              throw new Error(result.error || "Command failed");
+            }
+          } catch (error) {
+            // Revert both local state and notify parent on error
+            setLocalValue(localValue);
+            onChange?.(localValue);
+            throw new Error("[v0] Failed to update slider hardware");
+          }
+        }
       },
-      [onChange],
+      [localValue, onChange, deviceId, pinNumber, widgetId],
     );
+
+    const handleDecrement = useCallback(() => {
+      const newValue = Math.max(min, localValue - 1);
+      handleValueChange(newValue);
+    }, [localValue, min, handleValueChange]);
+
+    const handleIncrement = useCallback(() => {
+      const newValue = Math.min(max, localValue + 1);
+      handleValueChange(newValue);
+    }, [localValue, max, handleValueChange]);
 
     return (
       <div
@@ -144,38 +218,102 @@ export const SliderWidget: React.FC<BaseWidgetProps> = memo(
           className,
         )}
       >
-        <span className="text-teal-500 text-sm">−</span>
+        <span
+          className="text-teal-500 text-sm cursor-pointer hover:text-teal-600"
+          onClick={handleDecrement}
+        >
+          −
+        </span>
         <div className="flex-1 mx-2 relative">
           <div className="h-1 bg-gray-200 rounded-full">
             <div
-              className="h-1 bg-teal-500 rounded-full"
-              style={{ width: `50%` }}
+              className="h-1 bg-teal-500 rounded-full transition-all duration-200"
+              style={{ width: `${percentage}%` }}
             />
           </div>
           <div
-            className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-teal-500 rounded-full"
+            className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-teal-500 rounded-full transition-all duration-200"
             style={{
-              left: `50%`,
+              left: `${percentage}%`,
               transform: "translate(-50%, -50%)",
             }}
           />
         </div>
-        <span className="text-teal-500 text-sm">+</span>
-        <span className="text-gray-600 text-sm ml-2">5</span>
+        <span
+          className="text-teal-500 text-sm cursor-pointer hover:text-teal-600"
+          onClick={handleIncrement}
+        >
+          +
+        </span>
+        <span className="text-gray-600 text-sm ml-2">
+          {localValue < (settings?.max || Number.MAX_VALUE)
+            ? localValue
+            : settings?.max || Number.MAX_VALUE}
+        </span>
       </div>
     );
   },
 );
 
 export const NumberInputWidget: React.FC<BaseWidgetProps> = memo(
-  ({ value = 0, onChange, className }) => {
+  ({ value = 0, onChange, className, deviceId, pinNumber, widgetId }) => {
+    // Local state to track the current number value
+    const [localValue, setLocalValue] = useState(value);
+
+    // Effect to sync local state with prop changes
+    useEffect(() => {
+      setLocalValue(value);
+    }, [value]);
+
+    const sendCommand = useCallback(
+      async (newValue: number) => {
+        if (deviceId && pinNumber !== undefined) {
+          try {
+            const response = await fetch(
+              `/api/devices/${deviceId}/send-command`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  pin: pinNumber,
+                  value: newValue,
+                  command: "SET_VALUE",
+                  widgetId: widgetId,
+                }),
+              },
+            );
+
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (!result.success) {
+              throw new Error(result.error || "Command failed");
+            }
+          } catch (error) {
+            throw new Error("[v0] Failed to update number input hardware");
+          }
+        }
+      },
+      [deviceId, pinNumber, widgetId],
+    );
+
     const decrement = useCallback(() => {
-      onChange?.(Number(value) - 1);
-    }, [value, onChange]);
+      const newValue = Number(localValue) - 1;
+      setLocalValue(newValue);
+      onChange?.(newValue);
+      sendCommand(newValue);
+    }, [localValue, onChange, sendCommand]);
 
     const increment = useCallback(() => {
-      onChange?.(Number(value) + 1);
-    }, [value, onChange]);
+      const newValue = Number(localValue) + 1;
+      setLocalValue(newValue);
+      onChange?.(newValue);
+      sendCommand(newValue);
+    }, [localValue, onChange, sendCommand]);
 
     return (
       <div
@@ -200,7 +338,7 @@ export const NumberInputWidget: React.FC<BaseWidgetProps> = memo(
           className="font-light text-gray-700 text-center flex-1"
           style={{ fontSize: "clamp(16px, 6vw, 24px)" }}
         >
-          {value}
+          {localValue}
         </Label>
         <Button
           variant="ghost"
@@ -252,7 +390,7 @@ export const GaugeWidget: React.FC<BaseWidgetProps> = memo(
     return (
       <div
         className={cn(
-          "flex flex-col items-center justify-center h-full w-full",
+          "flex flex-col items-center justify-center h-full w-full p-2",
           className,
         )}
       >
@@ -261,7 +399,7 @@ export const GaugeWidget: React.FC<BaseWidgetProps> = memo(
             chartData={[
               {
                 id: "gauge-circle",
-                value,
+                value: value <= min ? min : value > max ? max : value,
                 timestamp: Date.now().toString(),
               },
             ]}
@@ -275,6 +413,8 @@ export const GaugeWidget: React.FC<BaseWidgetProps> = memo(
 
 export const RadialGaugeWidget: React.FC<BaseWidgetProps> = memo(
   ({ value = 42, settings, className }) => {
+    const min = settings?.min || 0;
+    const max = settings?.max || 100;
     return (
       <div
         className={cn(
@@ -285,7 +425,11 @@ export const RadialGaugeWidget: React.FC<BaseWidgetProps> = memo(
         <div className="relative w-full h-full flex items-center justify-center">
           <GaugeWidgetComponent
             chartData={[
-              { id: "gauge", value, timestamp: Date.now().toString() },
+              {
+                id: "gauge",
+                value: value <= min ? min : value > max ? max : value,
+                timestamp: Date.now().toString(),
+              },
             ]}
           />
         </div>
@@ -295,30 +439,67 @@ export const RadialGaugeWidget: React.FC<BaseWidgetProps> = memo(
 );
 
 export const ImageButtonWidget: React.FC<BaseWidgetProps> = memo(
-  ({ className, onChange }) => (
-    <div
-      className={cn(
-        "flex items-center justify-center h-full w-full p-[4%]",
-        className,
-      )}
-    >
-      <Button
-        variant="outline"
-        size="icon"
-        className="border-teal-400 hover:bg-teal-50 transition-colors p-0"
-        style={{
-          width: "clamp(72px, 60%, 192px)",
-          height: "clamp(72px, 60%, 192px)",
-        }}
-        onClick={() => onChange?.(true)}
+  ({ className, onChange, deviceId, pinNumber, widgetId }) => {
+    const handleClick = useCallback(async () => {
+      onChange?.(true);
+
+      if (deviceId && pinNumber !== undefined) {
+        try {
+          const response = await fetch(
+            `/api/devices/${deviceId}/send-command`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                pin: pinNumber,
+                value: 1,
+                command: "SET_PIN",
+                widgetId: widgetId,
+              }),
+            },
+          );
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const result = await response.json();
+          if (!result.success) {
+            throw new Error(result.error || "Command failed");
+          }
+        } catch (error) {
+          console.error("[v0] Failed to update image button hardware:", error);
+        }
+      }
+    }, [onChange, deviceId, pinNumber, widgetId]);
+
+    return (
+      <div
+        className={cn(
+          "flex items-center justify-center h-full w-full p-[4%]",
+          className,
+        )}
       >
-        <ImageIcon
-          style={{ width: "50%", height: "50%" }}
-          className="text-teal-400"
-        />
-      </Button>
-    </div>
-  ),
+        <Button
+          variant="outline"
+          size="icon"
+          className="border-teal-400 hover:bg-teal-50 transition-colors p-0 bg-transparent"
+          style={{
+            width: "clamp(72px, 60%, 192px)",
+            height: "clamp(72px, 60%, 192px)",
+          }}
+          onClick={handleClick}
+        >
+          <ImageIcon
+            style={{ width: "50%", height: "50%" }}
+            className="text-teal-400"
+          />
+        </Button>
+      </div>
+    );
+  },
 );
 
 export const VideoWidget: React.FC<BaseWidgetProps> = memo(({ className }) => (
@@ -522,25 +703,104 @@ export const ChartWidget: React.FC<BaseWidgetProps> = memo(
 );
 
 export const LedWidget: React.FC<BaseWidgetProps> = memo(
-  ({ value = true, className }) => (
-    <div
-      className={cn(
-        "flex items-center justify-center h-full w-full p-[4%]",
-        className,
-      )}
-    >
+  ({ value = true, onChange, className, deviceId, pinNumber, widgetId }) => {
+    // Local state to track the current LED value
+    const [localValue, setLocalValue] = useState(value);
+
+    // Effect to sync local state with prop changes
+    useEffect(() => {
+      setLocalValue(value);
+    }, [value]);
+
+    // Normalize value to boolean - handles boolean, string, and number formats
+    const isOn = useMemo(() => {
+      if (typeof localValue === "boolean") return localValue;
+      if (typeof localValue === "string")
+        return localValue === "1" || localValue.toLowerCase() === "true";
+      if (typeof localValue === "number") return localValue !== 0;
+      return false;
+    }, [localValue]);
+
+    const handleToggle = useCallback(async () => {
+      // Toggle the value, maintaining the same type as the input
+      let newValue: any;
+
+      if (typeof localValue === "boolean") {
+        newValue = !localValue;
+      } else if (typeof localValue === "string") {
+        newValue = isOn ? "0" : "1";
+      } else if (typeof localValue === "number") {
+        newValue = isOn ? 0 : 1;
+      } else {
+        newValue = !isOn;
+      }
+
+      // Update local state immediately for responsive UI
+      setLocalValue(newValue);
+
+      // Notify parent component of the change
+      onChange?.(newValue);
+
+      if (deviceId && pinNumber !== undefined) {
+        try {
+          // Convert to numeric value for the API call
+          const numericValue = isOn ? 0 : 1;
+
+          const response = await fetch(
+            `/api/devices/${deviceId}/send-command`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                pin: pinNumber,
+                value: numericValue,
+                command: "SET_PIN",
+                widgetId: widgetId,
+              }),
+            },
+          );
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP ${response.status}`);
+          }
+
+          const result = await response.json();
+          if (!result.success) {
+            throw new Error(result.error || "Command failed");
+          }
+        } catch (error) {
+          // Revert both local state and notify parent on error
+          setLocalValue(localValue);
+          onChange?.(localValue);
+          console.error("[v0] Failed to update LED hardware:", error);
+        }
+      }
+    }, [localValue, onChange, deviceId, pinNumber, widgetId, isOn]);
+
+    return (
       <div
         className={cn(
-          "rounded-full transition-all duration-300",
-          value ? "bg-green-500 shadow-md shadow-green-500/50" : "bg-gray-300",
+          "flex items-center justify-center h-full w-full p-[4%] cursor-pointer",
+          className,
         )}
-        style={{
-          width: "clamp(24px, 25%, 80px)",
-          height: "clamp(24px, 25%, 80px)",
-        }}
-      />
-    </div>
-  ),
+        onClick={handleToggle}
+      >
+        <div
+          className={cn(
+            "rounded-full transition-all duration-300",
+            isOn ? "bg-green-500 shadow-md shadow-green-500/50" : "bg-gray-300",
+          )}
+          style={{
+            width: "clamp(24px, 25%, 80px)",
+            height: "clamp(24px, 25%, 80px)",
+          }}
+        />
+      </div>
+    );
+  },
 );
 
 export const AlarmSoundWidget: React.FC<BaseWidgetProps> = memo(
@@ -595,32 +855,148 @@ export const TerminalWidget: React.FC<BaseWidgetProps> = memo(
 );
 
 export const TextInputWidget: React.FC<BaseWidgetProps> = memo(
-  ({ value = "Zero", onChange, className }) => (
-    <div
-      className={cn(
-        "flex items-center justify-center h-full w-full p-[4%]",
-        className,
-      )}
-    >
-      <Input
-        type="text"
-        placeholder="Zero"
-        value={value}
-        onChange={(e) => onChange?.(e.target.value)}
-        className="w-full border border-gray-300"
-        style={{
-          height: "clamp(32px, 15%, 64px)",
-          fontSize: "clamp(14px, 5vw, 20px)",
-          padding: "0 clamp(8px, 4%, 16px)",
-        }}
-      />
-    </div>
-  ),
+  ({ value = "Zero", onChange, className, deviceId, pinNumber, widgetId }) => {
+    // Local state to track the current text value
+    const [localValue, setLocalValue] = useState(value);
+
+    // Effect to sync local state with prop changes
+    useEffect(() => {
+      setLocalValue(value);
+    }, [value]);
+
+    const handleInputChange = useCallback(
+      async (newValue: string) => {
+        // Update local state immediately for responsive UI
+        setLocalValue(newValue);
+
+        // Notify parent component of the change
+        onChange?.(newValue);
+
+        if (deviceId && pinNumber !== undefined) {
+          try {
+            const response = await fetch(
+              `/api/devices/${deviceId}/send-command`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  pin: pinNumber,
+                  value: newValue,
+                  command: "SET_TEXT",
+                  widgetId: widgetId,
+                }),
+              },
+            );
+
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (!result.success) {
+              throw new Error(result.error || "Command failed");
+            }
+          } catch (error) {
+            // Revert both local state and notify parent on error
+            setLocalValue(value);
+            onChange?.(value);
+            throw new Error("[v0] Failed to update text input hardware");
+          }
+        }
+      },
+      [localValue, onChange, deviceId, pinNumber, widgetId, value],
+    );
+
+    return (
+      <div
+        className={cn(
+          "flex items-center justify-center h-full w-full p-[4%]",
+          className,
+        )}
+      >
+        <Input
+          type="text"
+          placeholder="Zero"
+          value={localValue}
+          onChange={(e) => handleInputChange(e.target.value)}
+          className="w-full border border-gray-300"
+          style={{
+            height: "clamp(32px, 15%, 64px)",
+            fontSize: "clamp(14px, 5vw, 20px)",
+            padding: "0 clamp(8px, 4%, 16px)",
+          }}
+        />
+      </div>
+    );
+  },
 );
 
 export const SegmentedSwitchWidget: React.FC<BaseWidgetProps> = memo(
-  ({ value = 0, onChange, settings, className }) => {
+  ({
+    value = 0,
+    onChange,
+    settings,
+    className,
+    deviceId,
+    pinNumber,
+    widgetId,
+  }) => {
+    // Local state to track the current selected option
+    const [localValue, setLocalValue] = useState(value);
+
+    // Effect to sync local state with prop changes
+    useEffect(() => {
+      setLocalValue(value);
+    }, [value]);
+
     const options = settings?.options || ["Zero", "One"];
+
+    const handleOptionChange = useCallback(
+      async (newValue: number) => {
+        // Update local state immediately for responsive UI
+        setLocalValue(newValue);
+
+        // Notify parent component of the change
+        onChange?.(newValue);
+
+        if (deviceId && pinNumber !== undefined) {
+          try {
+            const response = await fetch(
+              `/api/devices/${deviceId}/send-command`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  pin: pinNumber,
+                  value: newValue,
+                  command: "SET_OPTION",
+                  widgetId: widgetId,
+                }),
+              },
+            );
+
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (!result.success) {
+              throw new Error(result.error || "Command failed");
+            }
+          } catch (error) {
+            // Revert both local state and notify parent on error
+            setLocalValue(value);
+            onChange?.(value);
+            throw new Error("[v0] Failed to update segmented switch hardware");
+          }
+        }
+      },
+      [localValue, onChange, deviceId, pinNumber, widgetId, value],
+    );
 
     return (
       <div
@@ -637,7 +1013,7 @@ export const SegmentedSwitchWidget: React.FC<BaseWidgetProps> = memo(
               size="sm"
               className={cn(
                 "flex-1 h-full rounded-none transition-all duration-200",
-                value === index
+                localValue === index
                   ? "bg-green-500 text-white hover:bg-green-600"
                   : "text-gray-700 hover:bg-gray-200",
               )}
@@ -645,7 +1021,7 @@ export const SegmentedSwitchWidget: React.FC<BaseWidgetProps> = memo(
                 fontSize: "clamp(8px, 2.5vw, 14px)",
                 padding: "0 clamp(2px, 1%, 8px)",
               }}
-              onClick={() => onChange?.(index)}
+              onClick={() => handleOptionChange(index)}
             >
               {option}
             </Button>
@@ -657,8 +1033,69 @@ export const SegmentedSwitchWidget: React.FC<BaseWidgetProps> = memo(
 );
 
 export const MenuWidget: React.FC<BaseWidgetProps> = memo(
-  ({ value = "Zero", onChange, settings, className }) => {
+  ({
+    value = "Zero",
+    onChange,
+    settings,
+    className,
+    deviceId,
+    pinNumber,
+    widgetId,
+  }) => {
+    // Local state to track the current selected value
+    const [localValue, setLocalValue] = useState(value);
+
+    // Effect to sync local state with prop changes
+    useEffect(() => {
+      setLocalValue(value);
+    }, [value]);
+
     const options = settings?.options || ["Zero", "One", "Two"];
+
+    const handleMenuChange = useCallback(
+      async (newValue: string) => {
+        // Update local state immediately for responsive UI
+        setLocalValue(newValue);
+
+        // Notify parent component of the change
+        onChange?.(newValue);
+
+        if (deviceId && pinNumber !== undefined) {
+          try {
+            const response = await fetch(
+              `/api/devices/${deviceId}/send-command`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  pin: pinNumber,
+                  value: newValue,
+                  command: "SET_MENU",
+                  widgetId: widgetId,
+                }),
+              },
+            );
+
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (!result.success) {
+              throw new Error(result.error || "Command failed");
+            }
+          } catch (error) {
+            // Revert both local state and notify parent on error
+            setLocalValue(value);
+            onChange?.(value);
+            throw new Error("[v0] Failed to update menu hardware");
+          }
+        }
+      },
+      [localValue, onChange, deviceId, pinNumber, widgetId, value],
+    );
 
     return (
       <div
@@ -667,7 +1104,7 @@ export const MenuWidget: React.FC<BaseWidgetProps> = memo(
           className,
         )}
       >
-        <Select value={value} onValueChange={onChange}>
+        <Select value={localValue} onValueChange={handleMenuChange}>
           <SelectTrigger
             className="w-full border border-gray-300"
             style={{
@@ -731,7 +1168,6 @@ export const ModulesWidget: React.FC<BaseWidgetProps> = memo(
   ),
 );
 
-// Widget Registry with memoized components
 const components: Record<WidgetType, React.FC<BaseWidgetProps>> = {
   switch: SwitchWidget,
   slider: SliderWidget,
@@ -757,7 +1193,6 @@ const components: Record<WidgetType, React.FC<BaseWidgetProps>> = {
   modules: ModulesWidget,
 };
 
-// Memoized registry component
 export default memo(function WidgetRegistry({
   type,
   className,
@@ -767,7 +1202,6 @@ export default memo(function WidgetRegistry({
   return <Component className={className} {...props} />;
 });
 
-// Set display names for better debugging
 SwitchWidget.displayName = "SwitchWidget";
 SliderWidget.displayName = "SliderWidget";
 NumberInputWidget.displayName = "NumberInputWidget";

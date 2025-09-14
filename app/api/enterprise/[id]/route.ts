@@ -5,14 +5,14 @@ import { getToken } from "next-auth/jwt";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const token = await getToken({ req: request });
 
   if (!token) {
     return NextResponse.json(
       { error: "You must be logged in" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -27,7 +27,7 @@ export async function GET(
   if (!organization) {
     return NextResponse.json(
       { error: "Organization not found" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -36,7 +36,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const token = await getToken({ req: request });
@@ -45,7 +45,7 @@ export async function PUT(
     if (!token) {
       return NextResponse.json(
         { error: "You must be logged in" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -54,7 +54,7 @@ export async function PUT(
     if (!validation.success) {
       return NextResponse.json(
         { error: validation.error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -76,7 +76,7 @@ export async function PUT(
     if (!organization) {
       return NextResponse.json(
         { error: "Organization not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -96,17 +96,16 @@ export async function PUT(
 
     return NextResponse.json(updatedOrganization);
   } catch (error) {
-    console.error("Update enterprise error:", error);
     return NextResponse.json(
       { error: "Error updating enterprise information" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const token = await getToken({ req: request });
@@ -114,7 +113,7 @@ export async function DELETE(
     if (!token) {
       return NextResponse.json(
         { error: "You must be logged in" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -125,7 +124,7 @@ export async function DELETE(
     if (!organization) {
       return NextResponse.json(
         { error: "Organization not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -134,10 +133,9 @@ export async function DELETE(
       organization,
     });
   } catch (error) {
-    console.error("Delete enterprise error:", error);
     return NextResponse.json(
       { error: "Error deleting enterprise" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
