@@ -335,7 +335,7 @@ const DeviceDetails = ({ params }: Props) => {
         status === "unauthenticated" ||
         !session) && <LinearLoading />}
 
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-4">
+      <div className="bg-white rounded-lg shadow-sm p-1 mb-4">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">

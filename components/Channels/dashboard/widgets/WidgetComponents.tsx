@@ -783,21 +783,54 @@ export const LedWidget: React.FC<BaseWidgetProps> = memo(
     return (
       <div
         className={cn(
-          "flex items-center justify-center h-full w-full p-[4%] cursor-pointer",
+          "flex items-center justify-center h-full w-full cursor-pointer",
           className,
         )}
         onClick={handleToggle}
       >
+        {/* Compact LED - fits within widget bounds */}
         <div
           className={cn(
-            "rounded-full transition-all duration-300",
-            isOn ? "bg-green-500 shadow-md shadow-green-500/50" : "bg-gray-300",
+            "rounded-full transition-all duration-300 relative",
+            "w-10 h-10", // Fixed small size
+            "bg-gradient-to-br from-gray-300 to-gray-500",
+            "shadow-inner",
+            "p-0.5",
           )}
-          style={{
-            width: "clamp(24px, 25%, 80px)",
-            height: "clamp(24px, 25%, 80px)",
-          }}
-        />
+        >
+          {/* LED Core */}
+          <div
+            className={cn(
+              "rounded-full w-full h-full transition-all duration-300 relative",
+              isOn
+                ? "bg-gradient-to-br from-green-400 to-green-700"
+                : "bg-gradient-to-br from-gray-400 to-gray-600",
+            )}
+            style={{
+              boxShadow: isOn
+                ? `
+                  0 0 4px rgba(34, 197, 94, 0.8),
+                  0 0 8px rgba(34, 197, 94, 0.4),
+                  inset 0 0.5px 1px rgba(255, 255, 255, 0.4),
+                  inset 0 -1px 2px rgba(0, 0, 0, 0.2)
+                `
+                : `
+                  inset 0 1px 2px rgba(0, 0, 0, 0.3),
+                  inset 0 -0.5px 1px rgba(255, 255, 255, 0.1)
+                `,
+            }}
+          >
+            {/* Small highlight */}
+            <div
+              className="absolute top-1 left-1 w-2 h-2 rounded-full"
+              style={{
+                background: isOn
+                  ? "radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2))"
+                  : "radial-gradient(circle, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1))",
+              }}
+            />
+          </div>
+        </div>
       </div>
     );
   },

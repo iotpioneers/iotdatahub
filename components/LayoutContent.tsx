@@ -63,7 +63,7 @@ export default function LayoutContent({
         {/* Main content */}
         <Theme>
           <main className="flex-1 overflow-y-auto overflow-x-hidden w-full bg-white dark:bg-gray-900">
-            <div className="p-4 sm:p-6 lg:p-8 min-h-full">
+            <div className="p-1 min-h-full">
               <div className="max-w-full">
                 <ToastProvider>{children}</ToastProvider>
               </div>

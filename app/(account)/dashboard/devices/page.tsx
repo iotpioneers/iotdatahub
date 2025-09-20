@@ -7,7 +7,7 @@ const DeviceListingsPage = async () => {
   return (
     <Suspense
       fallback={
-        <div className="w-full pt-5">
+        <div className="w-full">
           <div className="mb-4">
             <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse mb-2" />
           </div>

@@ -12,7 +12,11 @@ const config_1 = __importDefault(require("./config"));
 const logger_1 = __importDefault(require("./logger"));
 function createAPIServer(deviceManager, protocolHandler, deviceCache) {
     const app = (0, express_1.default)();
-    app.use((0, cors_1.default)());
+    app.use((0, cors_1.default)({
+        origin: "*",
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+    }));
     app.use(express_1.default.json());
     const wsManager = new websocketManager_1.default(deviceCache);
     // Middleware to validate device token
@@ -24,7 +28,7 @@ function createAPIServer(deviceManager, protocolHandler, deviceCache) {
                 .json({ error: "Device token is required" });
             return;
         }
-        const device = deviceManager.getDevice(deviceToken);
+        let device = deviceManager.getDevice(deviceToken);
         if (!device) {
             res.status(404).json({
                 error: "Device not found or not connected",
