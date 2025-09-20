@@ -53,7 +53,22 @@ export const useWebSocket = ({
 
     try {
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-      const wsUrl = `${protocol}//localhost:${config.apiPort}/api/ws`;
+
+      // FIXED: Use the same host as the current page instead of hardcoded localhost
+      let wsHost = window.location.hostname;
+      let wsPort = config.apiPort;
+
+      // For development, detect if we're on localhost and use the config port
+      if (wsHost === "localhost" || wsHost === "127.0.0.1") {
+        wsPort = config.apiPort;
+      } else {
+        // For production, you might need to adjust the port based on your setup
+        // If your WebSocket server runs on a different port in production:
+        wsPort = window.location.protocol === "https:" ? 443 : 80;
+      }
+
+      const wsUrl = `${protocol}//${wsHost}:${wsPort}/api/ws`;
+      console.log("Connecting to WebSocket:", wsUrl); // Debug log
 
       wsRef.current = new WebSocket(wsUrl);
 
@@ -142,7 +157,7 @@ export const useWebSocket = ({
       };
 
       wsRef.current.onerror = (error) => {
-        setError("WebSocket connection error");
+        setError(`WebSocket connection error: ${wsUrl}`);
       };
     } catch (err) {
       setError("Failed to create WebSocket connection");

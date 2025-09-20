@@ -34,17 +34,23 @@ function createTCPServer(deviceManager, protocolHandler) {
     return { iotServer, iotSSLServer };
 }
 function startTCPServers(iotServer, iotSSLServer) {
-    // Start servers
-    iotServer.listen(config_1.default.iotPort, (err) => {
+    // FIXED: Bind to all interfaces (0.0.0.0) instead of localhost
+    iotServer.listen(config_1.default.iotPort, "0.0.0.0", (err) => {
         if (err)
             throw err;
-        logger_1.default.info("TCP server started", { port: config_1.default.iotPort });
+        logger_1.default.info("TCP server started on all interfaces", {
+            port: config_1.default.iotPort,
+            host: "0.0.0.0",
+        });
     });
     if (iotSSLServer) {
-        iotSSLServer.listen(config_1.default.iotSSLPort, (err) => {
+        iotSSLServer.listen(config_1.default.iotSSLPort, "0.0.0.0", (err) => {
             if (err)
                 throw err;
-            logger_1.default.info("SSL server started", { port: config_1.default.iotSSLPort });
+            logger_1.default.info("SSL server started on all interfaces", {
+                port: config_1.default.iotSSLPort,
+                host: "0.0.0.0",
+            });
         });
     }
     else {

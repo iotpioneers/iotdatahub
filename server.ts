@@ -44,13 +44,13 @@ const { iotServer, iotSSLServer } = createTCPServer(
 // Start TCP servers (for IoT devices)
 startTCPServers(iotServer, iotSSLServer);
 
-// Start HTTP server with WebSocket support (for dashboard)
-httpServer.listen(config.apiPort, () => {
+// FIXED: Start HTTP server with WebSocket support (for dashboard) - bind to all interfaces
+httpServer.listen(config.apiPort, "0.0.0.0", () => {
   logger.info(`
 ====================================
 🚀 Enhanced Hardware Command API + WebSocket Server running on port ${config.apiPort}
-📡 WebSocket endpoint: ws://localhost:${config.apiPort}/api/ws
-📱 TCP IoT Server running on port ${config.iotPort}
+📡 WebSocket endpoint: ws://0.0.0.0:${config.apiPort}/api/ws
+📱 TCP IoT Server running on port ${config.iotPort} (all interfaces)
 ====================================
 `);
 });

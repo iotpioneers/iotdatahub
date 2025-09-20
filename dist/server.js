@@ -29,13 +29,13 @@ wsManager.initialize(httpServer);
 const { iotServer, iotSSLServer } = (0, tcpServer_1.createTCPServer)(deviceManager, protocolHandler);
 // Start TCP servers (for IoT devices)
 (0, tcpServer_1.startTCPServers)(iotServer, iotSSLServer);
-// Start HTTP server with WebSocket support (for dashboard)
-httpServer.listen(config_1.default.apiPort, () => {
+// FIXED: Start HTTP server with WebSocket support (for dashboard) - bind to all interfaces
+httpServer.listen(config_1.default.apiPort, "0.0.0.0", () => {
     logger_1.default.info(`
 ====================================
 🚀 Enhanced Hardware Command API + WebSocket Server running on port ${config_1.default.apiPort}
-📡 WebSocket endpoint: ws://localhost:${config_1.default.apiPort}/api/ws
-📱 TCP IoT Server running on port ${config_1.default.iotPort}
+📡 WebSocket endpoint: ws://0.0.0.0:${config_1.default.apiPort}/api/ws
+📱 TCP IoT Server running on port ${config_1.default.iotPort} (all interfaces)
 ====================================
 `);
 });
