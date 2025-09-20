@@ -45,16 +45,22 @@ function startTCPServers(
   iotServer: net.Server,
   iotSSLServer: tls.Server | null,
 ): ServerComponents {
-  // Start servers
-  iotServer.listen(config.iotPort, (err?: Error) => {
+  // FIXED: Bind to all interfaces (0.0.0.0) instead of localhost
+  iotServer.listen(config.iotPort, "0.0.0.0", (err?: Error) => {
     if (err) throw err;
-    logger.info("TCP server started", { port: config.iotPort });
+    logger.info("TCP server started on all interfaces", {
+      port: config.iotPort,
+      host: "0.0.0.0",
+    });
   });
 
   if (iotSSLServer) {
-    iotSSLServer.listen(config.iotSSLPort, (err?: Error) => {
+    iotSSLServer.listen(config.iotSSLPort, "0.0.0.0", (err?: Error) => {
       if (err) throw err;
-      logger.info("SSL server started", { port: config.iotSSLPort });
+      logger.info("SSL server started on all interfaces", {
+        port: config.iotSSLPort,
+        host: "0.0.0.0",
+      });
     });
   } else {
     logger.info("SSL server not started - certificates not found", {
