@@ -241,7 +241,20 @@ class SimpleProtocolHandler {
             // Check last activity
             const lastActivity = await this.deviceCache.getDeviceLastActivity(deviceToken);
             const now = new Date();
-            const timeSinceLastActivity = now.getTime() - (lastActivity?.getTime() || 0);
+            // Ensure we have a valid date object
+            let lastActivityTime = 0;
+            if (lastActivity) {
+                if (lastActivity instanceof Date) {
+                    lastActivityTime = lastActivity.getTime();
+                }
+                else if (typeof lastActivity === "string") {
+                    lastActivityTime = new Date(lastActivity).getTime();
+                }
+                else if (typeof lastActivity === "number") {
+                    lastActivityTime = lastActivity;
+                }
+            }
+            const timeSinceLastActivity = now.getTime() - lastActivityTime;
             if (timeSinceLastActivity > HEARTBEAT_TIMEOUT) {
                 await this.handleDeviceDisconnection(deviceToken);
                 clearInterval(heartbeatTimer);

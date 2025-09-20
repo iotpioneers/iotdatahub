@@ -18,7 +18,14 @@ function createAPIServer(
   deviceCache: DeviceCacheManager,
 ): Application {
   const app = express();
-  app.use(cors());
+  app.use(
+    cors({
+      origin: "*",
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+    }),
+  );
+
   app.use(express.json());
 
   const wsManager = new WebSocketManager(deviceCache);
@@ -37,7 +44,7 @@ function createAPIServer(
       return;
     }
 
-    const device = deviceManager.getDevice(deviceToken);
+    let device = deviceManager.getDevice(deviceToken);
     if (!device) {
       res.status(404).json({
         error: "Device not found or not connected",
