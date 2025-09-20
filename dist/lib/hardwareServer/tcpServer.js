@@ -19,8 +19,8 @@ function createTCPServer(deviceManager, protocolHandler) {
     });
     // Create SSL TCP server if certificates exist
     let iotSSLServer = null;
-    const sslCertPath = path_1.default.join(__dirname, "../../ssl/server.crt");
-    const sslKeyPath = path_1.default.join(__dirname, "../../ssl/server.key");
+    const sslCertPath = path_1.default.join(process.cwd(), "ssl", "server.crt");
+    const sslKeyPath = path_1.default.join(process.cwd(), "ssl", "server.key");
     if (fs_1.default.existsSync(sslCertPath) && fs_1.default.existsSync(sslKeyPath)) {
         const sslOptions = {
             key: fs_1.default.readFileSync(sslKeyPath),

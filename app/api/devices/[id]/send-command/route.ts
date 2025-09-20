@@ -100,8 +100,7 @@ export async function POST(
       return NextResponse.json(
         {
           success: false,
-          error:
-            "Failed to communicate with hardware API server. Make sure it's running on port 3001.",
+          error: "Failed to communicate with hardware API server.",
         },
         { status: 503 },
       );

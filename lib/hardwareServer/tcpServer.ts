@@ -23,8 +23,8 @@ function createTCPServer(
 
   // Create SSL TCP server if certificates exist
   let iotSSLServer: tls.Server | null = null;
-  const sslCertPath = path.join(__dirname, "../../ssl/server.crt");
-  const sslKeyPath = path.join(__dirname, "../../ssl/server.key");
+  const sslCertPath = path.join(process.cwd(), "ssl", "server.crt");
+  const sslKeyPath = path.join(process.cwd(), "ssl", "server.key");
 
   if (fs.existsSync(sslCertPath) && fs.existsSync(sslKeyPath)) {
     const sslOptions: SSLOptions = {
