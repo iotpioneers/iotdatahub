@@ -2,7 +2,10 @@ import type { Config } from "./types";
 
 const config: Config = {
   iotPort: parseInt(
-    process.env.IOT_PORT || process.env.IOT_PORT_ALTERNATIVE || "8080",
+    process.env.PORT ||
+      process.env.IOT_PORT ||
+      process.env.IOT_PORT_ALTERNATIVE ||
+      "7000",
     10,
   ),
   iotSSLPort: parseInt(process.env.IOT_SSL_PORT || "8443", 10),
