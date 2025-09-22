@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useGlobalState } from "@/context";
 import { IconLogout, IconSettings, IconUser } from "@tabler/icons-react";
-import UpgradePlanCardAlert from "@/components/sidebar/UpgradePlanCardAlert";
+import DownloadLibraryCard from "@/components/sidebar/DownloadLibraryCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -121,7 +121,7 @@ const ProfileSection = () => {
                 <div className="space-y-4">
                   {/* Upgrade Plan Card */}
                   <Card className="bg-primary/5">
-                    <UpgradePlanCardAlert />
+                    <DownloadLibraryCard />
                   </Card>
 
                   <Separator />

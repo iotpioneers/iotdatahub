@@ -22,6 +22,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import Image from "next/image";
+import UpgradePlanCardAlert from "./DownloadLibraryCard";
 
 interface SidebarLink {
   href: string;
@@ -289,6 +290,13 @@ function SideNavbar({ isMobileOpen = false, onMobileClose }: SideNavbarProps) {
             </ul>
           </nav>
         </ScrollArea>
+
+        {/* Download Library Card */}
+        {shouldShowFullContent && (
+          <div className="my-2">
+            <UpgradePlanCardAlert />
+          </div>
+        )}
 
         {/* Footer - User info or additional controls */}
         {shouldShowFullContent && (
