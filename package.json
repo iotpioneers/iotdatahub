@@ -7,7 +7,7 @@
     "start": "next start",
     "build": "npx prisma generate && next build",
     "dev:server": "nodemon --project tsconfig.server.json --exec ts-node server.ts",
-    "build:server": "tsc --project tsconfig.server.json",
+    "build:server": "npx prisma generate && tsc --project tsconfig.server.json",
     "start:server": "node dist/server.js",
     "dev:both": "concurrently \"next dev\" \"nodemon --project tsconfig.server.json --exec ts-node server.ts\"",
     "build:both": "npx prisma generate && next build && npm run build:server",
