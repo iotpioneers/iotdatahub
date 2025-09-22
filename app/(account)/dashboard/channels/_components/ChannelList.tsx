@@ -50,13 +50,15 @@ const ChannelList = () => {
         </div>
       )}
 
-      <Button
-        className="button bg-orange-50 hover:bg-black p-3 rounded-md gap-1 mb-2"
-        onClick={() => setModalOpen(true)}
-      >
-        <Image src="/icons/add.svg" alt="add" width={24} height={24} />
-        <p className="block text-white">Add New Channel</p>
-      </Button>
+      {!isLoading && (
+        <Button
+          className="button bg-orange-50 hover:bg-black p-3 rounded-md gap-1 mb-2"
+          onClick={() => setModalOpen(true)}
+        >
+          <Image src="/icons/add.svg" alt="add" width={24} height={24} />
+          <p className="block text-white">Add New Channel</p>
+        </Button>
+      )}
 
       <Suspense fallback={<TableSkeleton rows={6} columns={5} />}>
         {channels && channels.length > 0 && (

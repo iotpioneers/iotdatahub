@@ -20,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen overflow-hidden" suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <ClientRootLayout>
           <LoadingProvider>
             <CollaborationProvider>
