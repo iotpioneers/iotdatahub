@@ -9,7 +9,7 @@ import { ToastProvider } from "@/components/ui/toast-provider";
 
 const Sidebar = dynamic(() => import("@/components/sidebar/SideNavbar"), {
   loading: () => (
-    <aside className="h-full bg-white dark:bg-gray-800 shadow-md w-52 flex-shrink-0">
+    <aside className="h-full shadow-md w-52 flex-shrink-0">
       <div className="flex flex-col h-full">
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
@@ -43,33 +43,31 @@ export default function LayoutContent({
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-gray-50 dark:bg-gray-900">
-      {/* Single Sidebar - handles both desktop and mobile states */}
+    <div className="flex h-screen w-full">
+      {/* Fixed Sidebar - never scrolls */}
       <Sidebar
         isMobileOpen={isMobileMenuOpen}
         onMobileClose={handleMobileMenuClose}
       />
 
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        {/* Navbar */}
-        <div className="flex-shrink-0 z-30 relative">
+      {/* Main content area - contains fixed navbar and scrollable content */}
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+        {/* Fixed Navbar - never scrolls */}
+        <div className="flex-shrink-0 z-10">
           <Navbar
             onMobileMenuToggle={handleMobileMenuToggle}
             isMobileMenuOpen={isMobileMenuOpen}
           />
         </div>
 
-        {/* Main content */}
-        <Theme>
-          <main className="flex-1 overflow-y-auto overflow-x-hidden w-full bg-white dark:bg-gray-900">
-            <div className="p-1 min-h-full">
-              <div className="max-w-full">
-                <ToastProvider>{children}</ToastProvider>
-              </div>
-            </div>
-          </main>
-        </Theme>
+        {/* Scrollable content area - only this scrolls */}
+        <div className="flex-1 overflow-y-auto p-2">
+          <Theme>
+            <main className="min-h-full">
+              <ToastProvider>{children}</ToastProvider>
+            </main>
+          </Theme>
+        </div>
       </div>
     </div>
   );

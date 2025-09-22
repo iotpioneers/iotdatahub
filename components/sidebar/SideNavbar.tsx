@@ -11,7 +11,7 @@ import { AdminPanelSettingsOutlined } from "@mui/icons-material";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Settings, ChevronLeft, ChevronRight } from "lucide-react";
+import { Settings, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Tooltip,
@@ -22,7 +22,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import Image from "next/image";
-import UpgradePlanCardAlert from "./DownloadLibraryCard";
+import DownloadLibraryCard from "./DownloadLibraryCard";
 
 interface SidebarLink {
   href: string;
@@ -49,7 +49,7 @@ function SideNavbar({ isMobileOpen = false, onMobileClose }: SideNavbarProps) {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/auth/login");
+      router.push("/login");
     }
   }, [status, router]);
 
@@ -209,7 +209,7 @@ function SideNavbar({ isMobileOpen = false, onMobileClose }: SideNavbarProps) {
               className="md:hidden flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               aria-label="Close sidebar"
             >
-              ×
+              <X className="w-4 h-4" />
             </button>
           )}
         </div>
@@ -217,7 +217,7 @@ function SideNavbar({ isMobileOpen = false, onMobileClose }: SideNavbarProps) {
         {/* Navigation */}
         <ScrollArea className="flex-1 h-0">
           <nav className="p-3">
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               {links.map((link) => (
                 <li key={link.href}>
                   <Link
@@ -235,7 +235,7 @@ function SideNavbar({ isMobileOpen = false, onMobileClose }: SideNavbarProps) {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             className={`
-                              flex items-center justify-center p-3 rounded-lg transition-all duration-200 group relative
+                              flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 group relative
                               ${
                                 pathname === link.href
                                   ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 shadow-sm"
@@ -257,7 +257,7 @@ function SideNavbar({ isMobileOpen = false, onMobileClose }: SideNavbarProps) {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         className={`
-                          flex items-center p-3 rounded-lg transition-all duration-200 group relative
+                          flex items-center px-3 py-2 rounded-lg transition-all duration-200 group relative
                           ${
                             pathname === link.href
                               ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 shadow-sm"
@@ -294,7 +294,7 @@ function SideNavbar({ isMobileOpen = false, onMobileClose }: SideNavbarProps) {
         {/* Download Library Card */}
         {shouldShowFullContent && (
           <div className="my-2">
-            <UpgradePlanCardAlert />
+            <DownloadLibraryCard />
           </div>
         )}
 

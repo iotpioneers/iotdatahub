@@ -112,7 +112,7 @@ const ChannelDetails: React.FC<ChannelDetailsProps> = ({ channelID }) => {
   const { channel, dataPoint = [], fields = [], apiKey } = channelData;
 
   return (
-    <main className="overflow-hidden">
+    <main>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}

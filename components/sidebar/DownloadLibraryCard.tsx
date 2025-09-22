@@ -148,7 +148,8 @@ const DownloadLibraryCard = () => {
 
       <CardContent className="p-2 relative">
         <h5 className="text-sm font-semibold text-primary/90">
-          IoT Data Hub Library
+          IoT Data Hub Library{" "}
+          <span className="text-xs text-red-500">(Latest)</span>
         </h5>
 
         {(isDownloading || downloadProgress > 0) && (

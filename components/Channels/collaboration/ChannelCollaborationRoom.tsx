@@ -19,8 +19,8 @@ const ChannelCollaborationRoom = ({
   return (
     <RoomProvider id={roomId}>
       <ClientSideSuspense fallback={<LinearLoading />}>
-        <div className="flex flex-col h-full space-y-4">
-          <div className="flex-shrink-0">
+        <div className="w-full">
+          <div>
             <ChannelDetailsHeading
               roomId={roomId}
               roomMetadata={roomMetadata}
@@ -29,7 +29,7 @@ const ChannelCollaborationRoom = ({
               dataPoint={dataPoint}
             />
           </div>
-          <div className="flex-shrink-0">
+          <div>
             <ChannelNavigation
               channelId={roomId}
               channel={channel}
@@ -39,7 +39,7 @@ const ChannelCollaborationRoom = ({
               currentUserType={currentUserType}
             />
           </div>
-          <div className="flex-1 overflow-y-auto">
+          <div>
             <ChannelCollaborationEditor currentUserType={currentUserType} />
           </div>
         </div>
