@@ -4,7 +4,7 @@ import "../globals.css";
 import ClientRootLayout from "../ClientRootLayout";
 import HydrationFix from "@/components/HydrationFix";
 import CollaborationProvider from "../CollaborationProvider";
-import { LoadingProvider } from "@/components/ui/UnifiedLoading";
+import { LoadingProvider } from "@/components/ui/unified-loading";
 import LayoutContent from "@/components/LayoutContent";
 
 export const metadata: Metadata = {

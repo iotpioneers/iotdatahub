@@ -19,7 +19,7 @@ import { useFormik } from "formik";
 import axios from "axios";
 import * as yup from "yup";
 import { PricingPlanType } from "@/types";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
+import LoadingProgressBar from "@/components/loading-progress-bar";
 import { useRouter } from "next/navigation";
 
 export const subscriptionSchema = yup.object({
@@ -104,7 +104,7 @@ const AddSubscriptionModal: React.FC<SubscriptionModalProps> = ({
       try {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`,
-          values,
+          values
         );
 
         if (response.status === 201) {
@@ -275,7 +275,7 @@ const AddSubscriptionModal: React.FC<SubscriptionModalProps> = ({
             onChange={(e) =>
               formik.setFieldValue(
                 "features",
-                e.target.value.split(",").map((f) => f.trim()),
+                e.target.value.split(",").map((f) => f.trim())
               )
             }
             onBlur={formik.handleBlur}

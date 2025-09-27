@@ -12,7 +12,7 @@ import Header from "@/components/Admin/components/Header";
 import SideMenu from "@/components/Admin/components/SideMenu";
 import NavBar from "@/components/Admin/NavBar";
 import { useSession } from "next-auth/react";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
+import LoadingProgressBar from "@/components/loading-progress-bar";
 
 interface AdminRootLayoutProps {
   children: React.ReactNode;

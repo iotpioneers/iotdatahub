@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { configureStore } from "@reduxjs/toolkit";
 
 import { useSession } from "next-auth/react";
-import { useGlobalState } from "@/context/GlobalContext";
+import { useGlobalState } from "@/context/globalContext";
 import { redirect } from "next/navigation";
 
 // material-ui
@@ -26,7 +26,7 @@ import { Formik } from "formik";
 
 // project imports
 import reducer from "@/app/store/reducer";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
+import LoadingProgressBar from "@/components/loading-progress-bar";
 
 const store = configureStore({ reducer });
 

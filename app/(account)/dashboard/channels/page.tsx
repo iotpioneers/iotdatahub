@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import ChannelList from "./_components/ChannelList";
 import type { Metadata } from "next";
-import { TableSkeleton } from "@/components/ui/UnifiedLoading";
+import { TableSkeleton } from "@/components/ui/unified-loading";
 
 const ChannelsPage = () => {
   return (

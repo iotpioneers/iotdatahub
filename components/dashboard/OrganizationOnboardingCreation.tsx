@@ -29,7 +29,7 @@ import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 import { organizationSchema } from "@/validations/schema.validation";
-import { useGlobalState } from "@/context/GlobalContext";
+import { useGlobalState } from "@/context/globalContext";
 import { CenterFocusStrong } from "@mui/icons-material";
 import { LinearLoading } from "../LinearLoading";
 

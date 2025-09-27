@@ -20,10 +20,10 @@ import PeopleWithAccess from "./PeopleWithAccess";
 import GeneralAccess from "./GeneralAccess";
 import { CheckCircle } from "lucide-react";
 import AddCollaboratorSelector from "./AddCollaboratorSelector";
-import { getUsers } from "@/lib/actions/UserActions";
-import { getRoomAccess } from "@/lib/actions/RoomActions";
+import { getUsers } from "@/lib/actions/user.actions";
+import { getRoomAccess } from "@/lib/actions/room.actions";
 import { useSession } from "next-auth/react";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
+import LoadingProgressBar from "@/components/loading-progress-bar";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {

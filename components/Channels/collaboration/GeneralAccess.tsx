@@ -20,7 +20,7 @@ import { UserAccessType } from "@/types";
 import {
   updateRoomDefaultAccess,
   getRoomAccess,
-} from "@/lib/actions/RoomActions";
+} from "@/lib/actions/room.actions";
 import { useSession } from "next-auth/react";
 
 const GeneralAccess = ({ roomId }: { roomId: string }) => {

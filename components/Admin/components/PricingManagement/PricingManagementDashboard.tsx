@@ -10,7 +10,7 @@ import {
 } from "@mui/icons-material";
 import AddSubscriptionModal from "./AddSubscriptionModal";
 import axios from "axios";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
+import LoadingProgressBar from "@/components/loading-progress-bar";
 
 interface Subscription {
   id: string;
@@ -37,7 +37,7 @@ const PricingManagementDashboard: React.FC = () => {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`
         );
 
         setSubscriptions(response.data);

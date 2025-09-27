@@ -6,7 +6,7 @@ import {
   ClientSideSuspense,
   LiveblocksProvider,
 } from "@liveblocks/react/suspense";
-import { getUsers, getChannelRoomUsers } from "@/lib/actions/UserActions";
+import { getUsers, getChannelRoomUsers } from "@/lib/actions/user.actions";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import SessionModal from "@/components/Actions/SessionModal";

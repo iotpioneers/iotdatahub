@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import type { Channel, DataPoint, Device, Field, Organization } from "@/types";
 import type { EmployeeMember } from "@/types/employees-member";
-import { CardSkeleton, ContentSkeleton } from "@/components/ui/UnifiedLoading";
+import { CardSkeleton, ContentSkeleton } from "@/components/ui/unified-loading";
 import DashboardOverview from "@/components/dashboard/DashboardOverview";
 
 interface ApiResponse {

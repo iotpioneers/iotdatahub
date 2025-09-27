@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useGlobalState } from "@/context/GlobalContext";
+import { useGlobalState } from "@/context/globalContext";
 import { IconLogout, IconSettings, IconUser } from "@tabler/icons-react";
 import DownloadLibraryCard from "@/components/sidebar/DownloadLibraryCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

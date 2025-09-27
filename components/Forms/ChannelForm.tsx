@@ -17,8 +17,8 @@ import Snackbar from "@mui/material/Snackbar";
 
 // Project Imports
 import ErrorMessage from "@/components/ErrorMessage";
-import { useGlobalState } from "@/context/GlobalContext";
-import { createChannelRoom } from "@/lib/actions/RoomActions";
+import { useGlobalState } from "@/context/globalContext";
+import { createChannelRoom } from "@/lib/actions/room.actions";
 import { channelSchema } from "@/validations/schema.validation";
 
 // Icons

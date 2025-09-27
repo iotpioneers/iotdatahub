@@ -8,7 +8,7 @@ import { CalendarIcon } from "@heroicons/react/20/solid";
 import { ChartPieIcon } from "@heroicons/react/24/solid";
 import { ViewIcon } from "lucide-react";
 
-import { updateChannelRoomData } from "@/lib/actions/RoomActions";
+import { updateChannelRoomData } from "@/lib/actions/room.actions";
 import { Input } from "@/components/Actions/TextEditingInput";
 import { dateConverter } from "@/lib/utils";
 import { ChannelHeadingProps } from "@/types";

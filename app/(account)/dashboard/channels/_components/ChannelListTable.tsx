@@ -1,22 +1,25 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
-  DataGrid,
-  GridColDef,
-  GridRenderCellParams,
-  GridToolbar,
-} from "@mui/x-data-grid";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useToast } from "@/components/ui/toast-provider";
 import Link from "next/link";
-import Alert from "@mui/material/Alert";
-import Snackbar from "@mui/material/Snackbar";
-import { Chip, Avatar, Typography, Button } from "@mui/material";
-import { Channel } from "@/types";
+import type { Channel } from "@/types";
 import axios from "axios";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
+import LoadingProgressBar from "@/components/loading-progress-bar";
 import { ActionModal } from "@/components/dashboard/ActionModal";
 import { useSession } from "next-auth/react";
-import { deleteChannel } from "@/lib/actions/RoomActions";
+import { deleteChannel } from "@/lib/actions/room.actions";
 
 const formatDate = (date: Date) =>
   new Intl.DateTimeFormat("en", {
@@ -35,19 +38,11 @@ const ChannelListTable = ({
   initialChannels: Channel[] | [];
 }) => {
   const [channels, setChannels] = useState<Channel[]>(initialChannels);
-  const [showMessage, setShowMessage] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>("");
-  const [info, setInfo] = useState<string>("");
   const [updateTrigger, setUpdateTrigger] = useState(0);
-
+  const toast = useToast();
   const { status, data: session } = useSession();
-
-  if (status !== "loading" && status === "unauthenticated") {
-    return null;
-  }
-
-  const email = session!.user!.email;
+  const email = session?.user?.email;
 
   const fetchChannels = useCallback(async () => {
     try {
@@ -58,13 +53,18 @@ const ChannelListTable = ({
         setChannels(response.data);
       }
     } catch (error) {
-      setError("Failed to fetch updated channel data");
+      toast.toast({
+        type: "error",
+        message: "Failed to fetch updated channel data",
+      });
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
-    fetchChannels();
-  }, [fetchChannels, updateTrigger]);
+    if (status === "authenticated") {
+      fetchChannels();
+    }
+  }, [fetchChannels, status, updateTrigger]);
 
   const updateChannelAccess = async (channelId: string, newAccess: string) => {
     setLoading(true);
@@ -77,16 +77,23 @@ const ChannelListTable = ({
       );
 
       if (response.status !== 200) {
-        setError(response.data.message);
-        setShowMessage(true);
+        toast.toast({
+          type: "error",
+          message: response.data.message,
+        });
         return;
       }
 
-      setInfo("Channel access updated successfully");
-      setShowMessage(true);
+      toast.toast({
+        type: "success",
+        message: "Channel access updated successfully",
+      });
       setUpdateTrigger((prev) => prev + 1);
     } catch (error) {
-      setError("Failed to update channel access");
+      toast.toast({
+        type: "error",
+        message: "Failed to update channel access",
+      });
     } finally {
       setLoading(false);
     }
@@ -96,19 +103,19 @@ const ChannelListTable = ({
     setLoading(true);
   };
 
-  const renderAccessBadge = (params: GridRenderCellParams) => {
-    const channel = params.row;
-    const access = params.value;
-    let color: "default" | "success" | "warning" = "default";
+  const renderAccessBadge = (channel: Channel) => {
+    const access = channel.access;
+    let variant: "default" | "secondary" | "destructive" | "outline" =
+      "default";
     let label = "Unknown";
 
     switch (access) {
       case "PUBLIC":
-        color = "warning";
+        variant = "secondary";
         label = "Public";
         break;
       case "PRIVATE":
-        color = "success";
+        variant = "outline";
         label = "Private";
         break;
       default:
@@ -121,13 +128,9 @@ const ChannelListTable = ({
     return (
       <ActionModal
         triggerComponent={
-          <Chip
-            label={label}
-            color={color}
-            variant="filled"
-            size="small"
-            className="cursor-pointer"
-          />
+          <Badge variant={variant} className="cursor-pointer">
+            {label}
+          </Badge>
         }
         title={`Change Access to ${newLabel}`}
         description={`Are you sure you want to change the access of "${channel.name}" to ${newLabel}?`}
@@ -138,127 +141,91 @@ const ChannelListTable = ({
     );
   };
 
-  const columns: GridColDef[] = [
-    {
-      field: "name",
-      headerName: "Channel",
-      width: 150,
-      renderCell: (params: GridRenderCellParams) => (
-        <div className="flex items-center mt-1 gap-1">
-          <img src="/icons/justify.svg" alt="channel" className="w-6 h-6"></img>
-          <Link
-            href={`/dashboard/channels/${params.row.id}`}
-            className="text-blue-500 hover:underline"
-            onClick={handleLinkClick}
-          >
-            {params.value}
-          </Link>
-        </div>
-      ),
-    },
-    {
-      field: "owner",
-      headerName: "Owner",
-      width: 200,
-      renderCell: (params: GridRenderCellParams) => (
-        <div className="flex items-center mt-1 gap-1">
-          <Avatar src={params.row.ownerImage} alt={params.row.ownerEmail}>
-            {params.row.ownerEmail[0].toUpperCase()}
-          </Avatar>
-          <Typography variant="body2">
-            {email && email === params.row.ownerEmail
-              ? "Me"
-              : params.row.ownerEmail}
-          </Typography>
-        </div>
-      ),
-    },
-    {
-      field: "access",
-      headerName: "Access",
-      width: 120,
-      renderCell: renderAccessBadge,
-    },
-    {
-      field: "createdAt",
-      headerName: "Created",
-      width: 280,
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant="body2" sx={{ color: "text.secondary", mt: 2 }}>
-          {formatDate(params.value)}
-        </Typography>
-      ),
-    },
-    {
-      field: "Action Button",
-      headerName: "",
-      width: 100,
-      renderCell: (params: GridRenderCellParams) => (
-        <ActionModal
-          triggerComponent={
-            <Button variant="contained" size="small" color="error">
-              Delete
-            </Button>
-          }
-          title="Delete Channel"
-          description={`Are you sure you want to delete the channel "${params.row.name}"?`}
-          confirmButtonText="Delete"
-          onConfirm={() => deleteChannel(params.row.id)}
-          iconSrc="/icons/delete.svg"
-        />
-      ),
-    },
-  ];
-
-  const handleCloseResult = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setShowMessage(false);
-  };
-
-  if (!channels || channels.length === 0) {
+  if (status === "loading") {
     return <LoadingProgressBar />;
   }
 
-  return (
-    <div style={{ height: 600, width: "100%" }}>
-      {loading && <LoadingProgressBar />}
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        open={showMessage}
-        autoHideDuration={6000}
-        onClose={handleCloseResult}
-      >
-        <Alert
-          onClose={handleCloseResult}
-          severity={error ? "error" : "success"}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {error ? error : info}
-        </Alert>
-      </Snackbar>
+  if (status === "unauthenticated" || !channels || channels.length === 0) {
+    return null;
+  }
 
-      <DataGrid
-        rows={channels}
-        columns={columns}
-        getRowId={(row) => row.id}
-        initialState={{
-          pagination: {
-            paginationModel: { pageSize: 10, page: 0 },
-          },
-        }}
-        pageSizeOptions={[5, 10, 20, 50, 100]}
-        autoHeight
-        disableRowSelectionOnClick
-        slots={{
-          toolbar: GridToolbar,
-        }}
-      />
+  return (
+    <div className="w-full">
+      {loading && <LoadingProgressBar />}
+
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Channel</TableHead>
+              <TableHead>Owner</TableHead>
+              <TableHead>Access</TableHead>
+              <TableHead>Created</TableHead>
+              <TableHead className="w-[100px]">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {channels.map((channel) => (
+              <TableRow key={channel.id}>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <img
+                      src="/icons/justify.svg"
+                      alt="channel"
+                      className="w-6 h-6"
+                    />
+                    <Link
+                      href={`/dashboard/channels/${channel.id}`}
+                      className="text-blue-500 hover:underline"
+                      onClick={handleLinkClick}
+                    >
+                      {channel.name}
+                    </Link>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage
+                        src={channel.ownerImage || "/placeholder.svg"}
+                        alt={channel.ownerEmail}
+                      />
+                      <AvatarFallback>
+                        {channel.ownerEmail[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm">
+                      {email && email === channel.ownerEmail
+                        ? "Me"
+                        : channel.ownerEmail}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell>{renderAccessBadge(channel)}</TableCell>
+                <TableCell>
+                  <span className="text-sm text-muted-foreground">
+                    {formatDate(channel.createdAt)}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <ActionModal
+                    triggerComponent={
+                      <Button variant="destructive" size="sm">
+                        Delete
+                      </Button>
+                    }
+                    title="Delete Channel"
+                    description={`Are you sure you want to delete the channel "${channel.name}"?`}
+                    confirmButtonText="Delete"
+                    onConfirm={() => deleteChannel(channel.id)}
+                    iconSrc="/icons/delete.svg"
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };

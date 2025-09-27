@@ -4,7 +4,7 @@ import React, { useRef, useState } from "react";
 import {
   removeCollaborator,
   updateChannelAccess,
-} from "@/lib/actions/RoomActions";
+} from "@/lib/actions/room.actions";
 import { CollaboratorProps, UserAccessType } from "@/types";
 
 import Button from "@mui/material/Button";

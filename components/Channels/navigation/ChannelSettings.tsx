@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 // Project Imports
-import { deleteChannel } from "@/lib/actions/RoomActions";
+import { deleteChannel } from "@/lib/actions/room.actions";
 import ChannelSettingsForm from "@/components/Forms/ChannelSettingsForm";
 import { Channel, Field } from "@/types";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
+import LoadingProgressBar from "@/components/loading-progress-bar";
 import { ActionModal } from "@/components/dashboard/ActionModal";
 
 // Material-UI Components

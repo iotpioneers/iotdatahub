@@ -1,15 +1,16 @@
 "use client";
 
+import type React from "react";
+
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
-import { ApiKey, Channel, DataPoint, Field } from "@/types";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
-import { getUsers } from "@/lib/actions/UserActions";
-import { getRoomAccess } from "@/lib/actions/RoomActions";
+import type { ApiKey, Channel, DataPoint, Field } from "@/types";
+import { getUsers } from "@/lib/actions/user.actions";
+import { getRoomAccess } from "@/lib/actions/room.actions";
 import ChannelCollaborationRoom from "@/components/Channels/collaboration/ChannelCollaborationRoom";
+import { useToast } from "@/components/ui/toast-provider";
+import LoadingProgressBar from "@/components/loading-progress-bar";
 
 interface ChannelData {
   channel: Channel;
@@ -35,12 +36,11 @@ interface ChannelDetailsProps {
 
 const ChannelDetails: React.FC<ChannelDetailsProps> = ({ channelID }) => {
   const { data: session } = useSession();
-  const [open, setOpen] = useState(false);
-  const [error, setError] = useState<string>("");
   const [currentUserType, setCurrentUserType] = useState<"editor" | "viewer">(
     "viewer"
   );
   const [room, setRoom] = useState<any>(null);
+  const toast = useToast();
 
   const { data: channelData, error: channelError } = useSWR<ChannelData>(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/${channelID}`,
@@ -50,10 +50,12 @@ const ChannelDetails: React.FC<ChannelDetailsProps> = ({ channelID }) => {
 
   useEffect(() => {
     if (channelError) {
-      setError(`Failed to load channel data: ${channelError.message}`);
-      setOpen(true);
+      toast.toast({
+        type: "error",
+        message: `Failed to load channel data: ${channelError.message}`,
+      });
     }
-  }, [channelError]);
+  }, [channelError, toast]);
 
   useEffect(() => {
     const fetchRoomData = async () => {
@@ -66,8 +68,10 @@ const ChannelDetails: React.FC<ChannelDetailsProps> = ({ channelID }) => {
         });
 
         if ("error" in roomData) {
-          setError(roomData.error);
-          setOpen(true);
+          toast.toast({
+            type: "error",
+            message: roomData.error,
+          });
           return;
         }
 
@@ -77,7 +81,10 @@ const ChannelDetails: React.FC<ChannelDetailsProps> = ({ channelID }) => {
         const users = await getUsers({ userIds });
 
         if (!users) {
-          setError("No users found or an error occurred");
+          toast.toast({
+            type: "error",
+            message: "No users found or an error occurred",
+          });
           return;
         }
 
@@ -89,22 +96,15 @@ const ChannelDetails: React.FC<ChannelDetailsProps> = ({ channelID }) => {
 
         setCurrentUserType(currentUserType);
       } catch (error) {
-        setError("An error occurred while fetching room data");
+        toast.toast({
+          type: "error",
+          message: "An error occurred while fetching room data",
+        });
       }
     };
 
     fetchRoomData();
-  }, [channelData, session]);
-
-  const handleCloseResult = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpen(false);
-  };
+  }, [channelData, session, toast]);
 
   if (channelError) return <div>Failed to load channel data</div>;
   if (!channelData) return <LoadingProgressBar />;
@@ -113,21 +113,6 @@ const ChannelDetails: React.FC<ChannelDetailsProps> = ({ channelID }) => {
 
   return (
     <main>
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        open={open}
-        autoHideDuration={12000}
-        onClose={handleCloseResult}
-      >
-        <Alert
-          onClose={handleCloseResult}
-          severity={error ? "error" : "success"}
-          variant="standard"
-          sx={{ width: "100%" }}
-        >
-          {error ? error : "Success"}
-        </Alert>
-      </Snackbar>
       <ChannelCollaborationRoom
         roomId={channelID}
         roomMetadata={room?.metadata}
