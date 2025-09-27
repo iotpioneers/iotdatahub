@@ -7,7 +7,6 @@ import Alert from "@mui/material/Alert";
 import { CalendarIcon } from "@heroicons/react/20/solid";
 import { ChartPieIcon } from "@heroicons/react/24/solid";
 import { ViewIcon } from "lucide-react";
-import ReactMarkdown from "react-markdown";
 
 import { updateChannelRoomData } from "@/lib/actions/room.actions";
 import { Input } from "@/components/Actions/TextEditingInput";
@@ -112,7 +111,7 @@ const ChannelDetailsHeading = ({
   }, [editing]);
 
   return (
-    <div className="lg:flex lg:items-center lg:justify-between mt-12 padding-x padding-y max-width">
+    <div className="lg:flex lg:items-center lg:justify-between padding-x padding-y max-width">
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={showResult}
@@ -173,11 +172,6 @@ const ChannelDetailsHeading = ({
         </div>
 
         <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-          <div className="mt-2 max-w-xl">
-            <Card sx={{ p: 2, border: "1px solid", borderColor: "divider" }}>
-              <ReactMarkdown>{channel.description}</ReactMarkdown>
-            </Card>
-          </div>
           <div className="flex flex-col">
             <div className="mt-2 flex items-center text-sm text-gray-500">
               <ChartPieIcon

@@ -58,7 +58,7 @@ export default function ChannelForm() {
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;
@@ -108,7 +108,7 @@ export default function ChannelForm() {
           ...data,
           organizationId: currentOrganization!.id,
         }),
-        false
+        false,
       );
 
       if (!result || "error" in result) {
@@ -133,7 +133,7 @@ export default function ChannelForm() {
         setIsSubmitting(false);
         return;
       }
-      router.push(`/dashboard/channels/${room.id}`);
+      router.push(`/dashboard/devices`);
       setOpen(true);
     } catch (error) {
       setIsSubmitting(false);

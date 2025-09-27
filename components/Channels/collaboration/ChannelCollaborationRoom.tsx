@@ -19,7 +19,7 @@ const ChannelCollaborationRoom = ({
   return (
     <RoomProvider id={roomId}>
       <ClientSideSuspense fallback={<LinearLoading />}>
-        <div className="w-full">
+        <div className="w-full overflow-x-hidden">
           <div>
             <ChannelDetailsHeading
               roomId={roomId}

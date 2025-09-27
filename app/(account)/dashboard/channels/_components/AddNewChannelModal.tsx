@@ -150,7 +150,7 @@ export default function AddNewChannelModal({
         return;
       }
 
-      router.push(`/dashboard/channels/${roomId}`);
+      router.push(`/dashboard/devices`);
     } catch (error) {
       setError("An unexpected error occurred.");
       onClose();
