@@ -23,7 +23,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@/components/*": ["./components/*"],
+      "@/lib/*": ["./lib/*"]
     },
     "typeRoots": ["./node_modules/@types", "./types"],
     "types": ["node", "ws"],
