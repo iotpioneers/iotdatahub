@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 // Project Imports
-import { deleteChannel } from "@/lib/actions/room.actions";
+import { deleteChannel } from "@/lib/actions/RoomActions";
 import ChannelSettingsForm from "@/components/Forms/ChannelSettingsForm";
 import { Channel, Field } from "@/types";
 import LoadingProgressBar from "@/components/LoadingProgressBar";

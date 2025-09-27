@@ -7,8 +7,8 @@ import { ApiKey, Channel, DataPoint, Field } from "@/types";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import { getUsers } from "@/lib/actions/user.actions";
-import { getRoomAccess } from "@/lib/actions/room.actions";
+import { getUsers } from "@/lib/actions/UserActions";
+import { getRoomAccess } from "@/lib/actions/RoomActions";
 import ChannelCollaborationRoom from "@/components/Channels/collaboration/ChannelCollaborationRoom";
 
 interface ChannelData {
@@ -38,14 +38,14 @@ const ChannelDetails: React.FC<ChannelDetailsProps> = ({ channelID }) => {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string>("");
   const [currentUserType, setCurrentUserType] = useState<"editor" | "viewer">(
-    "viewer",
+    "viewer"
   );
   const [room, setRoom] = useState<any>(null);
 
   const { data: channelData, error: channelError } = useSWR<ChannelData>(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/${channelID}`,
     fetcher,
-    { refreshInterval: 5000 },
+    { refreshInterval: 5000 }
   );
 
   useEffect(() => {
@@ -98,7 +98,7 @@ const ChannelDetails: React.FC<ChannelDetailsProps> = ({ channelID }) => {
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string,
+    reason?: string
   ) => {
     if (reason === "clickaway") {
       return;

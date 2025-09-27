@@ -34,7 +34,7 @@ import "@fontsource/poppins/700.css";
 
 // style + assets
 import "@/app/styles/scss/style.scss";
-import { GlobalStateProvider } from "@/context";
+import { GlobalStateProvider } from "@/context/GlobalContext";
 
 export const store = configureStore({ reducer });
 

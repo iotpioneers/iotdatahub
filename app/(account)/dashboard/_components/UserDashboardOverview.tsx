@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import type { Channel, DataPoint, Device, Field, Organization } from "@/types";
 import type { EmployeeMember } from "@/types/employees-member";
-import { DashboardOverview } from "@/components/dashboard";
-import { CardSkeleton, ContentSkeleton } from "@/components/ui/unified-loading";
+import { CardSkeleton, ContentSkeleton } from "@/components/ui/UnifiedLoading";
+import DashboardOverview from "@/components/dashboard/DashboardOverview";
 
 interface ApiResponse {
   hasOrganization: boolean;

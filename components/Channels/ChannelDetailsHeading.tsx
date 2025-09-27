@@ -8,7 +8,7 @@ import { CalendarIcon } from "@heroicons/react/20/solid";
 import { ChartPieIcon } from "@heroicons/react/24/solid";
 import { ViewIcon } from "lucide-react";
 
-import { updateChannelRoomData } from "@/lib/actions/room.actions";
+import { updateChannelRoomData } from "@/lib/actions/RoomActions";
 import { Input } from "@/components/Actions/TextEditingInput";
 import { dateConverter } from "@/lib/utils";
 import { ChannelHeadingProps } from "@/types";
@@ -34,7 +34,7 @@ const ChannelDetailsHeading = ({
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string,
+    reason?: string
   ) => {
     if (reason === "clickaway") {
       return;
@@ -51,7 +51,7 @@ const ChannelDetailsHeading = ({
   }
 
   const updateChannelTitleHandler = async (
-    e: React.KeyboardEvent<HTMLInputElement>,
+    e: React.KeyboardEvent<HTMLInputElement>
   ) => {
     if (e.key === "Enter") {
       setLoading(true);
@@ -61,7 +61,7 @@ const ChannelDetailsHeading = ({
         if (channelTitle !== channel?.name) {
           const updatedChannel = await updateChannelRoomData(
             roomId,
-            channelTitle,
+            channelTitle
           );
 
           if (!updatedChannel) {

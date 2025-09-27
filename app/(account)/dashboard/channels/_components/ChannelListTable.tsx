@@ -16,7 +16,7 @@ import axios from "axios";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import { ActionModal } from "@/components/dashboard/ActionModal";
 import { useSession } from "next-auth/react";
-import { deleteChannel } from "@/lib/actions/room.actions";
+import { deleteChannel } from "@/lib/actions/RoomActions";
 
 const formatDate = (date: Date) =>
   new Intl.DateTimeFormat("en", {
@@ -52,7 +52,7 @@ const ChannelListTable = ({
   const fetchChannels = useCallback(async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels`
       );
       if (response.status === 200) {
         setChannels(response.data);
@@ -73,7 +73,7 @@ const ChannelListTable = ({
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/${channelId}`,
         {
           access: newAccess,
-        },
+        }
       );
 
       if (response.status !== 200) {
@@ -212,7 +212,7 @@ const ChannelListTable = ({
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string,
+    reason?: string
   ) => {
     if (reason === "clickaway") {
       return;

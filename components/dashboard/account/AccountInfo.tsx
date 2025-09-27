@@ -13,7 +13,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 import UploadImage from "@/components/dashboard/account/UploadImage";
-import { useGlobalState } from "@/context";
+import { useGlobalState } from "@/context/GlobalContext";
 
 export function AccountInfo(): React.JSX.Element {
   const { state, updateUserData, isLoading } = useGlobalState();

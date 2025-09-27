@@ -27,8 +27,8 @@ import * as Yup from "yup";
 import { useSWRConfig } from "swr";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useGlobalState } from "@/context";
-import { createChannelRoom } from "@/lib/actions/room.actions";
+import { useGlobalState } from "@/context/GlobalContext";
+import { createChannelRoom } from "@/lib/actions/RoomActions";
 
 // Constants
 const hardwareOptions = [
@@ -93,7 +93,7 @@ export default function AddNewChannelModal({
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string,
+    reason?: string
   ) => {
     if (reason === "clickaway") {
       return;
@@ -124,7 +124,7 @@ export default function AddNewChannelModal({
           ...values,
           organizationId: currentOrganization!.id,
         }),
-        { revalidate: true },
+        { revalidate: true }
       );
 
       if (!result || "error" in result) {

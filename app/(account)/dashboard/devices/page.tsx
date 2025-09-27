@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import DeviceListingComponent from "./_components/DeviceListingComponent";
 import { Metadata } from "next";
-import { TableSkeleton } from "@/components/ui/unified-loading";
+import { TableSkeleton } from "@/components/ui/UnifiedLoading";
 
 const DeviceListingsPage = async () => {
   return (

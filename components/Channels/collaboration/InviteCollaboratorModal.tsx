@@ -20,8 +20,8 @@ import PeopleWithAccess from "./PeopleWithAccess";
 import GeneralAccess from "./GeneralAccess";
 import { CheckCircle } from "lucide-react";
 import AddCollaboratorSelector from "./AddCollaboratorSelector";
-import { getUsers } from "@/lib/actions/user.actions";
-import { getRoomAccess } from "@/lib/actions/room.actions";
+import { getUsers } from "@/lib/actions/UserActions";
+import { getRoomAccess } from "@/lib/actions/RoomActions";
 import { useSession } from "next-auth/react";
 import LoadingProgressBar from "@/components/LoadingProgressBar";
 
@@ -59,7 +59,7 @@ const InviteCollaboratorModal = ({
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string,
+    reason?: string
   ) => {
     if (reason === "clickaway") {
       return;
@@ -70,7 +70,7 @@ const InviteCollaboratorModal = ({
   const copyLinkToClipboard = useCallback(() => {
     navigator.clipboard
       .writeText(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/channels/${roomId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/channels/${roomId}`
       )
       .then(() => {
         setLinkCopied(true);
@@ -85,8 +85,8 @@ const InviteCollaboratorModal = ({
   const handleCollaboratorRemoved = (removedEmail: string) => {
     setCollaboratorList((prevCollaborators) =>
       prevCollaborators.filter(
-        (collaborator) => collaborator.email !== removedEmail,
-      ),
+        (collaborator) => collaborator.email !== removedEmail
+      )
     );
   };
 

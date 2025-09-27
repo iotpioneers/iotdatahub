@@ -29,7 +29,7 @@ import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 import { organizationSchema } from "@/validations/schema.validation";
-import { useGlobalState } from "@/context";
+import { useGlobalState } from "@/context/GlobalContext";
 import { CenterFocusStrong } from "@mui/icons-material";
 import { LinearLoading } from "../LinearLoading";
 
@@ -147,7 +147,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
   >([]);
   const [customAreaOfInterest, setCustomAreaOfInterest] = useState<string>("");
   const [areasOfInterest, setAreasOfInterest] = useState<string[]>(
-    Object.values(AreaOfInterest),
+    Object.values(AreaOfInterest)
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [open, setOpen] = React.useState(false);
@@ -164,7 +164,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string,
+    reason?: string
   ) => {
     if (reason === "clickaway") {
       return;
@@ -190,7 +190,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
   };
 
   const handleOrganizationNameChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setOrganizationName(event.target.value);
     setError("");
@@ -200,12 +200,12 @@ const OrganizationOnboardingCreation: React.FC = () => {
     setSelectedAreasOfInterest((prevSelectedAreas) =>
       prevSelectedAreas.includes(interest)
         ? prevSelectedAreas.filter((area) => area !== interest)
-        : [...prevSelectedAreas, interest],
+        : [...prevSelectedAreas, interest]
     );
   };
 
   const handleCustomAreaOfInterestChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setCustomAreaOfInterest(event.target.value.toUpperCase());
   };
@@ -252,7 +252,7 @@ const OrganizationOnboardingCreation: React.FC = () => {
     try {
       const response = await axios.post(
         process.env.NEXT_PUBLIC_BASE_URL + "/api/organizations",
-        organizationData,
+        organizationData
       );
 
       if (response.status !== 201) {

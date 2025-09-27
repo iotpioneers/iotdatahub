@@ -6,7 +6,7 @@ import useSWR from "swr";
 import ChannelListTable from "./ChannelListTable";
 import { Text } from "@radix-ui/themes";
 import { Button } from "@mui/material";
-import { TableSkeleton } from "@/components/ui/unified-loading";
+import { TableSkeleton } from "@/components/ui/UnifiedLoading";
 import Image from "next/image";
 import type { Channel } from "@/types";
 import AddNewChannelModal from "./AddNewChannelModal";
@@ -22,7 +22,7 @@ const ChannelList = () => {
   } = useSWR<Channel[]>(
     process.env.NEXT_PUBLIC_BASE_URL + "/api/channels",
     fetcher,
-    { refreshInterval: 5000 },
+    { refreshInterval: 5000 }
   );
 
   if (error) return <div>Failed to load channels</div>;

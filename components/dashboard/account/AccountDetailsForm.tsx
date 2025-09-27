@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { configureStore } from "@reduxjs/toolkit";
 
 import { useSession } from "next-auth/react";
-import { useGlobalState } from "@/context";
+import { useGlobalState } from "@/context/GlobalContext";
 import { redirect } from "next/navigation";
 
 // material-ui
@@ -55,11 +55,11 @@ export function AccountDetailsForm({ ...others }): React.JSX.Element {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
-    "success",
+    "success"
   );
   const { status } = useSession();
   const [selectedCountry, setSelectedCountry] = useState<CountryType | null>(
-    null,
+    null
   );
 
   const { currentUser } = state;
@@ -104,7 +104,7 @@ export function AccountDetailsForm({ ...others }): React.JSX.Element {
 
   const handleCloseSnackbar = (
     event?: React.SyntheticEvent | Event,
-    reason?: string,
+    reason?: string
   ) => {
     if (reason === "clickaway") {
       return;
