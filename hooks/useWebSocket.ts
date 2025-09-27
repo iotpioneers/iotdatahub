@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { WebSocketMessage } from "@/types/websocket";
 import { useSession } from "next-auth/react";
-import config from "@/lib/hardwareServer/config";
 
 interface UseWebSocketProps {
   deviceId?: string;
@@ -48,27 +47,25 @@ export const useWebSocket = ({
     }
   };
 
+  const getWebSocketUrl = () => {
+    // Use environment variable for backend URL
+    const backendUrl =
+      process.env.HARDWARE_APP_BASE_URL || "http://localhost:5000";
+
+    // Convert HTTP URL to WebSocket URL
+    const wsUrl = backendUrl
+      .replace("http://", "ws://")
+      .replace("https://", "wss://");
+
+    return `${wsUrl}/api/ws`;
+  };
+
   const connect = () => {
     if (!enabled) return;
 
     try {
-      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-
-      // FIXED: Use the same host as the current page instead of hardcoded localhost
-      let wsHost = window.location.hostname;
-      let wsPort = config.apiPort;
-
-      // For development, detect if we're on localhost and use the config port
-      if (wsHost === "localhost" || wsHost === "127.0.0.1") {
-        wsPort = config.apiPort;
-      } else {
-        // For production, you might need to adjust the port based on your setup
-        // If your WebSocket server runs on a different port in production:
-        wsPort = window.location.protocol === "https:" ? 443 : 80;
-      }
-
-      const wsUrl = `${protocol}//${wsHost}:${wsPort}/api/ws`;
-      console.log("Connecting to WebSocket:", wsUrl); // Debug log
+      const wsUrl = getWebSocketUrl();
+      console.log("Connecting to WebSocket:", wsUrl);
 
       wsRef.current = new WebSocket(wsUrl);
 
