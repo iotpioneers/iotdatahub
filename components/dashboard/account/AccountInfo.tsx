@@ -11,9 +11,9 @@ import CardContent from "@mui/material/CardContent";
 import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
+import LoadingProgressBar from "@/components/loading-progress-bar";
 import UploadImage from "@/components/dashboard/account/UploadImage";
-import { useGlobalState } from "@/context";
+import { useGlobalState } from "@/context/globalContext";
 
 export function AccountInfo(): React.JSX.Element {
   const { state, updateUserData, isLoading } = useGlobalState();

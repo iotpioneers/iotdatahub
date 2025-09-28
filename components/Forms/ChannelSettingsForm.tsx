@@ -26,7 +26,7 @@ import { ActionModal } from "../dashboard/ActionModal";
 // Icons
 import { ArchiveBoxXMarkIcon } from "@heroicons/react/24/outline";
 import { Save as SaveIcon, Add as AddIcon } from "@mui/icons-material";
-import LoadingProgressBar from "../LoadingProgressBar";
+import LoadingProgressBar from "../loading-progress-bar";
 
 // Types
 type ChannelForm = z.infer<typeof channelSchema>;

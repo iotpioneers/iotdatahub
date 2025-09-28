@@ -3,11 +3,10 @@
 import { Suspense, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
-import { CardSkeleton, ContentSkeleton } from "@/components/ui/unified-loading";
 import type { Channel, DataPoint, Device, Field, Organization } from "@/types";
 import type { EmployeeMember } from "@/types/employees-member";
-import { DashboardOverview } from "@/components/dashboard";
-
+import { CardSkeleton, ContentSkeleton } from "@/components/ui/UnifiedLoading";
+import DashboardOverview from "@/components/dashboard/DashboardOverview";
 interface ApiResponse {
   hasOrganization: boolean;
   organization: Organization | null;
@@ -32,7 +31,7 @@ const UserDashboardOverview = () => {
   const { data, error } = useSWR<ApiResponse, Error>(
     "/api/organizations/status",
     fetcher,
-    { refreshInterval: 5000 },
+    { refreshInterval: 5000 }
   );
 
   useEffect(() => {

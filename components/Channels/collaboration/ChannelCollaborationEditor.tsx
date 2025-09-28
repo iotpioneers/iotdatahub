@@ -3,7 +3,6 @@
 import Theme from "./plugins/Theme";
 import ToolbarPlugin from "./plugins/ToolbarPlugin";
 import { HeadingNode } from "@lexical/rich-text";
-import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -75,7 +74,7 @@ const ChannelCollaborationEditor = ({
               />
               {currentUserType === "editor" && <FloatingToolbarPlugin />}
               <HistoryPlugin />
-              <AutoFocusPlugin />
+              {/* <AutoFocusPlugin /> */}
             </div>
           )}
 

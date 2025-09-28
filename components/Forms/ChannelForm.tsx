@@ -17,7 +17,7 @@ import Snackbar from "@mui/material/Snackbar";
 
 // Project Imports
 import ErrorMessage from "@/components/ErrorMessage";
-import { useGlobalState } from "@/context";
+import { useGlobalState } from "@/context/globalContext";
 import { createChannelRoom } from "@/lib/actions/room.actions";
 import { channelSchema } from "@/validations/schema.validation";
 
@@ -133,7 +133,7 @@ export default function ChannelForm() {
         setIsSubmitting(false);
         return;
       }
-      router.push(`/dashboard/channels/${room.id}`);
+      router.push(`/dashboard/devices`);
       setOpen(true);
     } catch (error) {
       setIsSubmitting(false);

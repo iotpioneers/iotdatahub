@@ -4,14 +4,14 @@ import React from "react";
 import { Button } from "@radix-ui/themes";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
+import LoadingProgressBar from "@/components/loading-progress-bar";
 import { PricingPlanType } from "@/types";
 import { Loader2 } from "lucide-react";
 
 const UpgradePricingPlan = () => {
   const router = useRouter();
   const [subscriptions, setSubscriptions] = React.useState<PricingPlanType[]>(
-    [],
+    []
   );
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [loadingPlanId, setLoadingPlanId] = React.useState<string | null>(null);
@@ -21,7 +21,7 @@ const UpgradePricingPlan = () => {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`
         );
         setSubscriptions(response.data);
       } catch (error) {
@@ -93,10 +93,10 @@ const UpgradePricingPlan = () => {
                 (item.name === "Enterprise"
                   ? "Contact us"
                   : item.price === 0
-                    ? "Sign Up free"
-                    : item.name.includes("Enterprise")
-                      ? "Contact sales"
-                      : "Try Premium")
+                  ? "Sign Up free"
+                  : item.name.includes("Enterprise")
+                  ? "Contact sales"
+                  : "Try Premium")
               )}
             </Button>
           </div>

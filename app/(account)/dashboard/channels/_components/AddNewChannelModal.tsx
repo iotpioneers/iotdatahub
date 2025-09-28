@@ -1,33 +1,33 @@
 "use client";
-
-import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
-  Modal,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  MenuItem,
-  Snackbar,
-  Alert,
-  FormControl,
-  FormHelperText,
-  InputLabel,
-  OutlinedInput,
-} from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/toast-provider";
 import {
   ArchiveBoxXMarkIcon,
   CloudArrowUpIcon,
 } from "@heroicons/react/20/solid";
-import { Formik, Form, Field, FieldArray } from "formik";
+import { Formik, Form, FieldArray } from "formik";
 import * as Yup from "yup";
 import { useSWRConfig } from "swr";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useGlobalState } from "@/context";
+import { useGlobalState } from "@/context/globalContext";
 import { createChannelRoom } from "@/lib/actions/room.actions";
 
 // Constants
@@ -71,12 +71,9 @@ export default function AddNewChannelModal({
   const { status, data: session } = useSession();
   const { state, fetchCurrentOrganization } = useGlobalState();
   const router = useRouter();
-
-  const [error, setError] = useState<string>("");
-  const [openAlertModal, setOpenAlertModal] = useState(false);
+  const toast = useToast();
 
   const { mutate } = useSWRConfig();
-  const theme = useTheme();
 
   const currentOrganization = state.currentOrganization;
   const { id: userId, email } = session!.user;
@@ -91,31 +88,6 @@ export default function AddNewChannelModal({
     fetchCurrentOrganization();
   }, [currentOrganization]);
 
-  const handleCloseResult = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string,
-  ) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpenAlertModal(false);
-  };
-
-  const style = {
-    position: "absolute" as const,
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 600,
-    height: "auto",
-    bgcolor: "background.paper",
-    boxShadow: 24,
-    p: 2,
-    my: 8,
-    mx: 1,
-    borderRadius: 12,
-  };
-
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
     try {
       const result = await mutate(
@@ -124,12 +96,14 @@ export default function AddNewChannelModal({
           ...values,
           organizationId: currentOrganization!.id,
         }),
-        { revalidate: true },
+        { revalidate: true }
       );
 
       if (!result || "error" in result) {
-        setError(result?.error || "Failed to create channel");
-        setOpenAlertModal(true);
+        toast.toast({
+          type: "error",
+          message: result?.error || "Failed to create channel",
+        });
         setSubmitting(false);
         return;
       }
@@ -144,17 +118,26 @@ export default function AddNewChannelModal({
       });
 
       if ("error" in room) {
-        setError(room.error);
-        setOpenAlertModal(true);
+        toast.toast({
+          type: "error",
+          message: room.error,
+        });
         setSubmitting(false);
         return;
       }
 
-      router.push(`/dashboard/channels/${roomId}`);
+      toast.toast({
+        type: "success",
+        message: "Channel created successfully",
+      });
+
+      router.push(`/dashboard/devices`);
     } catch (error) {
-      setError("An unexpected error occurred.");
+      toast.toast({
+        type: "error",
+        message: "An unexpected error occurred.",
+      });
       onClose();
-      setOpenAlertModal(true);
     } finally {
       setSubmitting(false);
       onClose();
@@ -162,223 +145,185 @@ export default function AddNewChannelModal({
   };
 
   return (
-    <>
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        open={openAlertModal}
-        autoHideDuration={6000}
-        onClose={handleCloseResult}
-      >
-        <Alert
-          onClose={handleCloseResult}
-          severity={error ? "error" : "success"}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {error ? error : "Channel created successfully"}
-        </Alert>
-      </Snackbar>
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Create New Channel</DialogTitle>
+        </DialogHeader>
 
-      <Modal
-        open={open}
-        onClose={onClose}
-        aria-labelledby="modal-title"
-        sx={{ py: 2 }}
-      >
-        <Box sx={style}>
-          <Typography
-            id="modal-title"
-            variant="h1"
-            component="h2"
-            sx={{ my: 2 }}
+        <div className="space-y-4">
+          <Formik
+            initialValues={{
+              name: "",
+              description: "",
+              fields: [""],
+              connectionType: "WiFi",
+              hardware: "ESP8266",
+            }}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
           >
-            Create New Channel
-          </Typography>
-
-          {/* Make a scrollable form */}
-          <Box sx={{ overflowY: "auto", maxHeight: "400px" }}>
-            <Formik
-              initialValues={{
-                name: "",
-                description: "",
-                fields: [""],
-                connectionType: "WiFi",
-                hardware: "ESP8266",
-              }}
-              validationSchema={validationSchema}
-              onSubmit={handleSubmit}
-            >
-              {({
-                values,
-                errors,
-                touched,
-                isSubmitting,
-                handleBlur,
-                handleChange,
-              }) => (
-                <Form className="my-6">
-                  <FormControl
-                    fullWidth
-                    error={!!errors.name}
-                    sx={{ ...theme.typography.customInput }}
-                  >
-                    <InputLabel htmlFor="outlined-adornment-channelname-register">
-                      Channel Name
-                    </InputLabel>
-                    <OutlinedInput
-                      id="outlined-adornment-channelname-register"
-                      type="text"
-                      value={values.name}
-                      name="name"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      inputProps={{ maxLength: 50 }}
-                    />
-                    {touched.name && errors.name && (
-                      <FormHelperText
-                        error
-                        id="standard-weight-helper-text--register"
-                      >
-                        {errors.name}
-                      </FormHelperText>
-                    )}
-                  </FormControl>
-
-                  <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-                    <Field
-                      name="hardware"
-                      as={TextField}
-                      label="Hardware"
-                      select
-                      fullWidth
-                      margin="normal"
-                    >
-                      {hardwareOptions.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
-                        </MenuItem>
-                      ))}
-                    </Field>
-
-                    <Field
-                      name="connectionType"
-                      as={TextField}
-                      label="Connection Type"
-                      select
-                      fullWidth
-                      margin="normal"
-                    >
-                      {connectionOptions.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
-                        </MenuItem>
-                      ))}
-                    </Field>
-                  </Box>
-
-                  <FieldArray name="fields">
-                    {({ remove, push }) => (
-                      <>
-                        {values.fields.map((field, index) => (
-                          <Box key={index} className="mb-4 flex items-center">
-                            <FormControl
-                              fullWidth
-                              error={!!errors.fields?.[index]}
-                              sx={{ ...theme.typography.customInput }}
-                            >
-                              <InputLabel
-                                htmlFor={`outlined-adornment-field${index}-register`}
-                              >
-                                {`Field ${index + 1}`}
-                              </InputLabel>
-                              <OutlinedInput
-                                id={`outlined-adornment-field${index}-register`}
-                                type="text"
-                                value={field}
-                                name={`fields.${index}`}
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                inputProps={{}}
-                              />
-                              {touched.fields && errors.fields?.[index] && (
-                                <FormHelperText
-                                  error
-                                  id="standard-weight-helper-text--register"
-                                >
-                                  {errors.fields?.[index]}
-                                </FormHelperText>
-                              )}
-                            </FormControl>
-                            {index !== 0 && (
-                              <Button
-                                type="button"
-                                onClick={() => remove(index)}
-                                className="ml-2 mt-2"
-                              >
-                                <ArchiveBoxXMarkIcon className="h-12 w-12 text-orange-50 hover:text-black" />
-                              </Button>
-                            )}
-                          </Box>
-                        ))}
-                        <Button
-                          type="button"
-                          onClick={() => values.fields.length < 6 && push("")}
-                          disabled={values.fields.length >= 6}
-                          className="inline-flex bg-orange-50  hover:bg-black  text-white justify-center rounded-md p-2 my-2"
-                        >
-                          New Field
-                        </Button>
-                      </>
-                    )}
-                  </FieldArray>
-
-                  <Field
-                    name="description"
-                    as={TextField}
-                    label="Description"
-                    multiline
-                    rows={4}
-                    fullWidth
-                    margin="normal"
-                    inputProps={{ maxLength: 128 }}
-                    helperText={`${values.description?.length || 0} / 128`}
+            {({
+              values,
+              errors,
+              touched,
+              isSubmitting,
+              handleBlur,
+              handleChange,
+              setFieldValue,
+            }) => (
+              <Form className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Channel Name</Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    value={values.name}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    maxLength={50}
+                    className={
+                      errors.name && touched.name ? "border-red-500" : ""
+                    }
                   />
+                  {touched.name && errors.name && (
+                    <p className="text-sm text-red-500">{errors.name}</p>
+                  )}
+                </div>
 
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      mt: 2,
-                    }}
-                  >
-                    <Button onClick={onClose} variant="outlined">
-                      Cancel
-                    </Button>
-
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      disabled={isSubmitting}
-                      className="inline-flex justify-center rounded-md border border-transparent bg-orange-50 py-2 px-4 gap-1 text-sm font-medium items-center text-white shadow-sm hover:bg-orange-700"
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="hardware">Hardware</Label>
+                    <Select
+                      value={values.hardware}
+                      onValueChange={(value) =>
+                        setFieldValue("hardware", value)
+                      }
                     >
-                      {isSubmitting && (
-                        <CloudArrowUpIcon
-                          width={20}
-                          height={20}
-                          color="white"
-                        />
-                      )}
-                      {isSubmitting
-                        ? "Creating a new channel..."
-                        : "Add Channel"}
-                    </Button>
-                  </Box>
-                </Form>
-              )}
-            </Formik>
-          </Box>
-        </Box>
-      </Modal>
-    </>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {hardwareOptions.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="connectionType">Connection Type</Label>
+                    <Select
+                      value={values.connectionType}
+                      onValueChange={(value) =>
+                        setFieldValue("connectionType", value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {connectionOptions.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <FieldArray name="fields">
+                  {({ remove, push }) => (
+                    <div className="space-y-4">
+                      <Label>Fields</Label>
+                      {values.fields.map((field, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <div className="flex-1 space-y-1">
+                            <Input
+                              name={`fields.${index}`}
+                              value={field}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              placeholder={`Field ${index + 1}`}
+                              className={
+                                Array.isArray(errors.fields) &&
+                                Array.isArray(touched.fields) &&
+                                errors.fields[index] &&
+                                touched.fields[index]
+                                  ? "border-red-500"
+                                  : ""
+                              }
+                            />
+                            {touched.fields &&
+                              Array.isArray(touched.fields) &&
+                              touched.fields[index] &&
+                              errors.fields?.[index] && (
+                                <p className="text-sm text-red-500">
+                                  {errors.fields[index]}
+                                </p>
+                              )}
+                          </div>
+                          {index !== 0 && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => remove(index)}
+                            >
+                              <ArchiveBoxXMarkIcon className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => values.fields.length < 6 && push("")}
+                        disabled={values.fields.length >= 6}
+                      >
+                        Add Field
+                      </Button>
+                    </div>
+                  )}
+                </FieldArray>
+
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    name="description"
+                    value={values.description}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    rows={4}
+                    maxLength={128}
+                    placeholder="Enter channel description..."
+                  />
+                  <p className="text-sm text-gray-500">
+                    {values.description?.length || 0} / 128
+                  </p>
+                </div>
+
+                <div className="flex justify-between pt-4">
+                  <Button type="button" variant="outline" onClick={onClose}>
+                    Cancel
+                  </Button>
+
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting && (
+                      <CloudArrowUpIcon className="w-4 h-4 mr-2" />
+                    )}
+                    {isSubmitting ? "Creating..." : "Add Channel"}
+                  </Button>
+                </div>
+              </Form>
+            )}
+          </Formik>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

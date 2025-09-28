@@ -20,7 +20,7 @@ import NavigationMenuLinks from "./NavigationMenuLinks/NavigationMenuLinks";
 import { navigation } from "@/constants";
 import AngledButton from "./components/design/AngledButton";
 import MenuSvg from "./components/design/svg/MenuSvg";
-import LoadingProgressBar from "../LoadingProgressBar";
+import LoadingProgressBar from "../loading-progress-bar";
 import { Logo } from "./Logo";
 
 interface AppAppBarProps {

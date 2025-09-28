@@ -49,11 +49,11 @@ const DeviceDetails = ({ params }: Props) => {
   } = useFetch(`/api/devices/${params.id}`);
 
   const { data: organizationData } = useFetch(
-    `/api/organizations/${session?.user?.organizationId}`,
+    `/api/organizations/${session?.user?.organizationId}`
   );
 
   const { data: initialWidgetData, refetch: refetchWidgets } = useFetch(
-    `/api/devices/${params.id}/widgets`,
+    `/api/devices/${params.id}/widgets`
   );
 
   const handleWebSocketMessage = useCallback(
@@ -74,7 +74,7 @@ const DeviceDetails = ({ params }: Props) => {
                       lastActivity: new Date(),
                     },
                   }
-                : null,
+                : null
             );
 
             break;
@@ -177,7 +177,7 @@ const DeviceDetails = ({ params }: Props) => {
                       statusChangeTime: new Date(),
                     },
                   }
-                : null,
+                : null
             );
 
             break;
@@ -200,7 +200,7 @@ const DeviceDetails = ({ params }: Props) => {
         }
       }
     },
-    [params.id],
+    [params.id]
   );
 
   const { isConnected, cacheReady, sendMessage } = useWebSocket({
@@ -265,10 +265,10 @@ const DeviceDetails = ({ params }: Props) => {
   }
 
   const channel = organization?.Channel?.find(
-    (channel: Channel) => channel.id === device?.channelId,
+    (channel: Channel) => channel.id === device?.channelId
   );
   const apiKey = organization?.ApiKey?.find(
-    (key: ApiKey) => key.channelId === channel?.id,
+    (key: ApiKey) => key.channelId === channel?.id
   );
 
   const getConnectionStatus = () => {
@@ -456,8 +456,8 @@ const DeviceDetails = ({ params }: Props) => {
                 <div className="text-blue-400">"{channel?.name}"</div>
               </div>
               <div>
-                <div className="text-gray-400">CHANNEL_API_KEY</div>
-                <div className="text-green-400">"{apiKey?.apiKey}"</div>
+                <div className="text-gray-400">DEVICE_TOKEN</div>
+                <div className="text-green-400">"{device?.authToken}"</div>
               </div>
             </div>
           </div>

@@ -23,7 +23,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@/components/*": ["./components/*"],
+      "@/lib/*": ["./lib/*"]
     },
     "typeRoots": ["./node_modules/@types", "./types"],
     "types": ["node", "ws"],
@@ -38,5 +40,5 @@
     "types/global.d.ts",
     "types/ws.d.ts"
   ],
-  "exclude": ["node_modules", "dist", ".next"]
+  "exclude": ["node_modules", ".next"]
 }

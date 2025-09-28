@@ -32,7 +32,7 @@ import {
 } from "@mui/x-data-grid";
 
 import { SparkLineChart } from "@mui/x-charts/SparkLineChart";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
+import LoadingProgressBar from "@/components/loading-progress-bar";
 import axios from "axios";
 
 type SparkLineData = number[];
@@ -43,7 +43,7 @@ function getLastNDays(n: number) {
     const d = new Date();
     d.setDate(d.getDate() - i);
     result.push(
-      d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
     );
   }
   return result;
@@ -90,7 +90,7 @@ export function renderAvatar(
     { name: string; color: string; image?: string },
     any,
     any
-  >,
+  >
 ) {
   if (params.value == null) {
     return "";
@@ -144,7 +144,7 @@ export default function UserManagementDashboard() {
     try {
       setLoading(true);
       const response = await axios.get(
-        process.env.NEXT_PUBLIC_BASE_URL + "/api/users/overview",
+        process.env.NEXT_PUBLIC_BASE_URL + "/api/users/overview"
       );
       if (response.status !== 200) {
         throw new Error("Failed to fetch users");
@@ -170,7 +170,7 @@ export default function UserManagementDashboard() {
     try {
       setActionLoading(true);
       await axios.delete(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${userId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${userId}`
       );
       await fetchUsers();
       setSuccess("User deleted successfully");
@@ -187,7 +187,7 @@ export default function UserManagementDashboard() {
       setActionLoading(true);
       await axios.put(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${userId}`,
-        { role: newRole },
+        { role: newRole }
       );
       await fetchUsers();
       setSuccess("User role updated successfully");
