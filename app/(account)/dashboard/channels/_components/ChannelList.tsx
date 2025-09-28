@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import useSWR from "swr";
 import ChannelListTable from "./ChannelListTable";
 import { Button } from "@/components/ui/button";
-import { TableSkeleton } from "@/components/ui/unified-loading";
+import { TableSkeleton } from "@/components/ui/UnifiedLoading";
 import Image from "next/image";
 import type { Channel } from "@/types";
 import AddNewChannelModal from "./AddNewChannelModal";
