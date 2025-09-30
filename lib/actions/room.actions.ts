@@ -11,7 +11,7 @@ import {
   RoomAccesses,
   ShareChannelParams,
   UserAccessType,
-} from "@/types";
+} from "@/types/uni-types";
 import axios from "axios";
 import prisma from "@/prisma/client";
 

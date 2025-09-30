@@ -6,7 +6,7 @@ import { Box } from "@mui/material";
 import useFetch from "@/hooks/useFetch";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useSession } from "next-auth/react";
-import type { ApiKey, Channel, Device } from "@/types";
+import type { ApiKey, Channel, Device } from "@/types/uni-types";
 import { LinearLoading } from "@/components/LinearLoading";
 import { HiStatusOffline, HiStatusOnline } from "react-icons/hi";
 import Link from "next/link";

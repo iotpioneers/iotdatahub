@@ -22,7 +22,7 @@ import {
   OutlinedInput,
   useTheme,
 } from "@mui/material";
-import { Channel } from "@/types";
+import { Channel } from "@/types/uni-types";
 
 const deviceTypes = [
   { value: "SENSOR", label: "Sensor" },
@@ -40,7 +40,7 @@ const deviceSchema = Yup.object().shape({
   deviceType: Yup.string()
     .oneOf(
       deviceTypes.map((type) => type.value),
-      "Invalid device type",
+      "Invalid device type"
     )
     .required("Device type is required")
     .matches(/^[a-zA-Z0-9'\-_ ]+$/, "Invalid device type"),
@@ -64,7 +64,7 @@ const AddDeviceFormComponent: React.FC = () => {
 
   const { data: channels, error: channelsError } = useSWR<Channel[], Error>(
     "/api/channels",
-    fetcher,
+    fetcher
   );
 
   const initialValues = {
@@ -75,7 +75,7 @@ const AddDeviceFormComponent: React.FC = () => {
 
   const handleSubmit = async (
     values: typeof initialValues,
-    { setSubmitting, setFieldError }: any,
+    { setSubmitting, setFieldError }: any
   ) => {
     setLoading(true);
     try {
@@ -100,7 +100,7 @@ const AddDeviceFormComponent: React.FC = () => {
       router.push(`/dashboard/devices/${data.id}`);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "An unknown error occurred",
+        err instanceof Error ? err.message : "An unknown error occurred"
       );
     } finally {
       setLoading(false);

@@ -14,7 +14,7 @@ import SkeletonUserActivityOverviewCard from "../cards/Skeleton/SkeletonUserActi
 import { gridSpacing } from "@/app/store/constant";
 import ChevronRightOutlinedIcon from "@mui/icons-material/ChevronRightOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
-import { Channel, DataPoint, Device, Field } from "@/types";
+import { Channel, DataPoint, Device, Field } from "@/types/uni-types";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
@@ -56,7 +56,7 @@ const UserActivityOverviewCard = ({
 
   const filterDataByPeriod = (
     data: DataPoint[],
-    period: Period,
+    period: Period
   ): DataPoint[] => {
     const now = new Date();
     const startDate = new Date();
@@ -76,7 +76,7 @@ const UserActivityOverviewCard = ({
     return data.filter(
       (point) =>
         new Date(point.timestamp) >= startDate &&
-        new Date(point.timestamp) <= now,
+        new Date(point.timestamp) <= now
     );
   };
 
@@ -88,7 +88,7 @@ const UserActivityOverviewCard = ({
 
     fields.forEach((field) => {
       const count = filteredData.filter(
-        (point) => point.fieldId === field.id,
+        (point) => point.fieldId === field.id
       ).length;
       result.push({ id: field.name, value: count, label: field.name });
     });

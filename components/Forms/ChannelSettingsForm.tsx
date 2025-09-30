@@ -20,7 +20,7 @@ import { Card, CardContent, Grid, Typography } from "@mui/material";
 import MainCard from "../dashboard/cards/MainCard";
 import ErrorMessage from "@/components/ErrorMessage";
 import { channelSchema } from "@/validations/schema.validation";
-import { Channel, Field } from "@/types";
+import { Channel, Field } from "@/types/uni-types";
 import { ActionModal } from "../dashboard/ActionModal";
 
 // Icons

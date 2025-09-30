@@ -6,7 +6,7 @@ import { LineChart, Line, ResponsiveContainer } from "recharts";
 
 // project imports
 import SkeletonTotalChannelDetailsCard from "../cards/Skeleton/SkeletonTotalChannelDetailsCard";
-import { Device } from "@/types";
+import { Device } from "@/types/uni-types";
 
 // ==============================|| DASHBOARD - TOTAL DEVICES CARD ||============================== //
 

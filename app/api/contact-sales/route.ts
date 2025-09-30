@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import prisma from "@/prisma/client";
 import { contactSalesSchema } from "@/validations/schema.validation";
-import { ContactSalesFormData } from "@/types";
+import { ContactSalesFormData } from "@/types/uni-types";
 
 async function sendNotificationEmail(contactData: ContactSalesFormData) {
   const {
@@ -150,7 +150,9 @@ async function sendNotificationEmail(contactData: ContactSalesFormData) {
                     </tr>
                   </tbody>
                 </table>
-                <p style="font-size:12px;line-height:24px;margin:25px 0 0 0;text-align:center;color:rgb(102,102,102)">Copyright © ${new Date().getFullYear()} IoT DATA HUB. <br /> <a href="${process.env.NEXTAUTH_URL}" style="color:#067df7;text-decoration-line:none" target="_blank">All rights reserved</a></p>
+                <p style="font-size:12px;line-height:24px;margin:25px 0 0 0;text-align:center;color:rgb(102,102,102)">Copyright © ${new Date().getFullYear()} IoT DATA HUB. <br /> <a href="${
+      process.env.NEXTAUTH_URL
+    }" style="color:#067df7;text-decoration-line:none" target="_blank">All rights reserved</a></p>
               </td>
             </tr>
           </tbody>
@@ -220,7 +222,9 @@ async function sendNotificationEmail(contactData: ContactSalesFormData) {
                     </tr>
                   </tbody>
                 </table>
-                <p style="font-size:12px;line-height:24px;margin:25px 0 0 0;text-align:center;color:rgb(102,102,102)">Copyright © ${new Date().getFullYear()} IoT DATA HUB. <br /> <a href="${process.env.NEXTAUTH_URL}" style="color:#067df7;text-decoration-line:none" target="_blank">All rights reserved</a></p>
+                <p style="font-size:12px;line-height:24px;margin:25px 0 0 0;text-align:center;color:rgb(102,102,102)">Copyright © ${new Date().getFullYear()} IoT DATA HUB. <br /> <a href="${
+      process.env.NEXTAUTH_URL
+    }" style="color:#067df7;text-decoration-line:none" target="_blank">All rights reserved</a></p>
               </td>
             </tr>
           </tbody>
@@ -278,7 +282,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "Error processing contact request" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

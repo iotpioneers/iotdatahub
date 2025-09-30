@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ArrowUpRight, Radio } from "lucide-react";
 
 // project imports
-import { Channel } from "@/types";
+import { Channel } from "@/types/uni-types";
 import SkeletonTotalChannelDetailsCard from "../cards/Skeleton/SkeletonTotalChannelDetailsCard";
 
 // ===========================|| DASHBOARD DEFAULT - CHANNEL CARD ||=========================== //

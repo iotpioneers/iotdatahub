@@ -13,7 +13,7 @@ import {
   CardContent,
 } from "@mui/material";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
-import { PricingPlanType } from "@/types";
+import { PricingPlanType } from "@/types/uni-types";
 import AngledButton from "../../Home/components/design/AngledButton";
 import { LinearLoading } from "@/components/LinearLoading";
 
@@ -29,7 +29,7 @@ const SubscriptionModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
       setIsLoading(true);
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`
         );
         setSubscriptions(response.data);
       } catch (error) {
@@ -151,16 +151,16 @@ const SubscriptionModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
                       item.price === 0
                         ? "/signup"
                         : item.name === "Enterprise"
-                          ? "#"
-                          : "https://buy.stripe.com/test_9AQ5nNdR2653a5OcMN"
+                        ? "#"
+                        : "https://buy.stripe.com/test_9AQ5nNdR2653a5OcMN"
                     }
                     white={!!item.price}
                   >
                     {item.activation && item.name === "Enterprise"
                       ? "Contact us"
                       : item.price === 0
-                        ? "Try for free"
-                        : "Get started"}
+                      ? "Try for free"
+                      : "Get started"}
                   </AngledButton>
                 </CardActions>
 
@@ -224,12 +224,12 @@ const SubscriptionModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
                         {item.maxMessagesPerYear > 1000000000000
                           ? `${item.maxMessagesPerYear / 1000000000000}T`
                           : item.maxMessagesPerYear > 1000000000
-                            ? `${item.maxMessagesPerYear / 1000000000}B`
-                            : item.maxMessagesPerYear > 1000000
-                              ? `${item.maxMessagesPerYear / 1000000}M`
-                              : item.maxMessagesPerYear > 1000
-                                ? `${item.maxMessagesPerYear / 1000}K`
-                                : item.maxMessagesPerYear}{" "}
+                          ? `${item.maxMessagesPerYear / 1000000000}B`
+                          : item.maxMessagesPerYear > 1000000
+                          ? `${item.maxMessagesPerYear / 1000000}M`
+                          : item.maxMessagesPerYear > 1000
+                          ? `${item.maxMessagesPerYear / 1000}K`
+                          : item.maxMessagesPerYear}{" "}
                         Maximum messages
                       </Typography>
                     </li>

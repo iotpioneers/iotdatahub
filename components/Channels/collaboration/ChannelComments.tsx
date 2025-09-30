@@ -2,7 +2,7 @@ import { useIsThreadActive } from "@liveblocks/react-lexical";
 import { Composer, Thread } from "@liveblocks/react-ui";
 import { useThreads } from "@liveblocks/react/suspense";
 import { cn } from "@/lib/utils";
-import type { ThreadWrapperProps } from "@/types";
+import type { ThreadWrapperProps } from "@/types/uni-types";
 
 const ThreadWrapper = ({ thread }: ThreadWrapperProps) => {
   const isActive = useIsThreadActive(thread.id);
@@ -14,7 +14,7 @@ const ThreadWrapper = ({ thread }: ThreadWrapperProps) => {
       className={cn(
         "comment-thread border rounded-lg",
         isActive && "!border-blue-500 shadow-md",
-        thread.resolved && "opacity-40",
+        thread.resolved && "opacity-40"
       )}
     />
   );
