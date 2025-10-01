@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 // Project Imports
 import { deleteChannel } from "@/lib/actions/room.actions";
 import ChannelSettingsForm from "@/components/Forms/ChannelSettingsForm";
-import { Channel, Field } from "@/types";
+import { Channel, Field } from "@/types/uni-types";
 import LoadingProgressBar from "@/components/loading-progress-bar";
 import { ActionModal } from "@/components/dashboard/ActionModal";
 

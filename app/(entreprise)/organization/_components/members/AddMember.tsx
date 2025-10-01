@@ -20,7 +20,7 @@ import Grid from "@mui/material/Grid";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import { Callout } from "@radix-ui/themes";
-import { AddMemberProps } from "@/types";
+import { AddMemberProps } from "@/types/uni-types";
 import { EmployeeMember } from "@/types/employees-member";
 import ErrorMessage from "@/components/ErrorMessage";
 import UploadImage from "@/components/dashboard/account/UploadImage";
@@ -62,13 +62,13 @@ const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
   const [error, setError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [access, setAccess] = useState<"VIEWER" | "COMMENTER" | "EDITOR">(
-    "VIEWER",
+    "VIEWER"
   );
   const [showResult, setShowResult] = React.useState(false);
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string,
+    reason?: string
   ) => {
     if (reason === "clickaway") {
       return;

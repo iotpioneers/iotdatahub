@@ -7,7 +7,7 @@ import { AdjustmentsVerticalIcon } from "@heroicons/react/16/solid";
 import ChannelDataStream from "./navigation/ChannelDataStream";
 import ExportChannelData from "./ExportChannelData";
 import { ApiKeys } from "./navigation";
-import { ChannelNavigationProps } from "@/types";
+import { ChannelNavigationProps } from "@/types/uni-types";
 import ChannelSettings from "./navigation/ChannelSettings";
 import SampleCodeSnippet from "./navigation/SampleCodeSnippet";
 

@@ -13,7 +13,7 @@ import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { ShareChannelRoomAccessDialogProps, User } from "@/types";
+import { ShareChannelRoomAccessDialogProps, User } from "@/types/uni-types";
 import { CollaborationUser } from "@/types/user";
 import { Share, Link } from "@phosphor-icons/react";
 import PeopleWithAccess from "./PeopleWithAccess";

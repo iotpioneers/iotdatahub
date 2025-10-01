@@ -16,7 +16,7 @@ import {
 import { List, ListItem } from "@mui/material";
 import LockIcon from "@mui/icons-material/Lock";
 import PublicIcon from "@mui/icons-material/Public";
-import { UserAccessType } from "@/types";
+import { UserAccessType } from "@/types/uni-types";
 import {
   updateRoomDefaultAccess,
   getRoomAccess,

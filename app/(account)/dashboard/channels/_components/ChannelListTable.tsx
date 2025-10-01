@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/components/ui/toast-provider";
 import Link from "next/link";
-import type { Channel } from "@/types";
+import type { Channel } from "@/types/uni-types";
 import axios from "axios";
 import LoadingProgressBar from "@/components/loading-progress-bar";
 import { ActionModal } from "@/components/dashboard/ActionModal";

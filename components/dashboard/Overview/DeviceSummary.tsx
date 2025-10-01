@@ -8,7 +8,7 @@ import Typography from "@mui/material/Typography";
 import { ArrowDown as ArrowDownIcon } from "@phosphor-icons/react/dist/ssr/ArrowDown";
 import { ArrowUp as ArrowUpIcon } from "@phosphor-icons/react/dist/ssr/ArrowUp";
 import { MdOutlinePermDeviceInformation } from "react-icons/md";
-import { Device } from "@/types";
+import { Device } from "@/types/uni-types";
 
 export interface BudgetProps {
   diff?: number;

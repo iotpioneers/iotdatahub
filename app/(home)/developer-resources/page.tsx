@@ -1,6 +1,6 @@
 import React from "react";
 import { Metadata } from "next";
-import DeveloperResources from "@/components/Home/components/developer-resources";
+import DeveloperResources from "@/components/Home/components/developer-resources/DeveloperResources";
 
 const DeveloperResourcesPage = () => {
   return <DeveloperResources />;

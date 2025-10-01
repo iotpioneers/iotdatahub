@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { styled } from "@mui/system";
 import { Modal as BaseModal } from "@mui/base/Modal";
 import { Button } from "@mui/base/Button";
-import { Channel } from "@/types";
+import { Channel } from "@/types/uni-types";
 import axios from "axios";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
@@ -21,7 +21,7 @@ const NewFieldNestedModal = ({ channel }: NewFieldNestedModalProps) => {
   const [loading, setLoading] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
-    "success",
+    "success"
   );
   const [alertMessage, setAlertMessage] = useState("");
 
@@ -30,7 +30,7 @@ const NewFieldNestedModal = ({ channel }: NewFieldNestedModalProps) => {
 
   const handleSnackbarClose = (
     event?: React.SyntheticEvent | Event,
-    reason?: string,
+    reason?: string
   ) => {
     if (reason === "clickaway") {
       return;
@@ -53,7 +53,7 @@ const NewFieldNestedModal = ({ channel }: NewFieldNestedModalProps) => {
           name: fieldName,
           channelId: channel.id,
           organizationId: channel.organizationId,
-        },
+        }
       );
 
       if (response.status === 200) {
@@ -67,7 +67,7 @@ const NewFieldNestedModal = ({ channel }: NewFieldNestedModalProps) => {
     } catch (error) {
       showAlert(
         "error",
-        "An error occurred while adding the field. Please try again.",
+        "An error occurred while adding the field. Please try again."
       );
     } finally {
       setLoading(false);
@@ -314,7 +314,7 @@ const ModalContent = styled("div")(
     color: ${theme.palette.mode === "dark" ? grey[400] : grey[800]};
     margin-bottom: 4px;
   }
-`,
+`
 );
 
 const FormField = styled("div")`
@@ -392,7 +392,7 @@ const ModalButton = styled(Button)(
       background-color: ${blue[500]};
     }
   }
-`,
+`
 );
 
 export default NewFieldNestedModal;

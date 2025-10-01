@@ -5,7 +5,7 @@ import {
   removeCollaborator,
   updateChannelAccess,
 } from "@/lib/actions/room.actions";
-import { CollaboratorProps, UserAccessType } from "@/types";
+import { CollaboratorProps, UserAccessType } from "@/types/uni-types";
 
 import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";

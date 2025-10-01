@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import PricingList from "../Home/components/PricingList";
-import { PricingPlanType } from "@/types";
+import { PricingPlanType } from "@/types/uni-types";
 
 const SubscriptionSelection: React.FC = () => {
   const [subscriptions, setSubscriptions] = useState<PricingPlanType[]>([]);
@@ -17,7 +17,7 @@ const SubscriptionSelection: React.FC = () => {
     const fetchSubscriptions = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/pricing`
         );
         setSubscriptions(response.data);
       } catch (error) {
@@ -36,7 +36,7 @@ const SubscriptionSelection: React.FC = () => {
       try {
         await axios.post(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/subscription`,
-          selectedSubscription,
+          selectedSubscription
         );
         router.push("/dashboard/channels");
       } catch (error) {

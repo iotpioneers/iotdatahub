@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { Channel, DataPoint, Field } from "@/types";
+import { Channel, DataPoint, Field } from "@/types/uni-types";
 
 interface ChannelActivityOverviewProps {
   isLoading: boolean;
@@ -58,7 +58,7 @@ export default function ChannelActivityOverview({
       const date = new Date(dp.timestamp);
       if (date >= sixMonthsAgo) {
         const monthIndex = monthlyData.findIndex(
-          (m) => m.month === date.toLocaleString("default", { month: "short" }),
+          (m) => m.month === date.toLocaleString("default", { month: "short" })
         );
         if (monthIndex !== -1) {
           monthlyData[monthIndex]["Data Received"] += 1;
@@ -70,7 +70,7 @@ export default function ChannelActivityOverview({
       const date = new Date(field.createdAt);
       if (date >= sixMonthsAgo) {
         const monthIndex = monthlyData.findIndex(
-          (m) => m.month === date.toLocaleString("default", { month: "short" }),
+          (m) => m.month === date.toLocaleString("default", { month: "short" })
         );
         if (monthIndex !== -1) {
           monthlyData[monthIndex]["Field Created"] += 1;
@@ -82,7 +82,7 @@ export default function ChannelActivityOverview({
       const date = new Date(channel.createdAt);
       if (date >= sixMonthsAgo) {
         const monthIndex = monthlyData.findIndex(
-          (m) => m.month === date.toLocaleString("default", { month: "short" }),
+          (m) => m.month === date.toLocaleString("default", { month: "short" })
         );
         if (monthIndex !== -1) {
           monthlyData[monthIndex]["Channel Created"] += 1;
@@ -102,7 +102,7 @@ export default function ChannelActivityOverview({
         month["Data Received"] +
         month["Field Created"] +
         month["Channel Created"],
-      0,
+      0
     );
 
     const lastThreeMonths = aggregatedData.slice(-3);
@@ -114,7 +114,7 @@ export default function ChannelActivityOverview({
         month["Data Received"] +
         month["Field Created"] +
         month["Channel Created"],
-      0,
+      0
     );
 
     const previousThreeMonthsTotal = previousThreeMonths.reduce(
@@ -123,7 +123,7 @@ export default function ChannelActivityOverview({
         month["Data Received"] +
         month["Field Created"] +
         month["Channel Created"],
-      0,
+      0
     );
 
     const change =

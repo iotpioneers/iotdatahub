@@ -1,6 +1,6 @@
 "use client";
 
-import { Channel } from "@/types";
+import { Channel } from "@/types/uni-types";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
@@ -60,7 +60,7 @@ interface GlobalStateContextType {
 
 // Create the context
 const GlobalStateContext = createContext<GlobalStateContextType | undefined>(
-  undefined,
+  undefined
 );
 
 export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
