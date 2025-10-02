@@ -18,7 +18,7 @@ import { LinearLoading } from "@/components/LinearLoading";
 
 const DeviceOrganization = (): React.JSX.Element => {
   const [organization, setOrganization] = React.useState<Organization | null>(
-    null,
+    null
   );
   const [loading, setLoading] = React.useState<Boolean>(true); // Start with loading true
   const [error, setError] = React.useState<string | null>(null);
@@ -36,7 +36,7 @@ const DeviceOrganization = (): React.JSX.Element => {
       try {
         setLoading(true);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/organizations/${organizationId}`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/organizations/${organizationId}`
         );
 
         if (!response.ok) {
@@ -49,7 +49,7 @@ const DeviceOrganization = (): React.JSX.Element => {
         setError(
           error instanceof Error
             ? error.message
-            : "Failed to load organization data",
+            : "Failed to load organization data"
         );
       } finally {
         setLoading(false);

@@ -17,7 +17,7 @@ import Snackbar from "@mui/material/Snackbar";
 
 // Project Imports
 import ErrorMessage from "@/components/ErrorMessage";
-import { useGlobalState } from "@/context";
+import { useGlobalState } from "@/context/globalContext";
 import { createChannelRoom } from "@/lib/actions/room.actions";
 import { channelSchema } from "@/validations/schema.validation";
 
@@ -58,7 +58,7 @@ export default function ChannelForm() {
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string,
+    reason?: string
   ) => {
     if (reason === "clickaway") {
       return;
@@ -108,7 +108,7 @@ export default function ChannelForm() {
           ...data,
           organizationId: currentOrganization!.id,
         }),
-        false,
+        false
       );
 
       if (!result || "error" in result) {

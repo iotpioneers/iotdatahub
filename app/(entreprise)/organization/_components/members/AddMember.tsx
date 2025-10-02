@@ -62,13 +62,13 @@ const AddMember: React.FC<AddMemberProps> = ({ onNewMember }) => {
   const [error, setError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [access, setAccess] = useState<"VIEWER" | "COMMENTER" | "EDITOR">(
-    "VIEWER",
+    "VIEWER"
   );
   const [showResult, setShowResult] = React.useState(false);
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string,
+    reason?: string
   ) => {
     if (reason === "clickaway") {
       return;

@@ -23,7 +23,7 @@ import AddCollaboratorSelector from "./AddCollaboratorSelector";
 import { getUsers } from "@/lib/actions/user.actions";
 import { getRoomAccess } from "@/lib/actions/room.actions";
 import { useSession } from "next-auth/react";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
+import LoadingProgressBar from "@/components/loading-progress-bar";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -59,7 +59,7 @@ const InviteCollaboratorModal = ({
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string,
+    reason?: string
   ) => {
     if (reason === "clickaway") {
       return;
@@ -70,7 +70,7 @@ const InviteCollaboratorModal = ({
   const copyLinkToClipboard = useCallback(() => {
     navigator.clipboard
       .writeText(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/channels/${roomId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/channels/${roomId}`
       )
       .then(() => {
         setLinkCopied(true);
@@ -85,8 +85,8 @@ const InviteCollaboratorModal = ({
   const handleCollaboratorRemoved = (removedEmail: string) => {
     setCollaboratorList((prevCollaborators) =>
       prevCollaborators.filter(
-        (collaborator) => collaborator.email !== removedEmail,
-      ),
+        (collaborator) => collaborator.email !== removedEmail
+      )
     );
   };
 

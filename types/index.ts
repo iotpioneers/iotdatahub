@@ -16,7 +16,7 @@ export interface Device {
   id: string;
   name: string;
   description: string;
-  authToken?: string;
+  authToken: string;
   channelId: string | null;
   organizationId: string;
   status: "ONLINE" | "OFFLINE" | "DISCONNECTED";

@@ -38,7 +38,7 @@ export function UserPopover({
       const { error } = await authClient.signOut();
 
       if (error) {
-        console.log("Sign out error");
+        console.log("Sign out error:", error);
         return;
       }
 
@@ -49,7 +49,7 @@ export function UserPopover({
       router.refresh();
       // After refresh, AuthGuard will handle the redirect
     } catch (err) {
-      console.log("Sign out error");
+      console.log("Sign out error:", err);
     }
   }, [checkSession, router]);
 

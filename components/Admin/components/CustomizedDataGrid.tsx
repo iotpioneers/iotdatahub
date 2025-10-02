@@ -9,7 +9,7 @@ import {
 import { SparkLineChart } from "@mui/x-charts/SparkLineChart";
 import { DataPoint, Organization } from "@/types";
 import { dateConverter } from "@/lib/utils";
-import LoadingProgressBar from "@/components/LoadingProgressBar";
+import LoadingProgressBar from "@/components/loading-progress-bar";
 
 // Custom hook for fetching organization data
 function useOrganizationData() {
@@ -21,7 +21,7 @@ function useOrganizationData() {
     async function fetchData() {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/organizations`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/organizations`
         );
         const data = response.data;
 
@@ -29,7 +29,7 @@ function useOrganizationData() {
           const dataPoints: DataPoint[] = org.DataPoint || [];
           const sortedDataPoints = dataPoints.sort(
             (a, b) =>
-              new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+              new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
           );
 
           const lastUploaded =
@@ -67,7 +67,7 @@ function useOrganizationData() {
 }
 
 function calculateDataActivity(
-  dataPoints: DataPoint[],
+  dataPoints: DataPoint[]
 ): { value: number; date: Date }[] {
   // Group data points by day for the last 30 days
   const thirtyDaysAgo = new Date();
@@ -92,7 +92,7 @@ function calculateDataActivity(
 }
 
 function renderSparklineCell(
-  params: GridRenderCellParams<any, { value: number; date: Date }[]>,
+  params: GridRenderCellParams<any, { value: number; date: Date }[]>
 ) {
   const value = params.value;
 

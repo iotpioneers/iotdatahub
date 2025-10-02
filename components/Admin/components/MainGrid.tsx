@@ -27,14 +27,14 @@ interface OverviewData {
 export default function MainGrid() {
   const [loading, setLoading] = React.useState(true);
   const [overviewData, setOverviewData] = React.useState<OverviewData | null>(
-    null,
+    null
   );
 
   React.useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get<OverviewData>(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/overview`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/overview`
         );
         setOverviewData(response.data);
         setLoading(false);

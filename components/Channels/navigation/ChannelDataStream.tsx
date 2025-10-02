@@ -24,7 +24,7 @@ interface Props {
 
 const ChannelDataStream = ({ channel, fields, dataPoint }: Props) => {
   const [fieldWidgets, setFieldWidgets] = useState<Record<string, string>>(
-    Object.fromEntries(fields.map((field) => [field.id, "lineChart"])),
+    Object.fromEntries(fields.map((field) => [field.id, "lineChart"]))
   );
 
   const renderChart = (chartData: DataPoint[], widgetType: string) => {
@@ -48,7 +48,7 @@ const ChannelDataStream = ({ channel, fields, dataPoint }: Props) => {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {fields.map((field) => {
         const chartData = dataPoint.filter(
-          (datapoint) => datapoint.fieldId === field.id,
+          (datapoint) => datapoint.fieldId === field.id
         );
         return (
           <div key={field.id}>

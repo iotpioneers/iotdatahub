@@ -15,7 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/Actions/DialogActions";
 import { Button } from "@mui/material";
-import LoadingProgressBar from "../LoadingProgressBar";
+import LoadingProgressBar from "../loading-progress-bar";
 
 interface CustomModalProps {
   triggerComponent: React.ReactNode;

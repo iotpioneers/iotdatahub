@@ -13,7 +13,7 @@ export interface UserContextValue {
 }
 
 export const UserContext = React.createContext<UserContextValue | undefined>(
-  undefined,
+  undefined
 );
 
 export interface UserProviderProps {
@@ -38,13 +38,8 @@ export function UserProvider({
       const { data, error } = await authClient.getUser();
 
       if (error) {
-        console.log("Error checking session");
-        setState((prev) => ({
-          ...prev,
-          user: null,
-          error: "Something went wrong",
-          isLoading: false,
-        }));
+        console.log("Error fetching user:", error);
+
         return;
       }
 
@@ -55,7 +50,7 @@ export function UserProvider({
         isLoading: false,
       }));
     } catch (err) {
-      console.log("Error checking session");
+      console.log("Error fetching user:", err);
       setState((prev) => ({
         ...prev,
         user: null,
