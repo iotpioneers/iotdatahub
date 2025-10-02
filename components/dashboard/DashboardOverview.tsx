@@ -13,13 +13,7 @@ import TotalDevicesCard from "@/components/dashboard/Overview/TotalDevicesCard";
 import WelcomeContentCard from "./Overview/WelcomeContentCard";
 
 // types
-import {
-  Channel,
-  DataPoint,
-  Field,
-  Device,
-  Organization,
-} from "@/types/uni-types";
+import { Channel, DataPoint, Field, Device, Organization } from "@/types";
 import { EmployeeMember } from "@/types/employees-member";
 
 interface DashboardOverviewProps {

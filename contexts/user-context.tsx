@@ -13,7 +13,7 @@ export interface UserContextValue {
 }
 
 export const UserContext = React.createContext<UserContextValue | undefined>(
-  undefined,
+  undefined
 );
 
 export interface UserProviderProps {

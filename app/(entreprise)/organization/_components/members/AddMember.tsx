@@ -20,7 +20,7 @@ import Grid from "@mui/material/Grid";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import { Callout } from "@radix-ui/themes";
-import { AddMemberProps } from "@/types/uni-types";
+import { AddMemberProps } from "@/types";
 import { EmployeeMember } from "@/types/employees-member";
 import ErrorMessage from "@/components/ErrorMessage";
 import UploadImage from "@/components/dashboard/account/UploadImage";

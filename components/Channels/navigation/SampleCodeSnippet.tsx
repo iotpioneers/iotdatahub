@@ -18,7 +18,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import SendIcon from "@mui/icons-material/Send";
 
 // types
-import { Field } from "@/types/uni-types";
+import { Field } from "@/types";
 
 interface TabPanelProps {
   children?: React.ReactNode;

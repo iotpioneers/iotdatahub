@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import SkeletonTotalDatGeneratedLightCard from "../cards/Skeleton/SkeletonTotalDatGeneratedLightCard";
 
 // assets
-import { Organization } from "@/types/uni-types";
+import { Organization } from "@/types";
 import { EmployeeMember } from "@/types/employees-member";
 
 // ==============================|| DASHBOARD - ORGANIZATION OVERVIEW CARD ||============================== //

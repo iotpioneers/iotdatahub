@@ -5,7 +5,7 @@ import { Grid, MenuItem, TextField, Typography } from "@mui/material";
 import { gridSpacing } from "./constant";
 import LineChartComponent from "../charts/LineChartComponent";
 import MainCard from "@/components/dashboard/cards/MainCard";
-import { Channel, DataPoint, Field } from "@/types/uni-types";
+import { Channel, DataPoint, Field } from "@/types";
 import BarChartWidget from "../charts/BarChartWidget";
 import { AddChartComponent } from "../charts";
 import GaugeWidgetComponent from "../charts/GaugeWidget";

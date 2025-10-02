@@ -58,7 +58,7 @@ const cardVariants = {
     y: 0,
     scale: 1,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 100,
       damping: 15,
     },
@@ -69,7 +69,7 @@ const cardVariants = {
     boxShadow:
       "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 300,
       damping: 20,
     },

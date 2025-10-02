@@ -34,7 +34,7 @@ import {
 } from "lucide-react";
 import useSWR from "swr";
 import { ReplyForm } from "./ReplyForm";
-import { Feedback, FeedbackStatus, ReplyFormValues } from "@/types/uni-types";
+import { Feedback, FeedbackStatus, ReplyFormValues } from "@/types";
 import AnalyticsChart from "./AnalyticsChart";
 import { FaHourglassHalf } from "react-icons/fa6";
 import { a } from "react-spring";

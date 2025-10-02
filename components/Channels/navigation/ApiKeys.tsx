@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { ApiKey } from "@/types/uni-types";
+import { ApiKey } from "@/types";
 import axios from "axios";
 
 interface ApiKeysProps {

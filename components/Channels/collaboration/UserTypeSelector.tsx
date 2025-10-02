@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/Actions/SelectorActions";
-import { UserAccessType, UserTypeSelectorParams } from "@/types/uni-types";
+import { UserAccessType, UserTypeSelectorParams } from "@/types";
 
 const UserTypeSelector = ({
   userType,

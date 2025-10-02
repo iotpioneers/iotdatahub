@@ -22,7 +22,7 @@ import {
   OutlinedInput,
   useTheme,
 } from "@mui/material";
-import { Channel } from "@/types/uni-types";
+import { Channel } from "@/types";
 
 const deviceTypes = [
   { value: "SENSOR", label: "Sensor" },

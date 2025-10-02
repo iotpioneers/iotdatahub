@@ -11,7 +11,7 @@ import { ViewIcon } from "lucide-react";
 import { updateChannelRoomData } from "@/lib/actions/room.actions";
 import { Input } from "@/components/Actions/TextEditingInput";
 import { dateConverter } from "@/lib/utils";
-import { ChannelHeadingProps } from "@/types/uni-types";
+import { ChannelHeadingProps } from "@/types";
 
 import InviteCollaboratorModal from "./collaboration/InviteCollaboratorModal";
 import ActiveCollaborators from "./collaboration/ActiveCollaborators";

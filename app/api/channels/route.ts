@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { getToken } from "next-auth/jwt";
 import { channelSchema } from "@/validations/schema.validation";
-import { ApiKey } from "@/types/uni-types";
+import { ApiKey } from "@/types";
 
 interface Field {
   name: string;

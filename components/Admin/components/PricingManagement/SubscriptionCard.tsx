@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, Typography, Button } from "@mui/material";
-import { PricingPlanType } from "@/types/uni-types";
+import { PricingPlanType } from "@/types";
 
 interface SubscriptionCardProps {
   subscription: PricingPlanType;

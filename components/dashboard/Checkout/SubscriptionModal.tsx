@@ -13,7 +13,7 @@ import {
   CardContent,
 } from "@mui/material";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
-import { PricingPlanType } from "@/types/uni-types";
+import { PricingPlanType } from "@/types";
 import AngledButton from "../../Home/components/design/AngledButton";
 import { LinearLoading } from "@/components/LinearLoading";
 

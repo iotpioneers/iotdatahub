@@ -1,6 +1,6 @@
 import React from "react";
 import NewFieldNestedModal from "./NewFieldNestedModal";
-import { Channel } from "@/types/uni-types";
+import { Channel } from "@/types";
 
 interface AddChartComponentProps {
   channel: Channel;

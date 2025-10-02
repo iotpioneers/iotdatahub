@@ -5,7 +5,7 @@ import { Button } from "@radix-ui/themes";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import LoadingProgressBar from "@/components/loading-progress-bar";
-import { PricingPlanType } from "@/types/uni-types";
+import { PricingPlanType } from "@/types";
 import { Loader2 } from "lucide-react";
 
 const UpgradePricingPlan = () => {

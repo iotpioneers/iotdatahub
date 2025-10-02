@@ -14,7 +14,7 @@ import SkeletonUserActivityOverviewCard from "../cards/Skeleton/SkeletonUserActi
 import { gridSpacing } from "@/app/store/constant";
 import ChevronRightOutlinedIcon from "@mui/icons-material/ChevronRightOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
-import { Channel, DataPoint, Device, Field } from "@/types/uni-types";
+import { Channel, DataPoint, Device, Field } from "@/types";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 

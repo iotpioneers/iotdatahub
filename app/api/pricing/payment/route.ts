@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         // Additional metadata
         metadata: {
           initiatedAt: new Date().toISOString(),
-          ipAddress: request.ip,
+ipAddress: (request.headers.get('x-forwarded-for')) as string,
           userAgent: request.headers.get("user-agent"),
         },
       },
