@@ -4,7 +4,6 @@ import * as React from "react";
 
 import type { User } from "@/types/user";
 import { authClient } from "@/lib/auth/client";
-import logger from "@/lib/hardwareServer/logger";
 
 export interface UserContextValue {
   user: User | null;
@@ -39,7 +38,7 @@ export function UserProvider({
       const { data, error } = await authClient.getUser();
 
       if (error) {
-        logger.error("Error checking session");
+        console.log("Error checking session");
         setState((prev) => ({
           ...prev,
           user: null,
@@ -56,7 +55,7 @@ export function UserProvider({
         isLoading: false,
       }));
     } catch (err) {
-      logger.error("Error checking session");
+      console.log("Error checking session");
       setState((prev) => ({
         ...prev,
         user: null,

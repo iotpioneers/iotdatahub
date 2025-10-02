@@ -59,7 +59,7 @@ const AssistantModal: React.FC<ModalProps> = ({ open, setOpen }) => {
           className="pt-4 flex flex-col pl-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ type: "Tween", duration: 2 }}
+          transition={{ type: "tween", duration: 2 }}
         >
           <Typography variant="h5" gutterBottom className="text-orange-50">
             Hello There 🖐🏻
