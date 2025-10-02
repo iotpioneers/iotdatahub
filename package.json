@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "start": "next start",
+    "test": "nodemon --project tsconfig.server.json --exec ts-node server.ts",
     "build": "npx prisma generate && next build",
+    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
