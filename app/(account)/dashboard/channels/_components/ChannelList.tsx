@@ -7,7 +7,7 @@ import ChannelListTable from "./ChannelListTable";
 import { Button } from "@/components/ui/button";
 import { TableSkeleton } from "@/components/ui/UnifiedLoading";
 import Image from "next/image";
-import type { Channel } from "@/types/uni-types";
+import type { Channel } from "@/types";
 import AddNewChannelModal from "./AddNewChannelModal";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());

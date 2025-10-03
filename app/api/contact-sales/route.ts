@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import prisma from "@/prisma/client";
 import { contactSalesSchema } from "@/validations/schema.validation";
-import { ContactSalesFormData } from "@/types/uni-types";
+import { ContactSalesFormData } from "@/types";
 
 async function sendNotificationEmail(contactData: ContactSalesFormData) {
   const {

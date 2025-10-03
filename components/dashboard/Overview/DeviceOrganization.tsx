@@ -13,7 +13,7 @@ import { TotalUsers } from "@/components/dashboard/Overview/TotalUsers";
 import { EnterpriseMetrics } from "@/components/dashboard/Overview/EnterpriseMetrics";
 import { Traffic } from "@/components/dashboard/Overview/traffic";
 import { useSession } from "next-auth/react";
-import { Organization } from "@/types/uni-types";
+import { Organization } from "@/types";
 import { LinearLoading } from "@/components/LinearLoading";
 
 const DeviceOrganization = (): React.JSX.Element => {

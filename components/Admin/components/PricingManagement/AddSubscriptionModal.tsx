@@ -18,7 +18,7 @@ import {
 import { useFormik } from "formik";
 import axios from "axios";
 import * as yup from "yup";
-import { PricingPlanType } from "@/types/uni-types";
+import { PricingPlanType } from "@/types";
 import LoadingProgressBar from "@/components/loading-progress-bar";
 import { useRouter } from "next/navigation";
 

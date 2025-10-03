@@ -30,7 +30,7 @@ import CloseIcon from "@mui/icons-material/Close";
 
 // Types
 import { UserData } from "@/types/user";
-import { UserAccessType } from "@/types/uni-types";
+import { UserAccessType } from "@/types";
 import { updateChannelAccess } from "@/lib/actions/room.actions";
 import { useRouter } from "next/navigation";
 

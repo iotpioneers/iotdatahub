@@ -20,7 +20,7 @@ import {
 import FloatingToolbarPlugin from "./plugins/FloatingToolbarPlugin";
 import { useThreads } from "@liveblocks/react/suspense";
 import ChannelComments from "./ChannelComments";
-import type { UserAccessType } from "@/types/uni-types";
+import type { UserAccessType } from "@/types";
 import { Typography } from "@mui/material";
 import { LinearLoading } from "@/components/LinearLoading";
 

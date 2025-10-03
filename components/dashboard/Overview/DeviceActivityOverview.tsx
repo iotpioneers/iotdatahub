@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { Channel, DataPoint, Field } from "@/types/uni-types";
+import { Channel, DataPoint, Field } from "@/types";
 
 interface ChannelActivityOverviewProps {
   isLoading: boolean;

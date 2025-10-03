@@ -7,7 +7,7 @@ import {
   GridToolbar,
 } from "@mui/x-data-grid";
 import { SparkLineChart } from "@mui/x-charts/SparkLineChart";
-import { DataPoint, Organization } from "@/types/uni-types";
+import { DataPoint, Organization } from "@/types";
 import { dateConverter } from "@/lib/utils";
 import LoadingProgressBar from "@/components/loading-progress-bar";
 

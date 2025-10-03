@@ -15,7 +15,7 @@ import HighlightedCard from "./HighlightedCard";
 import PlatformActivityChart from "./PlatformActivityChart";
 import StatCard, { StatCardProps } from "./StatCard";
 import { UserData } from "@/types/user";
-import { Channel, Device, Organization } from "@/types/uni-types";
+import { Channel, Device, Organization } from "@/types";
 
 interface OverviewData {
   users: UserData[];
