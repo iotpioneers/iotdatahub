@@ -1,7 +1,7 @@
 "use client";
 import { ClientSideSuspense, RoomProvider } from "@liveblocks/react/suspense";
 
-import type { ChannelCollaborativeRoomProps } from "@/types/uni-types";
+import type { ChannelCollaborativeRoomProps } from "@/types";
 import ChannelDetailsHeading from "../ChannelDetailsHeading";
 import ChannelNavigation from "../ChannelNavigation";
 import ChannelCollaborationEditor from "@/components/Channels/collaboration/ChannelCollaborationEditor";

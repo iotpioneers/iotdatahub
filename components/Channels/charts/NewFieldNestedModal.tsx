@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { styled } from "@mui/system";
 import { Modal as BaseModal } from "@mui/base/Modal";
 import { Button } from "@mui/base/Button";
-import { Channel } from "@/types/uni-types";
+import { Channel } from "@/types";
 import axios from "axios";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";

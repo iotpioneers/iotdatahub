@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Channel, Organization, User } from "@/types/uni-types";
+import { Channel, Organization, User } from "@/types";
 
 export interface DeviceData {
   id: string;

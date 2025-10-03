@@ -1,6 +1,6 @@
 "use client";
 
-import { Channel } from "@/types/uni-types";
+import { Channel } from "@/types";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";

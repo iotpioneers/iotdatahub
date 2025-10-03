@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import PricingList from "../Home/components/PricingList";
-import { PricingPlanType } from "@/types/uni-types";
+import { PricingPlanType } from "@/types";
 
 const SubscriptionSelection: React.FC = () => {
   const [subscriptions, setSubscriptions] = useState<PricingPlanType[]>([]);

@@ -13,7 +13,7 @@ import Typography from "@mui/material/Typography";
 
 import AngledButton from "./design/AngledButton";
 import axios from "axios";
-import { PricingPlanType } from "@/types/uni-types";
+import { PricingPlanType } from "@/types";
 import { useSession } from "next-auth/react";
 import { LinearLoading } from "@/components/LinearLoading";
 

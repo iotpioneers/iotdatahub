@@ -12,7 +12,7 @@ import {
   Popover,
 } from "@mui/material";
 import { Send, Paperclip, Mic } from "lucide-react";
-import { ReplyFormValues, Feedback, FeedbackReply } from "@/types/uni-types";
+import { ReplyFormValues, Feedback, FeedbackReply } from "@/types";
 import { HiEmojiHappy } from "react-icons/hi";
 import EmojiPicker from "emoji-picker-react";
 
