@@ -50,14 +50,23 @@ export const useWebSocket = ({
   const getWebSocketUrl = () => {
     // Use environment variable for backend URL
     const backendUrl =
-      process.env.HARDWARE_APP_BASE_URL || "http://51.21.191.215:5000";
+      process.env.NEXT_PUBLIC_HARDWARE_APP_BASE_URL ||
+      "https://51.21.191.215:5000";
 
-    // Convert HTTP URL to WebSocket URL
-    const wsUrl = backendUrl
-      .replace("http://", "ws://")
-      .replace("https://", "wss://");
+    // Convert HTTP/HTTPS URL to WebSocket URL securely
+    const isLocalhost =
+      backendUrl.includes("localhost") || backendUrl.includes("127.0.0.1");
 
-    return `${wsUrl}/api/ws`;
+    if (backendUrl.startsWith("https://") || !isLocalhost) {
+      // Use WSS for production or HTTPS URLs
+      return (
+        backendUrl.replace("https://", "wss://").replace("http://", "wss://") +
+        "/api/ws"
+      );
+    } else {
+      // Use WS only for local development
+      return backendUrl.replace("http://", "ws://") + "/api/ws";
+    }
   };
 
   const connect = () => {
