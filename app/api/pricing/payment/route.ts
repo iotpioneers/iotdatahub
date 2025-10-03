@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   if (!token) {
     return NextResponse.json(
       { error: "You must be logged in" },
-      { status: 401 },
+      { status: 401 }
     );
   }
 
@@ -34,14 +34,14 @@ export async function POST(request: NextRequest) {
       ) {
         return NextResponse.json(
           { error: "Missing required credit card fields" },
-          { status: 400 },
+          { status: 400 }
         );
       }
     } else if (data.type === "MOBILE_MONEY") {
       if (!data.phoneNumber || !data.provider) {
         return NextResponse.json(
           { error: "Missing required mobile money fields" },
-          { status: 400 },
+          { status: 400 }
         );
       }
     }
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         // Additional metadata
         metadata: {
           initiatedAt: new Date().toISOString(),
-          ipAddress: request.ip,
+          ipAddress: request.headers.get("x-forwarded-for") || "",
           userAgent: request.headers.get("user-agent"),
         },
       },
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "Error processing payment" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
   if (!token) {
     return NextResponse.json(
       { error: "You must be logged in" },
-      { status: 401 },
+      { status: 401 }
     );
   }
 

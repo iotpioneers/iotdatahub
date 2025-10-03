@@ -19,17 +19,12 @@ const PopUpButton: React.FC<PopUpButtonProps> = ({ handleScroll }) => {
     open: {
       opacity: 1,
       y: 0,
-      transition: {
-        type: "spring",
-        duration: 0.2,
-      },
+      transition: { duration: 0.2 },
     },
     closed: {
       opacity: 0,
       y: 15,
-      transition: {
-        duration: 0.2,
-      },
+      transition: { duration: 0.2 },
     },
   };
 
