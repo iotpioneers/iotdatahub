@@ -5,12 +5,17 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
-import type { ApiKey, Channel, DataPoint, Field } from "@/types/uni-types";
-import { getUsers } from "@/lib/actions/user.actions";
-import { getRoomAccess } from "@/lib/actions/room.actions";
-import ChannelCollaborationRoom from "@/components/Channels/collaboration/ChannelCollaborationRoom";
-import { useToast } from "@/components/ui/toast-provider";
-import LoadingProgressBar from "@/components/loading-progress-bar";
+import type {
+  ApiKey,
+  Channel,
+  DataPoint,
+  Field,
+} from "../../../../../types/uni-types";
+import { getUsers } from "../../../../../lib/actions/user.actions";
+import { getRoomAccess } from "../../../../../lib/actions/room.actions";
+import ChannelCollaborationRoom from "../../../../../components/Channels/collaboration/ChannelCollaborationRoom";
+import { useToast } from "../../../../../components/ui/toast-provider";
+import LoadingProgressBar from "../../../../../components/loading-progress-bar";
 
 interface ChannelData {
   channel: Channel;

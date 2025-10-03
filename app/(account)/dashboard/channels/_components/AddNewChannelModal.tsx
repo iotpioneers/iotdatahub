@@ -1,6 +1,17 @@
 "use client";
 import { useEffect } from "react";
 import {
+  ArchiveBoxXMarkIcon,
+  CloudArrowUpIcon,
+} from "@heroicons/react/20/solid";
+import { Formik, Form, FieldArray } from "formik";
+import * as Yup from "yup";
+import { useSWRConfig } from "swr";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useGlobalState } from "../../../../../context/globalContext";
+import { createChannelRoom } from "../../../../../lib/actions/room.actions";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -18,17 +29,6 @@ import {
 } from "../../../../../components/ui/select";
 import { Textarea } from "../../../../../components/ui/textarea";
 import { useToast } from "../../../../../components/ui/toast-provider";
-import {
-  ArchiveBoxXMarkIcon,
-  CloudArrowUpIcon,
-} from "@heroicons/react/20/solid";
-import { Formik, Form, FieldArray } from "formik";
-import * as Yup from "yup";
-import { useSWRConfig } from "swr";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { useGlobalState } from "@/context/globalContext";
-import { createChannelRoom } from "@/lib/actions/room.actions";
 
 // Constants
 const hardwareOptions = [
@@ -38,6 +38,7 @@ const hardwareOptions = [
   "Raspberry Pi",
   "Other",
 ];
+
 const connectionOptions = ["WiFi", "Ethernet", "Satellite", "GSM"];
 
 // Validation Schema
