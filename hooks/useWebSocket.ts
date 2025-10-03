@@ -50,7 +50,7 @@ export const useWebSocket = ({
   const getWebSocketUrl = () => {
     // Use environment variable for backend URL
     const backendUrl =
-      process.env.HARDWARE_APP_BASE_URL || "http://localhost:5000";
+      process.env.HARDWARE_APP_BASE_URL || "http://51.21.191.215:5000";
 
     // Convert HTTP URL to WebSocket URL
     const wsUrl = backendUrl
@@ -143,7 +143,7 @@ export const useWebSocket = ({
               ? 1000
               : Math.min(1000 * Math.pow(2, reconnectAttempts), 10000);
           setError(
-            `Reconnecting in ${timeout}ms (attempt ${reconnectAttempts + 1}/3)`,
+            `Reconnecting in ${timeout}ms (attempt ${reconnectAttempts + 1}/3)`
           );
 
           reconnectTimeoutRef.current = setTimeout(() => {
