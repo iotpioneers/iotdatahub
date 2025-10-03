@@ -9,26 +9,26 @@ import * as Yup from "yup";
 import { useSWRConfig } from "swr";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useGlobalState } from "../../../../../context/globalContext";
-import { createChannelRoom } from "../../../../../lib/actions/room.actions";
+import { useGlobalState } from "@/context/globalContext";
+import { createChannelRoom } from "@/lib/actions/room.actions";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "../../../../../components/ui/dialog";
-import { Button } from "../../../../../components/ui/button";
-import { Input } from "../../../../../components/ui/input";
-import { Label } from "../../../../../components/ui/label";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../../../components/ui/select";
-import { Textarea } from "../../../../../components/ui/textarea";
-import { useToast } from "../../../../../components/ui/toast-provider";
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/toast-provider";
 
 // Constants
 const hardwareOptions = [
