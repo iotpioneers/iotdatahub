@@ -25,7 +25,7 @@ const FromChannelModal = ({
           From Channel
         </Typography>
       </DialogTitle>
-      <DialogContent>
+      <DialogContent className="rounded-md">
         {/* Content for "From Channel" modal */}
         <AddDeviceFormComponent />
       </DialogContent>

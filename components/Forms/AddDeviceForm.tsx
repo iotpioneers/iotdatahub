@@ -6,7 +6,6 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { Activity } from "lucide-react";
 import useSWR from "swr";
-
 import {
   Card,
   CardContent,
@@ -21,6 +20,10 @@ import {
   Button,
   OutlinedInput,
   useTheme,
+  Backdrop,
+  CircularProgress,
+  Modal,
+  Box,
 } from "@mui/material";
 import { Channel } from "@/types";
 
@@ -32,7 +35,6 @@ const deviceTypes = [
   { value: "OTHER", label: "Other" },
 ] as const;
 
-// Device form validation schema
 const deviceSchema = Yup.object().shape({
   name: Yup.string()
     .max(255, "Name must be 255 characters or less")
@@ -59,13 +61,14 @@ const AddDeviceFormComponent: React.FC = () => {
   const router = useRouter();
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
-
   const theme = useTheme();
 
-  const { data: channels, error: channelsError } = useSWR<Channel[], Error>(
-    "/api/channels",
-    fetcher
-  );
+  // Fetch channels
+  const {
+    data: channels,
+    error: channelsError,
+    isLoading: isChannelsLoading,
+  } = useSWR<Channel[], Error>("/api/channels", fetcher);
 
   const initialValues = {
     name: "",
@@ -77,7 +80,14 @@ const AddDeviceFormComponent: React.FC = () => {
     values: typeof initialValues,
     { setSubmitting, setFieldError }: any
   ) => {
+    if (!channels || channels.length === 0) {
+      setError("Please wait until channels are fully loaded.");
+      return;
+    }
+
     setLoading(true);
+    setError("");
+
     try {
       const response = await fetch("/api/devices", {
         method: "POST",
@@ -97,7 +107,7 @@ const AddDeviceFormComponent: React.FC = () => {
         throw new Error(data.error || "Failed to create device");
       }
 
-      router.push(`/dashboard/devices/${data.id}`);
+      router.push(`/dashboard/devices/${data.id}/edit`);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unknown error occurred"
@@ -108,15 +118,42 @@ const AddDeviceFormComponent: React.FC = () => {
     }
   };
 
-  if (channelsError) {
-    return <Alert severity="error">Failed to load channels</Alert>;
+  // 🧩 Loading Modal while fetching channels
+  if (isChannelsLoading) {
+    return (
+      <Modal open={true}>
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="100vh"
+          flexDirection="column"
+          bgcolor="background.paper"
+        >
+          <CircularProgress size={60} />
+          <Typography variant="h6" sx={{ mt: 3 }}>
+            Loading channels...
+          </Typography>
+        </Box>
+      </Modal>
+    );
   }
 
-  if (!channels) {
+  // 🧩 Channels fetch error
+  if (channelsError) {
     return (
-      <div className="flex justify-center p-8">
-        <Activity className="animate-spin" />
-      </div>
+      <Alert severity="error" className="mt-8">
+        Failed to load channels. Please refresh and try again.
+      </Alert>
+    );
+  }
+
+  // 🧩 No channels available
+  if (!channels || channels.length === 0) {
+    return (
+      <Alert severity="warning" className="mt-8">
+        No channels available. Please create a channel first.
+      </Alert>
     );
   }
 
@@ -150,80 +187,82 @@ const AddDeviceFormComponent: React.FC = () => {
             isSubmitting,
           }) => (
             <form onSubmit={handleSubmit} noValidate>
-              <Grid item xs={12}>
-                <FormControl
-                  fullWidth
-                  error={Boolean(touched.channelId && errors.channelId)}
-                >
-                  <InputLabel>Channel</InputLabel>
-                  <Select
-                    name="channelId"
-                    value={values.channelId}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    label="Channel"
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <FormControl
+                    fullWidth
+                    error={Boolean(touched.channelId && errors.channelId)}
                   >
-                    {channels.map((channel) => (
-                      <MenuItem key={channel.id} value={channel.id}>
-                        {channel.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {touched.channelId && errors.channelId && (
-                    <FormHelperText error>{errors.channelId}</FormHelperText>
-                  )}
-                </FormControl>
+                    <InputLabel>Channel</InputLabel>
+                    <Select
+                      name="channelId"
+                      value={values.channelId}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      label="Channel"
+                      disabled={!channels || channels.length === 0}
+                    >
+                      {channels.map((channel) => (
+                        <MenuItem key={channel.id} value={channel.id}>
+                          {channel.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {touched.channelId && errors.channelId && (
+                      <FormHelperText error>{errors.channelId}</FormHelperText>
+                    )}
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <FormControl
+                    fullWidth
+                    error={Boolean(touched.name && errors.name)}
+                    sx={{ ...theme.typography.customInput }}
+                  >
+                    <InputLabel htmlFor="outlined-adornment-name-login">
+                      Device Name
+                    </InputLabel>
+                    <OutlinedInput
+                      id="outlined-adornment-name-login"
+                      type="text"
+                      value={values.name}
+                      name="name"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      label="Device Name"
+                    />
+                    {touched.name && errors.name && (
+                      <FormHelperText error>{errors.name}</FormHelperText>
+                    )}
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <FormControl
+                    fullWidth
+                    error={Boolean(touched.deviceType && errors.deviceType)}
+                  >
+                    <InputLabel>Device Type</InputLabel>
+                    <Select
+                      name="deviceType"
+                      value={values.deviceType}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      label="Device Type"
+                    >
+                      {deviceTypes.map((type) => (
+                        <MenuItem key={type.value} value={type.value}>
+                          {type.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {touched.deviceType && errors.deviceType && (
+                      <FormHelperText error>{errors.deviceType}</FormHelperText>
+                    )}
+                  </FormControl>
+                </Grid>
               </Grid>
-
-              <FormControl
-                fullWidth
-                error={Boolean(touched.name && errors.name)}
-                sx={{ ...theme.typography.customInput }}
-              >
-                <InputLabel htmlFor="outlined-adornment-name-login">
-                  Device Name
-                </InputLabel>
-                <OutlinedInput
-                  id="outlined-adornment-name-login"
-                  type="name"
-                  value={values.name}
-                  name="name"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  label="Device Name"
-                />
-                {touched.name && errors.name && (
-                  <FormHelperText
-                    error
-                    id="standard-weight-helper-text-name-login"
-                  >
-                    {errors.name}
-                  </FormHelperText>
-                )}
-              </FormControl>
-
-              <FormControl
-                fullWidth
-                error={Boolean(touched.deviceType && errors.deviceType)}
-              >
-                <InputLabel>Device Type</InputLabel>
-                <Select
-                  name="deviceType"
-                  value={values.deviceType}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  label="Device Type"
-                >
-                  {deviceTypes.map((type) => (
-                    <MenuItem key={type.value} value={type.value}>
-                      {type.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {touched.deviceType && errors.deviceType && (
-                  <FormHelperText error>{errors.deviceType}</FormHelperText>
-                )}
-              </FormControl>
 
               <div className="flex justify-start gap-4 mt-6">
                 <Button
@@ -237,6 +276,11 @@ const AddDeviceFormComponent: React.FC = () => {
             </form>
           )}
         </Formik>
+
+        {/* Optional loading overlay during submission */}
+        <Backdrop open={loading}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
       </CardContent>
     </Card>
   );

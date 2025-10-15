@@ -72,6 +72,10 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  await prisma.device.deleteMany({
+    where: { channelId: params.id },
+  });
+
   await prisma.sampleCodes.deleteMany({
     where: { channelId: params.id },
   });

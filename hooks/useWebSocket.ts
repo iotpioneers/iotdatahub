@@ -51,7 +51,7 @@ export const useWebSocket = ({
     // Use environment variable for backend URL
     const backendUrl =
       process.env.NEXT_PUBLIC_HARDWARE_APP_BASE_URL ||
-      "https://51.21.191.215:5000";
+      "http://51.21.191.215:5000";
 
     // Convert HTTP/HTTPS URL to WebSocket URL securely
     const isLocalhost =
