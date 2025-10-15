@@ -58,9 +58,9 @@ export const useWebSocket = ({
       backendUrl.includes("localhost") || backendUrl.includes("127.0.0.1");
 
     if (backendUrl.startsWith("https://") || !isLocalhost) {
-      // Use WSS for production or HTTPS URLs
+      // Use WS for production or HTTPS URLs
       return (
-        backendUrl.replace("https://", "wss://").replace("http://", "wss://") +
+        backendUrl.replace("https://", "ws://").replace("http://", "ws://") +
         "/api/ws"
       );
     } else {
