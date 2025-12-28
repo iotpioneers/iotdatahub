@@ -18,6 +18,9 @@ import { LinearLoading } from "@/components/LinearLoading";
 import { useToast } from "@/components/ui/toast-provider";
 import { v4 as uuidv4 } from "uuid";
 import { getDefaultSize } from "@/app/store/constant";
+import EditDeviceHintModal from "./EditDeviceHintModal";
+
+// Enhanced HintModal for EditDashboard
 
 interface Props {
   params: { id: string };
@@ -37,6 +40,12 @@ const EditDashboardComponent = ({ params }: Props) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { toast } = useToast();
+  const [hintStep, setHintStep] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem(`edit-hint-${params.id}`) ? 0 : 1;
+    }
+    return 0;
+  });
 
   const initialWidgetsRef = useRef<Widget[]>([]);
   const [widgetState, setWidgetState] = useState<WidgetState>({
@@ -64,10 +73,61 @@ const EditDashboardComponent = ({ params }: Props) => {
     }
   }, [widgetData]);
 
-  // Calculate statistics
+  const editHintSteps = [
+    {
+      targetId: "widget-box",
+      title: "Add Widgets",
+      message:
+        "Click on any widget type in this box to add it to your dashboard. Choose from charts, gauges, and more.",
+      showPreview: true,
+      previewType: "add" as const,
+    },
+    {
+      targetId: "dashboard-grid",
+      title: "Drag & Drop",
+      message:
+        "Drag widgets around the dashboard to reposition them. Click and hold to move widgets anywhere.",
+      showPreview: true,
+      previewType: "drag" as const,
+    },
+    {
+      targetId: "dashboard-grid",
+      title: "Resize Widgets",
+      message:
+        "Drag the corners or edges of widgets to resize them. Make them bigger or smaller as needed.",
+      showPreview: true,
+      previewType: "resize" as const,
+    },
+    {
+      targetId: "save-button",
+      title: "Save Changes",
+      message:
+        "Click Save & Apply to save your dashboard changes and return to the device view.",
+    },
+  ];
+
+  const handleHintNext = () => {
+    if (hintStep < editHintSteps.length) {
+      setHintStep(hintStep + 1);
+    } else {
+      setHintStep(0);
+      localStorage.setItem(`edit-hint-${params.id}`, "completed");
+    }
+  };
+
+  const handleHintBack = () => {
+    if (hintStep > 1) {
+      setHintStep(hintStep - 1);
+    }
+  };
+
+  const handleHintClose = () => {
+    setHintStep(0);
+    localStorage.setItem(`edit-hint-${params.id}`, "completed");
+  };
   const stats = useMemo(() => {
     const newWidgets = Object.values(widgetState.pendingChanges).filter(
-      (change) => !initialWidgetsRef.current.some((w) => w.id === change.id),
+      (change) => !initialWidgetsRef.current.some((w) => w.id === change.id)
     ).length;
     const modifiedWidgets =
       Object.keys(widgetState.pendingChanges).length - newWidgets;
@@ -106,7 +166,7 @@ const EditDashboardComponent = ({ params }: Props) => {
               proposed.x < existing.x + existing.w &&
               proposed.x + proposed.w > existing.x &&
               proposed.y < existing.y + existing.h &&
-              proposed.y + proposed.h > existing.y,
+              proposed.y + proposed.h > existing.y
           );
 
           if (!overlaps) {
@@ -129,7 +189,7 @@ const EditDashboardComponent = ({ params }: Props) => {
         height: defaultSize.h,
       };
     },
-    [widgetState.widgets],
+    [widgetState.widgets]
   );
 
   // Widget handlers
@@ -152,21 +212,21 @@ const EditDashboardComponent = ({ params }: Props) => {
         },
       }));
     },
-    [params.id, findNextAvailablePosition],
+    [params.id, findNextAvailablePosition]
   );
 
   const handleUpdateWidget = useCallback(
     (widgetId: string, changes: Partial<Widget>) => {
       setWidgetState((prev) => {
         const isNewWidget = !initialWidgetsRef.current.some(
-          (w) => w.id === widgetId,
+          (w) => w.id === widgetId
         );
         const existingChanges = prev.pendingChanges[widgetId] || {};
 
         return {
           ...prev,
           widgets: prev.widgets.map((w) =>
-            w.id === widgetId ? { ...w, ...changes } : w,
+            w.id === widgetId ? { ...w, ...changes } : w
           ),
           pendingChanges: {
             ...prev.pendingChanges,
@@ -179,7 +239,7 @@ const EditDashboardComponent = ({ params }: Props) => {
         };
       });
     },
-    [],
+    []
   );
 
   const handleDeleteWidget = useCallback((widgetId: string) => {
@@ -192,7 +252,7 @@ const EditDashboardComponent = ({ params }: Props) => {
           ? prev.deletedWidgets
           : [...prev.deletedWidgets, widgetId],
         pendingChanges: Object.fromEntries(
-          Object.entries(prev.pendingChanges).filter(([id]) => id !== widgetId),
+          Object.entries(prev.pendingChanges).filter(([id]) => id !== widgetId)
         ),
       };
     });
@@ -202,7 +262,7 @@ const EditDashboardComponent = ({ params }: Props) => {
     (widgetId: string, position: Widget["position"]) => {
       handleUpdateWidget(widgetId, { position });
     },
-    [handleUpdateWidget],
+    [handleUpdateWidget]
   );
 
   const handleDuplicateWidget = useCallback(
@@ -222,7 +282,7 @@ const EditDashboardComponent = ({ params }: Props) => {
 
       handleAddWidget(duplicatedWidget);
     },
-    [handleAddWidget, findNextAvailablePosition],
+    [handleAddWidget, findNextAvailablePosition]
   );
 
   const handleSaveAndApply = async () => {
@@ -268,7 +328,9 @@ const EditDashboardComponent = ({ params }: Props) => {
 
       if (result.failed > 0) {
         toast({
-          message: `Some operations failed: ${result.errors.map((e: { error: string }) => e.error).join(", ")}`,
+          message: `Some operations failed: ${result.errors
+            .map((e: { error: string }) => e.error)
+            .join(", ")}`,
 
           type: "error",
         });
@@ -302,7 +364,7 @@ const EditDashboardComponent = ({ params }: Props) => {
     }
 
     const confirmCancel = window.confirm(
-      "You have unsaved changes. Are you sure you want to cancel?",
+      "You have unsaved changes. Are you sure you want to cancel?"
     );
     if (!confirmCancel) return;
 
@@ -372,21 +434,40 @@ const EditDashboardComponent = ({ params }: Props) => {
             stats={stats}
           />
 
-          <EditDeviceDashboard
-            params={params}
-            widgets={widgetState.widgets}
-            onUpdate={handleUpdateWidget}
-            onDelete={handleDeleteWidget}
-            onMove={handleMoveWidget}
-            onDuplicate={handleDuplicateWidget}
-            isDirty={stats.isDirty}
-          />
+          <div id="dashboard-grid">
+            <EditDeviceDashboard
+              params={params}
+              widgets={widgetState.widgets}
+              onUpdate={handleUpdateWidget}
+              onDelete={handleDeleteWidget}
+              onMove={handleMoveWidget}
+              onDuplicate={handleDuplicateWidget}
+              isDirty={stats.isDirty}
+            />
+          </div>
         </div>
 
-        <div className="flex flex-1 min-w-[150px] h-full rounded-md">
+        <div
+          id="widget-box"
+          className="flex flex-1 min-w-[150px] h-full rounded-md"
+        >
           <WidgetBox deviceId={params.id} />
         </div>
       </div>
+
+      {hintStep > 0 && (
+        <EditDeviceHintModal
+          steps={editHintSteps}
+          currentStep={hintStep}
+          onNext={handleHintNext}
+          onBack={handleHintBack}
+          onClose={handleHintClose}
+          onComplete={() => {
+            setHintStep(0);
+            localStorage.setItem(`edit-hint-${params.id}`, "completed");
+          }}
+        />
+      )}
     </DragDropProvider>
   );
 };

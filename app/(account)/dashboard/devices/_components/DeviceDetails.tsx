@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import DeviceConfigurationModal from "./DeviceConfigurationModal";
+import DeviceHintModal from "./DeviceHintModal";
 import { Box } from "@mui/material";
 import useFetch from "@/hooks/useFetch";
 import { useWebSocket } from "@/hooks/useWebSocket";
@@ -26,7 +27,18 @@ interface Organization {
 }
 
 const DeviceDetails = ({ params }: Props) => {
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return !localStorage.getItem(`device-config-${params.id}`);
+    }
+    return true;
+  });
+  const [hintStep, setHintStep] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(`device-hint-${params.id}`) ? 0 : 1;
+    }
+    return 0;
+  });
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [device, setDevice] = useState<Device | null>(null);
@@ -225,6 +237,33 @@ const DeviceDetails = ({ params }: Props) => {
     }
   }, [isConnected, session, cacheReady, sendMessage]);
 
+  const deviceHintSteps = [
+    {
+      targetId: 'config-button',
+      title: 'Device Configuration',
+      message: 'Click the Config button to access your device settings and copy configuration codes.'
+    },
+    {
+      targetId: 'edit-button',
+      title: 'Edit Dashboard',
+      message: 'Use the Edit button to customize your device dashboard and add widgets.'
+    }
+  ];
+
+  const handleHintNext = () => {
+    if (hintStep === 1) {
+      setShowModal(false);
+      setHintStep(2);
+    } else {
+      setHintStep(0);
+      localStorage.setItem(`device-hint-${params.id}`, 'completed');
+    }
+  };
+
+  const handleHintClose = () => {
+    setHintStep(0);
+    localStorage.setItem(`device-hint-${params.id}`, 'completed');
+  };
   const handleManualRefresh = async () => {
     if (cacheReady && isConnected) {
       sendMessage({
@@ -382,6 +421,7 @@ const DeviceDetails = ({ params }: Props) => {
                   </strong>
                 </span>
                 <button
+                  id="edit-button"
                   className="px-4 py-2 bg-orange-50 text-white rounded-lg hover:bg-green-600 font-medium"
                   onClick={() => setIsRedirecting(true)}
                 >
@@ -396,6 +436,7 @@ const DeviceDetails = ({ params }: Props) => {
                   Refresh
                 </button>
                 <button
+                  id="config-button"
                   onClick={() => setShowModal(true)}
                   className="px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 rounded-md transition-colors"
                 >
@@ -441,9 +482,20 @@ const DeviceDetails = ({ params }: Props) => {
         )}
       </div>
 
+      {hintStep > 0 && (
+        <DeviceHintModal
+          step={hintStep}
+          onNext={handleHintNext}
+          onClose={handleHintClose}
+        />
+      )}
+
       <DeviceConfigurationModal
         isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        onClose={() => {
+          setShowModal(false);
+          localStorage.setItem(`device-config-${params.id}`, 'seen');
+        }}
         userName={session?.user?.name}
         organizationName={organization?.name}
         deviceToken={device?.authToken}
