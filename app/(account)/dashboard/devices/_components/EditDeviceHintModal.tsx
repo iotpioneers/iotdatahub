@@ -154,9 +154,16 @@ const EditDeviceHintModal = ({
           </div>
           {resizeState.isResizing && (
             <div 
-              className="absolute w-3 h-3 bg-gray-400 rounded-full pointer-events-none transition-all duration-500"
+              className="absolute pointer-events-none transition-all duration-500 z-20 animate-pulse"
               style={{ left: `${10 + resizeState.width * 4 - 2}px`, top: `${10 + resizeState.height * 4 - 2}px` }}
-            />
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" className="text-gray-700 drop-shadow-lg">
+                <path fill="currentColor" d="M13.5 6.5C13.5 5.67 12.83 5 12 5s-1.5.67-1.5 1.5v4.5h-1c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5h1v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V14h1c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5h-1V6.5z"/>
+                <circle cx="12" cy="18" r="2" fill="currentColor" opacity="0.7"/>
+                <path fill="currentColor" d="M8 12c-.55 0-1 .45-1 1v5c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2v-5c0-.55-.45-1-1H8z" opacity="0.8"/>
+                <path fill="currentColor" d="M16 16l2-2m0 0l2 2m-2-2v4m0-4h4" stroke="currentColor" strokeWidth="1" opacity="0.9"/>
+              </svg>
+            </div>
           )}
           <div className="absolute bottom-1 left-2 text-xs text-gray-400">Drag corners to resize</div>
         </div>
@@ -198,9 +205,15 @@ const EditDeviceHintModal = ({
           </div>
           {dragState.isDragging && (
             <div 
-              className="absolute w-3 h-3 bg-gray-400 rounded-full pointer-events-none transition-all duration-500"
+              className="absolute pointer-events-none transition-all duration-500 z-20 animate-pulse"
               style={{ left: `${dragState.x + 8}px`, top: `${dragState.y + 6}px` }}
-            />
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" className="text-gray-700 drop-shadow-lg">
+                <path fill="currentColor" d="M13.5 6.5C13.5 5.67 12.83 5 12 5s-1.5.67-1.5 1.5v4.5h-1c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5h1v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V14h1c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5h-1V6.5z"/>
+                <circle cx="12" cy="18" r="2" fill="currentColor" opacity="0.7"/>
+                <path fill="currentColor" d="M8 12c-.55 0-1 .45-1 1v5c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2v-5c0-.55-.45-1-1-1H8z" opacity="0.8"/>
+              </svg>
+            </div>
           )}
           <div className="absolute bottom-1 left-2 text-xs text-gray-400">Click and drag to reposition</div>
         </div>
@@ -242,9 +255,15 @@ const EditDeviceHintModal = ({
           </div>
           {dragState.isDragging && (
             <div 
-              className="absolute w-3 h-3 bg-gray-400 rounded-full pointer-events-none transition-all duration-500"
+              className="absolute pointer-events-none transition-all duration-500 z-20 animate-pulse"
               style={{ left: `${dragState.x + 7}px`, top: `${dragState.y + 5}px` }}
-            />
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" className="text-gray-700 drop-shadow-lg">
+                <path fill="currentColor" d="M13.5 6.5C13.5 5.67 12.83 5 12 5s-1.5.67-1.5 1.5v4.5h-1c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5h1v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V14h1c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5h-1V6.5z"/>
+                <circle cx="12" cy="18" r="2" fill="currentColor" opacity="0.7"/>
+                <path fill="currentColor" d="M8 12c-.55 0-1 .45-1 1v5c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2v-5c0-.55-.45-1-1H8z" opacity="0.8"/>
+              </svg>
+            </div>
           )}
           <div className="absolute bottom-1 left-2 text-xs text-gray-400">Click and drag from widget box</div>
         </div>
