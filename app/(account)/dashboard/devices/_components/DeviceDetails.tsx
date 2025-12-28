@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { X } from "lucide-react";
+import DeviceConfigurationModal from "./DeviceConfigurationModal";
 import { Box } from "@mui/material";
 import useFetch from "@/hooks/useFetch";
 import { useWebSocket } from "@/hooks/useWebSocket";
@@ -26,7 +26,7 @@ interface Organization {
 }
 
 const DeviceDetails = ({ params }: Props) => {
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [device, setDevice] = useState<Device | null>(null);
@@ -395,6 +395,12 @@ const DeviceDetails = ({ params }: Props) => {
                 >
                   Refresh
                 </button>
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 rounded-md transition-colors"
+                >
+                  Config
+                </button>
               </div>
             </div>
           </div>
@@ -435,34 +441,13 @@ const DeviceDetails = ({ params }: Props) => {
         )}
       </div>
 
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-black text-white rounded-lg p-6 w-full max-w-lg">
-            <div className="flex justify-between items-center mb-6">
-              <button
-                onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-white"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="space-y-4 mb-6 font-mono text-sm">
-              <div>
-                <div className="text-gray-400">CHANNEL_ID</div>
-                <div className="text-orange-50">"{channel?.id}"</div>
-              </div>
-              <div>
-                <div className="text-gray-400">CHANNEL_NAME</div>
-                <div className="text-blue-400">"{channel?.name}"</div>
-              </div>
-              <div>
-                <div className="text-gray-400">DEVICE_TOKEN</div>
-                <div className="text-green-400">"{device?.authToken}"</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeviceConfigurationModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        userName={session?.user?.name}
+        organizationName={organization?.name}
+        deviceToken={device?.authToken}
+      />
     </div>
   );
 };

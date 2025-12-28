@@ -100,9 +100,16 @@ const DeviceListingComponent: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [isNavigating, setIsNavigating] = useState(false);
+
   const router = useRouter();
 
   const toast = useToast();
+
+  const handleNavigation = (deviceId: string) => {
+    setIsNavigating(true);
+    router.push(`/dashboard/devices/${deviceId}`);
+  };
 
   const fetchDevices = async () => {
     setIsLoading(true);
@@ -492,7 +499,7 @@ const DeviceListingComponent: React.FC = () => {
       </AnimatePresence>
 
       {/* Results */}
-      {isLoading ? (
+      {isLoading || isNavigating ? (
         <LoadingSkeleton />
       ) : (
         <>
@@ -622,9 +629,7 @@ const DeviceListingComponent: React.FC = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() =>
-                              router.push(`/dashboard/devices/${device.id}`)
-                            }
+                            onClick={() => handleNavigation(device.id)}
                           >
                             <Eye className="w-4 h-4 mr-1" />
                             View
@@ -646,7 +651,12 @@ const DeviceListingComponent: React.FC = () => {
               </AnimatePresence>
             </motion.div>
           ) : (
-            <DataTable columns={columns} data={filteredDevices} pagination />
+            <DataTable 
+              columns={columns} 
+              data={filteredDevices} 
+              pagination 
+              onRowClick={(device) => handleNavigation(device.id)}
+            />
           )}
         </>
       )}
