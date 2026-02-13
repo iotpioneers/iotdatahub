@@ -25,7 +25,7 @@ export default function DeviceWidgetCard({
     widgetData.values[widgetData.values.length - 2] ?? latestValue;
   const delta = latestValue - prevValue;
   const isOnline = device.status === "ONLINE";
-  const isMotion = widgetData.widgetName.toLowerCase().includes("motion");
+  const isMotion = widgetData.widgetName?.toLowerCase().includes("motion");
 
   return (
     <motion.div
