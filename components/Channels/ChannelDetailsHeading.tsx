@@ -4,18 +4,12 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import { CalendarIcon } from "@heroicons/react/20/solid";
-import { ChartPieIcon } from "@heroicons/react/24/solid";
 import { ViewIcon } from "lucide-react";
 
 import { updateChannelRoomData } from "@/lib/actions/room.actions";
 import { Input } from "@/components/Actions/TextEditingInput";
-import { dateConverter } from "@/lib/utils";
 import { ChannelHeadingProps } from "@/types";
 
-import InviteCollaboratorModal from "./collaboration/InviteCollaboratorModal";
-import ActiveCollaborators from "./collaboration/ActiveCollaborators";
-import { Card } from "@mui/material";
 import { LinearLoading } from "../LinearLoading";
 
 const ChannelDetailsHeading = ({
@@ -34,7 +28,7 @@ const ChannelDetailsHeading = ({
 
   const handleCloseResult = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;
@@ -51,7 +45,7 @@ const ChannelDetailsHeading = ({
   }
 
   const updateChannelTitleHandler = async (
-    e: React.KeyboardEvent<HTMLInputElement>
+    e: React.KeyboardEvent<HTMLInputElement>,
   ) => {
     if (e.key === "Enter") {
       setLoading(true);
@@ -61,7 +55,7 @@ const ChannelDetailsHeading = ({
         if (channelTitle !== channel?.name) {
           const updatedChannel = await updateChannelRoomData(
             roomId,
-            channelTitle
+            channelTitle,
           );
 
           if (!updatedChannel) {
@@ -142,13 +136,13 @@ const ChannelDetailsHeading = ({
               onChange={(e) => setChannelTitle(e.target.value)}
               onKeyDown={updateChannelTitleHandler}
               disabled={!editing}
-              className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:tracking-tight"
+              className="text-lg font-semibold leading-7 text-gray-900 sm:text-xl sm:tracking-tight"
             />
           ) : (
             <>
-              <p className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:tracking-tight">
+              <h1 className="text-2xl font-bold text-yellow-500">
                 {channelTitle}
-              </p>
+              </h1>
             </>
           )}
 
@@ -169,35 +163,6 @@ const ChannelDetailsHeading = ({
             </p>
           )}
           {loading && <p className="text-sm text-gray-400">saving...</p>}
-        </div>
-
-        <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-          <div className="flex flex-col">
-            <div className="mt-2 flex items-center text-sm text-gray-500">
-              <ChartPieIcon
-                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                aria-hidden="true"
-              />
-              Generated {dataPoint.length} data
-            </div>
-            <div className="mt-2 flex items-center text-sm text-gray-500">
-              <CalendarIcon
-                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                aria-hidden="true"
-              />
-              Created about {dateConverter(channel.createdAt.toString())}
-            </div>
-          </div>
-        </div>
-        <div className="flex justify-between items-center my-5 ">
-          {roomMetadata && (
-            <InviteCollaboratorModal
-              roomId={roomId}
-              creator={roomMetadata.creatorId}
-              currentUserType={currentUserType}
-            />
-          )}
-          <ActiveCollaborators />
         </div>
       </div>
     </div>

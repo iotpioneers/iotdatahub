@@ -447,12 +447,12 @@ model Widget {
   channel    Channel    @relation(fields: [channelId], references: [id])
   pinConfig  PinConfig? @relation(fields: [pinConfigId], references: [id])
 
-  widgetType String? // "button", "slider", "gauge", "chart", etc.
-  pinNumber  Int?
-  pinType    String? // "virtual", "digital", "analog"
-  config     Json? // Widget-specific configuration  
-  isActive   Boolean @default(true)
-
+  widgetType  String? // "button", "slider", "gauge", "chart", etc.
+  pinNumber   Int?
+  pinType     String? // "virtual", "digital", "analog"
+  config      Json? // Widget-specific configuration  
+  isActive    Boolean  @default(true)
+  unit        String?  @default("")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt()
   pinConfigId String?  @db.ObjectId
