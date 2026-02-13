@@ -69,7 +69,7 @@
     "lucide-react": "^0.395.0",
     "mongodb": "^6.8.0",
     "nanoid": "^5.0.7",
-    "next": "^14.2.15",
+    "next": "^14.2.35",
     "next-auth": "^4.24.7",
     "next-cloudinary": "^6.6.2",
     "nodemailer": "^6.10.1",

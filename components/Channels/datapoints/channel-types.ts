@@ -61,6 +61,7 @@ export interface WidgetData {
   deviceId?: string;
   channelId?: string;
   deviceName?: string;
+  widgetName?: string;
   fieldName?: string;
   unit?: string;
   fieldId: string;
