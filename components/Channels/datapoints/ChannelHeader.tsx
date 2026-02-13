@@ -6,6 +6,7 @@ import { ChartPieIcon } from "@heroicons/react/24/solid";
 import { Channel } from "./channel-types";
 import { dateConverter } from "@/lib/utils";
 import ExportChannelData from "../ExportChannelData";
+import { formatLongNumber } from "@/lib/format-long-number";
 
 interface ChannelHeaderProps {
   channel: Channel;
@@ -31,7 +32,7 @@ export default function ChannelHeader({
     <motion.div
       initial={{ opacity: 0, y: -12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-primary/5 border-primary/10 rounded-2xl p-6"
+      className="bg-[#111827] border border-primary/10 rounded-2xl p-6"
     >
       {/* Breadcrumb */}
       <nav
@@ -99,12 +100,6 @@ export default function ChannelHeader({
               </button>
             </div>
           </div>
-
-          {collaborationSection && (
-            <div className="flex justify-between items-center my-5">
-              {collaborationSection}
-            </div>
-          )}
         </div>
       </div>
 
@@ -117,7 +112,7 @@ export default function ChannelHeader({
                 className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                 aria-hidden="true"
               />
-              Generated {dataPointCount} data
+              Generated {formatLongNumber(channel.generatedWidgetsData)} data
             </div>
             <div className="mt-2 flex items-center text-sm text-gray-500">
               <CalendarIcon
@@ -132,6 +127,21 @@ export default function ChannelHeader({
           <ExportChannelData channelId={channel.id} />
         </div>
       </div>
+
+      <div className="text-center text-xs text-white pb-4">
+        {" · "}
+        Last updated:{" "}
+        <span className="font-mono text-white">
+          {dateConverter(channel.updatedAt)}
+        </span>{" "}
+        {" · "}
+      </div>
+
+      {collaborationSection && (
+        <div className="flex justify-between items-center my-5">
+          {collaborationSection}
+        </div>
+      )}
     </motion.div>
   );
 }

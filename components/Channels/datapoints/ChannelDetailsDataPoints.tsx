@@ -10,7 +10,6 @@ import ChannelHeader from "./ChannelHeader";
 import ChannelStatsHeader from "./ChannelStatsHeader";
 import DevicesList from "./DevicesList";
 import ActivityFeed from "./ActivityFeed";
-import ChannelFooter from "./ChannelFooter";
 import PageSkeleton from "./PageSkeleton";
 import ErrorState from "./ErrorState";
 import NotFoundState from "./NotFoundState";
@@ -31,14 +30,25 @@ export default function ChannelDetailsDataPoints({
   channel: initialChannel,
   dataPoint,
 }: ChannelHeadingProps): JSX.Element {
-  const { channel, activities, widgetData, isLoading, error, fetchChannel } =
-    useChannelData(initialChannel?.id);
+  const {
+    channel,
+    activities,
+    widgetData,
+    pagination,
+    isLoading,
+    isLoadingMore,
+    error,
+    currentPage,
+    fetchChannel,
+    loadNextPage,
+    loadPrevPage,
+  } = useChannelData(initialChannel?.id, 10); // 10 devices per page
 
   // ── RENDER STATES ──────────────────────────────────────────
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#080e17] p-6">
+      <div className="min-h-screen bg-white dark:bg-[#080e17] p-6">
         <PageSkeleton />
       </div>
     );
@@ -118,6 +128,11 @@ export default function ChannelDetailsDataPoints({
             <DevicesList
               devices={channel.devices}
               widgetData={widgetData}
+              pagination={pagination}
+              isLoadingMore={isLoadingMore}
+              onNextPage={loadNextPage}
+              onPrevPage={loadPrevPage}
+              onPageChange={(page) => fetchChannel(page)}
               initialExpandedDevices={initialExpandedDevices}
             />
           </div>
@@ -129,7 +144,6 @@ export default function ChannelDetailsDataPoints({
         </div>
 
         {/* ── FOOTER ──────────────────────────────────────────── */}
-        <ChannelFooter channelId={channel.id} updatedAt={channel.updatedAt} />
       </div>
     </div>
   );

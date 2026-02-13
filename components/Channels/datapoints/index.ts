@@ -1,80 +1,26 @@
 // ============================================================
-// SHARED TYPE DEFINITIONS FOR CHANNEL COMPONENTS
+// CENTRALIZED EXPORTS FOR CHANNEL COMPONENTS
 // ============================================================
 
-export type DeviceStatus = "ONLINE" | "OFFLINE" | "DISCONNECTED";
-export type Access = "PUBLIC" | "PRIVATE";
-export type ActivityType = "active" | "recent";
+// Types and Utilities
+export * from "./channel-types";
+export * from "./channel-utils";
+export { useChannelData } from "./useChannelData";
 
-export interface DataPoint {
-  id: string;
-  timestamp: string;
-  value: number;
-  fieldId: string;
-  channelId: string;
-}
+// Widget Components
+export { default as SparklineChart } from "./SparklineChart";
+export { default as StatusBadge } from "./StatusBadge";
+export { default as DeviceWidgetCard } from "./DeviceWidgetCard";
+export { default as DeviceCard } from "./DeviceCard";
 
-export interface Field {
-  id: string;
-  name: string;
-  description?: string;
-  channelId: string;
-  dataPoints: DataPoint[];
-}
+// Section Components
+export { default as DevicesList } from "./DevicesList";
+export { default as ActivityFeed } from "./ActivityFeed";
+export { default as ChannelStatsHeader } from "./ChannelStatsHeader";
+export { default as ChannelHeader } from "./ChannelHeader";
+export { default as Pagination } from "./Pagination";
 
-export interface Device {
-  id: string;
-  name: string;
-  description?: string;
-  userId: string;
-  channelId: string;
-  status: DeviceStatus;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Channel {
-  id: string;
-  name: string;
-  description?: string;
-  access: Access;
-  fields: Field[];
-  dataPoints: DataPoint[];
-  devices: Device[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ActivityItem {
-  id: string;
-  deviceId: string;
-  deviceName: string;
-  fieldName: string;
-  value: number;
-  unit: string;
-  timestamp: string;
-  type: ActivityType;
-}
-
-export interface WidgetData {
-  widgetId: string;
-  deviceId: string;
-  pinNumber: number;
-  widgetName: string;
-  values: number[];
-  labels: string[];
-  unit: string;
-}
-
-export interface StatusConfig {
-  color: string;
-  bg: string;
-  label: string;
-  dot: string;
-}
-
-export interface StatItem {
-  label: string;
-  value: string | number;
-  sub?: string;
-}
+// State Components
+export { default as PageSkeleton } from "./PageSkeleton";
+export { default as ErrorState } from "./ErrorState";
+export { default as NotFoundState } from "./NotFoundState";

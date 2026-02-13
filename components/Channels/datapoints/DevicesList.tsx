@@ -2,21 +2,32 @@
 
 import { useState, ChangeEvent } from "react";
 import { motion } from "framer-motion";
-import { Device, WidgetData } from "./channel-types";
+import { Device, WidgetData, PaginationInfo } from "./channel-types";
 import DeviceCard from "./DeviceCard";
+import Pagination from "./Pagination";
 
 interface DevicesListProps {
   devices: Device[];
   widgetData: Record<string, WidgetData>;
+  pagination: PaginationInfo | null;
+  isLoadingMore?: boolean;
+  onNextPage: () => void;
+  onPrevPage: () => void;
+  onPageChange: (page: number) => void;
   initialExpandedDevices?: Set<string>;
 }
 
 /**
- * Manages the list of devices with search and expand/collapse functionality
+ * Manages the list of devices with search, expand/collapse, and pagination
  */
 export default function DevicesList({
   devices,
   widgetData,
+  pagination,
+  isLoadingMore = false,
+  onNextPage,
+  onPrevPage,
+  onPageChange,
   initialExpandedDevices = new Set(),
 }: DevicesListProps): JSX.Element {
   const [expandedDevices, setExpandedDevices] = useState<Set<string>>(
@@ -100,6 +111,37 @@ export default function DevicesList({
         </button>
       </div>
 
+      {/* Loading overlay */}
+      {isLoadingMore && (
+        <div className="relative">
+          <div className="absolute inset-0 bg-[#080e17]/80 backdrop-blur-sm z-10 rounded-2xl flex items-center justify-center">
+            <div className="flex items-center gap-2 text-sky-400">
+              <svg
+                className="animate-spin h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              <span className="text-sm font-medium">Loading...</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Device list */}
       {filteredDevices.length === 0 ? (
         <motion.div
@@ -116,18 +158,31 @@ export default function DevicesList({
           </p>
         </motion.div>
       ) : (
-        <div className="space-y-3">
-          {filteredDevices.map((device: Device, i: number) => (
-            <DeviceCard
-              key={device.id}
-              device={device}
-              index={i}
-              isExpanded={expandedDevices.has(device.id)}
-              onToggle={() => handleToggleDevice(device.id)}
-              widgetData={widgetData}
+        <>
+          <div className="space-y-3">
+            {filteredDevices.map((device: Device, i: number) => (
+              <DeviceCard
+                key={device.id}
+                device={device}
+                index={i}
+                isExpanded={expandedDevices.has(device.id)}
+                onToggle={() => handleToggleDevice(device.id)}
+                widgetData={widgetData}
+              />
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {pagination && (
+            <Pagination
+              pagination={pagination}
+              onNextPage={onNextPage}
+              onPrevPage={onPrevPage}
+              onPageChange={onPageChange}
+              isLoading={isLoadingMore}
             />
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );

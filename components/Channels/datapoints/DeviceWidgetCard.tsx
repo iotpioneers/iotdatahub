@@ -49,7 +49,7 @@ export default function DeviceWidgetCard({
             {widgetData.widgetName}
           </p>
           <div className="flex items-end gap-1.5">
-            <span className="text-2xl font-bold text-white tabular-nums">
+            <span className="text-2xl font-bold text-yellow-500 tabular-nums">
               {isMotion
                 ? latestValue
                   ? "Active"

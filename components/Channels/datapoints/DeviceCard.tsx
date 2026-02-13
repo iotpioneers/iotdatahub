@@ -43,7 +43,7 @@ export default function DeviceCard({
         duration: 0.5,
         ease: [0.25, 0.46, 0.45, 0.94],
       }}
-      className="bg-primary/5 border-primary/10 rounded-2xl overflow-hidden"
+      className="bg-[#111827] border border-primary/10 rounded-2xl overflow-hidden"
       role="region"
       aria-label={`Device: ${device.name}`}
     >

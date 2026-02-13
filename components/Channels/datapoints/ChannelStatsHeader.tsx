@@ -22,7 +22,14 @@ export default function ChannelStatsHeader({
 
   const stats: StatItem[] = [
     { label: "Devices", value: totalDevices, sub: `${onlineCount} online` },
-    { label: "Fields", value: channel.fields.length, sub: "data streams" },
+    {
+      label: "Widgets",
+      value: channel.devices.reduce(
+        (acc, d: Device) => acc + (d.widgets?.length || 0),
+        0,
+      ),
+      sub: "data streams",
+    },
     { label: "Health", value: `${healthPercent}%`, sub: "uptime rate" },
     { label: "Access", value: channel.access, sub: "visibility" },
   ];
@@ -35,7 +42,7 @@ export default function ChannelStatsHeader({
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.08 }}
-          className="bg-primary/5 border-primary/10 rounded-xl p-4"
+          className="bg-[#111827] border border-primary/10 rounded-xl p-4"
         >
           <p className="text-xs text-slate-500 font-medium uppercase tracking-wide mb-1">
             {stat.label}

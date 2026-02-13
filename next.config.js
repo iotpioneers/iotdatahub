@@ -2,6 +2,23 @@
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
+  images: {
+    domains: ["img.icons8.com", "res.cloudinary.com", "flagcdn.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+      {
+        protocol: "https",
+        hostname: "flagcdn.com",
+      },
+    ],
+  },
   async headers() {
     return [
       {

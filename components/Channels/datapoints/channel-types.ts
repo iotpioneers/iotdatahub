@@ -29,6 +29,7 @@ export interface Device {
   userId: string;
   channelId: string;
   status: DeviceStatus;
+  widgets?: WidgetData[];
   createdAt: string;
   updatedAt: string;
 }
@@ -41,6 +42,7 @@ export interface Channel {
   fields: Field[];
   dataPoints: DataPoint[];
   devices: Device[];
+  generatedWidgetsData?: number; // Total count of generated widgets from pin history
   createdAt: string;
   updatedAt: string;
 }
@@ -57,16 +59,13 @@ export interface ActivityItem {
 }
 
 export interface WidgetData {
-  widgetId?: string;
-  deviceId?: string;
-  channelId?: string;
-  deviceName?: string;
-  widgetName?: string;
-  fieldName?: string;
-  unit?: string;
-  fieldId: string;
+  widgetId: string;
+  deviceId: string;
+  pinNumber: number;
+  widgetName: string;
   values: number[];
   labels: string[];
+  unit: string;
 }
 
 export interface StatusConfig {
@@ -80,4 +79,13 @@ export interface StatItem {
   label: string;
   value: string | number;
   sub?: string;
+}
+
+export interface PaginationInfo {
+  currentPage: number;
+  pageSize: number;
+  totalDevices: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
 }
