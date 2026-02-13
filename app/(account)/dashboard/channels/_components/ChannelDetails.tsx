@@ -37,7 +37,7 @@ interface ChannelDetailsProps {
 const ChannelDetails: React.FC<ChannelDetailsProps> = ({ channelID }) => {
   const { data: session } = useSession();
   const [currentUserType, setCurrentUserType] = useState<"editor" | "viewer">(
-    "viewer"
+    "viewer",
   );
   const [room, setRoom] = useState<any>(null);
   const toast = useToast();
@@ -45,7 +45,7 @@ const ChannelDetails: React.FC<ChannelDetailsProps> = ({ channelID }) => {
   const { data: channelData, error: channelError } = useSWR<ChannelData>(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/channels/${channelID}`,
     fetcher,
-    { refreshInterval: 5000 }
+    { refreshInterval: 5000 },
   );
 
   useEffect(() => {

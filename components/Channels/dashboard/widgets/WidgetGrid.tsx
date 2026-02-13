@@ -170,8 +170,8 @@ export const WidgetGrid: React.FC<WidgetGridProps> = ({
         style={{
           height: "100%",
           minHeight: "380px",
-          overflowY: "auto", // Enable vertical scrolling
-          paddingBottom: "12px", // Add some padding at the bottom
+          overflowY: "auto",
+          paddingBottom: "12px",
         }}
       >
         {widgets.map((widget) => {

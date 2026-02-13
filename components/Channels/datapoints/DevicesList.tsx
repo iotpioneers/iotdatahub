@@ -81,15 +81,15 @@ export default function DevicesList({
           value={searchQuery}
           onChange={handleSearchChange}
           aria-label="Search devices"
-          className="w-full bg-primary/5 border-primary/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500/40 focus:ring-1 focus:ring-sky-500/20 transition-all duration-200"
+          className="w-full bg-[#111827] border border-primary/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500/40 focus:ring-1 focus:ring-sky-500/20 transition-all duration-200"
         />
       </div>
 
       {/* Section title */}
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-slate-300">
+        <h2 className="text-sm font-semibold text-slate-700">
           Connected Devices
-          <span className="ml-2 text-xs text-slate-600 font-normal">
+          <span className="ml-2 text-xs text-yellow-500 font-normal">
             ({filteredDevices.length})
           </span>
         </h2>

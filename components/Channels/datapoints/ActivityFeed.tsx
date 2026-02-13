@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ActivityItem, ActivityType } from "./channel-types";
-import { formatTimeAgo } from "./channel-utils";
+import { dateConverter } from "@/lib/utils";
 
 interface ActivityFeedProps {
   activities: ActivityItem[];
@@ -24,7 +24,7 @@ export default function ActivityFeed({
   const tabs: ActivityType[] = ["active", "recent"];
 
   return (
-    <div className="bg-primary/5 border-primary/10 rounded-2xl overflow-hidden h-full flex flex-col">
+    <div className="bg-[#111827] border border-primary/10 rounded-2xl overflow-hidden h-full flex flex-col">
       {/* Header */}
       <div className="p-5 border-b border-white/[0.05]">
         <div className="flex items-center justify-between mb-4">
@@ -137,7 +137,7 @@ export default function ActivityFeed({
                         dateTime={item.timestamp}
                         className="text-xs text-slate-600 flex-shrink-0"
                       >
-                        {formatTimeAgo(item.timestamp)}
+                        {dateConverter(item.timestamp)}
                       </time>
                     </div>
                   </div>

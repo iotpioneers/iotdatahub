@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import DeviceConfigurationModal from "./DeviceConfigurationModal";
 import DeviceHintModal from "./DeviceHintModal";
 import { Box } from "@mui/material";
@@ -28,13 +28,13 @@ interface Organization {
 
 const DeviceDetails = ({ params }: Props) => {
   const [showModal, setShowModal] = useState(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       return !localStorage.getItem(`device-config-${params.id}`);
     }
     return true;
   });
   const [hintStep, setHintStep] = useState(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       return localStorage.getItem(`device-hint-${params.id}`) ? 0 : 1;
     }
     return 0;
@@ -51,6 +51,14 @@ const DeviceDetails = ({ params }: Props) => {
     fastestUpdate: Number.POSITIVE_INFINITY,
   });
 
+  // NEW: Track last data activity from PinHistory
+  const [lastDataActivity, setLastDataActivity] = useState<Date | null>(null);
+  const [deviceOnlineStatus, setDeviceOnlineStatus] = useState<
+    "ONLINE" | "OFFLINE"
+  >("OFFLINE");
+  const statusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const statusLockRef = useRef<boolean>(false);
+
   const { data: session, status } = useSession();
 
   const {
@@ -61,11 +69,76 @@ const DeviceDetails = ({ params }: Props) => {
   } = useFetch(`/api/devices/${params.id}`);
 
   const { data: organizationData } = useFetch(
-    `/api/organizations/${session?.user?.organizationId}`
+    `/api/organizations/${session?.user?.organizationId}`,
   );
 
   const { data: initialWidgetData, refetch: refetchWidgets } = useFetch(
-    `/api/devices/${params.id}/widgets`
+    `/api/devices/${params.id}/widgets`,
+  );
+
+  // NEW: Function to check recent data from PinHistory
+  const checkRecentDataActivity = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/devices/${params.id}/history/recent`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.lastActivity) {
+          const lastActivity = new Date(data.lastActivity);
+          setLastDataActivity(lastActivity);
+
+          // If we have recent data (within 10 seconds), device is online
+          const timeSinceLastData = Date.now() - lastActivity.getTime();
+          if (timeSinceLastData < 10000) {
+            return true;
+          }
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error("Error checking recent data activity:", error);
+      return false;
+    }
+  }, [params.id]);
+
+  // NEW: Improved status management with locking mechanism
+  const updateDeviceStatus = useCallback(
+    (newStatus: "ONLINE" | "OFFLINE", source: string) => {
+      console.log(
+        `[Status Update] Source: ${source}, New Status: ${newStatus}, Locked: ${statusLockRef.current}`,
+      );
+
+      if (newStatus === "ONLINE") {
+        // When going online, lock the status for 10 seconds
+        statusLockRef.current = true;
+        setDeviceOnlineStatus("ONLINE");
+
+        // Clear any existing timeout
+        if (statusTimeoutRef.current) {
+          clearTimeout(statusTimeoutRef.current);
+        }
+
+        // Set timeout to unlock and re-check status after 10 seconds
+        statusTimeoutRef.current = setTimeout(async () => {
+          console.log(
+            "[Status] 10-second lock expired, checking recent data...",
+          );
+          const hasRecentData = await checkRecentDataActivity();
+
+          if (!hasRecentData) {
+            console.log("[Status] No recent data, setting to OFFLINE");
+            setDeviceOnlineStatus("OFFLINE");
+          } else {
+            console.log("[Status] Recent data found, staying ONLINE");
+          }
+
+          statusLockRef.current = false;
+        }, 10000);
+      } else if (!statusLockRef.current) {
+        // Only allow offline status if not locked
+        setDeviceOnlineStatus("OFFLINE");
+      }
+    },
+    [checkRecentDataActivity],
   );
 
   const handleWebSocketMessage = useCallback(
@@ -86,20 +159,27 @@ const DeviceDetails = ({ params }: Props) => {
                       lastActivity: new Date(),
                     },
                   }
-                : null
+                : null,
             );
 
+            // Data received, mark as online
+            updateDeviceStatus("ONLINE", "DEVICE_UPDATE");
             break;
 
           case "HARDWARE_DATA":
             const isCmd20 = message.data.isCmd20 || message.priority === "HIGH";
             const updateTime = performance.now() - updateStartTime;
 
+            // NEW: Update last data activity timestamp
+            const now = new Date();
+            setLastDataActivity(now);
+            updateDeviceStatus("ONLINE", "HARDWARE_DATA");
+
             if (isCmd20) {
               setRealTimeStats((prev) => ({
                 ...prev,
                 cmd20Count: prev.cmd20Count + 1,
-                lastCmd20: new Date(),
+                lastCmd20: now,
               }));
             }
 
@@ -125,7 +205,7 @@ const DeviceDetails = ({ params }: Props) => {
                       ...widget.settings,
                       value: message.data.value,
                     },
-                    lastUpdated: new Date(),
+                    lastUpdated: now,
                     isCmd20Update: isCmd20,
                     instantUpdate: true,
                     updateTime: updateTime,
@@ -169,6 +249,7 @@ const DeviceDetails = ({ params }: Props) => {
               });
             });
 
+            updateDeviceStatus("ONLINE", "WIDGET_STATE_SYNC");
             break;
 
           case "WIDGET_UPDATE":
@@ -176,11 +257,12 @@ const DeviceDetails = ({ params }: Props) => {
             break;
 
           case "DEVICE_STATUS":
+            const statusFromMessage = message.data.status;
             setDevice((prevDevice) =>
               prevDevice
                 ? {
                     ...prevDevice,
-                    status: message.data.status,
+                    status: statusFromMessage,
                     lastPing: message.data.lastPing,
                     metadata: {
                       ...prevDevice.metadata,
@@ -189,9 +271,13 @@ const DeviceDetails = ({ params }: Props) => {
                       statusChangeTime: new Date(),
                     },
                   }
-                : null
+                : null,
             );
 
+            // Update our managed status
+            if (statusFromMessage === "ONLINE") {
+              updateDeviceStatus("ONLINE", "DEVICE_STATUS");
+            }
             break;
 
           case "DEVICE_REFRESH":
@@ -204,7 +290,6 @@ const DeviceDetails = ({ params }: Props) => {
             if (message.data.widgets) {
               setWidgetData(message.data.widgets);
             }
-
             break;
 
           case "CACHE_INITIALIZED":
@@ -212,7 +297,7 @@ const DeviceDetails = ({ params }: Props) => {
         }
       }
     },
-    [params.id]
+    [params.id, updateDeviceStatus],
   );
 
   const { isConnected, cacheReady, sendMessage } = useWebSocket({
@@ -237,18 +322,30 @@ const DeviceDetails = ({ params }: Props) => {
     }
   }, [isConnected, session, cacheReady, sendMessage]);
 
-  const deviceHintSteps = [
-    {
-      targetId: 'config-button',
-      title: 'Device Configuration',
-      message: 'Click the Config button to access your device settings and copy configuration codes.'
-    },
-    {
-      targetId: 'edit-button',
-      title: 'Edit Dashboard',
-      message: 'Use the Edit button to customize your device dashboard and add widgets.'
-    }
-  ];
+  // NEW: Initial check for recent data on mount
+  useEffect(() => {
+    checkRecentDataActivity();
+  }, [checkRecentDataActivity]);
+
+  // NEW: Periodic check for data activity every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!statusLockRef.current) {
+        checkRecentDataActivity();
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [checkRecentDataActivity]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (statusTimeoutRef.current) {
+        clearTimeout(statusTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleHintNext = () => {
     if (hintStep === 1) {
@@ -256,14 +353,15 @@ const DeviceDetails = ({ params }: Props) => {
       setHintStep(2);
     } else {
       setHintStep(0);
-      localStorage.setItem(`device-hint-${params.id}`, 'completed');
+      localStorage.setItem(`device-hint-${params.id}`, "completed");
     }
   };
 
   const handleHintClose = () => {
     setHintStep(0);
-    localStorage.setItem(`device-hint-${params.id}`, 'completed');
+    localStorage.setItem(`device-hint-${params.id}`, "completed");
   };
+
   const handleManualRefresh = async () => {
     if (cacheReady && isConnected) {
       sendMessage({
@@ -273,6 +371,8 @@ const DeviceDetails = ({ params }: Props) => {
     } else {
       await Promise.all([refetchDevice(), refetchWidgets()]);
     }
+    // Also check recent data
+    await checkRecentDataActivity();
   };
 
   useEffect(() => {
@@ -282,7 +382,7 @@ const DeviceDetails = ({ params }: Props) => {
       }, 8000);
 
       return () => clearInterval(pollInterval);
-    } else if (device?.status === "ONLINE") {
+    } else if (deviceOnlineStatus === "ONLINE") {
       const heartbeatInterval = setInterval(() => {
         sendMessage({
           type: "DEVICE_HEARTBEAT",
@@ -293,7 +393,7 @@ const DeviceDetails = ({ params }: Props) => {
 
       return () => clearInterval(heartbeatInterval);
     }
-  }, [isConnected, cacheReady, device?.status, params.id, sendMessage]);
+  }, [isConnected, cacheReady, deviceOnlineStatus, params.id, sendMessage]);
 
   if (error) {
     return (
@@ -304,10 +404,10 @@ const DeviceDetails = ({ params }: Props) => {
   }
 
   const channel = organization?.Channel?.find(
-    (channel: Channel) => channel.id === device?.channelId
+    (channel: Channel) => channel.id === device?.channelId,
   );
   const apiKey = organization?.ApiKey?.find(
-    (key: ApiKey) => key.channelId === channel?.id
+    (key: ApiKey) => key.channelId === channel?.id,
   );
 
   const getConnectionStatus = () => {
@@ -330,24 +430,31 @@ const DeviceDetails = ({ params }: Props) => {
 
   const connectionStatus = getConnectionStatus();
 
+  // NEW: Improved device status display with real-time data checking
   const getDeviceStatusDisplay = () => {
     if (!device)
       return { icon: HiStatusOffline, color: "text-gray-500", text: "Unknown" };
 
-    const isRealTimeOnline =
-      device.status === "ONLINE" && device.metadata?.realTimeStatus;
-    const timeSinceLastPing = device.lastPing
-      ? new Date().getTime() - new Date(device.lastPing).getTime()
-      : Number.POSITIVE_INFINITY;
+    // Use our managed status instead of database status
+    const isActuallyOnline = deviceOnlineStatus === "ONLINE";
 
-    const onlineThreshold = isRealTimeOnline ? 15000 : 45000;
-    const isActuallyOnline =
-      device.status === "ONLINE" && timeSinceLastPing < onlineThreshold;
+    // Additional check: if we have recent data activity, prioritize that
+    if (lastDataActivity) {
+      const timeSinceLastData = Date.now() - lastDataActivity.getTime();
+      if (timeSinceLastData < 10000) {
+        // Data within last 10 seconds
+        return {
+          icon: HiStatusOnline,
+          color: "text-green-500",
+          text: "ONLINE",
+        };
+      }
+    }
 
     if (isActuallyOnline) {
       return {
         icon: HiStatusOnline,
-        color: isRealTimeOnline ? "text-green-500" : "text-yellow-500",
+        color: "text-green-500",
         text: "ONLINE",
       };
     } else {
@@ -494,7 +601,7 @@ const DeviceDetails = ({ params }: Props) => {
         isOpen={showModal}
         onClose={() => {
           setShowModal(false);
-          localStorage.setItem(`device-config-${params.id}`, 'seen');
+          localStorage.setItem(`device-config-${params.id}`, "seen");
         }}
         userName={session?.user?.name}
         organizationName={organization?.name}

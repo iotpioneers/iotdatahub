@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Channel,
   ActivityItem,
@@ -38,6 +38,9 @@ export function useChannelData(
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
+  // Track if we've done the initial fetch for this channelId
+  const hasFetchedRef = useRef<string | null>(null);
+
   /**
    * Fetches channel data from the API.
    */
@@ -47,9 +50,9 @@ export function useChannelData(
 
       try {
         // Only show main loading on initial load or page 1
-        if (page === 1) {
+        if (page === 1 && hasFetchedRef.current !== channelId) {
           setIsLoading(true);
-        } else {
+        } else if (page !== currentPage) {
           setIsLoadingMore(true);
         }
 
@@ -85,15 +88,18 @@ export function useChannelData(
           setPagination(data.pagination);
           setCurrentPage(data.pagination.currentPage);
         }
+
+        // Mark that we've fetched for this channel
+        hasFetchedRef.current = channelId;
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Failed to load channel");
-        console.error("Error fetching channel data:", err);
+        console.error("Error fetching channel data in client:", err);
       } finally {
         setIsLoading(false);
         setIsLoadingMore(false);
       }
     },
-    [channelId, pageSize],
+    [channelId, pageSize, currentPage],
   );
 
   /**
@@ -114,31 +120,36 @@ export function useChannelData(
     }
   }, [pagination, currentPage, fetchChannel]);
 
-  // Initial fetch - load once when channelId changes
+  // Initial load when channelId changes
   useEffect(() => {
     if (!channelId) {
       setChannel(null);
       setActivities([]);
       setWidgetData({});
       setPagination(null);
+      hasFetchedRef.current = null;
       return;
     }
 
-    fetchChannel(1);
-  }, [channelId]);
-
-  // Auto-refresh every 5 seconds
-  useEffect(() => {
-    if (!channelId) {
-      return;
-    }
-
-    const interval = setInterval(() => {
+    // Only fetch if we haven't already fetched for this channelId
+    if (hasFetchedRef.current !== channelId) {
       fetchChannel(1);
-    }, 5000);
+    }
+  }, [channelId, fetchChannel]);
 
+  // Auto-refresh every 10 seconds (separate effect)
+  useEffect(() => {
+    if (!channelId || !hasFetchedRef.current) return;
+
+    // Set up interval for auto-refresh every 10 seconds
+    const interval = setInterval(() => {
+      // Silently refresh the current page without showing loading state
+      fetchChannel(currentPage);
+    }, 10000); // 10 seconds
+
+    // Cleanup interval on unmount or when dependencies change
     return () => clearInterval(interval);
-  }, [channelId]); // Only depend on channelId to ensure stable interval
+  }, [channelId, currentPage, fetchChannel]);
 
   return {
     channel,
