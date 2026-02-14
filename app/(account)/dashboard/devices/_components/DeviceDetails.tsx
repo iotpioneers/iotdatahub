@@ -13,6 +13,7 @@ import { HiStatusOffline, HiStatusOnline } from "react-icons/hi";
 import Link from "next/link";
 import WidgetGrid from "@/components/Channels/dashboard/widgets/WidgetGrid";
 import type { WebSocketMessage } from "@/types/websocket";
+import { useRouter } from "next/navigation";
 
 interface Props {
   params: { id: string };
@@ -60,6 +61,7 @@ const DeviceDetails = ({ params }: Props) => {
   const statusLockRef = useRef<boolean>(false);
 
   const { data: session, status } = useSession();
+  const router = useRouter();
 
   const {
     data: deviceData,
@@ -476,6 +478,19 @@ const DeviceDetails = ({ params }: Props) => {
 
   const deviceStatusDisplay = getDeviceStatusDisplay();
 
+  const handleRedirectToEdit = () => {
+    setIsRedirecting(true);
+    try {
+      // Wait a moment to show loading state before redirecting
+      setTimeout(() => {
+        router.push(`/dashboard/devices/${params.id}/edit`);
+      }, 1000);
+    } catch (error) {
+      console.error("Redirection error:", error);
+    } finally {
+      setIsRedirecting(false);
+    }
+  };
   return (
     <div className="min-h-screen">
       {(isLoading ||
@@ -538,7 +553,7 @@ const DeviceDetails = ({ params }: Props) => {
                 <button
                   id="edit-button"
                   className="px-4 py-2 bg-orange-50 text-white rounded-lg hover:bg-green-600 font-medium"
-                  onClick={() => setIsRedirecting(true)}
+                  onClick={handleRedirectToEdit}
                 >
                   <Link href={`/dashboard/devices/${params.id}/edit`}>
                     {isRedirecting || !deviceData ? <LinearLoading /> : "Edit"}
