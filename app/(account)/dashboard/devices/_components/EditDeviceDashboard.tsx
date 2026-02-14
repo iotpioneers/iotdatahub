@@ -58,7 +58,7 @@ const EditDeviceDashboard: React.FC<Props> = ({
                   Add new widget
                 </h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  Double click the widget or drag it to the canvas
+                  Search, Double click the widget or Drag it to the canvas
                 </p>
                 {isDirty && (
                   <p className="mt-2 text-xs text-orange-600">

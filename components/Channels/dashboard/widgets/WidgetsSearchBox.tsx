@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useMemo,
+  useCallback,
+  useRef,
+  useEffect,
+} from "react";
 import { Search, Check, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -218,6 +224,7 @@ const WidgetsSearchBox: React.FC<WidgetsSearchBoxProps> = ({
     message: string;
   }>({ type: null, message: "" });
   const { showToast } = useToast();
+  const closeTimeoutRef = useRef<number | null>(null);
 
   // Flatten all widgets with their categories
   const allWidgets = useMemo(() => {
@@ -311,31 +318,39 @@ const WidgetsSearchBox: React.FC<WidgetsSearchBoxProps> = ({
         onWidgetsSelected(selected);
       }
 
-      // Show success message
-      const widgetCount = selected.length;
-      const successMsg = `Successfully added ${widgetCount} widget${widgetCount !== 1 ? "s" : ""}!`;
-      setStatusMessage({
-        type: "success",
-        message: successMsg,
-      });
-
-      showToast(successMsg, "success");
-
-      // Trigger refresh if callback provided
+      // Trigger refresh if callback provided, but don't wait forever
       if (onRefresh) {
         try {
-          await onRefresh();
+          // race onRefresh against a short timeout to avoid hanging UI
+          await Promise.race([
+            onRefresh(),
+            new Promise((resolve) => setTimeout(resolve, 3000)),
+          ]);
         } catch (err) {
           console.error("Error refreshing widgets:", err);
         }
       }
 
-      // Reset after showing success status
-      setTimeout(() => {
+      // No fallback dispatch here — the parent listens for `widget-search-add`
+      // and will add widgets to the dashboard. Avoid duplicate events.
+
+      // Show success message
+      const widgetCount = selected.length;
+      const successMsg = `Successfully added ${widgetCount} widget${widgetCount !== 1 ? "s" : ""}!`;
+      setStatusMessage({ type: "success", message: successMsg });
+      showToast(successMsg, "success");
+
+      // stop loading and keep status visible briefly, then close
+      setIsLoading(false);
+      if (closeTimeoutRef.current) {
+        window.clearTimeout(closeTimeoutRef.current);
+      }
+      closeTimeoutRef.current = window.setTimeout(() => {
         setSelectedWidgets(new Set());
         setSearchQuery("");
         setStatusMessage({ type: null, message: "" });
         setIsOpen(false);
+        closeTimeoutRef.current = null;
       }, 1500);
     } catch (error) {
       console.error("Error adding widgets:", error);
@@ -359,8 +374,29 @@ const WidgetsSearchBox: React.FC<WidgetsSearchBoxProps> = ({
 
   // Reset when modal closes
   const handleClose = useCallback(() => {
+    if (isLoading) {
+      // prevent closing while processing
+      showToast("Operation in progress, please wait...", "info");
+      return;
+    }
+
+    // clear any pending close timeout
+    if (closeTimeoutRef.current) {
+      window.clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+
     setIsOpen(false);
     // Don't reset selection/search to maintain context if reopened
+  }, [isLoading, showToast]);
+
+  // cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        window.clearTimeout(closeTimeoutRef.current);
+      }
+    };
   }, []);
 
   return (

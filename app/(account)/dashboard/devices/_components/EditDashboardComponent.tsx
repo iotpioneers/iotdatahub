@@ -82,35 +82,8 @@ const EditDashboardComponent = ({ params }: Props) => {
   }, [widgetData]);
 
   // Handle widget-search-add event from WidgetsSearchBox
-  useEffect(() => {
-    const handleWidgetSearchAdd = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      const { widget: definition } = customEvent.detail;
-
-      if (definition && definition.type) {
-        const widget = createWidget(definition as WidgetDefinition);
-
-        // Dispatch the same event as double-click for consistency
-        window.dispatchEvent(
-          new CustomEvent("widget-double-click", {
-            detail: { widget },
-          }),
-        );
-      }
-    };
-
-    window.addEventListener(
-      "widget-search-add",
-      handleWidgetSearchAdd as EventListener,
-    );
-
-    return () => {
-      window.removeEventListener(
-        "widget-search-add",
-        handleWidgetSearchAdd as EventListener,
-      );
-    };
-  }, [createWidget]);
+  // NOTE: widget-search-add handling moved lower (after handlers) to ensure
+  // helper functions like `findNextAvailablePosition` are available.
 
   // Refresh handler for widgets after successful addition
   const handleRefresh = React.useCallback(async () => {
@@ -267,6 +240,42 @@ const EditDashboardComponent = ({ params }: Props) => {
     },
     [params.id, findNextAvailablePosition],
   );
+
+  // Handle widget-search-add event from WidgetsSearchBox
+  useEffect(() => {
+    const handleWidgetSearchAdd = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { widget: definition } = customEvent.detail;
+
+      if (definition && definition.type) {
+        // create a widget object and add it to local state (same flow as drop)
+        const widget = createWidget(definition as WidgetDefinition);
+
+        // Use the existing add handler to ensure consistent temp id and positioning
+        handleAddWidget(widget as Widget);
+
+        // Optionally notify user
+        try {
+          // Use toast if available
+          toast({ message: "Widget added to dashboard", type: "success" });
+        } catch (e) {
+          // ignore
+        }
+      }
+    };
+
+    window.addEventListener(
+      "widget-search-add",
+      handleWidgetSearchAdd as EventListener,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "widget-search-add",
+        handleWidgetSearchAdd as EventListener,
+      );
+    };
+  }, [createWidget, handleAddWidget, toast]);
 
   const handleUpdateWidget = useCallback(
     (widgetId: string, changes: Partial<Widget>) => {
@@ -487,7 +496,7 @@ const EditDashboardComponent = ({ params }: Props) => {
             stats={stats}
           />
 
-          <WidgetsSearchBox deviceId={params.id} />
+          <WidgetsSearchBox deviceId={params.id} onRefresh={handleRefresh} />
 
           <div id="dashboard-grid">
             <EditDeviceDashboard
