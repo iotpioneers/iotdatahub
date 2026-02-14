@@ -61,6 +61,8 @@ const EditDashboardComponent = ({ params }: Props) => {
     error,
   } = useFetch(`/api/devices/${params.id}/widgets`);
 
+  console.log("Received widget data:---", widgetData, "Error:---", error);
+
   // Initialize state when data loads
   useEffect(() => {
     if (widgetData) {
@@ -127,7 +129,7 @@ const EditDashboardComponent = ({ params }: Props) => {
   };
   const stats = useMemo(() => {
     const newWidgets = Object.values(widgetState.pendingChanges).filter(
-      (change) => !initialWidgetsRef.current.some((w) => w.id === change.id)
+      (change) => !initialWidgetsRef.current.some((w) => w.id === change.id),
     ).length;
     const modifiedWidgets =
       Object.keys(widgetState.pendingChanges).length - newWidgets;
@@ -166,7 +168,7 @@ const EditDashboardComponent = ({ params }: Props) => {
               proposed.x < existing.x + existing.w &&
               proposed.x + proposed.w > existing.x &&
               proposed.y < existing.y + existing.h &&
-              proposed.y + proposed.h > existing.y
+              proposed.y + proposed.h > existing.y,
           );
 
           if (!overlaps) {
@@ -189,7 +191,7 @@ const EditDashboardComponent = ({ params }: Props) => {
         height: defaultSize.h,
       };
     },
-    [widgetState.widgets]
+    [widgetState.widgets],
   );
 
   // Widget handlers
@@ -212,21 +214,21 @@ const EditDashboardComponent = ({ params }: Props) => {
         },
       }));
     },
-    [params.id, findNextAvailablePosition]
+    [params.id, findNextAvailablePosition],
   );
 
   const handleUpdateWidget = useCallback(
     (widgetId: string, changes: Partial<Widget>) => {
       setWidgetState((prev) => {
         const isNewWidget = !initialWidgetsRef.current.some(
-          (w) => w.id === widgetId
+          (w) => w.id === widgetId,
         );
         const existingChanges = prev.pendingChanges[widgetId] || {};
 
         return {
           ...prev,
           widgets: prev.widgets.map((w) =>
-            w.id === widgetId ? { ...w, ...changes } : w
+            w.id === widgetId ? { ...w, ...changes } : w,
           ),
           pendingChanges: {
             ...prev.pendingChanges,
@@ -239,7 +241,7 @@ const EditDashboardComponent = ({ params }: Props) => {
         };
       });
     },
-    []
+    [],
   );
 
   const handleDeleteWidget = useCallback((widgetId: string) => {
@@ -252,7 +254,7 @@ const EditDashboardComponent = ({ params }: Props) => {
           ? prev.deletedWidgets
           : [...prev.deletedWidgets, widgetId],
         pendingChanges: Object.fromEntries(
-          Object.entries(prev.pendingChanges).filter(([id]) => id !== widgetId)
+          Object.entries(prev.pendingChanges).filter(([id]) => id !== widgetId),
         ),
       };
     });
@@ -262,7 +264,7 @@ const EditDashboardComponent = ({ params }: Props) => {
     (widgetId: string, position: Widget["position"]) => {
       handleUpdateWidget(widgetId, { position });
     },
-    [handleUpdateWidget]
+    [handleUpdateWidget],
   );
 
   const handleDuplicateWidget = useCallback(
@@ -282,7 +284,7 @@ const EditDashboardComponent = ({ params }: Props) => {
 
       handleAddWidget(duplicatedWidget);
     },
-    [handleAddWidget, findNextAvailablePosition]
+    [handleAddWidget, findNextAvailablePosition],
   );
 
   const handleSaveAndApply = async () => {
@@ -364,7 +366,7 @@ const EditDashboardComponent = ({ params }: Props) => {
     }
 
     const confirmCancel = window.confirm(
-      "You have unsaved changes. Are you sure you want to cancel?"
+      "You have unsaved changes. Are you sure you want to cancel?",
     );
     if (!confirmCancel) return;
 

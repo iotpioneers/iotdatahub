@@ -42,7 +42,7 @@ const deviceSchema = Yup.object().shape({
   deviceType: Yup.string()
     .oneOf(
       deviceTypes.map((type) => type.value),
-      "Invalid device type"
+      "Invalid device type",
     )
     .required("Device type is required")
     .matches(/^[a-zA-Z0-9'\-_ ]+$/, "Invalid device type"),
@@ -78,7 +78,7 @@ const AddDeviceFormComponent: React.FC = () => {
 
   const handleSubmit = async (
     values: typeof initialValues,
-    { setSubmitting, setFieldError }: any
+    { setSubmitting, setFieldError }: any,
   ) => {
     if (!channels || channels.length === 0) {
       setError("Please wait until channels are fully loaded.");
@@ -108,9 +108,10 @@ const AddDeviceFormComponent: React.FC = () => {
       }
 
       router.push(`/dashboard/devices/${data.id}/edit`);
+      // Set loading to true for 5 seconds to allow the new device page to load properly
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "An unknown error occurred"
+        err instanceof Error ? err.message : "An unknown error occurred",
       );
     } finally {
       setLoading(false);
