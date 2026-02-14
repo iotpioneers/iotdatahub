@@ -12,13 +12,14 @@ import EditDeviceDashboard from "./EditDeviceDashboard";
 import { useRouter } from "next/navigation";
 import DeviceHeaderComponent from "./DeviceHeaderComponent";
 import { DragDropProvider } from "@/components/Channels/dashboard/widgets/DragDropProvider";
-import { Widget } from "@/types/widgets";
+import { Widget, WidgetDefinition } from "@/types/widgets";
 import useFetch from "@/hooks/useFetch";
 import { LinearLoading } from "@/components/LinearLoading";
 import { useToast } from "@/components/ui/toast-provider";
 import { v4 as uuidv4 } from "uuid";
 import { getDefaultSize } from "@/app/store/constant";
 import EditDeviceHintModal from "./EditDeviceHintModal";
+import WidgetsSearchBox from "@/components/Channels/dashboard/widgets/WidgetsSearchBox";
 
 // Enhanced HintModal for EditDashboard
 
@@ -61,7 +62,12 @@ const EditDashboardComponent = ({ params }: Props) => {
     error,
   } = useFetch(`/api/devices/${params.id}/widgets`);
 
-  console.log("Received widget data:---", widgetData, "Error:---", error);
+  const createWidget = (definition: WidgetDefinition): Widget => ({
+    id: `${definition.type}-${Date.now()}`,
+    definition,
+    settings: {},
+    deviceId: params.id,
+  });
 
   // Initialize state when data loads
   useEffect(() => {
@@ -74,6 +80,51 @@ const EditDashboardComponent = ({ params }: Props) => {
       });
     }
   }, [widgetData]);
+
+  // Handle widget-search-add event from WidgetsSearchBox
+  useEffect(() => {
+    const handleWidgetSearchAdd = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { widget: definition } = customEvent.detail;
+
+      if (definition && definition.type) {
+        const widget = createWidget(definition as WidgetDefinition);
+
+        // Dispatch the same event as double-click for consistency
+        window.dispatchEvent(
+          new CustomEvent("widget-double-click", {
+            detail: { widget },
+          }),
+        );
+      }
+    };
+
+    window.addEventListener(
+      "widget-search-add",
+      handleWidgetSearchAdd as EventListener,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "widget-search-add",
+        handleWidgetSearchAdd as EventListener,
+      );
+    };
+  }, [createWidget]);
+
+  // Refresh handler for widgets after successful addition
+  const handleRefresh = React.useCallback(async () => {
+    try {
+      // Dispatch refresh event to parent components
+      window.dispatchEvent(
+        new CustomEvent("widget-refresh-request", {
+          detail: { deviceId: params.id },
+        }),
+      );
+    } catch (error) {
+      console.error("Error refreshing widgets:", error);
+    }
+  }, [params.id]);
 
   const editHintSteps = [
     {
@@ -435,6 +486,8 @@ const EditDashboardComponent = ({ params }: Props) => {
             isDirty={stats.isDirty}
             stats={stats}
           />
+
+          <WidgetsSearchBox deviceId={params.id} />
 
           <div id="dashboard-grid">
             <EditDeviceDashboard

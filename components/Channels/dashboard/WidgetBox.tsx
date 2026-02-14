@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { ChartBarIcon } from "@heroicons/react/20/solid";
 import {
@@ -628,8 +629,6 @@ const WidgetBox = ({ deviceId, onWidgetAdded }: WidgetBoxProps) => {
         <WidgetsOutlined className="text-gray-700 text-xl" />
         <h2 className="text-xl font-bold text-gray-800">Widget Box</h2>
       </div>
-
-      <WidgetsSearchBox />
       <div className="p-3 max-h-[calc(80vh)] overflow-y-auto">
         {Object.entries(widgetDefinitions).map(([category, definitions]) => (
           <div key={category} className="mb-4 last:mb-0">

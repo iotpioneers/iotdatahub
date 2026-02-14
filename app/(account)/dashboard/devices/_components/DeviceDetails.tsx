@@ -325,10 +325,15 @@ const DeviceDetails = ({ params }: Props) => {
   // NEW: Initial check for recent data on mount
   useEffect(() => {
     checkRecentDataActivity();
-  }, [checkRecentDataActivity]);
+  }, [params.id]);
 
-  // NEW: Periodic check for data activity every 5 seconds
+  // NEW: Periodic check for data activity every 5 seconds (only when not connected to WebSocket)
   useEffect(() => {
+    if (isConnected && cacheReady) {
+      // WebSocket is handling data - don't poll
+      return;
+    }
+
     const interval = setInterval(() => {
       if (!statusLockRef.current) {
         checkRecentDataActivity();
@@ -336,7 +341,7 @@ const DeviceDetails = ({ params }: Props) => {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [checkRecentDataActivity]);
+  }, [isConnected, cacheReady, params.id]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -362,38 +367,41 @@ const DeviceDetails = ({ params }: Props) => {
     localStorage.setItem(`device-hint-${params.id}`, "completed");
   };
 
-  const handleManualRefresh = async () => {
+  const handleManualRefresh = useCallback(async () => {
     if (cacheReady && isConnected) {
       sendMessage({
         type: "REFRESH_DEVICE",
         deviceId: params.id,
       });
     } else {
-      await Promise.all([refetchDevice(), refetchWidgets()]);
+      // Only fetch when explicitly refreshed or polling
+      try {
+        await refetchDevice();
+        await refetchWidgets();
+      } catch (err) {
+        console.error("Error refreshing device data:", err);
+      }
     }
-    // Also check recent data
-    await checkRecentDataActivity();
-  };
+  }, [
+    cacheReady,
+    isConnected,
+    params.id,
+    sendMessage,
+    refetchDevice,
+    refetchWidgets,
+  ]);
 
   useEffect(() => {
+    // Only poll via API when WebSocket is not ready
     if (!isConnected || !cacheReady) {
       const pollInterval = setInterval(() => {
         handleManualRefresh();
-      }, 8000);
+      }, 15000); // Increased from 8000 to 15000ms to reduce API load
 
       return () => clearInterval(pollInterval);
-    } else if (deviceOnlineStatus === "ONLINE") {
-      const heartbeatInterval = setInterval(() => {
-        sendMessage({
-          type: "DEVICE_HEARTBEAT",
-          deviceId: params.id,
-          timestamp: new Date().toISOString(),
-        });
-      }, 3000);
-
-      return () => clearInterval(heartbeatInterval);
     }
-  }, [isConnected, cacheReady, deviceOnlineStatus, params.id, sendMessage]);
+    // When WebSocket is connected, no polling needed - WebSocket will push updates
+  }, [isConnected, cacheReady, handleManualRefresh]);
 
   if (error) {
     return (

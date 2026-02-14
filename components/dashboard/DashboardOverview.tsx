@@ -15,6 +15,7 @@ import WelcomeContentCard from "./Overview/WelcomeContentCard";
 // types
 import { Channel, DataPoint, Field, Device, Organization } from "@/types";
 import { EmployeeMember } from "@/types/employees-member";
+import UserActivityOverviewCard from "./Overview/UserActivityOverviewCard";
 
 interface DashboardOverviewProps {
   organization: Organization | null;
@@ -101,7 +102,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             {/* Devices Card */}
             <div
               className="cursor-pointer"
-              onClick={() => handleRedirect("/organization/dashboard")}
+              onClick={() => handleRedirect("/dashboard/devices")}
             >
               <TotalDevicesCard isLoading={isLoading} devices={devices} />
             </div>
@@ -122,15 +123,15 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             </div>
 
             {/* User Activity Overview */}
-            {/* <div className="col-span-12 md:col-span-4 rounded-md border shadow shadow-black bg-white">
+            <div className="col-span-12 md:col-span-4 rounded-md border shadow shadow-black bg-white">
               <UserActivityOverviewCard
                 isLoading={isLoading}
                 devices={devices}
                 channels={channels}
                 fields={fields}
                 dataPoints={datapoints}
-              /> 
-            </div>*/}
+              />
+            </div>
           </div>
         </div>
       </div>
