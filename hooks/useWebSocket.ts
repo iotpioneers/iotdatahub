@@ -50,7 +50,8 @@ export const useWebSocket = ({
   const getWebSocketUrl = () => {
     // Use environment variable for backend URL
     const backendUrl =
-      process.env.NEXT_PUBLIC_HARDWARE_APP_BASE_URL || "http://localhost:5000";
+      process.env.NEXT_PUBLIC_HARDWARE_APP_BASE_URL ||
+      "http://16.170.208.121:5000";
 
     // Convert HTTP/HTTPS URL to WebSocket URL securely
     const isLocalhost =
@@ -210,28 +211,6 @@ export const useWebSocket = ({
       deviceId: targetDeviceId || deviceId,
     });
   };
-
-  // Log sent data for debugging
-  console.log("WebSocket sendMessage:", {
-    deviceId,
-    sessionUserId: session?.user?.id,
-    sessionOrganizationId: session?.user?.organizationId,
-  });
-
-  console.log("WebSocket send data:", {
-    isConnected,
-    cacheReady,
-    error,
-    sendMessage,
-    ping,
-    initializeCache,
-    refreshDevice,
-    reconnect: connect,
-    stats: {
-      reconnectAttempts,
-      maxReconnectAttempts: 3, // Reduced max attempts
-    },
-  });
 
   return {
     isConnected,
