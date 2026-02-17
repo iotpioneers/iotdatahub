@@ -5,6 +5,7 @@ import { Device, WidgetData } from "./channel-types";
 import { getDeviceIcon, getStatusConfig } from "./channel-utils";
 import StatusBadge from "./StatusBadge";
 import DeviceWidgetCard from "./DeviceWidgetCard";
+import Link from "next/link";
 
 interface DeviceCardProps {
   device: Device;
@@ -74,6 +75,13 @@ export default function DeviceCard({
             )}
           </div>
         </div>
+
+        <Link
+          href={`/dashboard/devices/${device.id}`}
+          className="bg-white text-sm text-orange-500 rounded-md p-1"
+        >
+          View Details
+        </Link>
 
         <motion.svg
           animate={{ rotate: isExpanded ? 180 : 0 }}
