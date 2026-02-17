@@ -50,8 +50,7 @@ export const useWebSocket = ({
   const getWebSocketUrl = () => {
     // Use environment variable for backend URL
     const backendUrl =
-      process.env.NEXT_PUBLIC_HARDWARE_APP_BASE_URL ||
-      "http://51.21.191.215:5000";
+      process.env.NEXT_PUBLIC_HARDWARE_APP_BASE_URL || "http://localhost:5000";
 
     // Convert HTTP/HTTPS URL to WebSocket URL securely
     const isLocalhost =
@@ -152,7 +151,7 @@ export const useWebSocket = ({
               ? 1000
               : Math.min(1000 * Math.pow(2, reconnectAttempts), 10000);
           setError(
-            `Reconnecting in ${timeout}ms (attempt ${reconnectAttempts + 1}/3)`
+            `Reconnecting in ${timeout}ms (attempt ${reconnectAttempts + 1}/3)`,
           );
 
           reconnectTimeoutRef.current = setTimeout(() => {
@@ -211,6 +210,28 @@ export const useWebSocket = ({
       deviceId: targetDeviceId || deviceId,
     });
   };
+
+  // Log sent data for debugging
+  console.log("WebSocket sendMessage:", {
+    deviceId,
+    sessionUserId: session?.user?.id,
+    sessionOrganizationId: session?.user?.organizationId,
+  });
+
+  console.log("WebSocket send data:", {
+    isConnected,
+    cacheReady,
+    error,
+    sendMessage,
+    ping,
+    initializeCache,
+    refreshDevice,
+    reconnect: connect,
+    stats: {
+      reconnectAttempts,
+      maxReconnectAttempts: 3, // Reduced max attempts
+    },
+  });
 
   return {
     isConnected,

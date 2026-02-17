@@ -153,6 +153,8 @@ const NewDeviceModal = () => {
             justifyContent: "space-around",
             gap: 4,
             p: 4,
+            borderRadius: 2,
+            boxShadow: 3,
           }}
         >
           {/* From Channel */}

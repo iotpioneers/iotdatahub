@@ -109,6 +109,7 @@ const AddDeviceFormComponent: React.FC = () => {
 
       router.push(`/dashboard/devices/${data.id}/edit`);
       // Set loading to true for 5 seconds to allow the new device page to load properly
+      setTimeout(() => setLoading(false), 5000);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unknown error occurred",
@@ -159,7 +160,7 @@ const AddDeviceFormComponent: React.FC = () => {
   }
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
+    <Card className="w-full max-w-4xl mx-auto rounded-lg">
       <CardContent className="p-6">
         <div className="flex items-center gap-2 mb-10">
           <Typography variant="h4">

@@ -45,10 +45,6 @@ const connectionOptions = ["WiFi", "Ethernet", "Satellite", "GSM"];
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Name is required"),
   description: Yup.string().optional(),
-  fields: Yup.array()
-    .of(Yup.string().required("Field cannot be empty"))
-    .min(1, "At least one field is required")
-    .max(6, "Maximum 6 fields allowed"),
   connectionType: Yup.string().required("Connection type is required"),
   hardware: Yup.string().required("Hardware is required"),
 });
@@ -129,7 +125,7 @@ export default function AddNewChannelModal({
 
       toast.toast({
         type: "success",
-        message: "Channel created successfully",
+        message: "Channel created successfully, redirecting to devices ...",
       });
 
       router.push(`/dashboard/devices`);
@@ -204,7 +200,7 @@ export default function AddNewChannelModal({
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white shadow shadow-black">
                         {hardwareOptions.map((option) => (
                           <SelectItem key={option} value={option}>
                             {option}
@@ -225,7 +221,7 @@ export default function AddNewChannelModal({
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white shadow shadow-black">
                         {connectionOptions.map((option) => (
                           <SelectItem key={option} value={option}>
                             {option}

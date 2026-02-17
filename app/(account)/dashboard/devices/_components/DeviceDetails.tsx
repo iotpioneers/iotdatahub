@@ -14,6 +14,7 @@ import Link from "next/link";
 import WidgetGrid from "@/components/Channels/dashboard/widgets/WidgetGrid";
 import type { WebSocketMessage } from "@/types/websocket";
 import { useRouter } from "next/navigation";
+import { update } from "react-spring";
 
 interface Props {
   params: { id: string };
@@ -131,6 +132,7 @@ const DeviceDetails = ({ params }: Props) => {
             setDeviceOnlineStatus("OFFLINE");
           } else {
             console.log("[Status] Recent data found, staying ONLINE");
+            setDeviceOnlineStatus("ONLINE");
           }
 
           statusLockRef.current = false;
@@ -256,6 +258,7 @@ const DeviceDetails = ({ params }: Props) => {
 
           case "WIDGET_UPDATE":
             setWidgetData(message.data.widgets);
+            updateDeviceStatus("ONLINE", "WIDGET_UPDATE");
             break;
 
           case "DEVICE_STATUS":
@@ -292,9 +295,11 @@ const DeviceDetails = ({ params }: Props) => {
             if (message.data.widgets) {
               setWidgetData(message.data.widgets);
             }
+            updateDeviceStatus("ONLINE", "DEVICE_REFRESH");
             break;
 
           case "CACHE_INITIALIZED":
+            updateDeviceStatus("ONLINE", "CACHE_INITIALIZED");
             break;
         }
       }
@@ -307,6 +312,10 @@ const DeviceDetails = ({ params }: Props) => {
     onMessage: handleWebSocketMessage,
     enabled: !!session && status === "authenticated",
   });
+
+  if (isConnected) {
+    updateDeviceStatus("ONLINE", "WebSocket Connected");
+  }
 
   useEffect(() => {
     if (deviceData) setDevice(deviceData);
@@ -439,6 +448,8 @@ const DeviceDetails = ({ params }: Props) => {
   };
 
   const connectionStatus = getConnectionStatus();
+
+  console.log("Received status:---", connectionStatus);
 
   // NEW: Improved device status display with real-time data checking
   const getDeviceStatusDisplay = () => {
