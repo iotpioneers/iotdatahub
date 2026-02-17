@@ -28,6 +28,27 @@ export async function GET(
       return NextResponse.json({ error: "Device not found" }, { status: 404 });
     }
 
+    // Check recent data activity from PinHistory
+    const recentData = await prisma.pinHistory.findFirst({
+      where: { deviceId: params.id },
+      orderBy: { timestamp: "desc" },
+      select: { timestamp: true },
+    });
+
+    // Update status based on recent data (within 30 seconds = ONLINE)
+    if (recentData) {
+      const timeSinceData = Date.now() - new Date(recentData.timestamp).getTime();
+      const computedStatus = timeSinceData < 30000 ? "ONLINE" : "OFFLINE";
+      
+      if (device.status !== computedStatus) {
+        await prisma.device.update({
+          where: { id: params.id },
+          data: { status: computedStatus },
+        });
+        device.status = computedStatus;
+      }
+    }
+
     return NextResponse.json(device);
   } catch (error) {
     return NextResponse.json(

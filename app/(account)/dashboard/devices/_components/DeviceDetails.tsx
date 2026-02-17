@@ -338,21 +338,17 @@ const DeviceDetails = ({ params }: Props) => {
     checkRecentDataActivity();
   }, [params.id]);
 
-  // NEW: Periodic check for data activity every 5 seconds (only when not connected to WebSocket)
+  // NEW: Periodic check for data activity every 3 seconds
   useEffect(() => {
-    if (isConnected && cacheReady) {
-      // WebSocket is handling data - don't poll
-      return;
-    }
-
-    const interval = setInterval(() => {
-      if (!statusLockRef.current) {
-        checkRecentDataActivity();
+    const interval = setInterval(async () => {
+      const hasRecent = await checkRecentDataActivity();
+      if (hasRecent) {
+        updateDeviceStatus("ONLINE", "Periodic Check");
       }
-    }, 5000);
+    }, 3000);
 
     return () => clearInterval(interval);
-  }, [isConnected, cacheReady, params.id]);
+  }, [checkRecentDataActivity, updateDeviceStatus]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -456,14 +452,10 @@ const DeviceDetails = ({ params }: Props) => {
     if (!device)
       return { icon: HiStatusOffline, color: "text-gray-500", text: "Unknown" };
 
-    // Use our managed status instead of database status
-    const isActuallyOnline = deviceOnlineStatus === "ONLINE";
-
-    // Additional check: if we have recent data activity, prioritize that
+    // Priority 1: Recent data activity (last 10 seconds)
     if (lastDataActivity) {
       const timeSinceLastData = Date.now() - lastDataActivity.getTime();
       if (timeSinceLastData < 10000) {
-        // Data within last 10 seconds
         return {
           icon: HiStatusOnline,
           color: "text-green-500",
@@ -472,19 +464,29 @@ const DeviceDetails = ({ params }: Props) => {
       }
     }
 
-    if (isActuallyOnline) {
+    // Priority 2: WebSocket connection status
+    if (isConnected && cacheReady && deviceOnlineStatus === "ONLINE") {
       return {
         icon: HiStatusOnline,
         color: "text-green-500",
         text: "ONLINE",
       };
-    } else {
+    }
+
+    // Priority 3: Database status from API
+    if (device.status === "ONLINE") {
       return {
-        icon: HiStatusOffline,
-        color: "text-red-500",
-        text: "OFFLINE",
+        icon: HiStatusOnline,
+        color: "text-green-500",
+        text: "ONLINE",
       };
     }
+
+    return {
+      icon: HiStatusOffline,
+      color: "text-red-500",
+      text: "OFFLINE",
+    };
   };
 
   const deviceStatusDisplay = getDeviceStatusDisplay();
