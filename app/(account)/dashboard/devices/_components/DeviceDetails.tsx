@@ -313,10 +313,6 @@ const DeviceDetails = ({ params }: Props) => {
     enabled: !!session && status === "authenticated",
   });
 
-  if (isConnected) {
-    updateDeviceStatus("ONLINE", "WebSocket Connected");
-  }
-
   useEffect(() => {
     if (deviceData) setDevice(deviceData);
     if (organizationData) setOrganization(organizationData);
@@ -338,17 +334,14 @@ const DeviceDetails = ({ params }: Props) => {
     checkRecentDataActivity();
   }, [params.id]);
 
-  // NEW: Periodic check for data activity every 3 seconds
+  // NEW: Periodic check for data activity every 5 seconds
   useEffect(() => {
     const interval = setInterval(async () => {
-      const hasRecent = await checkRecentDataActivity();
-      if (hasRecent) {
-        updateDeviceStatus("ONLINE", "Periodic Check");
-      }
-    }, 3000);
+      await checkRecentDataActivity();
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, [checkRecentDataActivity, updateDeviceStatus]);
+  }, [params.id]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
