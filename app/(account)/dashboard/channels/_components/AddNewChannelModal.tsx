@@ -97,7 +97,7 @@ export default function AddNewChannelModal({
           ...values,
           organizationId: currentOrganization!.id,
         }),
-        { revalidate: true }
+        { revalidate: true },
       );
 
       if (!result || "error" in result) {
@@ -235,61 +235,6 @@ export default function AddNewChannelModal({
                     </Select>
                   </div>
                 </div>
-
-                <FieldArray name="fields">
-                  {({ remove, push }) => (
-                    <div className="space-y-4">
-                      <Label>Fields</Label>
-                      {values.fields.map((field, index) => (
-                        <div key={index} className="flex items-center gap-2">
-                          <div className="flex-1 space-y-1">
-                            <Input
-                              name={`fields.${index}`}
-                              value={field}
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                              placeholder={`Field ${index + 1}`}
-                              className={
-                                Array.isArray(errors.fields) &&
-                                Array.isArray(touched.fields) &&
-                                errors.fields[index] &&
-                                touched.fields[index]
-                                  ? "border-red-500"
-                                  : ""
-                              }
-                            />
-                            {touched.fields &&
-                              Array.isArray(touched.fields) &&
-                              touched.fields[index] &&
-                              errors.fields?.[index] && (
-                                <p className="text-sm text-red-500">
-                                  {errors.fields[index]}
-                                </p>
-                              )}
-                          </div>
-                          {index !== 0 && (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => remove(index)}
-                            >
-                              <ArchiveBoxXMarkIcon className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                      ))}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => values.fields.length < 6 && push("")}
-                        disabled={values.fields.length >= 6}
-                      >
-                        Add Field
-                      </Button>
-                    </div>
-                  )}
-                </FieldArray>
 
                 <div className="space-y-2">
                   <Label htmlFor="description">Description</Label>
