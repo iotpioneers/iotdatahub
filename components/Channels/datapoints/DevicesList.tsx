@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Device, WidgetData, PaginationInfo } from "./channel-types";
 import DeviceCard from "./DeviceCard";
 import Pagination from "./Pagination";
+import Link from "next/link";
 
 interface DevicesListProps {
   devices: Device[];
@@ -161,14 +162,16 @@ export default function DevicesList({
         <>
           <div className="space-y-3">
             {filteredDevices.map((device: Device, i: number) => (
-              <DeviceCard
-                key={device.id}
-                device={device}
-                index={i}
-                isExpanded={expandedDevices.has(device.id)}
-                onToggle={() => handleToggleDevice(device.id)}
-                widgetData={widgetData}
-              />
+              <Link href={`/dashboard/devices/${device.id}`}>
+                <DeviceCard
+                  key={device.id}
+                  device={device}
+                  index={i}
+                  isExpanded={expandedDevices.has(device.id)}
+                  onToggle={() => handleToggleDevice(device.id)}
+                  widgetData={widgetData}
+                />
+              </Link>
             ))}
           </div>
 

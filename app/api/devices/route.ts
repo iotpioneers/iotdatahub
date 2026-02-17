@@ -154,6 +154,30 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    for (const device of devices) {
+      // Check recent data activity from PinHistory
+      const recentData = await prisma.pinHistory.findFirst({
+        where: { deviceId: device.id },
+        orderBy: { timestamp: "desc" },
+        select: { timestamp: true },
+      });
+
+      // Update status based on recent data (within 30 seconds = ONLINE)
+      if (recentData) {
+        const timeSinceData =
+          Date.now() - new Date(recentData.timestamp).getTime();
+        const computedStatus = timeSinceData < 30000 ? "ONLINE" : "OFFLINE";
+
+        if (device.status !== computedStatus) {
+          await prisma.device.update({
+            where: { id: device.id },
+            data: { status: computedStatus },
+          });
+          device.status = computedStatus;
+        }
+      }
+    }
+
     return NextResponse.json(devices);
   } catch (error) {
     return NextResponse.json(
